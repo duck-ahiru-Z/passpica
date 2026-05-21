@@ -245,8 +245,9 @@ export default function PseudoLangPage() {
         generatorRef.current = null;
         setCurrentLine(null);
       } else {
-        setCurrentLine(res.value.line);
-        setVariables(res.value.getVars());
+        const val = res.value as any;
+        setCurrentLine(val.line);
+        setVariables(val.getVars());
       }
     } catch (err: any) {
       setError(`実行エラー: ${err.message}`);
