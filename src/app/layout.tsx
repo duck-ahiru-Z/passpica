@@ -1,28 +1,35 @@
 import type { Metadata } from "next";
+import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
-// 今作った部品を読み込む
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 
-// サイト全体のタイトルや説明（SEO対策やSNSシェア時に使われます）
+// Noto Sans JP の設定
+const notoSansJP = Noto_Sans_JP({
+  subsets: ["latin"],
+  weight: ["400", "500", "700"],
+  display: "swap",
+  variable: "--font-noto-sans-jp", // CSS変数として登録
+});
+
 export const metadata: Metadata = {
-  title: "Passpica",
-  description: "受験生のための最強対策まとめ＆ツールサイト",
+  title: "passpica | 志望校合格への最短ルート",
+  description: "受験生のための最強対策まとめ＆ツールサイト。共通テストから総合型選抜までサポート。",
 };
 
 export default function RootLayout({
-  children, // ← この children に、各ページ（記事一覧など）の中身が入ってきます
+  children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja">
-      {/* min-h-screen で「最低でも画面の高さいっぱい」にし、flex-col で縦並びにします */}
-      <body className="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
+    // htmlタグにフォントの変数を適用
+    <html lang="ja" className={`${notoSansJP.variable}`}>
+      {/* 背景をほんのり温かいグレーにし、文字色を真っ黒ではなくスレート（濃いグレー）にして目の負担を軽減 */}
+      <body className="flex flex-col min-h-screen bg-[#FAFAFA] text-slate-800 font-sans selection:bg-brand-200">
         <Header />
         
-        {/* メインコンテンツ部分。flex-grow で「余ったスペースをすべて埋める」ようにします */}
-        <main className="flex-grow py-8">
+        <main className="flex-grow">
           {children}
         </main>
 
