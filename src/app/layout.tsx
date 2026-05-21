@@ -6,8 +6,8 @@ import Footer from "../components/layout/Footer";
 
 // サイト全体のタイトルや説明（SEO対策やSNSシェア時に使われます）
 export const metadata: Metadata = {
-  title: "しろねこプロジェクト",
-  description: "みんなで作る、受験生のための最強対策まとめ＆ツールサイト",
+  title: "Passpica",
+  description: "受験生のための最強対策まとめ＆ツールサイト",
 };
 
 export default function RootLayout({

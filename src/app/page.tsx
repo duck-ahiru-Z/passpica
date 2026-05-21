@@ -1,65 +1,69 @@
-import Image from "next/image";
+import Link from 'next/link';
 
-export default function Home() {
+export default function HomePage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="font-sans">
+      
+      {/* ヒーローセクション（一番目立つ上部） */}
+      <section className="bg-gradient-to-b from-blue-50 to-white py-20 px-4 text-center">
+        <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 tracking-tight">
+          志望校合格への<br className="md:hidden" />最短ルート。
+        </h1>
+        <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-2xl mx-auto leading-relaxed">
+          共通テスト、二次試験、そして総合型選抜まで。
+          <strong className="text-blue-600">passpica（パスピカ）</strong>は、現代の受験生に必要なすべての知識とツールを無料で提供します。
+        </p>
+        
+        {/* いま一番のキラーコンテンツへの導線 */}
+        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-xl border border-gray-100 max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-2 h-full bg-blue-600"></div>
+          <div className="text-left">
+            <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full mb-2 inline-block">NEW! 完成しました</span>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">情報I 共通テスト シミュレーター</h2>
+            <p className="text-sm text-gray-600">令和7年度からの新DNCL（Python風表記）に完全対応。ブラウザ上でコードを書いてステップ実行できます。</p>
+          </div>
+          <Link href="/tools/pseudo-lang" className="shrink-0 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition-all shadow-md hover:shadow-lg transform hover:-translate-y-1">
+            今すぐ使ってみる
+          </Link>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </section>
+
+      {/* メインカテゴリのカード群 */}
+      <section className="py-16 px-4 max-w-7xl mx-auto">
+        <h2 className="text-2xl font-bold text-center mb-12 text-gray-800">あなたに必要な対策は？</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          
+          {/* 共通テスト */}
+          <Link href="/common-test" className="group block bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative overflow-hidden">
+            <div className="w-12 h-12 bg-green-100 text-green-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">📝</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">共通テスト対策</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              各科目の傾向と対策、目標点数別の勉強法、過去問の活用法など、マーク式試験を攻略するための戦略をまとめました。
+            </p>
+          </Link>
+
+          {/* 二次試験 */}
+          <Link href="/secondary-exam" className="group block bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative overflow-hidden">
+            <div className="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">🎯</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">二次試験対策</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              難関国公立・私立大学に向けた記述力の養成。科目別の深い理解と、本番で1点でも多くもぎ取るための解答テクニック。
+            </p>
+          </Link>
+
+          {/* 総合型選抜 */}
+          <Link href="/comprehensive" className="group block bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl transition-all relative overflow-hidden">
+            <div className="w-12 h-12 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">✨</div>
+            <h3 className="text-xl font-bold text-gray-900 mb-3">総合型選抜（AO）</h3>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              志望理由書の書き方、面接・小論文対策、ポートフォリオの作り方など、あなたの熱意を大学に伝えるためのノウハウ。
+            </p>
+          </Link>
+
         </div>
-      </main>
+      </section>
+
     </div>
   );
 }

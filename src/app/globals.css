@@ -2,6 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+
 /* --- src/app/globals.css の一番下に追加 --- */
 
 /* プロ向けエディタ風のカスタムスクロールバー */
