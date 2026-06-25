@@ -1,79 +1,260 @@
+"use client";
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+interface TodoItem {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
 export default function HomePage() {
+  // --- 共通テストカウントダウン計算 ---
+  const [daysLeft, setDaysLeft] = useState<number>(0);
+
+  useEffect(() => {
+    const targetDate = new Date('2027-01-16T09:00:00+09:00'); // 2027年共通テスト初日
+    const calculateCountdown = () => {
+      const now = new Date();
+      const diffTime = targetDate.getTime() - now.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      setDaysLeft(diffDays > 0 ? diffDays : 0);
+    };
+
+    calculateCountdown();
+    const timer = setInterval(calculateCountdown, 3600000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // --- ToDoリスト状態管理 ---
+  const [todos, setTodos] = useState<TodoItem[]>([]);
+  const [newTodoText, setNewTodoText] = useState('');
+
+  // ローカルストレージからToDoの読み込み
+  useEffect(() => {
+    const saved = localStorage.getItem('passpica_dashboard_todos');
+    if (saved) {
+      try {
+        setTodos(JSON.parse(saved));
+      } catch (e) {
+        console.error(e);
+      }
+    } else {
+      const defaultTodos = [
+        { id: '1', text: '時間割予定表で今週の勉強コマを組む', completed: false },
+        { id: '2', text: '化学・炎色反応の語呂合わせを確認する', completed: false },
+        { id: '3', text: '数学・三角比の座標変化を復習する', completed: false }
+      ];
+      setTodos(defaultTodos);
+      localStorage.setItem('passpica_dashboard_todos', JSON.stringify(defaultTodos));
+    }
+  }, []);
+
+  // ToDo保存
+  const saveTodos = (updatedTodos: TodoItem[]) => {
+    setTodos(updatedTodos);
+    localStorage.setItem('passpica_dashboard_todos', JSON.stringify(updatedTodos));
+  };
+
+  // ToDo追加
+  const addTodo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTodoText.trim()) return;
+    const newTodo: TodoItem = {
+      id: Date.now().toString(),
+      text: newTodoText.trim(),
+      completed: false
+    };
+    saveTodos([...todos, newTodo]);
+    setNewTodoText('');
+  };
+
+  // ToDo切り替え
+  const toggleTodo = (id: string) => {
+    const updated = todos.map(todo => 
+      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    saveTodos(updated);
+  };
+
+  // ToDo削除
+  const deleteTodo = (id: string) => {
+    const updated = todos.filter(todo => todo.id !== id);
+    saveTodos(updated);
+  };
+
   return (
-    <div className="font-sans">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-8">
       
-      {/* ヒーローセクション（上品な余白と柔らかい影） */}
-      <section className="pt-24 pb-20 px-4 text-center">
-        <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-6 tracking-tight leading-tight">
-          志望校合格への<br className="md:hidden" />最短ルート。
+      {/* ウェルカムバナー */}
+      <div className="border border-gray-400 bg-gray-50 p-6">
+        <h1 className="text-xl md:text-2xl font-bold mb-2 text-slate-900">
+          ようこそ、passpica 自習室へ
         </h1>
-        <p className="text-lg md:text-xl text-slate-600 mb-12 max-w-2xl mx-auto leading-relaxed">
-          共通テスト、二次試験、そして総合型選抜まで。<br className="hidden md:block" />
-          <strong className="text-brand-600 font-bold">passpica</strong> は、現代の受験生に必要な<br className="hidden md:block" />知識とツールを無料で提供します。
+        <p className="text-xs text-gray-600 leading-relaxed max-w-3xl">
+          当サイトは、大学受験生が自習の合間に利用できるWebツール（勉強スケジュール作成、重要項目のビジュアル理解シミュレータ）を提供する個人運営の学習室サイトです。PC・スマートフォンどちらのブラウザでも軽快に動作します。
         </p>
+      </div>
+
+      {/* カウントダウン看板 */}
+      <div className="border border-red-300 bg-red-50/40 p-4 text-center">
+        <span className="text-xs font-bold text-red-600 block mb-1">【大学入学共通テスト カウントダウン】</span>
+        <div className="text-xl md:text-2xl font-bold text-slate-800 font-mono tracking-wide">
+          共通テスト本番まで あと <span className="text-red-600 text-3xl font-extrabold">{daysLeft}</span> 日
+        </div>
+        <span className="text-[10px] text-gray-500 block mt-1">試験日程：2027年1月16日・17日</span>
+      </div>
+
+      {/* 2カラム構成のメインコンテンツ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* キラーコンテンツへの導線（柔らかいデザイン） */}
-        <div className="bg-white p-6 md:p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100 max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden group hover:border-brand-200 transition-colors">
-          <div className="absolute top-0 left-0 w-1.5 h-full bg-brand-500"></div>
-          <div className="text-left">
-            <span className="bg-brand-50 text-brand-700 border border-brand-200 text-xs font-bold px-3 py-1 rounded-full mb-3 inline-block">
-              NEW! 完成しました
-            </span>
-            <h2 className="text-2xl font-bold text-slate-800 mb-2 group-hover:text-brand-600 transition-colors">情報I 共通テスト シミュレーター</h2>
-            <p className="text-sm text-slate-500 leading-relaxed">令和7年度からの新DNCL（Python風表記）に完全対応。ブラウザ上でコードを書いてステップ実行できます。</p>
+        {/* 左カラム：学習室コンテンツ一覧 (2/3) */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="retro-box">
+            <h2 className="text-sm font-bold border-b border-gray-300 pb-1.5 mb-4 flex items-center gap-1">
+              <span>■</span> 学習室の設置教材（解説＆シミュレータ）
+            </h2>
+            
+            <div className="space-y-6 text-xs leading-relaxed">
+              
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-rose-100 border border-rose-300 text-rose-800 px-1 py-0.5 rounded">数学I・A</span>
+                  <Link href="/learn/math/trigonometry">三角比（単位円）ビジュアル図解</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  角度θの値を変化させたときの、sin, cos, tan の長さの変化を動的に確認できる幾何学シミュレータです。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-purple-100 border border-purple-300 text-purple-800 px-1 py-0.5 rounded">化学基礎</span>
+                  <Link href="/learn/chemistry/flame-reaction">炎色反応ビジュアルシミュレーター</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  金属塩類のボトルの選択に応じて、炎の色の変化を視覚的に観察できます。暗記用の有名な語呂合わせも掲載。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-purple-100 border border-purple-300 text-purple-800 px-1 py-0.5 rounded">化学基礎</span>
+                  <Link href="/learn/chemistry/acid-base">指示薬・pH中和滴定シミュレーター</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  pHの強弱スライダーを操作し、主要なpH指示薬（フェノールフタレイン等）の色調変化を確認します。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-blue-100 border border-blue-300 text-blue-800 px-1 py-0.5 rounded">情報I</span>
+                  <Link href="/learn/information/pseudo-lang">共通テスト擬似言語（DNCL）エディタ</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  共通テストのプログラミング問題で使われる擬似言語（新DNCL）をブラウザ上で実行し、ステップ確認できます。
+                </p>
+              </div>
+
+            </div>
           </div>
-          <Link href="/tools/pseudo-lang" className="shrink-0 bg-slate-900 hover:bg-brand-500 text-white font-bold py-3.5 px-8 rounded-full transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5">
-            今すぐ使ってみる
-          </Link>
-        </div>
-      </section>
 
-      {/* メインカテゴリのカード群 */}
-      <section className="py-16 px-4 max-w-6xl mx-auto border-t border-slate-100">
-        <div className="text-center mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-slate-800 tracking-tight">あなたに必要な対策は？</h2>
-          <div className="w-12 h-1 bg-brand-400 mx-auto mt-4 rounded-full"></div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
-          
-          {/* 共通テスト */}
-          <Link href="/common-test" className="group bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all flex flex-col">
-            <div className="w-12 h-12 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+          {/* クイックツール案内 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <div className="border border-gray-300 p-4 bg-gray-50/50">
+              <h3 className="font-bold text-xs mb-2 text-slate-800 flex items-center gap-1">
+                <span>■</span> <Link href="/tools/schedule">時間割予定表（勉強枠の作成）</Link>
+              </h3>
+              <p className="text-xs text-gray-500 leading-normal">
+                1週間の自習スケジュールを1時限〜6時限の時間割形式で埋めて、ブラウザに保存・管理できます。
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-brand-600 transition-colors">共通テスト対策</h3>
-            <p className="text-slate-500 text-sm leading-relaxed flex-grow">
-              各科目の傾向と対策、目標点数別の勉強法、過去問の活用法など、マーク式試験を攻略するための戦略。
-            </p>
-          </Link>
 
-          {/* 二次試験 */}
-          <Link href="/secondary-exam" className="group bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all flex flex-col">
-            <div className="w-12 h-12 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 4a2 2 0 114 0v1a1 1 0 001 1h3a1 1 0 011 1v3a1 1 0 01-1 1h-1a2 2 0 100 4h1a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-1a2 2 0 10-4 0v1a1 1 0 01-1 1H7a1 1 0 01-1-1v-3a1 1 0 00-1-1H4a2 2 0 110-4h1a1 1 0 001-1V7a1 1 0 011-1h3a1 1 0 001-1V4z"></path></svg>
+            <div className="border border-gray-300 p-4 bg-gray-50/50">
+              <h3 className="font-bold text-xs mb-2 text-slate-800 flex items-center gap-1">
+                <span>■</span> <Link href="/tools/calendar">受験カレンダー（日程メモ）</Link>
+              </h3>
+              <p className="text-xs text-gray-500 leading-normal">
+                共通テストの重要日程の確認と、各自で受ける外部模試や私立大出願期日をカレンダーに登録します。
+              </p>
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-brand-600 transition-colors">二次試験対策</h3>
-            <p className="text-slate-500 text-sm leading-relaxed flex-grow">
-              難関国公立・私立大学に向けた記述力の養成。科目別の深い理解と、本番で1点でも多くもぎ取るための解答テクニック。
-            </p>
-          </Link>
 
-          {/* 総合型選抜 */}
-          <Link href="/comprehensive" className="group bg-white rounded-2xl p-8 shadow-sm border border-slate-100 hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] transition-all flex flex-col">
-            <div className="w-12 h-12 bg-slate-50 text-slate-600 rounded-xl flex items-center justify-center mb-6 group-hover:bg-brand-50 group-hover:text-brand-600 transition-colors">
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path></svg>
-            </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-3 group-hover:text-brand-600 transition-colors">総合型選抜（AO）</h3>
-            <p className="text-slate-500 text-sm leading-relaxed flex-grow">
-              志望理由書の書き方、面接・小論文対策、ポートフォリオの作り方など、あなたの熱意を大学に伝えるためのノウハウ。
-            </p>
-          </Link>
-
+          </div>
         </div>
-      </section>
+
+        {/* 右カラム：ToDoリスト (1/3) */}
+        <div className="col-span-1">
+          <div className="retro-box space-y-4">
+            
+            <div className="border-b border-gray-300 pb-2">
+              <h2 className="text-sm font-bold text-slate-800 flex items-center gap-1">
+                <span>■</span> 今日の自習ToDo
+              </h2>
+              <span className="text-[10px] text-gray-400 block mt-0.5">※ブラウザ（端末）に自動保存されます</span>
+            </div>
+
+            {/* ToDoフォーム */}
+            <form onSubmit={addTodo} className="flex gap-2">
+              <input
+                type="text"
+                value={newTodoText}
+                onChange={(e) => setNewTodoText(e.target.value)}
+                placeholder="例: 青チャート数学IA P10"
+                className="flex-grow retro-input"
+              />
+              <button type="submit" className="retro-btn-classic shrink-0 font-bold">
+                追加
+              </button>
+            </form>
+
+            {/* ToDoリスト */}
+            <ul className="space-y-2 text-xs">
+              {todos.map(todo => (
+                <li 
+                  key={todo.id}
+                  className="flex items-start justify-between gap-2 p-2 bg-gray-50 border border-gray-200"
+                >
+                  <label className="flex items-start gap-2 cursor-pointer flex-grow min-w-0">
+                    <input
+                      type="checkbox"
+                      checked={todo.completed}
+                      onChange={() => toggleTodo(todo.id)}
+                      className="mt-0.5 shrink-0"
+                    />
+                    <span className={`break-words ${todo.completed ? 'line-through text-gray-400' : 'text-slate-700'}`}>
+                      {todo.text}
+                    </span>
+                  </label>
+                  <button
+                    onClick={() => deleteTodo(todo.id)}
+                    className="text-[10px] text-red-500 hover:text-red-700 font-bold px-1"
+                    title="削除"
+                  >
+                    削除
+                  </button>
+                </li>
+              ))}
+              {todos.length === 0 && (
+                <div className="text-center py-6 text-gray-400 italic">
+                  登録されているやることがありません。
+                </div>
+              )}
+            </ul>
+
+            {/* 統計表示 */}
+            {todos.length > 0 && (
+              <div className="text-[10px] text-gray-500 text-right pt-2 border-t border-dashed border-gray-200">
+                状況: {todos.filter(t => t.completed).length} / {todos.length} 完了
+              </div>
+            )}
+
+          </div>
+        </div>
+
+      </div>
 
     </div>
   );
