@@ -1,13 +1,13 @@
-export type TargetGrade = '高1' | '高2' | '高3・高卒';
+export type TargetGrade = '中3' |'高1' | '高2' | '高3・高卒';
 export type ExamCategory = 'national' | 'mock' | 'custom';
-export type ProviderType = '河合塾' | '駿台' | '東進' | '代ゼミ' | '進研模試' | 'その他';
+export type ProviderType = '河合塾' | '駿台' | '東進' | '代ゼミ' | 'その他';
 
 // 冠模試の対象大学（固定・統一用）
 export type TargetUniversity = 
   | '東京大学' | '京都大学' | '北海道大学' | '東北大学' 
   | '名古屋大学' | '大阪大学' | '九州大学' 
   | '東京工業大学' | '東京科学大学' | '一橋大学' | '神戸大学' 
-  | '早稲田大学' | '慶應義塾大学' | 'その他';
+  | '早稲田大学' | '慶應義塾大学' | '千葉大学' | '広島大学' | 'その他';
 
 export type EventBadge = '申込開始' | '申込締切' | '試験日' | '成績返却' | '公式' | '自分';
 

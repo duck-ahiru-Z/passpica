@@ -13,7 +13,7 @@ import {
 const UNIVERSITIES: TargetUniversity[] = [
   '東京大学', '京都大学', '北海道大学', '東北大学', 
   '名古屋大学', '大阪大学', '九州大学', '東京工業大学', '東京科学大学',
-  '一橋大学', '神戸大学', '早稲田大学', '慶應義塾大学', 'その他'
+  '一橋大学', '神戸大学', '千葉大学', '広島大学', '早稲田大学', '慶應義塾大学', 'その他'
 ];
 
 export default function CalendarPage() {
@@ -476,6 +476,42 @@ export default function CalendarPage() {
               </button>
 
             </form>
+          </div>
+
+          {/* 公式サイトへのリンク集 */}
+          <div className="retro-box space-y-3">
+            <h3 className="font-bold border-b border-gray-300 pb-1.5 text-slate-800">
+              ■ 各予備校の公式サイト
+            </h3>
+            <p className="text-[10px] text-gray-500 mb-2 leading-relaxed">
+              最新の正確な日程や申込方法については、必ず各予備校の公式サイトをご確認ください。
+            </p>
+            <ul className="space-y-2 text-[11px]">
+              <li>
+                <a href="https://www.kawai-juku.ac.jp/zento/pdf/schedule-2026.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                  <span>河合塾 全統模試スケジュール</span>
+                  <span className="text-[8px] text-gray-400">🔗</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www2.sundai.ac.jp/teacher/assets/pdf/2026-schedule.pdf" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                  <span>駿台模試 年間スケジュール</span>
+                  <span className="text-[8px] text-gray-400">🔗</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.toshin-moshi.com/schedules/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                  <span>東進 模試スケジュール</span>
+                  <span className="text-[8px] text-gray-400">🔗</span>
+                </a>
+              </li>
+              <li>
+                <a href="https://www.yozemi.ac.jp/moshi/schedule/" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center gap-1">
+                  <span>代ゼミ 模試・テストスケジュール</span>
+                  <span className="text-[8px] text-gray-400">🔗</span>
+                </a>
+              </li>
+            </ul>
           </div>
 
         </div>

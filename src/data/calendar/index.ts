@@ -4,7 +4,6 @@ import { kawaiEvents } from './kawai';
 import { sundaiEvents } from './sundai';
 import { toshinEvents } from './toshin';
 import { yozemiEvents } from './yozemi';
-import { benesseEvents } from './benesse';
 
 export * from './types';
 
@@ -15,5 +14,4 @@ export const MOCK_MASTER_DATA: MockExamData[] = [
   ...sundaiEvents,
   ...toshinEvents,
   ...yozemiEvents,
-  ...benesseEvents,
 ];
