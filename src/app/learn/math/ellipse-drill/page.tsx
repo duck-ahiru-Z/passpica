@@ -113,7 +113,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let strD = D > 0 ? `+${D}y` : (D < 0 ? `${D}y` : "");
       let strE = E > 0 ? `+${E}` : (E < 0 ? `${E}` : "");
       
-      let qStr = `${strA}x^2 ${strB} ${strC} ${strD} ${strE} = 0 \\quad \\text{の中心の座標 } (p, q) \\text{ を求めよ。}`;
+      let qStr = `$${strA}x^2 ${strB} ${strC} ${strD} ${strE} = 0$ の中心の座標 $(p, q)$ を求めよ。`;
       
       let expLines = [
         `\\text{平方完成を行って基本形に変形します。}`,
@@ -135,7 +135,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let a2 = a*a;
       let b2 = b*b;
       
-      let qStr = `2点 $(${c}, 0), (-${c}, 0)$ からの距離の和が ${2*a} である楕円の方程式を $\\frac{x^2}{A} + \\frac{y^2}{B} = 1$ とするとき、$A, B$ の値を求めよ。`;
+      let qStr = `2点 $(${c}, 0), (-${c}, 0)$ からの距離の和が $${2*a}$ である楕円の方程式を $\\frac{x^2}{A} + \\frac{y^2}{B} = 1$ とするとき、$A, B$ の値を求めよ。`;
       
       let expLines = [
         `\\text{焦点が } x \\text{ 軸上にあり、中心が原点であるため、求める楕円の方程式は}`,
@@ -330,7 +330,11 @@ export default function EllipseDrill() {
             </div>
 
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed">
-              <MathEq math={problem.qStr} />
+              <div>
+                {problem.qStr.split('$').map((part, i) => 
+                  i % 2 === 1 ? <MathEq key={i} math={part} /> : <span key={i}>{part}</span>
+                )}
+              </div>
             </div>
             
             <div className="space-y-4">

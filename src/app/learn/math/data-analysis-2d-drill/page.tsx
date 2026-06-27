@@ -88,7 +88,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       for (let i = 0; i < 5; i++) sumProd += (dataX[i] - meanX) * (dataY[i] - meanY);
       let cov = sumProd / 5;
       
-      let qStr = `次の2つの変量 $x, y$ のデータについて、共分散 $s_{xy}$ を求めよ。\n\n$x$: ${dataX.join(', ')}\n$y$: ${dataY.join(', ')}`;
+      let qStr = `次の2つの変量 $x, y$ のデータについて、共分散 $s_{xy}$ を求めよ。\n\n$x$: $${dataX.join(', ')}$\n$y$: $${dataY.join(', ')}$`;
       
       let expLines = [
         `\\text{平均値 } \\bar{x} = ${meanX}, \\quad \\bar{y} = ${meanY}`,
@@ -121,7 +121,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let sumSqY = dataY.reduce((a,b)=>a+Math.pow(b-meanY, 2), 0);
       let sumProd = dataX.reduce((a,b,i)=>a+(b-meanX)*(dataY[i]-meanY), 0);
       
-      let qStr = `次のデータについて、相関係数 $r$ を求めよ。\n\n$x$: ${dataX.join(', ')}\n$y$: ${dataY.join(', ')}`;
+      let qStr = `次のデータについて、相関係数 $r$ を求めよ。\n\n$x$: $${dataX.join(', ')}$\n$y$: $${dataY.join(', ')}$`;
       
       let expLines = [
         `\\text{平均値 } \\bar{x} = ${meanX}, \\quad \\bar{y} = ${meanY}`,
@@ -158,7 +158,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       choices.sort((a,b) => a-b);
       
-      let qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n${choices.join('　/　')}`;
+      let qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('　/　')}$`;
       
       let dir = rNum > 0.4 ? '右上がり（正の相関）' : (rNum < -0.4 ? '右下がり（負の相関）' : 'バラバラ（無相関）');
       
@@ -352,7 +352,11 @@ export default function DataAnalysis2DDrill() {
             </div>
 
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed whitespace-pre-wrap">
-              <MathEq math={problem.qStr} />
+              <div>
+                {problem.qStr.split('$').map((part, i) => 
+                  i % 2 === 1 ? <MathEq key={i} math={part} /> : <span key={i}>{part}</span>
+                )}
+              </div>
               
               {problem.pattern === 'pattern4' && problem.tableData && (
                 <div className="mt-4 flex justify-center text-sm">

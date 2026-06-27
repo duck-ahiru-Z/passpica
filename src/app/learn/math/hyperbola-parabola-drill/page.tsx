@@ -69,7 +69,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let a2 = a*a;
       let b2 = b*b;
       
-      let qStr = `\\frac{x^2}{${a2}} - \\frac{y^2}{${b2}} = ${isH ? '1' : '-1'} \\quad \\text{の焦点の座標と、漸近線の方程式 } y = \\pm mx \\text{ の } m \\text{ を求めよ。}`;
+      let qStr = `$\\frac{x^2}{${a2}} - \\frac{y^2}{${b2}} = ${isH ? '1' : '-1'}$ の焦点の座標と、漸近線の方程式 $y = \\pm mx$ の $m$ を求めよ。`;
       
       let expLines = [
         `\\text{与えられた方程式は双曲線の標準形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,
@@ -94,7 +94,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let p_val = Math.floor(Math.random() * 9) - 4; // -4..4
       if (p_val === 0) p_val = 2;
       
-      let qStr = isH ? `y^2 = ${4*p_val}x \\quad \\text{の焦点の座標と、準線の方程式を求めよ。}` : `x^2 = ${4*p_val}y \\quad \\text{の焦点の座標と、準線の方程式を求めよ。}`;
+      let qStr = isH ? `$y^2 = ${4*p_val}x$ の焦点の座標と、準線の方程式を求めよ。` : `$x^2 = ${4*p_val}y$ の焦点の座標と、準線の方程式を求めよ。`;
       
       let expLines = [
         `\\text{基本形 } ${isH ? 'y^2 = 4px' : 'x^2 = 4py'} \\text{ と比較します。}`,
@@ -126,7 +126,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let strC = C > 0 ? `+${C}x` : (C < 0 ? `${C}x` : "");
       let strD = D > 0 ? `+${D}` : (D < 0 ? `${D}` : "");
       
-      let qStr = `y^2 ${strB} ${strC} ${strD} = 0 \\quad \\text{の頂点と焦点の座標を求めよ。}`;
+      let qStr = `$y^2 ${strB} ${strC} ${strD} = 0$ の頂点と焦点の座標を求めよ。`;
       
       let expLines = [
         `\\text{平方完成を行って基本形を変形します。}`,
@@ -415,7 +415,11 @@ export default function HyperbolaParabolaDrill() {
             </div>
 
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed">
-              <MathEq math={problem.qStr} />
+              <div>
+                {problem.qStr.split('$').map((part, i) => 
+                  i % 2 === 1 ? <MathEq key={i} math={part} /> : <span key={i}>{part}</span>
+                )}
+              </div>
             </div>
             
             <div className="space-y-4">

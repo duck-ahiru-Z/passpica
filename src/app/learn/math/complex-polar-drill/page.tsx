@@ -226,7 +226,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       let z1Str = `z_1 = ${r1}\\left(\\cos ${a1.s} + i\\sin ${a1.s}\\right)`;
       let z2Str = `z_2 = ${r2}\\left(\\cos ${a2.s} + i\\sin ${a2.s}\\right)`;
-      let qStr = `${z1Str}, \\quad ${z2Str} \\text{ のとき、} ${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'} \\text{ を } a+bi \\text{ の形で表せ。}`;
+      let qStr = `$${z1Str}$, $${z2Str}$ のとき、$${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'}$ を $a+bi$ の形で表せ。`;
       
       let cosVal = Math.cos(thRes);
       let sinVal = Math.sin(thRes);
@@ -500,7 +500,11 @@ export default function ComplexPolarDrill() {
             </div>
 
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed">
-              <MathEq math={problem.qStr} />
+              <div>
+                {problem.qStr.split('$').map((part, i) => 
+                  i % 2 === 1 ? <MathEq key={i} math={part} /> : <span key={i}>{part}</span>
+                )}
+              </div>
             </div>
             
             <div className="space-y-4">

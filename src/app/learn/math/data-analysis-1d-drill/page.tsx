@@ -75,7 +75,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       // Shuffle data
       data.sort(() => Math.random() - 0.5);
       
-      let qStr = `次のデータについて、平均値、中央値、最頻値を求めよ。\n\n${data.join(', ')}`;
+      let qStr = `次のデータについて、平均値、中央値、最頻値を求めよ。\n\n$${data.join(', ')}$`;
       
       let expLines = [
         `\\text{データの合計は } ${data.join(' + ')} = ${sum}`,
@@ -110,7 +110,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let sumSq = devs.reduce((a, b) => a + b*b, 0);
       let variance = sumSq / 5;
       
-      let qStr = `次の5個のデータについて、分散を求めよ。\n\n${data.join(', ')}`;
+      let qStr = `次の5個のデータについて、分散を求めよ。\n\n$${data.join(', ')}$`;
       
       let expLines = [
         `\\text{平均値 } \\bar{x} = \\frac{${data.join(' + ')}}{5} = ${mean}`,
@@ -138,7 +138,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let meanSq = sumSq / 5;
       let variance = meanSq - mean*mean;
       
-      let qStr = `次の5個のデータについて、2乗の平均から平均の2乗を引く公式を利用して分散を求めよ。\n\n${data.join(', ')}`;
+      let qStr = `次の5個のデータについて、2乗の平均から平均の2乗を引く公式を利用して分散を求めよ。\n\n$${data.join(', ')}$`;
       
       let expLines = [
         `\\text{別公式 } s^2 = \\overline{x^2} - (\\bar{x})^2 \\text{ を用います。}`,
@@ -352,7 +352,11 @@ export default function DataAnalysis1DDrill() {
             </div>
 
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed whitespace-pre-wrap">
-              <MathEq math={problem.qStr} />
+              <div>
+                {problem.qStr.split('$').map((part, i) => 
+                  i % 2 === 1 ? <MathEq key={i} math={part} /> : <span key={i}>{part}</span>
+                )}
+              </div>
             </div>
             
             <div className="space-y-4">
