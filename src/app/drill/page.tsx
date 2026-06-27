@@ -18,6 +18,61 @@ interface LearningContent {
 const CONTENTS: LearningContent[] = [
 
   {
+    slug: 'cross-multiply-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（因数分解）',
+    title: 'たすき掛け因数分解ドリル',
+    description: '係数が入り組んだ2次式を「たすき掛け」を使ってスピーディに因数分解する反復練習です。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/cross-multiply-drill'
+  },
+  {
+    slug: 'symmetric-polynomial-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（式の値）',
+    title: '対称式の値ドリル',
+    description: '基本対称式（和と積）を用いて、与えられた対称式の値をスピーディに計算する反復練習です。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/symmetric-polynomial-drill'
+  },
+  {
+    slug: 'double-radical-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（実数）',
+    title: '二重根号の外し方ドリル',
+    description: 'ルートの中のルート（二重根号）を外す計算を、基本から応用までパターン別に反復練習します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/double-radical-drill'
+  },
+  {
+    slug: 'absolute-value-eq-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（方程式）',
+    title: '絶対値を含む方程式ドリル',
+    description: '絶対値記号の意味を方程式とグラフの交点として視覚的に捉え、素早く解を導く反復練習です。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/absolute-value-eq-drill'
+  },
+  {
+    slug: 'rationalization-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（実数）',
+    title: '有理化の計算ドリル',
+    description: '分母にルートの足し算・引き算が含まれる分数を、共役な無理数を掛けて有理化する反復練習です。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/rationalization-drill'
+  },
+  {
     slug: 'calculus-drill',
     subject: 'math',
     subjectJp: '数学II',
