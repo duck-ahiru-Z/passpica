@@ -172,6 +172,61 @@ const CONTENTS: LearningContent[] = [
     type: '無限計算ドリル',
     link: '/learn/math/quadratic-max-min-drill'
   },
+  {
+    slug: 'trig-identity-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '図形と計量（三角比）',
+    title: '三角比の相互関係ドリル',
+    description: '単位円上の直角三角形をイメージして、三角比の相互関係を瞬時に導く反復練習です。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/trig-identity-drill'
+  },
+  {
+    slug: 'sine-rule-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '図形と計量（三角比）',
+    title: '正弦定理と外接円ドリル',
+    description: '正弦定理を活用して、三角形の辺・角・外接円の半径を瞬時に求める反復練習です。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/sine-rule-drill'
+  },
+  {
+    slug: 'cosine-rule-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '図形と計量（三角比）',
+    title: '余弦定理ドリル',
+    description: '余弦定理を活用して、三角形の辺や角を瞬時に求める反復練習です。2次方程式を利用する応用パターンも収録。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/cosine-rule-drill'
+  },
+  {
+    slug: 'triangle-area-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '図形と計量（三角比）',
+    title: '三角形の面積ドリル',
+    description: '面積公式やヘロンの公式を利用して、三角形の面積や辺の長さをスピーディに求める反復練習です。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/triangle-area-drill'
+  },
+  {
+    slug: 'inscribed-circle-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '図形と計量（三角比）',
+    title: '内接円・傍接円の半径ドリル',
+    description: '三角形の面積公式などを利用して、内接円・外接円・傍接円の半径を求める総合演習です。',
+    difficulty: '応用',
+    type: '無限計算ドリル',
+    link: '/learn/math/inscribed-circle-drill'
+  },
 ];
 
 export default function DrillPortalPage() {
