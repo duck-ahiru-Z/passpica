@@ -1,14 +1,19 @@
-import { ExamEvent } from './types';
+import { MockExamData, NationalExamData } from './types';
 import { nationalEvents } from './national';
 import { kawaiEvents } from './kawai';
 import { sundaiEvents } from './sundai';
 import { toshinEvents } from './toshin';
+import { yozemiEvents } from './yozemi';
+import { benesseEvents } from './benesse';
 
 export * from './types';
 
-export const EXAM_MASTER_DATA: ExamEvent[] = [
-  ...nationalEvents,
+export const NATIONAL_MASTER_DATA: NationalExamData[] = nationalEvents;
+
+export const MOCK_MASTER_DATA: MockExamData[] = [
   ...kawaiEvents,
   ...sundaiEvents,
   ...toshinEvents,
+  ...yozemiEvents,
+  ...benesseEvents,
 ];
