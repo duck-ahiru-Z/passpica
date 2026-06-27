@@ -19,7 +19,7 @@ function getSquareFactors(n: number): number[] {
   return factors;
 }
 
-type Pattern = 'basic_plus' | 'basic_minus' | 'bring_in' | 'multiply_two';
+type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 
 interface ProblemData {
   pattern: Pattern;
@@ -29,48 +29,47 @@ interface ProblemData {
   sign: '+' | '-';
   sum: number;
   prod: number;
-  k?: number; // for bring_in
-  inner?: number; // for bring_in
-  X?: number; // for multiply_two
+  k?: number; // for pattern3
+  inner?: number; // for pattern3
+  X?: number; // for pattern4
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['basic_plus', 'basic_minus', 'bring_in', 'multiply_two'][Math.floor(Math.random() * 4)] as Pattern
+    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
     : selectedPattern;
 
   while (true) {
-    let a = Math.floor(Math.random() * 15) + 2;
-    let b = Math.floor(Math.random() * 15) + 1;
-    if (a <= b) continue;
-    
-    // 平方因数を持たない（ルートがこれ以上簡単にならない）ようにする
-    if (getSquareFactors(a).length > 0 || getSquareFactors(b).length > 0) continue;
+    let a = Math.floor(Math.random() * 8) + 2; // 2 to 9
+    let b = Math.floor(Math.random() * 8) + 2; // 2 to 9
+    if (a <= b) continue; // 必ず a > b
     
     let sum = a + b;
     let prod = a * b;
     
-    if (p === 'basic_plus' || p === 'basic_minus') {
-      let sign: '+' | '-' = p === 'basic_plus' ? '+' : '-';
+    if (p === 'pattern1' || p === 'pattern2') {
+      // ユーザー要望: 答えが整数になる場合はそのまま √の中身として扱っても良いが、
+      // 逆算ロジックとしては単に a+b, ab を使えばOK
+      let sign: '+' | '-' = p === 'pattern1' ? '+' : '-';
       let eq = `\\sqrt{${sum} ${sign} 2\\sqrt{${prod}}}`;
       return { pattern: p, a, b, eq, sign, sum, prod };
     }
     
-    if (p === 'bring_in') {
+    if (p === 'pattern3') {
       let kFactors = getSquareFactors(prod);
-      if (kFactors.length === 0) continue;
+      if (kFactors.length === 0) continue; // 係数として外に出せる数がない場合はやり直し
       let k = kFactors[kFactors.length - 1]; // 最大の平方因数のルート
       let inner = prod / (k * k);
       let sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      let coef = 2 * k;
+      let coef = 2 * k; // 2以外の偶数係数 (4, 6, 8...)
       let eq = `\\sqrt{${sum} ${sign} ${coef}\\sqrt{${inner}}}`;
       return { pattern: p, a, b, eq, sign, sum, prod, k, inner };
     }
     
-    if (p === 'multiply_two') {
-      if (sum % 2 !== 0) continue; // a+b は偶数である必要がある
+    if (p === 'pattern4') {
+      if (a % 2 === 0 || b % 2 === 0) continue; // a, b は奇数（和が偶数になるように）
       let X = sum / 2;
-      // prodが4で割り切れると 2\sqrt{Y} の形になりbasicと被るため除外
+      // prodが4で割り切れると係数が出てしまうので除外
       if (prod % 4 === 0) continue;
       let sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
       let eq = `\\sqrt{${X} ${sign} \\sqrt{${prod}}}`;
@@ -90,6 +89,7 @@ export default function DoubleRadicalDrillPage() {
   // 判定状態
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [showGraph, setShowGraph] = useState(false); // 二重根号はグラフ不要ですが、要件統一のためUIは用意するか？(後述)
   
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
@@ -117,7 +117,6 @@ export default function DoubleRadicalDrillPage() {
       return;
     }
     
-    // a > b であるため、そのまま一致するかチェック
     if (ua === problem.a && ub === problem.b) {
       setIsCorrect(true);
     } else {
@@ -159,11 +158,11 @@ export default function DoubleRadicalDrillPage() {
                 onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
                 className="border p-1 text-xs"
               >
-                <option value="mix">MIX (全パターンランダム)</option>
-                <option value="basic_plus">基本1 (足し算)</option>
-                <option value="basic_minus">基本2 (引き算)</option>
-                <option value="bring_in">応用1 (係数をルートの中へ)</option>
-                <option value="multiply_two">応用2 (2をかけて割る)</option>
+                <option value="mix">ミックスモード (ランダム)</option>
+                <option value="pattern1">パターン1 (基本の和)</option>
+                <option value="pattern2">パターン2 (基本の差)</option>
+                <option value="pattern3">パターン3 (係数が2以外の偶数)</option>
+                <option value="pattern4">パターン4 (係数なし・割るルート2)</option>
               </select>
             </div>
 
@@ -177,7 +176,7 @@ export default function DoubleRadicalDrillPage() {
               </div>
               <div className="flex items-center justify-center gap-2 text-xl">
                 <MathEq math="=" />
-                {problem.pattern === 'multiply_two' ? (
+                {problem.pattern === 'pattern4' ? (
                   <div className="flex flex-col items-center">
                     <div className="flex items-center gap-2 border-b border-slate-800 pb-1 px-2">
                       <MathEq math="\sqrt{" />
@@ -202,8 +201,7 @@ export default function DoubleRadicalDrillPage() {
               </div>
               <div className="text-[10px] text-gray-500 text-center">
                 ※ 引き算の場合、必ず大きい数字を左側（大）に入力してください。<br/>
-                ※ 答えが整数になる場合（例：3）も、ルートのまま（例：\(\sqrt{9}\)）入力してください。<br/>
-                ※ このドリルでは、外側のルートの中が最も簡単になる（素因数分解できない）数値を生成しています。
+                ※ 答えが整数になる場合もルートのまま（例：\(\sqrt{4}\)）入力してください。<br/>
               </div>
             </div>
 
@@ -253,7 +251,7 @@ export default function DoubleRadicalDrillPage() {
             ) : (
               <div className="space-y-4 text-xs leading-relaxed">
                 <div className="bg-white p-3 border text-center font-bold text-lg mb-4 text-emerald-700 shadow-sm">
-                  {problem.pattern === 'multiply_two' ? (
+                  {problem.pattern === 'pattern4' ? (
                     <MathEq math={`${problem.eq} = \\frac{\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}}{\\sqrt{2}}`} />
                   ) : (
                     <MathEq math={`${problem.eq} = \\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}`} />
@@ -262,13 +260,13 @@ export default function DoubleRadicalDrillPage() {
 
                 {detailLevel === 'brief' && (
                   <div>
-                    {problem.pattern === 'bring_in' && (
+                    {problem.pattern === 'pattern3' && (
                       <div className="mb-2">
                         <MathEq math={`${problem.eq} = \\sqrt{${problem.sum} ${problem.sign} 2\\sqrt{${problem.k} \\times ${problem.k} \\times ${problem.inner}}}`} block />
                         <MathEq math={`= \\sqrt{${problem.sum} ${problem.sign} 2\\sqrt{${problem.prod}}}`} block />
                       </div>
                     )}
-                    {problem.pattern === 'multiply_two' && (
+                    {problem.pattern === 'pattern4' && (
                       <div className="mb-2">
                         <MathEq math={`${problem.eq} = \\sqrt{\\frac{${problem.sum} ${problem.sign} 2\\sqrt{${problem.prod}}}{2}}`} block />
                       </div>
@@ -280,7 +278,7 @@ export default function DoubleRadicalDrillPage() {
 
                 {detailLevel === 'normal' && (
                   <div>
-                    {problem.pattern === 'bring_in' && (
+                    {problem.pattern === 'pattern3' && (
                       <div className="mb-4">
                         二重根号を外すには、内側のルートの前の係数を「<MathEq math="2" />」にする必要があります。<br/>
                         今回は係数が <MathEq math={`${2 * problem.k!}`} /> なので、<MathEq math={`${problem.k!}`} /> をルートの中に戻します。<br/>
@@ -288,7 +286,7 @@ export default function DoubleRadicalDrillPage() {
                         これにより、式は <MathEq math={`\\sqrt{${problem.sum} ${problem.sign} 2\\sqrt{${problem.prod}}}`} /> となります。
                       </div>
                     )}
-                    {problem.pattern === 'multiply_two' && (
+                    {problem.pattern === 'pattern4' && (
                       <div className="mb-4">
                         二重根号を外すには、内側のルートの前の係数を「<MathEq math="2" />」にする必要があります。<br/>
                         しかし今回は係数がありません。そこで、無理やりルートの中身の分母・分子に2を掛けます。<br/>
@@ -324,9 +322,9 @@ export default function DoubleRadicalDrillPage() {
                     </p>
 
                     <p className="font-bold border-b border-gray-300 pb-1 mt-4 mb-2">1. 式の形を整える</p>
-                    {problem.pattern === 'basic_plus' || problem.pattern === 'basic_minus' ? (
+                    {problem.pattern === 'pattern1' || problem.pattern === 'pattern2' ? (
                       <p>今回はすでに <MathEq math={`\\sqrt{A \\pm 2\\sqrt{B}}`} /> の形（内側のルートの前に2がある）になっているので、そのまま次へ進めます。</p>
-                    ) : problem.pattern === 'bring_in' ? (
+                    ) : problem.pattern === 'pattern3' ? (
                       <div className="bg-gray-50 p-2 border">
                         公式を使うためには、内側のルートの前を必ず「<MathEq math="2" />」にする必要があります。<br/>
                         式は <MathEq math={`${problem.eq}`} /> です。<br/>
@@ -361,7 +359,7 @@ export default function DoubleRadicalDrillPage() {
                     </p>
 
                     <p className="font-bold border-b border-gray-300 pb-1 mt-4 mb-2">3. 答えの形にする</p>
-                    {problem.pattern === 'multiply_two' ? (
+                    {problem.pattern === 'pattern4' ? (
                       <p>
                         分子の二重根号が外れて <MathEq math={`\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}`} /> となります。<br/>
                         分母には <MathEq math={`\\sqrt{2}`} /> が残っているので、最終的な答えは <MathEq math={`\\frac{\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}}{\\sqrt{2}}`} /> です。
