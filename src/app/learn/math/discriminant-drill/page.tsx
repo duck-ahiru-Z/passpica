@@ -400,7 +400,7 @@ export default function DiscriminantDrillPage() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
-                className="border border-gray-300 bg-white shadow-sm mb-2"
+                className="border border-gray-300 bg-white shadow-sm mb-2 w-full max-w-full h-auto"
               />
               <div className="w-[300px] flex items-center gap-2 text-[10px] font-bold text-gray-600">
                 <span>kを動かす:</span>

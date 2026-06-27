@@ -423,7 +423,7 @@ export default function TrigIdentityDrillPage() {
                 ref={canvasRef} 
                 width={200} 
                 height={200} 
-                className="border border-gray-300 bg-white shadow-sm"
+                className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
 

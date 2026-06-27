@@ -389,7 +389,7 @@ export default function CosineRuleDrillPage() {
                 ref={canvasRef} 
                 width={250} 
                 height={200} 
-                className="border border-gray-300 bg-white shadow-sm"
+                className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
 

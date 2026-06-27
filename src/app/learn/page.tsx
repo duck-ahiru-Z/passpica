@@ -271,8 +271,8 @@ export default function LearnPortalPage() {
 
       </div>
 
-      {/* 教材テーブル */}
-      <div className="border border-gray-300 overflow-x-auto">
+      {/* 教材一覧 (デスクトップ版テーブル) */}
+      <div className="hidden md:block border border-gray-300 overflow-x-auto">
         <table className="classic-table text-xs">
           <thead>
             <tr>
@@ -318,6 +318,47 @@ export default function LearnPortalPage() {
             )}
           </tbody>
         </table>
+      </div>
+
+      {/* 教材一覧 (スマホ版カード) */}
+      <div className="md:hidden space-y-4">
+        {filteredContents.map(c => (
+          <div key={c.slug} className="retro-box p-4 bg-white space-y-3 relative">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="font-bold text-slate-700 bg-gray-100 px-2 py-0.5 rounded text-xs border border-gray-300">
+                {c.subjectJp}
+              </span>
+              <span className="text-xs text-slate-600 font-bold bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                {c.field}
+              </span>
+              <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold ${c.difficulty === '基礎' ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : c.difficulty === '標準' ? 'bg-blue-50 text-blue-800 border border-blue-200' : 'bg-amber-50 text-amber-800 border border-amber-200'}`}>
+                {c.difficulty}
+              </span>
+              <span className="text-[10px] text-gray-500 font-bold border px-1.5 py-0.5 rounded">
+                {c.type}
+              </span>
+            </div>
+            
+            <div>
+              <div className="font-bold text-slate-900 text-sm mb-1">{c.title}</div>
+              <div className="text-gray-500 text-xs leading-relaxed">{c.description}</div>
+            </div>
+
+            <div className="pt-2 border-t border-gray-100 flex justify-end">
+              <Link 
+                href={c.link}
+                className="retro-btn-classic font-bold text-xs px-4"
+              >
+                開く ➔
+              </Link>
+            </div>
+          </div>
+        ))}
+        {filteredContents.length === 0 && (
+          <div className="text-center py-12 text-gray-400 italic bg-gray-50 border border-gray-200 rounded">
+            該当する学習教材がありません。
+          </div>
+        )}
       </div>
 
     </div>

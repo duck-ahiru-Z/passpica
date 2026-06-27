@@ -497,7 +497,7 @@ export default function QuadraticInequalityDrillPage() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
-                className="border border-gray-300 bg-white shadow-sm"
+                className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
 

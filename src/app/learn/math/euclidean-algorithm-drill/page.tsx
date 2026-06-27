@@ -291,7 +291,7 @@ export default function EuclideanAlgorithmDrill() {
                 ref={canvasRef} 
                 width={360} 
                 height={200} 
-                className="border border-gray-300 bg-white shadow-sm"
+                className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
 
