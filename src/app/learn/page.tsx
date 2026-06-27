@@ -50,61 +50,7 @@ const CONTENTS: LearningContent[] = [
     type: 'ビジュアル図解',
     link: '/learn/math/unit-circle-complex'
   },
-  {
-    slug: 'calculus-drill',
-    subject: 'math',
-    subjectJp: '数学II',
-    field: '微積分（面積公式）',
-    title: '微積分・面積公式（無限計算ドリル）',
-    description: '1/6公式、1/12公式など定積分のショートカット面積公式を無限に反復演習できるドリル。自動生成される問題とグラフ・詳細な解説付き。',
-    difficulty: '標準',
-    type: '無限計算ドリル',
-    link: '/learn/math/calculus-drill'
-  },
-  {
-    slug: 'vector-drill',
-    subject: 'math',
-    subjectJp: '数学C',
-    field: 'ベクトル',
-    title: 'ベクトル・交点位置ベクトルドリル',
-    description: '内分比から2直線の交点の位置ベクトルをメネラウスの定理等を用いて求める反復ドリル。',
-    difficulty: '標準',
-    type: '無限計算ドリル',
-    link: '/learn/math/vector-drill'
-  },
-  {
-    slug: 'complex-drill',
-    subject: 'math',
-    subjectJp: '数学C',
-    field: '複素数平面',
-    title: '複素数平面・ド・モアブルの定理ドリル',
-    description: '極形式とド・モアブルの定理を用いて、複素数の累乗が実数となる最小の自然数を求める演習。',
-    difficulty: '標準',
-    type: '無限計算ドリル',
-    link: '/learn/math/complex-drill'
-  },
-  {
-    slug: 'sequence-drill',
-    subject: 'math',
-    subjectJp: '数学B',
-    field: '数列',
-    title: '数列・隣接2項間の漸化式ドリル',
-    description: '特性方程式を用いて一般項を求める反復演習と、コブウェブプロットによる収束・発散の視覚化ツール。',
-    difficulty: '標準',
-    type: '無限計算ドリル',
-    link: '/learn/math/sequence-drill'
-  },
-  {
-    slug: 'circle-tangent-drill',
-    subject: 'math',
-    subjectJp: '数学II',
-    field: '図形と方程式',
-    title: '図形と方程式・円の接線ドリル',
-    description: '円の外部の点から引いた2本の接線の方程式を正確に求めるための幾何学＆計算演習。',
-    difficulty: '標準',
-    type: '無限計算ドリル',
-    link: '/learn/math/circle-tangent-drill'
-  },
+
   // 化学基礎・化学（新設含む）
   {
     slug: 'inorganic-colors',

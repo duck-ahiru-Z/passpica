@@ -161,8 +161,9 @@ export default function HomePage() {
           </div>
 
           <div className="retro-box">
-            <h2 className="text-sm font-bold border-b border-gray-300 pb-1.5 mb-4 flex items-center gap-1">
-              <span>■</span> 無限計算ドリル（反復演習用）
+            <h2 className="text-sm font-bold border-b border-gray-300 pb-1.5 mb-4 flex items-center gap-1 justify-between">
+              <div className="flex items-center gap-1"><span>■</span> 無限演習ポータル（ドリル）</div>
+              <Link href="/drill" className="retro-btn-classic text-[10px] px-2 py-0.5 no-underline">一覧を見る ➔</Link>
             </h2>
             <div className="space-y-6 text-xs leading-relaxed">
               

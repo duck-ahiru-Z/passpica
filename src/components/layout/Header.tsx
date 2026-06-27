@@ -20,6 +20,10 @@ export default function Header() {
             [学習室ポータル]
           </Link>
           <span className="text-gray-300">|</span>
+          <Link href="/drill" className="no-underline">
+            [無限演習]
+          </Link>
+          <span className="text-gray-300">|</span>
           <Link href="/tools/schedule" className="no-underline">
             [時間割予定表]
           </Link>
