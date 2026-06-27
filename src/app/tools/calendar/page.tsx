@@ -7,7 +7,8 @@ import {
   NATIONAL_MASTER_DATA, 
   CalendarDisplayEvent, 
   TargetGrade,
-  TargetUniversity 
+  TargetUniversity,
+  ExamCategory
 } from '@/src/data/calendar';
 
 const UNIVERSITIES: TargetUniversity[] = [
@@ -19,14 +20,17 @@ const UNIVERSITIES: TargetUniversity[] = [
 export default function CalendarPage() {
   const [customEvents, setCustomEvents] = useState<CalendarDisplayEvent[]>([]);
   const [selectedMockIds, setSelectedMockIds] = useState<string[]>([]);
+  const [selectedNationalIds, setSelectedNationalIds] = useState<string[]>(NATIONAL_MASTER_DATA.map(n => n.id));
   
   const [customTitle, setCustomTitle] = useState('');
   const [customDate, setCustomDate] = useState('');
   
   const [filterType, setFilterType] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   
   // 模試追加用UIのステート
-  const [addTab, setAddTab] = useState<'normal' | 'kanmuri'>('normal');
+  const [addTab, setAddTab] = useState<'national' | 'normal' | 'kanmuri'>('normal');
   const [selectedGrade, setSelectedGrade] = useState<TargetGrade | 'all'>('all');
   const [activeProvider, setActiveProvider] = useState<string | null>(null);
   
@@ -52,20 +56,35 @@ export default function CalendarPage() {
         setSelectedMockIds([]);
       }
     }
+
+    const savedNationals = localStorage.getItem('passpica_calendar_selected_nationals');
+    if (savedNationals) {
+      try {
+        setSelectedNationalIds(JSON.parse(savedNationals));
+      } catch (e) {
+        setSelectedNationalIds(NATIONAL_MASTER_DATA.map(n => n.id));
+      }
+    } else {
+      // 初回はすべて選択状態にして保存
+      const allNationalIds = NATIONAL_MASTER_DATA.map(n => n.id);
+      setSelectedNationalIds(allNationalIds);
+      localStorage.setItem('passpica_calendar_selected_nationals', JSON.stringify(allNationalIds));
+    }
   }, []);
 
   // カレンダーに表示するすべてのイベントを生成
   const displayEvents = useMemo(() => {
     const events: CalendarDisplayEvent[] = [];
 
-    // 固定（公式）イベント
-    NATIONAL_MASTER_DATA.forEach(n => {
+    // 固定（公式）イベント (選択されたものだけ)
+    NATIONAL_MASTER_DATA.filter(n => selectedNationalIds.includes(n.id)).forEach(n => {
       events.push({
         id: n.id,
         date: n.date,
         title: n.title,
         type: 'national',
-        badge: n.badge
+        badge: n.badge,
+        parentMockId: n.id // 公式日程の解除用
       });
     });
 
@@ -123,7 +142,7 @@ export default function CalendarPage() {
     events.push(...customEvents);
 
     return events;
-  }, [selectedMockIds, customEvents]);
+  }, [selectedMockIds, selectedNationalIds, customEvents]);
 
   // カスタム予定追加
   const addCustomEvent = (e: React.FormEvent) => {
@@ -166,6 +185,27 @@ export default function CalendarPage() {
     localStorage.setItem('passpica_calendar_selected_mocks', JSON.stringify(newSelected));
   };
 
+  // 公式日程の選択・解除
+  const toggleNational = (id: string) => {
+    let newSelected: string[];
+    if (selectedNationalIds.includes(id)) {
+      newSelected = selectedNationalIds.filter(nid => nid !== id);
+    } else {
+      newSelected = [...selectedNationalIds, id];
+    }
+    setSelectedNationalIds(newSelected);
+    localStorage.setItem('passpica_calendar_selected_nationals', JSON.stringify(newSelected));
+  };
+
+  // 削除ハンドラ（リスト上の「はずす」ボタン用）
+  const removeEventGroup = (parentMockId: string, type: ExamCategory) => {
+    if (type === 'national') {
+      toggleNational(parentMockId);
+    } else if (type === 'mock') {
+      toggleMock(parentMockId);
+    }
+  };
+
   // 表示用のフィルタとソート
   const filteredDisplayEvents = displayEvents.filter(ev => filterType === 'all' || ev.type === filterType);
   const sortedEvents = [...filteredDisplayEvents].sort((a, b) => a.date.localeCompare(b.date));
@@ -201,17 +241,72 @@ export default function CalendarPage() {
     }
   };
 
+  // カレンダー用のヘルパー
+  const prevMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1));
+  };
+  const nextMonth = () => {
+    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1));
+  };
+
+  const getDaysInMonth = (year: number, month: number) => {
+    const date = new Date(year, month, 1);
+    const days: Date[] = [];
+    while (date.getMonth() === month) {
+      days.push(new Date(date));
+      date.setDate(date.getDate() + 1);
+    }
+    return days;
+  };
+
+  const formatToYYYYMMDD = (date: Date) => {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+  };
+
+  const calendarDays = useMemo(() => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const days = getDaysInMonth(year, month);
+    const firstDayOfWeek = days[0].getDay(); // 0(Sun) to 6(Sat)
+    
+    // pad with nulls
+    const paddedDays: (Date | null)[] = Array(firstDayOfWeek).fill(null);
+    paddedDays.push(...days);
+    
+    return paddedDays;
+  }, [currentMonth]);
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-2 md:px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
       
       {/* ページヘッダー */}
       <div className="border-b border-gray-300 pb-2">
         <nav className="text-[10px] text-gray-500 mb-1">
           <Link href="/">トップ</Link> &gt; 受験カレンダー
         </nav>
-        <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-          受験カレンダー日程メモ
-        </h1>
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <h1 className="text-xl md:text-2xl font-bold text-slate-900">
+            受験カレンダー日程メモ
+          </h1>
+          {/* 表示形式切り替え */}
+          <div className="flex border border-slate-300 rounded overflow-hidden">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-3 py-1 text-[11px] font-bold ${viewMode === 'list' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              リスト形式
+            </button>
+            <button
+              onClick={() => setViewMode('calendar')}
+              className={`px-3 py-1 text-[11px] font-bold ${viewMode === 'calendar' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            >
+              カレンダー形式
+            </button>
+          </div>
+        </div>
         <p className="text-xs text-gray-500 mt-1">
           共通テスト等の年間公式日程と、自分が受ける模試、出願予定日などを追加して管理できます。
         </p>
@@ -219,7 +314,7 @@ export default function CalendarPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        {/* 左側：イベント一覧テーブル (2/3) */}
+        {/* 左側：イベント一覧テーブル / カレンダー (2/3) */}
         <div className="lg:col-span-2 space-y-4">
           
           {/* 絞り込みタブ */}
@@ -241,62 +336,123 @@ export default function CalendarPage() {
             ))}
           </div>
 
-          {/* 表組み表示 */}
-          <div className="border border-gray-300 overflow-x-auto bg-white">
-            <table className="classic-table text-xs">
-              <thead>
-                <tr className="bg-gray-100 font-bold">
-                  <th className="w-24">年月日</th>
-                  <th className="w-20">種類</th>
-                  <th>イベント内容</th>
-                  <th className="w-16">操作</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedEvents.map((ev) => (
-                  <tr key={ev.id} className="hover:bg-gray-50/50">
-                    <td className="font-mono text-center">{ev.date.replace(/-/g, '/')}</td>
-                    <td className="text-center">
-                      <span className={`px-1.5 py-0.5 rounded text-[10px] border whitespace-nowrap ${getBadgeColor(ev.badge)}`}>
-                        {ev.badge || '予定'}
-                      </span>
-                    </td>
-                    <td className="font-bold text-slate-800 text-left">
-                      {ev.provider && <span className="text-[10px] text-gray-500 mr-1">[{ev.provider}]</span>}
-                      {ev.title}
-                    </td>
-                    <td className="text-center">
-                      {ev.type === 'custom' ? (
-                        <button 
-                          onClick={() => deleteCustomEvent(ev.id)}
-                          className="text-red-500 hover:text-red-700 font-bold"
-                        >
-                          削除
-                        </button>
-                      ) : ev.parentMockId ? (
-                        <button 
-                          onClick={() => toggleMock(ev.parentMockId!)}
-                          className="text-gray-500 hover:text-gray-700"
-                          title="この模試のすべての日程をカレンダーから外す"
-                        >
-                          はずす
-                        </button>
-                      ) : (
-                        <span className="text-gray-400">-</span>
-                      )}
-                    </td>
+          {viewMode === 'list' ? (
+            /* 表組み表示 */
+            <div className="border border-gray-300 overflow-x-auto bg-white">
+              <table className="classic-table text-xs w-full">
+                <thead>
+                  <tr className="bg-gray-100 font-bold">
+                    <th className="w-20 md:w-24">年月日</th>
+                    <th className="w-16 md:w-20">種類</th>
+                    <th>イベント内容</th>
+                    <th className="w-12 md:w-16">操作</th>
                   </tr>
-                ))}
-                {sortedEvents.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="text-center py-12 text-gray-400 italic">
-                      表示する予定はありません。
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {sortedEvents.map((ev) => (
+                    <tr key={ev.id} className="hover:bg-gray-50/50">
+                      <td className="font-mono text-center text-[10px] md:text-xs">{ev.date.replace(/-/g, '/')}</td>
+                      <td className="text-center">
+                        <span className={`px-1 py-0.5 rounded text-[9px] md:text-[10px] border whitespace-nowrap ${getBadgeColor(ev.badge)}`}>
+                          {ev.badge || '予定'}
+                        </span>
+                      </td>
+                      <td className="font-bold text-slate-800 text-left text-[11px] md:text-xs">
+                        {ev.provider && <span className="text-[9px] md:text-[10px] text-gray-500 mr-1 hidden sm:inline-block">[{ev.provider}]</span>}
+                        {ev.title}
+                      </td>
+                      <td className="text-center">
+                        {ev.type === 'custom' ? (
+                          <button 
+                            onClick={() => deleteCustomEvent(ev.id)}
+                            className="text-red-500 hover:text-red-700 font-bold text-[10px] md:text-xs"
+                          >
+                            削除
+                          </button>
+                        ) : ev.parentMockId ? (
+                          <button 
+                            onClick={() => removeEventGroup(ev.parentMockId!, ev.type)}
+                            className="text-gray-500 hover:text-gray-700 text-[10px] md:text-xs"
+                            title="この日程・模試をカレンダーから外す"
+                          >
+                            はずす
+                          </button>
+                        ) : (
+                          <span className="text-gray-400">-</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                  {sortedEvents.length === 0 && (
+                    <tr>
+                      <td colSpan={4} className="text-center py-12 text-gray-400 italic">
+                        表示する予定はありません。
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            /* カレンダー表示 */
+            <div className="border border-gray-300 bg-white">
+              {/* カレンダーヘッダー */}
+              <div className="flex justify-between items-center p-3 bg-gray-50 border-b border-gray-300">
+                <button onClick={prevMonth} className="px-3 py-1 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-100 font-bold text-slate-600">
+                  ◀ 前月
+                </button>
+                <h2 className="text-lg font-bold text-slate-800">
+                  {currentMonth.getFullYear()}年 {currentMonth.getMonth() + 1}月
+                </h2>
+                <button onClick={nextMonth} className="px-3 py-1 bg-white border border-gray-300 rounded shadow-sm hover:bg-gray-100 font-bold text-slate-600">
+                  次月 ▶
+                </button>
+              </div>
+              
+              {/* 曜日ヘッダー */}
+              <div className="grid grid-cols-7 border-b border-gray-300 bg-gray-100 text-center font-bold text-slate-600 text-[10px] md:text-xs">
+                <div className="py-2 text-red-600">日</div>
+                <div className="py-2">月</div>
+                <div className="py-2">火</div>
+                <div className="py-2">水</div>
+                <div className="py-2">木</div>
+                <div className="py-2">金</div>
+                <div className="py-2 text-blue-600">土</div>
+              </div>
+
+              {/* 日付グリッド */}
+              <div className="grid grid-cols-7 auto-rows-[minmax(80px,auto)] md:auto-rows-[minmax(100px,auto)]">
+                {calendarDays.map((date, idx) => {
+                  if (!date) {
+                    return <div key={`empty-${idx}`} className="border-b border-r border-gray-200 bg-gray-50/50"></div>;
+                  }
+
+                  const dateStr = formatToYYYYMMDD(date);
+                  const dayEvents = filteredDisplayEvents.filter(ev => ev.date === dateStr);
+                  const isToday = dateStr === formatToYYYYMMDD(new Date());
+
+                  return (
+                    <div key={dateStr} className={`border-b border-r border-gray-200 p-1 flex flex-col ${isToday ? 'bg-yellow-50/50' : 'bg-white'}`}>
+                      <div className={`text-[10px] md:text-xs font-bold text-right mb-1 ${date.getDay() === 0 ? 'text-red-500' : date.getDay() === 6 ? 'text-blue-500' : 'text-slate-600'}`}>
+                        {isToday && <span className="bg-yellow-400 text-white rounded-full px-1.5 py-0.5 text-[9px] mr-1">今日</span>}
+                        {date.getDate()}
+                      </div>
+                      <div className="flex-1 overflow-y-auto space-y-1 custom-scrollbar">
+                        {dayEvents.map(ev => (
+                          <div key={ev.id} className="text-[9px] md:text-[10px] leading-tight border-l-2 pl-1 break-words" style={{ borderColor: ev.type === 'national' ? '#ef4444' : ev.type === 'mock' ? '#3b82f6' : '#10b981' }}>
+                            <span className="font-bold text-slate-700 block mb-0.5">
+                              {ev.badge && <span className={`inline-block mr-1 ${ev.badge === '申込開始' || ev.badge === '申込締切' ? 'text-orange-600' : ev.badge === '試験日' ? 'text-blue-600' : 'text-purple-600'}`}>[{ev.badge}]</span>}
+                              {ev.title}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -309,19 +465,56 @@ export default function CalendarPage() {
             {/* タブ切り替え */}
             <div className="flex border-b border-gray-300">
               <button
-                className={`flex-1 py-1.5 text-[11px] font-bold ${addTab === 'normal' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`flex-1 py-1.5 text-[10px] md:text-[11px] font-bold ${addTab === 'national' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                onClick={() => setAddTab('national')}
+              >
+                公式日程
+              </button>
+              <button
+                className={`flex-1 py-1.5 text-[10px] md:text-[11px] font-bold border-l border-gray-200 ${addTab === 'normal' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 onClick={() => setAddTab('normal')}
               >
                 通常模試
               </button>
               <button
-                className={`flex-1 py-1.5 text-[11px] font-bold ${addTab === 'kanmuri' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`flex-1 py-1.5 text-[10px] md:text-[11px] font-bold border-l border-gray-200 ${addTab === 'kanmuri' ? 'bg-slate-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
                 onClick={() => setAddTab('kanmuri')}
               >
                 冠模試
               </button>
             </div>
             
+            {/* 公式日程タブ */}
+            {addTab === 'national' && (
+              <div className="space-y-3 pt-2">
+                <div className="space-y-2">
+                  <label className="block text-[10px] font-bold text-slate-600 mb-1">共通テスト・国公立二次試験など</label>
+                  <div className="bg-white border border-gray-200 rounded p-2 max-h-60 overflow-y-auto space-y-2">
+                    {NATIONAL_MASTER_DATA.map(ev => (
+                      <label key={ev.id} className="flex items-start gap-2 p-1 hover:bg-gray-50 cursor-pointer rounded border-b border-gray-100 last:border-0">
+                        <input
+                          type="checkbox"
+                          className="mt-0.5"
+                          checked={selectedNationalIds.includes(ev.id)}
+                          onChange={() => toggleNational(ev.id)}
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-bold text-slate-700 text-[11px] leading-tight">
+                            {ev.badge && <span className="text-red-600 mr-1">[{ev.badge}]</span>}
+                            {ev.title}
+                          </span>
+                          <span className="text-[9px] text-gray-500 mt-0.5">
+                            {ev.date.replace(/-/g, '/')}
+                          </span>
+                        </div>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 通常模試タブ */}
             {addTab === 'normal' && (
               <div className="space-y-3 pt-2">
                 <div>
@@ -385,6 +578,7 @@ export default function CalendarPage() {
               </div>
             )}
 
+            {/* 冠模試タブ */}
             {addTab === 'kanmuri' && (
               <div className="space-y-3 pt-2">
                 <div>
@@ -432,8 +626,9 @@ export default function CalendarPage() {
               </div>
             )}
 
-            <div className="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded">
-              ※追加すると、試験日だけでなく「申込開始/締切」「成績返却日」も一括でカレンダーに表示されます。
+            <div className="text-[10px] text-gray-500 mt-2 bg-gray-50 p-2 rounded leading-relaxed">
+              ※追加すると、カレンダーや一覧にすべての関連日程が表示されます。<br/>
+              ※不要になった場合は「はずす」かチェックを外してください。
             </div>
           </div>
 
