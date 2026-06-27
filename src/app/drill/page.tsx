@@ -128,6 +128,50 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/math/circle-tangent-drill'
   },
 
+  {
+    slug: 'completing-square-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '2次関数',
+    title: '平方完成の特訓ドリル',
+    description: '2次関数の式を平方完成して、頂点の座標を正確に求める反復練習です。分数や文字係数にも対応。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/completing-square-drill'
+  },
+  {
+    slug: 'quadratic-inequality-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '2次関数',
+    title: '2次不等式の解ドリル',
+    description: '放物線とx軸の位置関係をイメージして、2次不等式を素早く正確に解く反復練習です。D=0の特殊解も網羅。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/quadratic-inequality-drill'
+  },
+  {
+    slug: 'discriminant-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '2次関数',
+    title: '判別式と共有点の個数ドリル',
+    description: '定数kを含む方程式の判別式を利用して、グラフとx軸の位置関係を調べる演習です。スライダーを使った視覚的理解が可能です。',
+    difficulty: '応用',
+    type: '無限計算ドリル',
+    link: '/learn/math/discriminant-drill'
+  },
+  {
+    slug: 'quadratic-max-min-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '2次関数',
+    title: '2次関数の最大・最小ドリル',
+    description: '定義域と軸の位置関係をグラフから視覚的に判断し、最大値・最小値を求める演習です。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/quadratic-max-min-drill'
+  },
 ];
 
 export default function DrillPortalPage() {
