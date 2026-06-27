@@ -127,7 +127,6 @@ export default function HomePage() {
                   角度θの値を変化させたときの、sin, cos, tan の長さの変化を動的に確認できる幾何学シミュレータです。
                 </p>
               </div>
-
               <div>
                 <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
                   <span className="text-[10px] bg-purple-100 border border-purple-300 text-purple-800 px-1 py-0.5 rounded">化学基礎</span>
@@ -155,6 +154,65 @@ export default function HomePage() {
                 </h3>
                 <p className="text-gray-500 pl-4">
                   共通テストのプログラミング問題で使われる擬似言語（新DNCL）をブラウザ上で実行し、ステップ確認できます。
+                </p>
+              </div>
+
+            </div>
+          </div>
+
+          <div className="retro-box">
+            <h2 className="text-sm font-bold border-b border-gray-300 pb-1.5 mb-4 flex items-center gap-1">
+              <span>■</span> 無限計算ドリル（反復演習用）
+            </h2>
+            <div className="space-y-6 text-xs leading-relaxed">
+              
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-sky-100 border border-sky-300 text-sky-800 px-1 py-0.5 rounded">数学II</span>
+                  <Link href="/learn/math/calculus-drill">微積分・面積公式ドリル</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  1/6, 1/12, 1/20, 1/30公式を用いて定積分のショートカット計算を反復演習できるドリルです。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-sky-100 border border-sky-300 text-sky-800 px-1 py-0.5 rounded">数学C</span>
+                  <Link href="/learn/math/vector-drill">ベクトル・交点位置ベクトルドリル</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  内分比から2直線の交点の位置ベクトルをメネラウスの定理等を用いて求める反復ドリルです。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-sky-100 border border-sky-300 text-sky-800 px-1 py-0.5 rounded">数学C</span>
+                  <Link href="/learn/math/complex-drill">複素数平面・ド・モアブルの定理ドリル</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  極形式とド・モアブルの定理を用いて、複素数の累乗が実数となる最小の自然数を求める演習です。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-sky-100 border border-sky-300 text-sky-800 px-1 py-0.5 rounded">数学B</span>
+                  <Link href="/learn/math/sequence-drill">数列・隣接2項間の漸化式ドリル</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  特性方程式を用いて一般項を求める反復演習と、コブウェブプロットによる収束・発散の視覚化ツールです。
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-slate-800 flex items-center gap-1.5 mb-1.5">
+                  <span className="text-[10px] bg-sky-100 border border-sky-300 text-sky-800 px-1 py-0.5 rounded">数学II</span>
+                  <Link href="/learn/math/circle-tangent-drill">図形と方程式・円の接線ドリル</Link>
+                </h3>
+                <p className="text-gray-500 pl-4">
+                  円の外部の点から引いた2本の接線の方程式を正確に求めるための幾何学＆計算演習です。
                 </p>
               </div>
 

@@ -210,7 +210,7 @@ export default function TrigonometryGraphPage() {
           三角関数の平行移動・拡大縮小シミュレーター
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          式 $y = a \sin(b(\theta - c)) + d$ の各係数 $a, b, c, d$ を操作し、波の振幅・周期・位置がどのように変形するかを学びます。
+          式 y = a sin(b(θ - c)) + d の各係数 a, b, c, d を操作し、波の振幅・周期・位置がどのように変形するかを学びます。
         </p>
       </div>
 
