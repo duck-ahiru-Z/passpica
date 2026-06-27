@@ -178,24 +178,49 @@ export default function DoubleRadicalDrillPage() {
                 <MathEq math="=" />
                 {problem.pattern === 'pattern4' ? (
                   <div className="flex flex-col items-center">
-                    <div className="flex items-center gap-2 border-b border-slate-800 pb-1 px-2">
-                      <MathEq math="\sqrt{" />
-                      <input type="number" className="w-12 border p-1 text-center font-bold" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
-                      <MathEq math={`} ${problem.sign} \\sqrt{`} />
-                      <input type="number" className="w-12 border p-1 text-center font-bold" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
-                      <MathEq math="}" />
+                    <div className="flex items-center gap-3 border-b-2 border-slate-800 pb-2 px-4">
+                      {/* Root A */}
+                      <div className="flex items-stretch">
+                        <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
+                        <div className="border-t-2 border-slate-700 pt-1">
+                          <input type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
+                        </div>
+                      </div>
+                      
+                      <div className="text-xl font-bold">{problem.sign}</div>
+                      
+                      {/* Root B */}
+                      <div className="flex items-stretch">
+                        <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
+                        <div className="border-t-2 border-slate-700 pt-1">
+                          <input type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
+                        </div>
+                      </div>
                     </div>
-                    <div className="pt-1">
-                      <MathEq math="\sqrt{2}" />
+                    <div className="pt-2 text-xl font-bold flex items-stretch">
+                      <div className="text-xl font-serif text-slate-700 flex items-center pr-0.5 select-none">√</div>
+                      <div className="border-t-2 border-slate-700 pt-0.5">2</div>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2">
-                    <MathEq math="\sqrt{" />
-                    <input type="number" className="w-12 border p-1 text-center font-bold" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
-                    <MathEq math={`} ${problem.sign} \\sqrt{`} />
-                    <input type="number" className="w-12 border p-1 text-center font-bold" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
-                    <MathEq math="}" />
+                  <div className="flex items-center gap-3">
+                    {/* Root A */}
+                    <div className="flex items-stretch">
+                      <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
+                      <div className="border-t-[3px] border-slate-700 pt-1">
+                        <input type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
+                      </div>
+                    </div>
+                    
+                    <div className="text-2xl font-bold px-2">{problem.sign}</div>
+                    
+                    {/* Root B */}
+                    <div className="flex items-stretch">
+                      <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
+                      <div className="border-t-[3px] border-slate-700 pt-1">
+                        <input type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
