@@ -6,14 +6,15 @@ import Link from "next/link";
 import { TEMPLATES, TEMPLATE_OPTIONS } from "@/src/data/pseudo-lang";
 
 export default function PseudoLangPage() {
-  const [code, setCode] = useState(TEMPLATES["exam_binary_search"]);
+  const initialTmpl = TEMPLATES["exam_binary_search"];
+  const [code, setCode] = useState<string>(typeof initialTmpl === 'string' ? initialTmpl : initialTmpl.code);
   const [output, setOutput] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   
   const [isDebugging, setIsDebugging] = useState(false);
   const [currentLine, setCurrentLine] = useState<number | null>(null);
   const [variables, setVariables] = useState<Record<string, any>>({});
-  const [isOneBased, setIsOneBased] = useState(false);
+  const [isOneBased, setIsOneBased] = useState<boolean>(typeof initialTmpl !== 'string' && initialTmpl.isOneBased ? true : false);
 
   
   const generatorRef = useRef<Generator | null>(null);
