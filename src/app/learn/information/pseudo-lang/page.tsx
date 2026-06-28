@@ -169,8 +169,8 @@ export default function PseudoLangPage() {
         let m = content.match(/(.+)の間繰り返す:/);
         parsed = `while (${m![1].trim()}) {`;
         opensBlock = true;
-      } else if (content.startsWith('表示する(')) {
-        let args = content.substring(4);
+      } else if (content.match(/^表示する\s*\(/)) {
+        let args = content.replace(/^表示する\s*/, '');
         parsed = `sys_print${args};`;
       } else {
         parsed = content + ';';
