@@ -264,8 +264,8 @@ export default function PseudoLangPage() {
       
       {/* ページヘッダー */}
       <div className="mb-8">
-        <nav className="text-xs text-slate-500 mb-2 font-pixel">
-          <Link href="/" className="hover:underline">トップ</Link> &gt; <Link href="/learn" className="hover:underline">学習室</Link> &gt; 情報I
+        <nav className="text-xs text-gray-500 mb-2">
+          <Link href="/" className="hover:underline text-indigo-600">トップ</Link> &gt; <Link href="/learn" className="hover:underline text-indigo-600">学習室</Link> &gt; 情報I
         </nav>
         <h1 className="text-3xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
           💻 共通テスト擬似言語（DNCL）エディタ＆シミュレータ
@@ -276,12 +276,12 @@ export default function PseudoLangPage() {
       </div>
 
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-4 gap-4">
-        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border-2 border-slate-800 shadow-[2px_2px_0px_rgba(0,0,0,1)] text-xs font-bold w-full md:w-auto">
-          <label className="text-slate-600">プリセット読み込み:</label>
+        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-300 shadow-sm text-xs w-full md:w-auto">
+          <label className="text-gray-600 font-semibold">プリセット読み込み:</label>
           <select 
             onChange={handleTemplateChange}
             disabled={isDebugging}
-            className="bg-transparent font-bold focus:outline-none disabled:opacity-50 text-indigo-600 cursor-pointer"
+            className="bg-transparent focus:outline-none disabled:opacity-50 text-indigo-600 cursor-pointer font-medium"
           >
             {TEMPLATE_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
@@ -290,14 +290,14 @@ export default function PseudoLangPage() {
             ))}
           </select>
         </div>
-        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border-2 border-slate-800 shadow-[2px_2px_0px_rgba(0,0,0,1)] text-xs font-bold w-full md:w-auto">
-          <label className="flex items-center gap-1 cursor-pointer text-slate-700">
+        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-md border border-gray-300 shadow-sm text-xs w-full md:w-auto">
+          <label className="flex items-center gap-1.5 cursor-pointer text-gray-700 font-medium">
             <input 
               type="checkbox" 
               checked={isOneBased} 
               onChange={(e) => setIsOneBased(e.target.checked)}
               disabled={isDebugging}
-              className="w-4 h-4 text-indigo-600 border-slate-800 focus:ring-indigo-500 rounded"
+              className="w-4 h-4 text-indigo-600 border-gray-300 focus:ring-indigo-500 rounded"
             />
             配列の要素番号を1から始める（最近の共通テスト形式）
           </label>
@@ -312,11 +312,11 @@ export default function PseudoLangPage() {
             <div className="flex flex-wrap gap-1.5">
               {!isDebugging && (
                 <>
-                  <button onClick={() => insertText(" = ")} className="px-2.5 py-1 bg-white border-2 border-slate-800 shadow-[1.5px_1.5px_0_0_rgba(15,23,42,1)] text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors">= 代入</button>
-                  <button onClick={() => insertText("表示する(\"\")\n")} className="px-2.5 py-1 bg-white border-2 border-slate-800 shadow-[1.5px_1.5px_0_0_rgba(15,23,42,1)] text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors">表示する()</button>
-                  <button onClick={() => insertText("もし  ならば:\n｜  \n")} className="px-2.5 py-1 bg-white border-2 border-slate-800 shadow-[1.5px_1.5px_0_0_rgba(15,23,42,1)] text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors">もし〜ならば:</button>
-                  <button onClick={() => insertText("を  から  まで  ずつ増やしながら繰り返す:\n｜  \n")} className="px-2.5 py-1 bg-white border-2 border-slate-800 shadow-[1.5px_1.5px_0_0_rgba(15,23,42,1)] text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors">for文</button>
-                  <button onClick={() => insertText("の間繰り返す:\n｜  \n")} className="px-2.5 py-1 bg-white border-2 border-slate-800 shadow-[1.5px_1.5px_0_0_rgba(15,23,42,1)] text-[11px] font-bold rounded-lg hover:bg-slate-50 transition-colors">while文</button>
+                  <button onClick={() => insertText(" = ")} className="px-3 py-1.5 bg-white border border-gray-300 shadow-sm text-xs font-medium rounded-md hover:bg-gray-50 transition-colors text-gray-700">= 代入</button>
+                  <button onClick={() => insertText("表示する(\"\")\n")} className="px-3 py-1.5 bg-white border border-gray-300 shadow-sm text-xs font-medium rounded-md hover:bg-gray-50 transition-colors text-gray-700">表示する()</button>
+                  <button onClick={() => insertText("もし  ならば:\n｜  \n")} className="px-3 py-1.5 bg-white border border-gray-300 shadow-sm text-xs font-medium rounded-md hover:bg-gray-50 transition-colors text-gray-700">もし〜ならば:</button>
+                  <button onClick={() => insertText("を  から  まで  ずつ増やしながら繰り返す:\n｜  \n")} className="px-3 py-1.5 bg-white border border-gray-300 shadow-sm text-xs font-medium rounded-md hover:bg-gray-50 transition-colors text-gray-700">for文</button>
+                  <button onClick={() => insertText("の間繰り返す:\n｜  \n")} className="px-3 py-1.5 bg-white border border-gray-300 shadow-sm text-xs font-medium rounded-md hover:bg-gray-50 transition-colors text-gray-700">while文</button>
                 </>
               )}
             </div>
@@ -324,19 +324,19 @@ export default function PseudoLangPage() {
             <div className="flex gap-2 shrink-0 justify-end">
               {!isDebugging ? (
                 <>
-                  <button onClick={handleRunAll} className="retro-btn text-xs py-1.5 px-4 rounded-lg bg-slate-900 text-white border-2 border-slate-800 shadow-[2px_2px_0_0_rgba(15,23,42,1)]">
+                  <button onClick={handleRunAll} className="text-xs py-2 px-4 rounded-md bg-slate-800 hover:bg-slate-700 text-white shadow-sm font-medium transition-colors">
                     ▶ 実行
                   </button>
-                  <button onClick={handleStartDebug} className="retro-btn text-xs py-1.5 px-4 rounded-lg bg-indigo-500 border-2 border-slate-800 shadow-[2px_2px_0_0_rgba(15,23,42,1)] flex items-center gap-1">
+                  <button onClick={handleStartDebug} className="text-xs py-2 px-4 rounded-md bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm font-medium transition-colors flex items-center gap-1">
                     🐞 デバッグ
                   </button>
                 </>
               ) : (
                 <>
-                  <button onClick={() => handleNextStep()} className="retro-btn text-xs py-1.5 px-4 rounded-lg bg-amber-400 border-2 border-slate-800 shadow-[2px_2px_0_0_rgba(15,23,42,1)] animate-pulse">
+                  <button onClick={() => handleNextStep()} className="text-xs py-2 px-4 rounded-md bg-amber-500 hover:bg-amber-600 text-white shadow-sm font-medium transition-colors animate-pulse">
                     ⏭ 1ステップ進む
                   </button>
-                  <button onClick={resetState} className="retro-btn text-xs py-1.5 px-4 rounded-lg bg-rose-500 border-2 border-slate-800 shadow-[2px_2px_0_0_rgba(15,23,42,1)] text-white">
+                  <button onClick={resetState} className="text-xs py-2 px-4 rounded-md bg-rose-600 hover:bg-rose-700 text-white shadow-sm font-medium transition-colors">
                     ⏹ 終了
                   </button>
                 </>
@@ -344,7 +344,7 @@ export default function PseudoLangPage() {
             </div>
           </div>
 
-          <div className="flex flex-col h-[520px] bg-[#1e1e1e] border-4 border-slate-800 rounded-2xl overflow-hidden shadow-[4px_4px_0_0_rgba(30,41,59,1)]">
+          <div className="flex flex-col h-[520px] bg-[#1e1e1e] border border-gray-300 rounded-xl overflow-hidden shadow-sm">
             <div className="h-10 bg-[#2d2d2d] border-b border-[#404040] flex items-center px-4 justify-between select-none">
               <div className="flex gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]"></div>
@@ -400,36 +400,36 @@ export default function PseudoLangPage() {
           
           {/* 変数モニター */}
           <div className="flex flex-col h-[250px]">
-            <div className="flex items-center gap-2 mb-2 px-1 text-slate-700 text-xs font-bold">
-              <span className={`w-2 h-2 rounded-full ${isDebugging ? 'bg-amber-400 animate-pulse' : 'bg-slate-300'}`}></span> 
+            <div className="flex items-center gap-2 mb-2 px-1 text-gray-700 text-xs font-semibold">
+              <span className={`w-2 h-2 rounded-full ${isDebugging ? 'bg-amber-500 animate-pulse' : 'bg-gray-300'}`}></span> 
               <span>変数モニター（リアルタイム値）</span>
             </div>
-            <div className="flex-grow bg-white border-3 border-slate-800 rounded-xl overflow-y-auto editor-scrollbar shadow-[2px_2px_0px_rgba(0,0,0,1)]">
+            <div className="flex-grow bg-white border border-gray-200 rounded-xl overflow-y-auto editor-scrollbar shadow-sm">
               {Object.keys(variables).length === 0 ? (
-                <div className="flex h-full items-center justify-center text-slate-400 text-xs font-semibold p-4 text-center leading-normal">
+                <div className="flex h-full items-center justify-center text-gray-400 text-xs p-4 text-center leading-normal">
                   {isDebugging ? 'スコープ内に有効な変数がありません' : 'デバッグ（ステップ実行）を開始すると変数の値がリアルタイムで追跡できます'}
                 </div>
               ) : (
                 <table className="w-full text-left text-xs table-fixed">
-                  <thead className="bg-slate-50 border-b-2 border-slate-800 sticky top-0 z-10 font-bold">
+                  <thead className="bg-gray-50 border-b border-gray-200 sticky top-0 z-10 font-medium">
                     <tr>
-                      <th className="py-2 px-3 text-slate-700 w-[45%]">変数名</th>
-                      <th className="py-2 px-3 text-slate-700 w-[55%]">値</th>
+                      <th className="py-2.5 px-4 text-gray-600 w-[45%] font-medium">変数名</th>
+                      <th className="py-2.5 px-4 text-gray-600 w-[55%] font-medium">値</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 font-mono">
+                  <tbody className="divide-y divide-gray-100 font-mono">
                     {Object.entries(variables).map(([key, val]) => (
-                      <tr key={key} className="hover:bg-slate-50">
-                        <td className="py-2 px-3 text-indigo-600 truncate font-semibold" title={key}>{key}</td>
-                        <td className="py-2 px-3 text-slate-800 truncate" title={JSON.stringify(val)}>
+                      <tr key={key} className="hover:bg-gray-50 transition-colors">
+                        <td className="py-2.5 px-4 text-indigo-600 truncate" title={key}>{key}</td>
+                        <td className="py-2.5 px-4 text-gray-800 truncate" title={JSON.stringify(val)}>
                           {Array.isArray(val) ? (
-                            <span className="text-purple-600 font-bold">{JSON.stringify(val)}</span>
+                            <span className="text-purple-600">{JSON.stringify(val)}</span>
                           ) : typeof val === 'number' ? (
-                            <span className="text-amber-600 font-bold">{val}</span>
+                            <span className="text-amber-600">{val}</span>
                           ) : typeof val === 'boolean' ? (
-                            <span className="text-teal-600 font-bold">{val ? '真' : '偽'}</span>
+                            <span className="text-teal-600">{val ? '真' : '偽'}</span>
                           ) : (
-                            <span className="text-emerald-600 font-semibold">"{val}"</span>
+                            <span className="text-emerald-600">"{val}"</span>
                           )}
                         </td>
                       </tr>
@@ -442,10 +442,10 @@ export default function PseudoLangPage() {
 
           {/* 実行ターミナル */}
           <div className="flex flex-col h-[250px]">
-            <div className="flex items-center gap-2 mb-2 px-1 text-slate-700 text-xs font-bold">
+            <div className="flex items-center gap-2 mb-2 px-1 text-gray-700 text-xs font-semibold">
               <span>🖥️ ターミナル出力（表示画面）</span>
             </div>
-            <div className="flex-grow p-4 font-mono text-xs bg-[#0d1117] text-[#56d364] border-3 border-slate-800 rounded-xl overflow-y-auto editor-scrollbar shadow-[inset_0_2px_4px_rgba(0,0,0,0.8),2px_2px_0px_rgba(0,0,0,1)] leading-relaxed">
+            <div className="flex-grow p-4 font-mono text-xs bg-slate-900 text-emerald-400 border border-gray-200 rounded-xl overflow-y-auto editor-scrollbar shadow-inner leading-relaxed">
               {error ? (
                 <div className="text-rose-400 whitespace-pre-wrap break-all">{error}</div>
               ) : output.length === 0 ? (
