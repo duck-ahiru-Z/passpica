@@ -3,13 +3,7 @@
 import { useState, useRef, UIEvent } from "react";
 import Link from "next/link";
 
-const TEMPLATES: Record<string, string> = {
-  "blank": "",
-  "sample_basic": `kingaku = 300\nkosu = 3\nkingaku_goukei = kingaku * kosu\n表示する("合計は", kingaku_goukei, "円です")`,
-  "sample_if": `x = 5\nもし x < 3 ならば:\n｜  x = x + 1\nそうでなくもし x == 5 ならば:\n｜  表示する("xは5です")\nそうでなければ:\n⎿  x = x * 2`,
-  "sample_loop": `Data = [10, 20, 30]\ngoukei = 0\nx を 0 から 2 まで 1 ずつ増やしながら繰り返す:\n⎿  goukei = goukei + Data[x]\n表示する("合計:", goukei)`,
-  "exam_binary_search": `# 共通テスト試作問題風 二分探索プログラム\nData = [3,18,29,33,48,52,62,77,89,97]\nkazu = 要素数(Data)\n表示する("探したい数字(例:52)が何番目にあるか検索します")\natai = 52\n\nhidari = 0\nmigi = kazu - 1\nowari = 0\n\nhidari <= migi and owari == 0 の間繰り返す:\n｜  aida = (hidari + migi) ÷ 2 \n｜  もし Data[aida] == atai ならば:\n｜  ｜  表示する(atai, "は", aida, "番目にありました")\n｜  ｜  owari = 1\n｜  そうでなくもし Data[aida] < atai ならば:\n｜  ｜  hidari = aida + 1\n｜  そうでなければ:\n⎿  ⎿  migi = aida - 1\n\nもし owari == 0 ならば:\n⎿  表示する(atai, "は見つかりませんでした")`
-};
+import { TEMPLATES, TEMPLATE_OPTIONS } from "@/data/pseudo-lang";
 
 export default function PseudoLangPage() {
   const [code, setCode] = useState(TEMPLATES["exam_binary_search"]);
@@ -19,6 +13,8 @@ export default function PseudoLangPage() {
   const [isDebugging, setIsDebugging] = useState(false);
   const [currentLine, setCurrentLine] = useState<number | null>(null);
   const [variables, setVariables] = useState<Record<string, any>>({});
+  const [isOneBased, setIsOneBased] = useState(false);
+
   
   const generatorRef = useRef<Generator | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -31,7 +27,13 @@ export default function PseudoLangPage() {
   };
 
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setCode(TEMPLATES[e.target.value]);
+    const tmpl = TEMPLATES[e.target.value];
+    setCode(typeof tmpl === 'string' ? tmpl : tmpl.code);
+    if (typeof tmpl !== 'string' && tmpl.isOneBased !== undefined) {
+      setIsOneBased(tmpl.isOneBased);
+    } else {
+      setIsOneBased(false);
+    }
     resetState();
   };
 
@@ -135,7 +137,11 @@ export default function PseudoLangPage() {
                        .replace(/要素数/g, 'sys_len')
                        .replace(/整数/g, 'Math.trunc')
                        .replace(/乱数\(\)/g, 'sys_ransuu()')
-                       .replace(/【外部からの入力】/g, 'parseInt(window.prompt("値を入力してください:") || "0")');
+                       .replace(/【外部からの入力】/g, 'parseInt(window.prompt("値を入力してください:") || "0")')
+                       .replace(/【整数を入力】/g, 'parseInt(window.prompt("整数を入力してください:") || "0")')
+                       .replace(/【文字列を入力】/g, 'window.prompt("文字列を入力してください:") || ""');
+
+      content = content.replace(/=\s*(\[.*\])$/, '= sys_arr($1)');
 
       content = content.replace(/([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+(?:\[[^\]]+\])?|\([^\)]+\))\s*÷\s*([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+(?:\[[^\]]+\])?|\([^\)]+\))/g, 'Math.trunc($1 / $2)');
 
@@ -190,7 +196,7 @@ export default function PseudoLangPage() {
     const GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor as any;
     
     const makeGen = new GeneratorFunction(
-      "sys_print", "sys_len", "sys_ransuu",
+      "sys_print", "sys_len", "sys_ransuu", "sys_arr",
       `
       try {
         ${jsCode}
@@ -202,8 +208,9 @@ export default function PseudoLangPage() {
 
     return makeGen(
       (...args: any[]) => { setOutput(prev => [...prev, args.join("")]); },
-      (arr: any[]) => arr.length,
-      () => Math.random()
+      (arr: any[]) => isOneBased ? arr.length - 1 : arr.length,
+      () => Math.random(),
+      (arr: any[]) => isOneBased ? [undefined, ...arr] : arr
     );
   };
 
@@ -275,12 +282,24 @@ export default function PseudoLangPage() {
             disabled={isDebugging}
             className="bg-transparent font-bold focus:outline-none disabled:opacity-50 text-indigo-600 cursor-pointer"
           >
-            <option value="exam_binary_search">試作問題（二分探索）</option>
-            <option value="sample_basic">基本構文と代入</option>
-            <option value="sample_if">条件分岐（if文）</option>
-            <option value="sample_loop">配列と繰り返し（for文）</option>
-            <option value="blank">新規作成（空白）</option>
+            {TEMPLATE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
+        </div>
+        <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-lg border-2 border-slate-800 shadow-[2px_2px_0px_rgba(0,0,0,1)] text-xs font-bold w-full md:w-auto">
+          <label className="flex items-center gap-1 cursor-pointer text-slate-700">
+            <input 
+              type="checkbox" 
+              checked={isOneBased} 
+              onChange={(e) => setIsOneBased(e.target.checked)}
+              disabled={isDebugging}
+              className="w-4 h-4 text-indigo-600 border-slate-800 focus:ring-indigo-500 rounded"
+            />
+            配列の要素番号を1から始める（最近の共通テスト形式）
+          </label>
         </div>
       </div>
 
