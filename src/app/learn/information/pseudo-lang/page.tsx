@@ -3,7 +3,7 @@
 import { useState, useRef, UIEvent } from "react";
 import Link from "next/link";
 
-import { TEMPLATES, TEMPLATE_OPTIONS } from "@/data/pseudo-lang";
+import { TEMPLATES, TEMPLATE_OPTIONS } from "@/src/data/pseudo-lang";
 
 export default function PseudoLangPage() {
   const [code, setCode] = useState(TEMPLATES["exam_binary_search"]);
