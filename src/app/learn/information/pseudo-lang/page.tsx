@@ -74,6 +74,14 @@ export default function PseudoLangPage() {
         vars.add(match[1]);
       }
     }
+    const arrRegex = /([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+)\[/g;
+    const arrVars = new Set<string>();
+    while ((match = arrRegex.exec(cleanCode)) !== null) {
+      if (!['if', 'elif', 'else', 'while', 'for', 'and', 'or', 'not', 'sys_len', 'sys_arr'].includes(match[1])) {
+        arrVars.add(match[1]);
+        vars.add(match[1]);
+      }
+    }
     const forRegex = /([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+)\s*を.+?から/g;
     while ((match = forRegex.exec(cleanCode)) !== null) {
       vars.add(match[1]);
@@ -82,6 +90,9 @@ export default function PseudoLangPage() {
     const varNames = Array.from(vars);
     if (varNames.length > 0) {
       jsCode += `let ${varNames.join(', ')};\n`;
+      for (const arrVar of Array.from(arrVars)) {
+        jsCode += `${arrVar} = sys_arr([]);\n`;
+      }
     }
 
     const getYieldCode = (lineIndex: number) => {
@@ -135,6 +146,9 @@ export default function PseudoLangPage() {
                        .replace(/\band\b/g, '&&')
                        .replace(/\bor\b/g, '||')
                        .replace(/\bnot\b/g, '!')
+                       .replace(/かつ/g, '&&')
+                       .replace(/または/g, '||')
+                       .replace(/でない/g, '!')
                        .replace(/要素数/g, 'sys_len')
                        .replace(/整数/g, 'Math.trunc')
                        .replace(/乱数\(\)/g, 'sys_ransuu()')
@@ -146,27 +160,27 @@ export default function PseudoLangPage() {
 
       content = content.replace(/([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+(?:\[[^\]]+\])?|\([^\)]+\))\s*÷\s*([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+(?:\[[^\]]+\])?|\([^\)]+\))/g, 'Math.trunc($1 / $2)');
 
-      if (content.startsWith('もし') && content.endsWith(':')) {
-        let cond = content.substring(2, content.length - 1).replace(/ならば$/, '').trim();
+      if (content.startsWith('もし') && content.match(/ならば:?\s*$/)) {
+        let cond = content.substring(2).replace(/ならば:?\s*$/, '').trim();
         parsed = `if (${cond}) {`;
         opensBlock = true;
-      } else if (content.startsWith('そうでなくもし') && content.endsWith(':')) {
-        let cond = content.substring(7, content.length - 1).replace(/ならば$/, '').trim();
+      } else if (content.startsWith('そうでなくもし') && content.match(/ならば:?\s*$/)) {
+        let cond = content.substring(7).replace(/ならば:?\s*$/, '').trim();
         parsed = `else if (${cond}) {`;
         opensBlock = true;
-      } else if (content.startsWith('そうでなければ:')) {
+      } else if (content.match(/^そうでなければ:?\s*$/)) {
         parsed = `else {`;
         opensBlock = true;
-      } else if (content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:/)) {
-        let m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:/);
+      } else if (content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:?/)) {
+        let m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:?/);
         parsed = `for (${m![1].trim()} = (${m![2]}); ${m![1].trim()} <= (${m![3]}); ${m![1].trim()} += (${m![4]})) {`;
         opensBlock = true;
-      } else if (content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:/)) {
-        let m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:/);
+      } else if (content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:?/)) {
+        let m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:?/);
         parsed = `for (${m![1].trim()} = (${m![2]}); ${m![1].trim()} >= (${m![3]}); ${m![1].trim()} -= (${m![4]})) {`;
         opensBlock = true;
-      } else if (content.match(/(.+)の間繰り返す:/)) {
-        let m = content.match(/(.+)の間繰り返す:/);
+      } else if (content.match(/(.+)の間繰り返す:?/)) {
+        let m = content.match(/(.+)の間繰り返す:?/);
         parsed = `while (${m![1].trim()}) {`;
         opensBlock = true;
       } else if (content.match(/^表示する\s*\(/)) {
