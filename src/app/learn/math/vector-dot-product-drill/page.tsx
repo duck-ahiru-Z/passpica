@@ -57,21 +57,21 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1') {
-      let ax = Math.floor(Math.random() * 11) - 5;
-      let ay = Math.floor(Math.random() * 11) - 5;
-      let bx = Math.floor(Math.random() * 11) - 5;
-      let by = Math.floor(Math.random() * 11) - 5;
+      const ax = Math.floor(Math.random() * 11) - 5;
+      const ay = Math.floor(Math.random() * 11) - 5;
+      const bx = Math.floor(Math.random() * 11) - 5;
+      const by = Math.floor(Math.random() * 11) - 5;
       if (ax===0 && ay===0) continue;
       if (bx===0 && by===0) continue;
       
-      let dot = ax*bx + ay*by;
+      const dot = ax*bx + ay*by;
       
-      let a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
-      let b: Vector2D = { xStr: bx.toString(), yStr: by.toString(), xVal: bx, yVal: by };
+      const a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
+      const b: Vector2D = { xStr: bx.toString(), yStr: by.toString(), xVal: bx, yVal: by };
       
-      let qStr = `\\vec{a} = (${ax}, ${ay}), \\quad \\vec{b} = (${bx}, ${by}) \\quad \\text{のとき、内積 } \\vec{a} \\cdot \\vec{b} \\text{ を求めよ。}`;
+      const qStr = `\\vec{a} = (${ax}, ${ay}), \\quad \\vec{b} = (${bx}, ${by}) \\quad \\text{のとき、内積 } \\vec{a} \\cdot \\vec{b} \\text{ を求めよ。}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{成分による内積の定義より：}`,
         `\\vec{a} \\cdot \\vec{b} = x_1 x_2 + y_1 y_2`,
         `= (${ax}) \\times (${bx}) + (${ay}) \\times (${by})`,
@@ -82,15 +82,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, a, b, qStr, ansNum: dot, ansDen: 1, expLines };
     } 
     else if (p === 'pattern2') {
-      let pair = anglePairs[Math.floor(Math.random() * anglePairs.length)];
+      const pair = anglePairs[Math.floor(Math.random() * anglePairs.length)];
       // Maybe swap a and b
       let a = pair.a;
       let b = pair.b;
       if (Math.random() > 0.5) { a = pair.b; b = pair.a; }
       
-      let qStr = `\\vec{a} = (${a.xStr}, ${a.yStr}), \\quad \\vec{b} = (${b.xStr}, ${b.yStr}) \\quad \\text{のなす角 } \\theta \\, (0^\\circ \\le \\theta \\le 180^\\circ) \\text{ を求めよ。}`;
+      const qStr = `\\vec{a} = (${a.xStr}, ${a.yStr}), \\quad \\vec{b} = (${b.xStr}, ${b.yStr}) \\quad \\text{のなす角 } \\theta \\, (0^\\circ \\le \\theta \\le 180^\\circ) \\text{ を求めよ。}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{なす角を求める公式 } \\cos\\theta = \\frac{\\vec{a} \\cdot \\vec{b}}{|\\vec{a}||\\vec{b}|} \\text{ を用います。}`,
         `\\cos\\theta = ${pair.cos}`,
         `0^\\circ \\le \\theta \\le 180^\\circ \\text{ の範囲でこれを満たす } \\theta \\text{ は } ${pair.deg}^\\circ \\text{ です。}`
@@ -106,19 +106,19 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let by = Math.floor(Math.random() * 9) - 4;
       if (by === 0) by = -1;
       
-      let a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
-      let b: Vector2D = { xStr: "x", yStr: by.toString(), xVal: 0, yVal: by }; // xVal unused here
+      const a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
+      const b: Vector2D = { xStr: "x", yStr: by.toString(), xVal: 0, yVal: by }; // xVal unused here
       
       // ax * x + ay * by = 0  => ax * x = -ay * by
       let num = -ay * by;
       let den = ax;
-      let g = gcd(num, den);
+      const g = gcd(num, den);
       num /= g; den /= g;
       if (den < 0) { num = -num; den = -den; }
       
-      let qStr = `\\vec{a} = (${ax}, ${ay}), \\quad \\vec{b} = (x, ${by}) \\quad \\text{が垂直であるとき、} x \\text{ の値を求めよ。}`;
+      const qStr = `\\vec{a} = (${ax}, ${ay}), \\quad \\vec{b} = (x, ${by}) \\quad \\text{が垂直であるとき、} x \\text{ の値を求めよ。}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{2つのベクトルが垂直である条件は、内積が } 0 \\text{ となることです。}`,
         `\\vec{a} \\cdot \\vec{b} = 0`,
         `(${ax}) \\times x + (${ay}) \\times (${by}) = 0`,
@@ -129,24 +129,24 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       else expLines.push(`x = \\frac{${num}}{${den}}`);
       
       // for drawing, use the actual solved x
-      let solvedB: Vector2D = { xStr: (num/den).toString(), yStr: by.toString(), xVal: num/den, yVal: by };
+      const solvedB: Vector2D = { xStr: (num/den).toString(), yStr: by.toString(), xVal: num/den, yVal: by };
       
       return { pattern: p, a, b: solvedB, qStr, ansNum: num, ansDen: den, expLines };
     }
     else if (p === 'pattern4') {
-      let ax = Math.floor(Math.random() * 9) - 4;
-      let ay = Math.floor(Math.random() * 9) - 4;
-      let bx = Math.floor(Math.random() * 9) - 4;
-      let by = Math.floor(Math.random() * 9) - 4;
+      const ax = Math.floor(Math.random() * 9) - 4;
+      const ay = Math.floor(Math.random() * 9) - 4;
+      const bx = Math.floor(Math.random() * 9) - 4;
+      const by = Math.floor(Math.random() * 9) - 4;
       
-      let a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
-      let b: Vector2D = { xStr: bx.toString(), yStr: by.toString(), xVal: bx, yVal: by };
+      const a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
+      const b: Vector2D = { xStr: bx.toString(), yStr: by.toString(), xVal: bx, yVal: by };
       
-      let sq = (ax+bx)*(ax+bx) + (ay+by)*(ay+by);
+      const sq = (ax+bx)*(ax+bx) + (ay+by)*(ay+by);
       
-      let qStr = `\\vec{a} = (${ax}, ${ay}), \\quad \\vec{b} = (${bx}, ${by}) \\quad \\text{のとき、} |\\vec{a} + \\vec{b}|^2 \\text{ の値を求めよ。}`;
+      const qStr = `\\vec{a} = (${ax}, ${ay}), \\quad \\vec{b} = (${bx}, ${by}) \\quad \\text{のとき、} |\\vec{a} + \\vec{b}|^2 \\text{ の値を求めよ。}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{成分同士を足してから大きさを求めます。}`,
         `\\vec{a} + \\vec{b} = (${ax} + ${bx}, \\quad ${ay} + ${by})`,
         `= (${ax+bx}, \\quad ${ay+by})`,
@@ -185,9 +185,9 @@ export default function VectorDotProductDrill() {
     if (!problem) return;
     
     let uNum = 0, uDen = 1;
-    let uStr = ansVal.trim().replace(/\s+/g, '');
+    const uStr = ansVal.trim().replace(/\s+/g, '');
     if (uStr.includes('/')) {
-      let parts = uStr.split('/');
+      const parts = uStr.split('/');
       uNum = parseInt(parts[0]);
       uDen = parseInt(parts[1]);
     } else {
@@ -213,7 +213,7 @@ export default function VectorDotProductDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let { a, b } = problem;
+    const { a, b } = problem;
     
     let minX = Math.min(0, a.xVal, b.xVal);
     let maxX = Math.max(0, a.xVal, b.xVal);
@@ -227,20 +227,20 @@ export default function VectorDotProductDrill() {
       maxY = Math.max(maxY, a.yVal + b.yVal);
     }
 
-    let margin = 2;
-    let spanX = Math.max(maxX - minX + margin*2, 4);
-    let spanY = Math.max(maxY - minY + margin*2, 4);
-    let scale = Math.min(W / spanX, H / spanY);
+    const margin = 2;
+    const spanX = Math.max(maxX - minX + margin*2, 4);
+    const spanY = Math.max(maxY - minY + margin*2, 4);
+    const scale = Math.min(W / spanX, H / spanY);
     
-    let cx = (minX + maxX) / 2;
-    let cy = (minY + maxY) / 2;
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
 
     const toScr = (x: number, y: number) => ({
       x: W/2 + (x - cx) * scale,
       y: H/2 - (y - cy) * scale
     });
 
-    let origin = toScr(0, 0);
+    const origin = toScr(0, 0);
 
     // Draw axes
     ctx.strokeStyle = '#e2e8f0';
@@ -255,7 +255,7 @@ export default function VectorDotProductDrill() {
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(from.x, from.y); ctx.lineTo(to.x, to.y); ctx.stroke();
       
-      let angle = Math.atan2(to.y - from.y, to.x - from.x);
+      const angle = Math.atan2(to.y - from.y, to.x - from.x);
       ctx.beginPath();
       ctx.moveTo(to.x, to.y);
       ctx.lineTo(to.x - 10 * Math.cos(angle - Math.PI/6), to.y - 10 * Math.sin(angle - Math.PI/6));
@@ -266,11 +266,11 @@ export default function VectorDotProductDrill() {
       ctx.fillText(label, to.x + (to.x>from.x?5:-15), to.y + (to.y>from.y?15:-5));
     };
 
-    let sa = toScr(a.xVal, a.yVal);
-    let sb = toScr(b.xVal, b.yVal);
+    const sa = toScr(a.xVal, a.yVal);
+    const sb = toScr(b.xVal, b.yVal);
 
     if (problem.pattern === 'pattern4' && hasChecked) {
-      let sc = toScr(a.xVal + b.xVal, a.yVal + b.yVal);
+      const sc = toScr(a.xVal + b.xVal, a.yVal + b.yVal);
       // parallelogram
       ctx.strokeStyle = '#94a3b8';
       ctx.setLineDash([4, 4]);
@@ -287,8 +287,8 @@ export default function VectorDotProductDrill() {
 
       if (problem.pattern === 'pattern2' && hasChecked) {
         // Draw angle arc
-        let angA = Math.atan2(sa.y - origin.y, sa.x - origin.x);
-        let angB = Math.atan2(sb.y - origin.y, sb.x - origin.x);
+        const angA = Math.atan2(sa.y - origin.y, sa.x - origin.x);
+        const angB = Math.atan2(sb.y - origin.y, sb.x - origin.x);
         
         ctx.strokeStyle = '#f59e0b';
         ctx.fillStyle = '#fef3c7';

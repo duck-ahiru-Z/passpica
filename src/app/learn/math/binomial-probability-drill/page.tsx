@@ -51,47 +51,47 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p === 'pattern1') {
-    let n = Math.floor(Math.random() * 4) + 3; // 3 to 6
-    let r = Math.floor(Math.random() * (n - 1)) + 1; // 1 to n-1
-    let p_num = 1;
-    let p_den = 2;
-    let ans_num = nCr(n, r);
-    let ans_den = Math.pow(2, n);
-    let g = gcd(ans_num, ans_den);
+    const n = Math.floor(Math.random() * 4) + 3; // 3 to 6
+    const r = Math.floor(Math.random() * (n - 1)) + 1; // 1 to n-1
+    const p_num = 1;
+    const p_den = 2;
+    const ans_num = nCr(n, r);
+    const ans_den = Math.pow(2, n);
+    const g = gcd(ans_num, ans_den);
     return { pattern: p, n, r, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g };
   } else if (p === 'pattern2') {
-    let probs = [{n:1, d:6}, {n:1, d:3}, {n:2, d:3}, {n:1, d:4}]; 
-    let prob = probs[Math.floor(Math.random() * probs.length)];
-    let n = Math.floor(Math.random() * 3) + 3; // 3 to 5
-    let r = Math.floor(Math.random() * (n - 1)) + 1;
-    let p_num = prob.n;
-    let p_den = prob.d;
-    let ans_num = nCr(n, r) * Math.pow(p_num, r) * Math.pow(p_den - p_num, n - r);
-    let ans_den = Math.pow(p_den, n);
-    let g = gcd(ans_num, ans_den);
+    const probs = [{n:1, d:6}, {n:1, d:3}, {n:2, d:3}, {n:1, d:4}]; 
+    const prob = probs[Math.floor(Math.random() * probs.length)];
+    const n = Math.floor(Math.random() * 3) + 3; // 3 to 5
+    const r = Math.floor(Math.random() * (n - 1)) + 1;
+    const p_num = prob.n;
+    const p_den = prob.d;
+    const ans_num = nCr(n, r) * Math.pow(p_num, r) * Math.pow(p_den - p_num, n - r);
+    const ans_den = Math.pow(p_den, n);
+    const g = gcd(ans_num, ans_den);
     return { pattern: p, n, r, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g };
   } else if (p === 'pattern3') {
-    let probs = [{n:1, d:6}, {n:1, d:3}, {n:1, d:4}];
-    let prob = probs[Math.floor(Math.random() * probs.length)];
-    let n = Math.floor(Math.random() * 3) + 3; // 3 to 5
-    let p_num = prob.n;
-    let p_den = prob.d;
-    let fail_num = p_den - p_num;
-    let ans_num = Math.pow(p_den, n) - Math.pow(fail_num, n);
-    let ans_den = Math.pow(p_den, n);
-    let g = gcd(ans_num, ans_den);
+    const probs = [{n:1, d:6}, {n:1, d:3}, {n:1, d:4}];
+    const prob = probs[Math.floor(Math.random() * probs.length)];
+    const n = Math.floor(Math.random() * 3) + 3; // 3 to 5
+    const p_num = prob.n;
+    const p_den = prob.d;
+    const fail_num = p_den - p_num;
+    const ans_num = Math.pow(p_den, n) - Math.pow(fail_num, n);
+    const ans_den = Math.pow(p_den, n);
+    const g = gcd(ans_num, ans_den);
     return { pattern: p, n, r: 0, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g };
   } else {
     // pattern4: conditional
-    let req_wins = Math.floor(Math.random() * 2) + 3; // 3 or 4 wins to win match
+    const req_wins = Math.floor(Math.random() * 2) + 3; // 3 or 4 wins to win match
     let n = Math.floor(Math.random() * (req_wins)) + req_wins; // n=3,4,5
     if (n === req_wins) n++; // ensure it's not a straight sweep for more interesting calculation
-    let r = req_wins; 
-    let p_num = 1;
-    let p_den = 2; // keep it simple 1/2 for matches
-    let ans_num = nCr(n - 1, r - 1);
-    let ans_den = Math.pow(2, n);
-    let g = gcd(ans_num, ans_den);
+    const r = req_wins; 
+    const p_num = 1;
+    const p_den = 2; // keep it simple 1/2 for matches
+    const ans_num = nCr(n - 1, r - 1);
+    const ans_den = Math.pow(2, n);
+    const g = gcd(ans_num, ans_den);
     return { pattern: p, n, r, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g, req_wins };
   }
 }
@@ -128,14 +128,14 @@ export default function BinomialProbabilityDrill() {
     if (problem.pattern === 'pattern4') {
       ctx.fillText(`${problem.req_wins}勝で優勝 (現在 ${problem.n}戦目)`, W/2, 20);
       
-      let boxW = 20;
-      let startX = W/2 - (problem.n * (boxW + 5)) / 2;
-      let startY = 60;
+      const boxW = 20;
+      const startX = W/2 - (problem.n * (boxW + 5)) / 2;
+      const startY = 60;
       
       ctx.font = '10px sans-serif';
       
       for (let i = 0; i < problem.n; i++) {
-        let isLast = i === problem.n - 1;
+        const isLast = i === problem.n - 1;
         ctx.fillStyle = isLast ? '#ef4444' : '#cbd5e1';
         ctx.fillRect(startX + i * (boxW + 5), startY, boxW, boxW);
         ctx.strokeStyle = '#64748b';
@@ -159,12 +159,12 @@ export default function BinomialProbabilityDrill() {
     } else if (problem.pattern === 'pattern1' || problem.pattern === 'pattern2') {
       ctx.fillText(`${problem.n} 回中、ちょうど ${problem.r} 回成功`, W/2, 20);
       
-      let boxW = 15;
-      let startX = W/2 - (problem.n * (boxW + 4)) / 2;
-      let startY = 60;
+      const boxW = 15;
+      const startX = W/2 - (problem.n * (boxW + 4)) / 2;
+      const startY = 60;
       
       for (let i = 0; i < problem.n; i++) {
-        let isSuccess = i < problem.r;
+        const isSuccess = i < problem.r;
         ctx.fillStyle = isSuccess ? '#3b82f6' : '#ef4444';
         ctx.beginPath();
         ctx.arc(startX + i * (boxW + 4) + boxW/2, startY + boxW/2, boxW/2, 0, 2*Math.PI);
@@ -182,10 +182,10 @@ export default function BinomialProbabilityDrill() {
       ctx.fillText(`少なくとも 1 回成功する確率`, W/2, 20);
       
       // Draw 100% bar and subtract failure
-      let barW = 200;
-      let barH = 20;
-      let barX = W/2 - barW/2;
-      let barY = 80;
+      const barW = 200;
+      const barH = 20;
+      const barX = W/2 - barW/2;
+      const barY = 80;
       
       ctx.fillStyle = '#3b82f6'; // Success part
       ctx.fillRect(barX, barY, barW * 0.8, barH);
@@ -222,7 +222,7 @@ export default function BinomialProbabilityDrill() {
     
     // Check if the answer matches exactly
     // since root is 1, checkFractionRoot handles it.
-    let isOk = checkFractionRoot(ansVal, 1, problem.ans_num, 1, problem.ans_den);
+    const isOk = checkFractionRoot(ansVal, 1, problem.ans_num, 1, problem.ans_den);
     
     setIsCorrect(isOk);
     setHasChecked(true);

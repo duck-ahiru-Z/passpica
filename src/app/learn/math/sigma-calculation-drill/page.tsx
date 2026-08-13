@@ -39,22 +39,22 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1') {
-      let a = Math.floor(Math.random() * 11) - 5;
-      let b = Math.floor(Math.random() * 11) - 5;
+      const a = Math.floor(Math.random() * 11) - 5;
+      const b = Math.floor(Math.random() * 11) - 5;
       if (a === 0) continue;
       
-      let ns = [10, 15, 20];
-      let n = ns[Math.floor(Math.random() * ns.length)];
+      const ns = [10, 15, 20];
+      const n = ns[Math.floor(Math.random() * ns.length)];
       
-      let val = a * (n * (n + 1) / 2) + b * n;
+      const val = a * (n * (n + 1) / 2) + b * n;
       
       let inner = `${a === 1 ? '' : (a === -1 ? '-' : a)}k`;
       if (b > 0) inner += `+${b}`;
       else if (b < 0) inner += `${b}`;
       
-      let qStr = `\\sum_{k=1}^{n} (${inner}) \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
+      const qStr = `\\sum_{k=1}^{n} (${inner}) \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{まず } n \\text{ のまま公式を展開します。}`,
         `\\sum_{k=1}^{n} (${inner}) = ${a}\\sum_{k=1}^{n} k ${b !== 0 ? (b > 0 ? '+' + b : b) + '\\sum_{k=1}^{n} 1' : ''}`,
         `= ${a} \\cdot \\frac{1}{2}n(n+1) ${b !== 0 ? (b > 0 ? '+' : '-') + Math.abs(b) + 'n' : ''}`,
@@ -67,15 +67,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, n, qStr, ansNum: val, ansDen: 1, expLines };
     } 
     else if (p === 'pattern2') {
-      let a = Math.floor(Math.random() * 5) + 1;
-      let b = Math.floor(Math.random() * 11) - 5;
+      const a = Math.floor(Math.random() * 5) + 1;
+      const b = Math.floor(Math.random() * 11) - 5;
       
-      let ns = [10, 12];
-      let n = ns[Math.floor(Math.random() * ns.length)];
+      const ns = [10, 12];
+      const n = ns[Math.floor(Math.random() * ns.length)];
       
-      let sumK2 = n * (n + 1) * (2 * n + 1) / 6;
-      let sumK = n * (n + 1) / 2;
-      let val = a * sumK2 + b * sumK;
+      const sumK2 = n * (n + 1) * (2 * n + 1) / 6;
+      const sumK = n * (n + 1) / 2;
+      const val = a * sumK2 + b * sumK;
       
       let inner = `${a === 1 ? '' : a}k^2`;
       if (b === 1) inner += `+k`;
@@ -83,9 +83,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       else if (b > 0) inner += `+${b}k`;
       else if (b < 0) inner += `${b}k`;
       
-      let qStr = `\\sum_{k=1}^{n} (${inner}) \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
+      const qStr = `\\sum_{k=1}^{n} (${inner}) \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{公式 } \\sum k^2 = \\frac{1}{6}n(n+1)(2n+1) \\text{ 等を利用します。}`,
         `\\sum_{k=1}^{n} (${inner}) = ${a}\\sum_{k=1}^{n} k^2 ${b !== 0 ? (b > 0 ? '+' + (b===1?'':b) : '-' + (b===-1?'':Math.abs(b))) + '\\sum_{k=1}^{n} k' : ''}`,
         `\\text{ここで } n = ${n} \\text{ を代入します。}`,
@@ -98,19 +98,19 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, n, qStr, ansNum: val, ansDen: 1, expLines };
     }
     else if (p === 'pattern3') {
-      let c = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
-      let ns = [10, 15, 20];
-      let n = ns[Math.floor(Math.random() * ns.length)];
+      const c = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
+      const ns = [10, 15, 20];
+      const n = ns[Math.floor(Math.random() * ns.length)];
       
       // sum = c * (n / (n+1))
       let num = c * n;
       let den = n + 1;
-      let g = gcd(num, den);
+      const g = gcd(num, den);
       num /= g; den /= g;
       
-      let qStr = `\\sum_{k=1}^{n} \\frac{${c}}{k(k+1)} \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
+      const qStr = `\\sum_{k=1}^{n} \\frac{${c}}{k(k+1)} \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{部分分数分解を行います。}`,
         `\\frac{${c}}{k(k+1)} = ${c} \\left( \\frac{1}{k} - \\frac{1}{k+1} \\right)`,
         `\\text{これに } k=1, 2, \\dots, n \\text{ を代入して足し合わせると、}`,
@@ -125,15 +125,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, n, qStr, ansNum: num, ansDen: den, expLines };
     }
     else if (p === 'pattern4') {
-      let a = Math.floor(Math.random() * 4) + 2; // 2..5
-      let r = Math.floor(Math.random() * 3) + 2; // 2..4
-      let n = Math.floor(Math.random() * 3) + 5; // 5..7
+      const a = Math.floor(Math.random() * 4) + 2; // 2..5
+      const r = Math.floor(Math.random() * 3) + 2; // 2..4
+      const n = Math.floor(Math.random() * 3) + 5; // 5..7
       
-      let val = a * (Math.pow(r, n) - 1) / (r - 1);
+      const val = a * (Math.pow(r, n) - 1) / (r - 1);
       
-      let qStr = `\\sum_{k=1}^{n} ${a} \\cdot ${r}^{k-1} \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
+      const qStr = `\\sum_{k=1}^{n} ${a} \\cdot ${r}^{k-1} \\quad \\text{において、} n = ${n} \\text{ のときの値}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{シグマの中身は、初項 } ${a} \\text{ 、公比 } ${r} \\text{ の等比数列です。}`,
         `\\text{等比数列の和の公式を用います。}`,
         `\\sum_{k=1}^{n} ${a} \\cdot ${r}^{k-1} = \\frac{${a}(${r}^n - 1)}{${r} - 1}`,
@@ -172,9 +172,9 @@ export default function SigmaCalculationDrill() {
     if (!problem) return;
     
     let uNum = 0, uDen = 1;
-    let uStr = ansVal.trim().replace(/\s+/g, '');
+    const uStr = ansVal.trim().replace(/\s+/g, '');
     if (uStr.includes('/')) {
-      let parts = uStr.split('/');
+      const parts = uStr.split('/');
       uNum = parseInt(parts[0]);
       uDen = parseInt(parts[1]);
     } else {

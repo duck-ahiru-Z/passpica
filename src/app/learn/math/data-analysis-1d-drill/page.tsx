@@ -37,10 +37,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   while (true) {
     if (p === 'pattern1') {
       // Mean, Median, Mode (5-7 items)
-      let n = Math.floor(Math.random() * 3) + 5; // 5, 6, 7
-      let data = [];
+      const n = Math.floor(Math.random() * 3) + 5; // 5, 6, 7
+      const data = [];
       let sum = 0;
-      let modeVal = Math.floor(Math.random() * 10) + 1; // 1..10
+      const modeVal = Math.floor(Math.random() * 10) + 1; // 1..10
       data.push(modeVal);
       data.push(modeVal);
       sum += modeVal * 2;
@@ -53,9 +53,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       }
       
       // adjust to integer mean
-      let rem = sum % n;
+      const rem = sum % n;
       if (rem !== 0) {
-        let diff = n - rem;
+        const diff = n - rem;
         // add diff to a non-mode element
         for (let i = 2; i < n; i++) {
           if (data[i] + diff <= 20 && data[i] + diff !== modeVal) {
@@ -67,17 +67,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       }
       
       if (sum % n !== 0) continue; // retry if fail
-      let mean = sum / n;
+      const mean = sum / n;
       
-      let sorted = [...data].sort((a,b)=>a-b);
-      let median = n % 2 === 1 ? sorted[Math.floor(n/2)] : (sorted[n/2 - 1] + sorted[n/2]) / 2;
+      const sorted = [...data].sort((a,b)=>a-b);
+      const median = n % 2 === 1 ? sorted[Math.floor(n/2)] : (sorted[n/2 - 1] + sorted[n/2]) / 2;
       
       // Shuffle data
       data.sort(() => Math.random() - 0.5);
       
-      let qStr = `次のデータについて、平均値、中央値、最頻値を求めよ。\n\n$${data.join(', ')}$`;
+      const qStr = `次のデータについて、平均値、中央値、最頻値を求めよ。\n\n$${data.join(', ')}$`;
       
-      let expLines = [
+      const expLines = [
         `\\text{データの合計は } ${data.join(' + ')} = ${sum}`,
         `\\text{平均値 } \\bar{x} = \\frac{${sum}}{${n}} = ${mean}`,
         `\\text{データを小さい順に並べると } ${sorted.join(', ')}`,
@@ -89,30 +89,30 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern2') {
       // Variance def. 5 items. Mean int. sum of sq diffs is multiple of 5.
-      let mean = Math.floor(Math.random() * 5) + 5; // 5..9
+      const mean = Math.floor(Math.random() * 5) + 5; // 5..9
       // We want 5 deviations that sum to 0. And sum of sq is multiple of 5.
       // e.g. dev: [-2, -1, 0, 1, 2] -> sq: 4, 1, 0, 1, 4 -> sum 10. var=2.
       // [-3, -1, 0, 1, 3] -> 9, 1, 0, 1, 9 -> 20. var=4.
       // [-4, -2, 0, 2, 4] -> 16, 4, 0, 4, 16 -> 40. var=8.
       // [-2, -2, 0, 2, 2] -> 4, 4, 0, 4, 4 -> 16. (not mult of 5, wait variance is 16/5=3.2. which is fine but user wants nice values)
-      let devsList = [
+      const devsList = [
         [-2, -1, 0, 1, 2],
         [-3, -1, 0, 1, 3],
         [-4, -2, 0, 2, 4],
         [-1, -1, 0, 1, 1], // sum sq 4. var = 0.8
         [-5, -3, 0, 3, 5],
       ];
-      let devs = devsList[Math.floor(Math.random() * devsList.length)];
+      const devs = devsList[Math.floor(Math.random() * devsList.length)];
       
-      let data = devs.map(d => mean + d);
+      const data = devs.map(d => mean + d);
       data.sort(() => Math.random() - 0.5);
       
-      let sumSq = devs.reduce((a, b) => a + b*b, 0);
-      let variance = sumSq / 5;
+      const sumSq = devs.reduce((a, b) => a + b*b, 0);
+      const variance = sumSq / 5;
       
-      let qStr = `次の5個のデータについて、分散を求めよ。\n\n$${data.join(', ')}$`;
+      const qStr = `次の5個のデータについて、分散を求めよ。\n\n$${data.join(', ')}$`;
       
-      let expLines = [
+      const expLines = [
         `\\text{平均値 } \\bar{x} = \\frac{${data.join(' + ')}}{5} = ${mean}`,
         `\\text{各データの偏差 } (x_i - \\bar{x}) \\text{ は } ${data.map(x => x - mean).join(', ')}`,
         `\\text{偏差の2乗は } ${data.map(x => Math.pow(x - mean, 2)).join(', ')}`,
@@ -123,24 +123,24 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern3') {
       // Variance alt formula. Give slightly larger numbers
-      let base = Math.floor(Math.random() * 5) * 10 + 20; // 20, 30, 40, 50, 60
-      let devsList = [
+      const base = Math.floor(Math.random() * 5) * 10 + 20; // 20, 30, 40, 50, 60
+      const devsList = [
         [-2, -1, 0, 1, 2],
         [-3, -1, 0, 1, 3]
       ];
-      let devs = devsList[Math.floor(Math.random() * devsList.length)];
-      let data = devs.map(d => base + d);
+      const devs = devsList[Math.floor(Math.random() * devsList.length)];
+      const data = devs.map(d => base + d);
       data.sort(() => Math.random() - 0.5);
       
-      let sum = data.reduce((a,b)=>a+b, 0);
-      let mean = sum/5;
-      let sumSq = data.reduce((a,b)=>a+b*b, 0);
-      let meanSq = sumSq / 5;
-      let variance = meanSq - mean*mean;
+      const sum = data.reduce((a,b)=>a+b, 0);
+      const mean = sum/5;
+      const sumSq = data.reduce((a,b)=>a+b*b, 0);
+      const meanSq = sumSq / 5;
+      const variance = meanSq - mean*mean;
       
-      let qStr = `次の5個のデータについて、2乗の平均から平均の2乗を引く公式を利用して分散を求めよ。\n\n$${data.join(', ')}$`;
+      const qStr = `次の5個のデータについて、2乗の平均から平均の2乗を引く公式を利用して分散を求めよ。\n\n$${data.join(', ')}$`;
       
-      let expLines = [
+      const expLines = [
         `\\text{別公式 } s^2 = \\overline{x^2} - (\\bar{x})^2 \\text{ を用います。}`,
         `\\text{平均値 } \\bar{x} = \\frac{${sum}}{5} = ${mean}`,
         `\\text{2乗の和は } ${data.map(x => x*x).join(' + ')} = ${sumSq}`,
@@ -152,19 +152,19 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       // Data transform
-      let origMean = Math.floor(Math.random() * 10) + 10;
-      let origVar = Math.floor(Math.random() * 5) + 2;
+      const origMean = Math.floor(Math.random() * 10) + 10;
+      const origVar = Math.floor(Math.random() * 5) + 2;
       
-      let a = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
+      const a = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
       let b = Math.floor(Math.random() * 10) - 5; // -5 .. 4
       if (b === 0) b = 5;
       
-      let qStr = `ある変量 $x$ の平均値が $${origMean}$、分散が $${origVar}$ である。\n新しい変量 $y$ を $y = ${a}x ${b > 0 ? '+' : '-'} ${Math.abs(b)}$ で定めるとき、$y$ の平均値と分散を求めよ。`;
+      const qStr = `ある変量 $x$ の平均値が $${origMean}$、分散が $${origVar}$ である。\n新しい変量 $y$ を $y = ${a}x ${b > 0 ? '+' : '-'} ${Math.abs(b)}$ で定めるとき、$y$ の平均値と分散を求めよ。`;
       
-      let newMean = a * origMean + b;
-      let newVar = a * a * origVar;
+      const newMean = a * origMean + b;
+      const newVar = a * a * origVar;
       
-      let expLines = [
+      const expLines = [
         `\\text{変量の変換公式 } y = ax + b \\text{ に対し、}`,
         `\\bar{y} = a\\bar{x} + b, \\quad s_y^2 = a^2 s_x^2 \\text{ が成り立ちます。}`,
         `\\text{平均値 } \\bar{y} = ${a} \\times ${origMean} ${b > 0 ? '+' : '-'} ${Math.abs(b)} = ${newMean}`,
@@ -205,9 +205,9 @@ export default function DataAnalysis1DDrill() {
     if (!problem) return;
     let isOk = false;
     
-    let v1 = parseFloat(ans1.trim() || 'NaN');
-    let v2 = parseFloat(ans2.trim() || 'NaN');
-    let v3 = parseFloat(ans3.trim() || 'NaN');
+    const v1 = parseFloat(ans1.trim() || 'NaN');
+    const v2 = parseFloat(ans2.trim() || 'NaN');
+    const v3 = parseFloat(ans3.trim() || 'NaN');
     
     if (problem.pattern === 'pattern1') {
       if (Math.abs(v1 - parseFloat(problem.ans1!)) < 0.01 && 
@@ -235,41 +235,41 @@ export default function DataAnalysis1DDrill() {
     ctx.clearRect(0, 0, W, H);
 
     // Draw simple dot plot / histogram for the data
-    let data = problem.data;
+    const data = problem.data;
     if (!data || data.length === 0) return;
     
-    let minX = Math.min(...data) - 1;
-    let maxX = Math.max(...data) + 1;
+    const minX = Math.min(...data) - 1;
+    const maxX = Math.max(...data) + 1;
     
-    let padX = 20;
-    let plotW = W - 2 * padX;
+    const padX = 20;
+    const plotW = W - 2 * padX;
     
     // Axis
-    let baseY = H - 30;
+    const baseY = H - 30;
     ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(padX, baseY); ctx.lineTo(W - padX, baseY); ctx.stroke();
     
     // Draw dots
-    let counts: Record<number, number> = {};
-    for (let x of data) counts[x] = (counts[x] || 0) + 1;
+    const counts: Record<number, number> = {};
+    for (const x of data) counts[x] = (counts[x] || 0) + 1;
     
     ctx.fillStyle = '#3b82f6';
     ctx.font = '10px sans-serif';
     ctx.textAlign = 'center';
     
     for (let x = minX; x <= maxX; x++) {
-      let px = padX + ((x - minX) / (maxX - minX)) * plotW;
+      const px = padX + ((x - minX) / (maxX - minX)) * plotW;
       
       // tick mark
       ctx.beginPath(); ctx.moveTo(px, baseY); ctx.lineTo(px, baseY + 4); ctx.stroke();
       ctx.fillStyle = '#64748b';
       ctx.fillText(x.toString(), px, baseY + 14);
       
-      let c = counts[x] || 0;
+      const c = counts[x] || 0;
       ctx.fillStyle = '#3b82f6';
       for (let i = 0; i < c; i++) {
-        let py = baseY - 10 - i * 16;
+        const py = baseY - 10 - i * 16;
         ctx.beginPath(); ctx.arc(px, py, 6, 0, 2*Math.PI); ctx.fill();
       }
     }
@@ -279,7 +279,7 @@ export default function DataAnalysis1DDrill() {
       let mean = parseFloat(problem.ans1!);
       if (problem.pattern === 'pattern1') mean = parseFloat(problem.ans1!);
       
-      let px = padX + ((mean - minX) / (maxX - minX)) * plotW;
+      const px = padX + ((mean - minX) / (maxX - minX)) * plotW;
       ctx.strokeStyle = '#ef4444';
       ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(px, baseY); ctx.lineTo(px, baseY - 60); ctx.stroke();

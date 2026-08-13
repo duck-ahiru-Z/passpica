@@ -40,7 +40,7 @@ function getVal(sign: 1 | -1, sqNum: number, sqDen: number): TermVal {
     }
   }
   let den = sqDen;
-  let g = gcd(coeff, den);
+  const g = gcd(coeff, den);
   coeff /= g;
   den /= g;
   
@@ -49,7 +49,7 @@ function getVal(sign: 1 | -1, sqNum: number, sqDen: number): TermVal {
 
 function formatTerm(v: TermVal): string {
   if (v.num === 0) return '0';
-  let s = v.sign === 1 ? '' : '-';
+  const s = v.sign === 1 ? '' : '-';
   
   let numStr = '';
   if (v.root === 1) {
@@ -84,26 +84,26 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p_type === 'pattern4') {
-    let q = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
-    let maxP = Math.floor(q * 1.414); // sqrt(2)
+    const q = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
+    const maxP = Math.floor(q * 1.414); // sqrt(2)
     let p = Math.floor(Math.random() * (maxP * 2 + 1)) - maxP;
     if (p === q || p === -q || p === 0) p = 1; // avoid 0, 1, -1 for non-trivial
     
     // sum = p/q. (sin+cos)^2 = p^2/q^2 => 1 + 2sin cos = p^2/q^2 => sin cos = (p^2 - q^2)/(2q^2)
-    let sqNum = Math.abs(p * p - q * q);
-    let signProd = p * p - q * q >= 0 ? 1 : -1;
-    let sqDen = 2 * q * q;
+    const sqNum = Math.abs(p * p - q * q);
+    const signProd = p * p - q * q >= 0 ? 1 : -1;
+    const sqDen = 2 * q * q;
     
     // We can just use getVal to simplify (p^2 - q^2) / (2q^2) 
     // wait, getVal takes squared values. The actual value is (p^2-q^2)/(2q^2), not its sqrt.
     // So we need a standard fraction simplifier.
     let num = p * p - q * q;
     let den = 2 * q * q;
-    let g = gcd(num, den);
+    const g = gcd(num, den);
     num /= g; den /= g;
-    let prodVal: TermVal = { sign: num >= 0 ? 1 : -1, num: Math.abs(num), root: 1, den: den };
+    const prodVal: TermVal = { sign: num >= 0 ? 1 : -1, num: Math.abs(num), root: 1, den: den };
     
-    let sumVal: TermVal = { sign: p >= 0 ? 1 : -1, num: Math.abs(p), root: 1, den: q };
+    const sumVal: TermVal = { sign: p >= 0 ? 1 : -1, num: Math.abs(p), root: 1, den: q };
     
     return {
       pattern: p_type, givenType: 'sum', givenVal: sumVal,
@@ -113,12 +113,12 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     };
   }
 
-  let triples = [[3,4,5], [5,12,13], [8,15,17]];
+  const triples = [[3,4,5], [5,12,13], [8,15,17]];
   let X2, Y2, R2, signX: 1|-1 = 1;
   let isObtuse = false;
 
   if (p_type === 'pattern1' || p_type === 'pattern2') {
-    let t = triples[Math.floor(Math.random() * triples.length)];
+    const t = triples[Math.floor(Math.random() * triples.length)];
     if (Math.random() < 0.5) {
       X2 = t[0]*t[0]; Y2 = t[1]*t[1];
     } else {
@@ -132,7 +132,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
   } else {
     // pattern3
-    let r = Math.floor(Math.random() * 4) + 2; // 2 to 5
+    const r = Math.floor(Math.random() * 4) + 2; // 2 to 5
     R2 = r * r;
     X2 = Math.floor(Math.random() * (R2 - 1)) + 1; // 1 to R2-1
     Y2 = R2 - X2;
@@ -142,14 +142,14 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
   }
 
-  let sinVal = getVal(1, Y2, R2);
-  let cosVal = getVal(signX, X2, R2);
-  let tanVal = getVal(signX, Y2, X2);
+  const sinVal = getVal(1, Y2, R2);
+  const cosVal = getVal(signX, X2, R2);
+  const tanVal = getVal(signX, Y2, X2);
 
-  let types: ('sin'|'cos'|'tan')[] = ['sin', 'cos', 'tan'];
-  let givenType = types[Math.floor(Math.random() * 3)];
-  let givenVal = givenType === 'sin' ? sinVal : givenType === 'cos' ? cosVal : tanVal;
-  let eq = `\\${givenType} \\theta = ${formatTerm(givenVal)}`;
+  const types: ('sin'|'cos'|'tan')[] = ['sin', 'cos', 'tan'];
+  const givenType = types[Math.floor(Math.random() * 3)];
+  const givenVal = givenType === 'sin' ? sinVal : givenType === 'cos' ? cosVal : tanVal;
+  const eq = `\\${givenType} \\theta = ${formatTerm(givenVal)}`;
 
   return {
     pattern: p_type, givenType, givenVal,
@@ -194,9 +194,9 @@ export default function TrigIdentityDrillPage() {
       return;
     }
 
-    let cx = W / 2;
-    let cy = H / 2;
-    let R = 80;
+    const cx = W / 2;
+    const cy = H / 2;
+    const R = 80;
 
     // x-axis, y-axis
     ctx.strokeStyle = '#cbd5e1';
@@ -213,12 +213,12 @@ export default function TrigIdentityDrillPage() {
     ctx.stroke();
 
     // Calculate endpoint
-    let x = problem.signX * Math.sqrt(problem.X2);
-    let y = Math.sqrt(problem.Y2);
-    let r = Math.sqrt(problem.R2);
+    const x = problem.signX * Math.sqrt(problem.X2);
+    const y = Math.sqrt(problem.Y2);
+    const r = Math.sqrt(problem.R2);
     
-    let px = cx + (x / r) * R;
-    let py = cy - (y / r) * R;
+    const px = cx + (x / r) * R;
+    const py = cy - (y / r) * R;
 
     // Radius line
     ctx.strokeStyle = '#ef4444';
@@ -248,7 +248,7 @@ export default function TrigIdentityDrillPage() {
     // Angle arc
     ctx.strokeStyle = '#f59e0b';
     ctx.beginPath();
-    let theta = Math.atan2(y, x);
+    const theta = Math.atan2(y, x);
     ctx.arc(cx, cy, 20, -theta, 0); // canvas angles: y is down
     ctx.stroke();
 
@@ -304,8 +304,8 @@ export default function TrigIdentityDrillPage() {
 
   if (!problem) return null;
 
-  let target1 = problem.givenType === 'sin' ? 'cos' : 'sin';
-  let target2 = problem.givenType === 'tan' ? 'cos' : 'tan';
+  const target1 = problem.givenType === 'sin' ? 'cos' : 'sin';
+  const target2 = problem.givenType === 'tan' ? 'cos' : 'tan';
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">

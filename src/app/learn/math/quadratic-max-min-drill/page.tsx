@@ -28,12 +28,12 @@ interface ProblemData {
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  let p_type = selectedPattern === 'mix' 
+  const p_type = selectedPattern === 'mix' 
     ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
     : selectedPattern;
 
   while (true) {
-    let alpha = Math.floor(Math.random() * 9) - 4; // -4 to 4
+    const alpha = Math.floor(Math.random() * 9) - 4; // -4 to 4
     let length = Math.floor(Math.random() * 4) + 2; // 2 to 5
     let beta = alpha + length;
     
@@ -43,7 +43,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     if (p_type === 'pattern4') {
       a = -(Math.floor(Math.random() * 3) + 1); // -1 to -3
       isDownward = true;
-      let sub = Math.floor(Math.random() * 3);
+      const sub = Math.floor(Math.random() * 3);
       if (sub === 0) logicPattern = 'pattern1';
       if (sub === 1) logicPattern = 'pattern2';
       if (sub === 2) logicPattern = 'pattern3';
@@ -69,18 +69,18 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       p = alpha + length / 2;
     }
     
-    let q = Math.floor(Math.random() * 9) - 4;
-    let eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}(x ${p === 0 ? '' : p > 0 ? '-' : '+'} ${Math.abs(p)})^2 ${q === 0 ? '' : q > 0 ? '+' : '-'} ${Math.abs(q)}`;
+    const q = Math.floor(Math.random() * 9) - 4;
+    const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}(x ${p === 0 ? '' : p > 0 ? '-' : '+'} ${Math.abs(p)})^2 ${q === 0 ? '' : q > 0 ? '+' : '-'} ${Math.abs(q)}`;
     
-    let f = (x: number) => a * (x - p) * (x - p) + q;
+    const f = (x: number) => a * (x - p) * (x - p) + q;
     let maxV = -Infinity; let minV = Infinity;
     let maxX: number[] = []; let minX: number[] = [];
     
-    let testPoints = [alpha, beta];
+    const testPoints = [alpha, beta];
     if (p >= alpha && p <= beta) testPoints.push(p);
     
-    for (let x of testPoints) {
-      let y = f(x);
+    for (const x of testPoints) {
+      const y = f(x);
       if (y > maxV) { maxV = y; maxX = [x]; }
       else if (y === maxV && !maxX.includes(x)) { maxX.push(x); }
       
@@ -134,13 +134,13 @@ export default function QuadraticMaxMinDrillPage() {
     if (problem.p < minX) minX = problem.p - 1;
     if (problem.p > maxX) maxX = problem.p + 1;
     
-    let rangeX = maxX - minX;
+    const rangeX = maxX - minX;
     
     let minY = problem.q;
     let maxY = problem.q;
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = f(x);
+      const x = minX + (rangeX * i) / 100;
+      const y = f(x);
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
     }
@@ -168,8 +168,8 @@ export default function QuadraticMaxMinDrillPage() {
     ctx.setLineDash([4, 4]);
     ctx.beginPath();
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = f(x);
+      const x = minX + (rangeX * i) / 100;
+      const y = f(x);
       if (i === 0) ctx.moveTo(mapX(x), mapY(y));
       else ctx.lineTo(mapX(x), mapY(y));
     }
@@ -181,8 +181,8 @@ export default function QuadraticMaxMinDrillPage() {
     ctx.lineWidth = 3;
     ctx.beginPath();
     for (let i = 0; i <= 100; i++) {
-      let x = problem.alpha + ((problem.beta - problem.alpha) * i) / 100;
-      let y = f(x);
+      const x = problem.alpha + ((problem.beta - problem.alpha) * i) / 100;
+      const y = f(x);
       if (i === 0) ctx.moveTo(mapX(x), mapY(y));
       else ctx.lineTo(mapX(x), mapY(y));
     }
@@ -192,7 +192,7 @@ export default function QuadraticMaxMinDrillPage() {
       // Max dots
       ctx.fillStyle = '#ef4444'; // red
       problem.maxX.forEach(x => {
-        let y = problem.maxV;
+        const y = problem.maxV;
         ctx.beginPath();
         ctx.arc(mapX(x), mapY(y), 5, 0, 2 * Math.PI);
         ctx.fill();
@@ -204,7 +204,7 @@ export default function QuadraticMaxMinDrillPage() {
       // Min dots
       ctx.fillStyle = '#3b82f6'; // blue
       problem.minX.forEach(x => {
-        let y = problem.minV;
+        const y = problem.minV;
         ctx.beginPath();
         ctx.arc(mapX(x), mapY(y), 5, 0, 2 * Math.PI);
         ctx.fill();
@@ -232,7 +232,7 @@ export default function QuadraticMaxMinDrillPage() {
     
     const checkVals = (uV: string, ux1: string, ux2: string, pV: number, pX: number[]) => {
       if (parseInt(uV) !== pV) return false;
-      let uX = [];
+      const uX = [];
       if (ux1.trim() !== '') uX.push(parseInt(ux1));
       if (ux2.trim() !== '') uX.push(parseInt(ux2));
       uX.sort((a,b)=>a-b);
@@ -243,8 +243,8 @@ export default function QuadraticMaxMinDrillPage() {
       return true;
     };
 
-    let maxOk = checkVals(ansMaxV, ansMaxX1, ansMaxX2, problem.maxV, problem.maxX);
-    let minOk = checkVals(ansMinV, ansMinX1, ansMinX2, problem.minV, problem.minX);
+    const maxOk = checkVals(ansMaxV, ansMaxX1, ansMaxX2, problem.maxV, problem.maxX);
+    const minOk = checkVals(ansMinV, ansMinX1, ansMinX2, problem.minV, problem.minX);
 
     setIsCorrect(maxOk && minOk);
     setHasChecked(true);

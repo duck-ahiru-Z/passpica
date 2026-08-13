@@ -79,7 +79,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   const getRStr = (r2: number) => {
-    let root = Math.sqrt(r2);
+    const root = Math.sqrt(r2);
     if (Math.abs(root - Math.round(root)) < 0.001) return Math.round(root).toString();
     // Simplified roots for our limited set (8, 12, 18, 20, 32, etc.)
     if (r2 === 8) return "2\\sqrt{2}";
@@ -93,20 +93,20 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1' || p === 'pattern2') {
-      let bases = [
+      const bases = [
         {x: 1, y: Math.sqrt(3), xS: "1", yS: "\\sqrt{3}", r2: 4, th: Math.PI/3},
         {x: Math.sqrt(3), y: 1, xS: "\\sqrt{3}", yS: "1", r2: 4, th: Math.PI/6},
         {x: 1, y: 1, xS: "1", yS: "1", r2: 2, th: Math.PI/4}
       ];
-      let b = bases[Math.floor(Math.random() * bases.length)];
-      let k = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
+      const b = bases[Math.floor(Math.random() * bases.length)];
+      const k = Math.floor(Math.random() * 3) + 1; // 1, 2, 3
       
-      let x = b.x * k;
-      let y = b.y * k;
-      let r2 = b.r2 * k * k;
+      const x = b.x * k;
+      const y = b.y * k;
+      const r2 = b.r2 * k * k;
       
-      let xS = b.xS === "1" ? k.toString() : (k === 1 ? b.xS : `${k}${b.xS}`);
-      let yS = b.yS === "1" ? k.toString() : (k === 1 ? b.yS : `${k}${b.yS}`);
+      const xS = b.xS === "1" ? k.toString() : (k === 1 ? b.xS : `${k}${b.xS}`);
+      const yS = b.yS === "1" ? k.toString() : (k === 1 ? b.yS : `${k}${b.yS}`);
       
       let signX = 1;
       let signY = 1;
@@ -117,10 +117,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         if (signX === 1 && signY === 1) signX = -1; // force quad II-IV
       }
       
-      let finalX = x * signX;
-      let finalY = y * signY;
-      let finalXS = signX === -1 ? `-${xS}` : xS;
-      let finalYS = signY === -1 ? `-${yS}` : yS;
+      const finalX = x * signX;
+      const finalY = y * signY;
+      const finalXS = signX === -1 ? `-${xS}` : xS;
+      const finalYS = signY === -1 ? `-${yS}` : yS;
       
       let zStr = "";
       if (finalXS === "1") zStr = "1";
@@ -135,22 +135,22 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         else zStr += ` + ${finalYS}i`;
       }
       
-      let qStr = `複素数 $z = ${zStr}$ を極形式 $r(\\cos\\theta + i\\sin\\theta)$ で表せ。`;
+      const qStr = `複素数 $z = ${zStr}$ を極形式 $r(\\cos\\theta + i\\sin\\theta)$ で表せ。`;
       
-      let rVal = Math.sqrt(r2);
-      let rStr = getRStr(r2);
+      const rVal = Math.sqrt(r2);
+      const rStr = getRStr(r2);
       let thVal = Math.atan2(finalY, finalX);
       if (thVal < 0) thVal += 2 * Math.PI;
       
-      let ansTheta = parseAngleStr(thVal);
+      const ansTheta = parseAngleStr(thVal);
       let thDisplay = ansTheta.replace("pi", "\\pi");
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay.includes("/")) {
-        let pts = thDisplay.split("/");
+        const pts = thDisplay.split("/");
         thDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
       }
       
-      let expLines = [
+      const expLines = [
         `r = \\sqrt{(${finalXS})^2 + (${finalYS})^2} = ${rStr}`,
         `\\cos\\theta = \\frac{${finalXS}}{${rStr}}, \\quad \\sin\\theta = \\frac{${finalYS}}{${rStr}}`,
         `0 \\le \\theta < 2\\pi \\text{ の範囲でこれを満たす } \\theta \\text{ は } ${thDisplay}`,
@@ -160,26 +160,26 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansR: rStr, ansTheta, zX: finalX, zY: finalY, rVal, thetaVal: thVal, expLines };
     }
     else if (p === 'pattern3') {
-      let rVal = Math.floor(Math.random() * 5) + 2; // 2..6
-      let axes = [
+      const rVal = Math.floor(Math.random() * 5) + 2; // 2..6
+      const axes = [
         {th: 0, x: rVal, y: 0, s: `${rVal}`},
         {th: Math.PI/2, x: 0, y: rVal, s: `${rVal}i`},
         {th: Math.PI, x: -rVal, y: 0, s: `-${rVal}`},
         {th: Math.PI*3/2, x: 0, y: -rVal, s: `-${rVal}i`}
       ];
-      let a = axes[Math.floor(Math.random() * axes.length)];
+      const a = axes[Math.floor(Math.random() * axes.length)];
       
-      let qStr = `複素数 $z = ${a.s}$ を極形式 $r(\\cos\\theta + i\\sin\\theta)$ で表せ。`;
-      let ansTheta = parseAngleStr(a.th);
+      const qStr = `複素数 $z = ${a.s}$ を極形式 $r(\\cos\\theta + i\\sin\\theta)$ で表せ。`;
+      const ansTheta = parseAngleStr(a.th);
       let thDisplay = ansTheta.replace("pi", "\\pi");
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay === "0") thDisplay = "0";
       else if (thDisplay.includes("/")) {
-        let pts = thDisplay.split("/");
+        const pts = thDisplay.split("/");
         thDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
       }
       
-      let expLines = [
+      const expLines = [
         `\\text{複素数平面上で、点 } ${a.s} \\text{ は原点からの距離が } ${rVal} \\text{、偏角が } ${thDisplay} \\text{ の位置にあります。}`,
         `\\text{よって極形式は } z = ${rVal}\\left(\\cos ${thDisplay} + i\\sin ${thDisplay}\\right)`
       ];
@@ -187,9 +187,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansR: rVal.toString(), ansTheta, zX: a.x, zY: a.y, rVal, thetaVal: a.th, expLines };
     }
     else if (p === 'pattern4') {
-      let isProduct = Math.random() > 0.5;
+      const isProduct = Math.random() > 0.5;
       // Generate two angles that sum/diff to famous angles
-      let angles = [
+      const angles = [
         {val: Math.PI/6, s: "\\frac{\\pi}{6}"},
         {val: Math.PI/4, s: "\\frac{\\pi}{4}"},
         {val: Math.PI/3, s: "\\frac{\\pi}{3}"},
@@ -199,8 +199,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         {val: 5*Math.PI/6, s: "\\frac{5\\pi}{6}"}
       ];
       
-      let a1 = angles[Math.floor(Math.random() * angles.length)];
-      let a2 = angles[Math.floor(Math.random() * angles.length)];
+      const a1 = angles[Math.floor(Math.random() * angles.length)];
+      const a2 = angles[Math.floor(Math.random() * angles.length)];
       
       let r1 = Math.floor(Math.random() * 3) + 2; // 2..4
       let r2 = Math.floor(Math.random() * 3) + 2;
@@ -213,9 +213,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       // Need rRes to be simple if quotient (or just don't do quotient if it's messy)
       if (!isProduct) {
-        let mults = [2, 3, 4, 6, 8, 9, 12];
+        const mults = [2, 3, 4, 6, 8, 9, 12];
         r1 = mults[Math.floor(Math.random() * mults.length)];
-        let divs = [2, 3, 4];
+        const divs = [2, 3, 4];
         r2 = divs[Math.floor(Math.random() * divs.length)];
         while (r1 % r2 !== 0) {
           r1 = mults[Math.floor(Math.random() * mults.length)];
@@ -224,17 +224,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         rRes = r1 / r2;
       }
       
-      let z1Str = `z_1 = ${r1}\\left(\\cos ${a1.s} + i\\sin ${a1.s}\\right)`;
-      let z2Str = `z_2 = ${r2}\\left(\\cos ${a2.s} + i\\sin ${a2.s}\\right)`;
-      let qStr = `$${z1Str}$, $${z2Str}$ のとき、$${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'}$ を $a+bi$ の形で表せ。`;
+      const z1Str = `z_1 = ${r1}\\left(\\cos ${a1.s} + i\\sin ${a1.s}\\right)`;
+      const z2Str = `z_2 = ${r2}\\left(\\cos ${a2.s} + i\\sin ${a2.s}\\right)`;
+      const qStr = `$${z1Str}$, $${z2Str}$ のとき、$${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'}$ を $a+bi$ の形で表せ。`;
       
-      let cosVal = Math.cos(thRes);
-      let sinVal = Math.sin(thRes);
-      let zX = rRes * cosVal;
-      let zY = rRes * sinVal;
+      const cosVal = Math.cos(thRes);
+      const sinVal = Math.sin(thRes);
+      const zX = rRes * cosVal;
+      const zY = rRes * sinVal;
       
       // find a and b strings
-      let thStr = parseAngleStr(thRes);
+      const thStr = parseAngleStr(thRes);
       // to determine exact string
       let ansA = "", ansB = "";
       
@@ -276,12 +276,12 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let finalThDisplay = thStr.replace("pi", "\\pi");
       if (finalThDisplay.startsWith("1\\pi")) finalThDisplay = finalThDisplay.replace("1\\pi", "\\pi");
       if (finalThDisplay.includes("/")) {
-        let pts = finalThDisplay.split("/");
+        const pts = finalThDisplay.split("/");
         finalThDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
       }
       if (finalThDisplay === "0") finalThDisplay = "0";
 
-      let expLines = [
+      const expLines = [
         `\\text{極形式の${isProduct ? '積' : '商'}の性質を利用します。}`,
         `${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'} = ${isProduct ? `${r1} \\times ${r2}` : `\\frac{${r1}}{${r2}}`}\\left\\{ \\cos\\left(${a1.s} ${isProduct ? '+' : '-'} ${a2.s}\\right) + i\\sin\\left(${a1.s} ${isProduct ? '+' : '-'} ${a2.s}\\right) \\right\\}`,
         `= ${rRes}\\left(\\cos ${finalThDisplay} + i\\sin ${finalThDisplay}\\right)`,
@@ -333,17 +333,17 @@ export default function ComplexPolarDrill() {
     
     let isOk = false;
     if (problem.pattern === 'pattern4') {
-      let uA = cleanAns(ansA);
-      let pA = cleanAns(problem.ansA!);
-      let uB = cleanAns(ansB);
-      let pB = cleanAns(problem.ansB!);
+      const uA = cleanAns(ansA);
+      const pA = cleanAns(problem.ansA!);
+      const uB = cleanAns(ansB);
+      const pB = cleanAns(problem.ansB!);
       // handle simple numeric matches as well if no sqrt
       if (uA === pA && uB === pB) isOk = true;
     } else {
-      let uR = cleanAns(ansR);
-      let pR = cleanAns(problem.ansR!);
-      let uTh = cleanAns(ansTheta).toLowerCase();
-      let pTh = cleanAns(problem.ansTheta!);
+      const uR = cleanAns(ansR);
+      const pR = cleanAns(problem.ansR!);
+      const uTh = cleanAns(ansTheta).toLowerCase();
+      const pTh = cleanAns(problem.ansTheta!);
       if (uR === pR && (uTh === pTh || (uTh === "0" && pTh === "2pi") || (uTh === "2pi" && pTh === "0"))) {
         isOk = true;
       }
@@ -369,9 +369,9 @@ export default function ComplexPolarDrill() {
     }
     maxR = Math.max(maxR, 2) * 1.2;
 
-    let scale = Math.min(W/2 - 20, H/2 - 20) / maxR;
-    let cx = W/2;
-    let cy = H/2;
+    const scale = Math.min(W/2 - 20, H/2 - 20) / maxR;
+    const cx = W/2;
+    const cy = H/2;
 
     const toScr = (x: number, y: number) => ({
       x: cx + x * scale,
@@ -390,7 +390,7 @@ export default function ComplexPolarDrill() {
     ctx.fillText('Im', cx + 5, 10);
 
     const drawZ = (x: number, y: number, r: number, th: number, label: string, color: string) => {
-      let scr = toScr(x, y);
+      const scr = toScr(x, y);
       
       // Line to origin
       ctx.strokeStyle = color;
@@ -414,10 +414,10 @@ export default function ComplexPolarDrill() {
     };
 
     if (problem.pattern === 'pattern4') {
-      let z1x = problem.z1!.r * Math.cos(problem.z1!.thVal);
-      let z1y = problem.z1!.r * Math.sin(problem.z1!.thVal);
-      let z2x = problem.z2!.r * Math.cos(problem.z2!.thVal);
-      let z2y = problem.z2!.r * Math.sin(problem.z2!.thVal);
+      const z1x = problem.z1!.r * Math.cos(problem.z1!.thVal);
+      const z1y = problem.z1!.r * Math.sin(problem.z1!.thVal);
+      const z2x = problem.z2!.r * Math.cos(problem.z2!.thVal);
+      const z2y = problem.z2!.r * Math.sin(problem.z2!.thVal);
       
       drawZ(z1x, z1y, problem.z1!.r, problem.z1!.thVal, 'z₁', '#94a3b8');
       drawZ(z2x, z2y, problem.z2!.r, problem.z2!.thVal, 'z₂', '#94a3b8');
@@ -429,7 +429,7 @@ export default function ComplexPolarDrill() {
       drawZ(problem.zX, problem.zY, problem.rVal, problem.thetaVal, 'z', '#3b82f6');
       if (hasChecked) {
         // Label r and theta clearly
-        let midA = problem.thetaVal / 2;
+        const midA = problem.thetaVal / 2;
         ctx.fillStyle = '#ef4444';
         ctx.fillText('θ', cx + 30*Math.cos(midA), cy - 30*Math.sin(midA));
         ctx.fillStyle = '#3b82f6';

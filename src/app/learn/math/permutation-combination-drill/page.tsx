@@ -19,7 +19,7 @@ function fact(n: number): number {
 // 階乗の展開文字列 "5 \times 4 \times 3 \times 2 \times 1"
 function factStr(n: number, downTo: number = 1): string {
   if (n < downTo) return "1";
-  let arr = [];
+  const arr = [];
   for (let i = n; i >= downTo; i--) arr.push(i);
   return arr.join(" \\times ");
 }
@@ -47,45 +47,45 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p === 'pattern1') {
-    let n = Math.floor(Math.random() * 8) + 3; // 3 to 10
-    let r = Math.floor(Math.random() * Math.min(4, n)) + 1; // 1 to min(4, n)
-    let ans = fact(n) / fact(n - r);
+    const n = Math.floor(Math.random() * 8) + 3; // 3 to 10
+    const r = Math.floor(Math.random() * Math.min(4, n)) + 1; // 1 to min(4, n)
+    const ans = fact(n) / fact(n - r);
     return { pattern: p, n, r, ans };
   } else if (p === 'pattern2') {
-    let n = Math.floor(Math.random() * 8) + 3; // 3 to 10
-    let r = Math.floor(Math.random() * Math.min(4, n)) + 1; // 1 to min(4, n)
-    let ans = fact(n) / (fact(r) * fact(n - r));
+    const n = Math.floor(Math.random() * 8) + 3; // 3 to 10
+    const r = Math.floor(Math.random() * Math.min(4, n)) + 1; // 1 to min(4, n)
+    const ans = fact(n) / (fact(r) * fact(n - r));
     return { pattern: p, n, r, ans };
   } else if (p === 'pattern3') {
-    let n = Math.floor(Math.random() * 9) + 7; // 7 to 15
-    let diff = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
-    let r = n - diff;
-    let ans = fact(n) / (fact(diff) * fact(n - diff));
+    const n = Math.floor(Math.random() * 9) + 7; // 7 to 15
+    const diff = Math.floor(Math.random() * 3) + 1; // 1, 2, or 3
+    const r = n - diff;
+    const ans = fact(n) / (fact(diff) * fact(n - diff));
     return { pattern: p, n, r, ans };
   } else {
     // pattern4: Same elements or Circular
-    let subType = Math.random() < 0.5 ? 'same' : 'circle';
+    const subType = Math.random() < 0.5 ? 'same' : 'circle';
     if (subType === 'same') {
-      let types = [
+      const types = [
         {names: ['A', 'B'], max: 4},
         {names: ['赤玉', '白玉'], max: 4},
         {names: ['1', '2', '3'], max: 3}
       ];
-      let t = types[Math.floor(Math.random() * types.length)];
-      let items = [];
+      const t = types[Math.floor(Math.random() * types.length)];
+      const items = [];
       let total = 0;
       let div = 1;
-      for (let name of t.names) {
-        let count = Math.floor(Math.random() * t.max) + 1;
+      for (const name of t.names) {
+        const count = Math.floor(Math.random() * t.max) + 1;
         items.push({ name, count });
         total += count;
         div *= fact(count);
       }
-      let ans = fact(total) / div;
+      const ans = fact(total) / div;
       return { pattern: p, n: total, r: 0, subType: 'same', items, ans };
     } else {
-      let n = Math.floor(Math.random() * 5) + 4; // 4 to 8
-      let ans = fact(n - 1);
+      const n = Math.floor(Math.random() * 5) + 4; // 4 to 8
+      const ans = fact(n - 1);
       return { pattern: p, n, r: 0, subType: 'circle', ans };
     }
   }
@@ -122,22 +122,22 @@ export default function PermutationCombinationDrill() {
 
     if (problem.pattern === 'pattern1' || problem.pattern === 'pattern2' || problem.pattern === 'pattern3') {
       // 順列 P または 組合せ C の図解
-      let n = problem.n;
+      const n = problem.n;
       let r = problem.pattern === 'pattern3' ? problem.n - problem.r : problem.r; // For pattern3, visualize the smaller symmetric C
       if (problem.pattern === 'pattern3') {
         r = problem.n - problem.r;
       }
       
-      let itemRadius = 12;
-      let spacing = 35;
+      const itemRadius = 12;
+      const spacing = 35;
       
       // Draw pool of N items
       ctx.font = '12px sans-serif';
       ctx.fillText(`全体 ${n} 個`, W/2, 20);
       
       // We can only draw up to 15 items nicely
-      let drawN = Math.min(n, 15);
-      let startX = W/2 - (drawN-1) * spacing / 2;
+      const drawN = Math.min(n, 15);
+      const startX = W/2 - (drawN-1) * spacing / 2;
       
       for (let i = 0; i < drawN; i++) {
         ctx.beginPath();
@@ -152,8 +152,8 @@ export default function PermutationCombinationDrill() {
       ctx.fillStyle = '#1e293b';
       if (problem.pattern === 'pattern1') {
         ctx.fillText(`取り出して並べる (順列 P): ${r} 枠`, W/2, 100);
-        let slotW = 30;
-        let slotStartX = W/2 - (r * (slotW + 10) - 10) / 2;
+        const slotW = 30;
+        const slotStartX = W/2 - (r * (slotW + 10) - 10) / 2;
         for (let i = 0; i < r; i++) {
           ctx.strokeStyle = '#3b82f6';
           ctx.strokeRect(slotStartX + i * (slotW + 10), 120, slotW, 30);
@@ -164,8 +164,8 @@ export default function PermutationCombinationDrill() {
         ctx.fillText(`取り出してグループ化 (組合せ C): ${r} 個`, W/2, 100);
         ctx.strokeStyle = '#3b82f6';
         ctx.setLineDash([5, 5]);
-        let grpW = r * 30;
-        let grpX = W/2 - grpW/2;
+        const grpW = r * 30;
+        const grpX = W/2 - grpW/2;
         ctx.strokeRect(grpX, 115, grpW, 40);
         ctx.setLineDash([]);
         for (let i = 0; i < r; i++) {
@@ -179,12 +179,12 @@ export default function PermutationCombinationDrill() {
     } else if (problem.pattern === 'pattern4') {
       if (problem.subType === 'circle') {
         // 円順列の図解
-        let n = problem.n;
+        const n = problem.n;
         ctx.fillText(`${n} 人の円順列`, W/2, 20);
         
-        let cx = W/2;
-        let cy = H/2 + 10;
-        let R = 60;
+        const cx = W/2;
+        const cy = H/2 + 10;
+        const R = 60;
         
         ctx.beginPath();
         ctx.arc(cx, cy, R - 20, 0, 2 * Math.PI);
@@ -193,9 +193,9 @@ export default function PermutationCombinationDrill() {
         ctx.stroke();
         
         for (let i = 0; i < n; i++) {
-          let angle = i * 2 * Math.PI / n - Math.PI / 2;
-          let x = cx + R * Math.cos(angle);
-          let y = cy + R * Math.sin(angle);
+          const angle = i * 2 * Math.PI / n - Math.PI / 2;
+          const x = cx + R * Math.cos(angle);
+          const y = cy + R * Math.sin(angle);
           
           ctx.beginPath();
           ctx.arc(x, y, 15, 0, 2 * Math.PI);
@@ -212,13 +212,13 @@ export default function PermutationCombinationDrill() {
         // 同じものを含む順列
         ctx.fillText(`同じものを含む順列`, W/2, 20);
         
-        let startY = 60;
-        let total = problem.n;
+        const startY = 60;
+        const total = problem.n;
         let drawn = 0;
-        let colors = ['#ef4444', '#3b82f6', '#10b981'];
+        const colors = ['#ef4444', '#3b82f6', '#10b981'];
         
-        let spacing = 35;
-        let startX = W/2 - (total-1) * spacing / 2;
+        const spacing = 35;
+        const startX = W/2 - (total-1) * spacing / 2;
         
         problem.items?.forEach((item, idx) => {
           for (let i = 0; i < item.count; i++) {

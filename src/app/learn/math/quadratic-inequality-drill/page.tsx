@@ -28,7 +28,7 @@ interface Root {
 
 function simplifyFraction(n: number, d: number): Root {
   if (d === 0) return { num: 0, den: 1 };
-  let g = gcd(n, d);
+  const g = gcd(n, d);
   let num = n / g;
   let den = d / g;
   if (den < 0) {
@@ -88,13 +88,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const signs: InequalityType[] = ['<', '>', '\\le', '\\ge'];
 
   while (true) {
-    let sign = signs[Math.floor(Math.random() * signs.length)];
+    const sign = signs[Math.floor(Math.random() * signs.length)];
     let p, q, r, s, a, b, c;
     let roots: Root[] = [];
 
     if (p_type === 'pattern4') {
-      let root_val = Math.floor(Math.random() * 19) - 9;
-      let sign_a = Math.random() < 0.5 ? 1 : -1;
+      const root_val = Math.floor(Math.random() * 19) - 9;
+      const sign_a = Math.random() < 0.5 ? 1 : -1;
       a = sign_a;
       b = -2 * sign_a * root_val;
       c = sign_a * root_val * root_val;
@@ -119,10 +119,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       }
       if (q === 0 || s === 0) continue;
       
-      let root1 = simplifyFraction(-q, p);
-      let root2 = simplifyFraction(-s, r);
-      let v1 = root1.num / root1.den;
-      let v2 = root2.num / root2.den;
+      const root1 = simplifyFraction(-q, p);
+      const root2 = simplifyFraction(-s, r);
+      const v1 = root1.num / root1.den;
+      const v2 = root2.num / root2.den;
       if (v1 === v2) continue; // D>0 needs distinct roots
       
       roots = v1 < v2 ? [root1, root2] : [root2, root1];
@@ -133,8 +133,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
     if (a === 0) continue;
 
-    let D = b * b - 4 * a * c;
-    let ansType = getAnsType(a, D, sign);
+    const D = b * b - 4 * a * c;
+    const ansType = getAnsType(a, D, sign);
 
     let eq = '';
     if (a === 1) eq += 'x^2';
@@ -191,20 +191,20 @@ export default function QuadraticInequalityDrillPage() {
     let maxX = vx + 4;
     
     if (problem.roots.length === 2) {
-      let r1 = problem.roots[0].num / problem.roots[0].den;
-      let r2 = problem.roots[1].num / problem.roots[1].den;
+      const r1 = problem.roots[0].num / problem.roots[0].den;
+      const r2 = problem.roots[1].num / problem.roots[1].den;
       minX = r1 - 2;
       maxX = r2 + 2;
     }
 
-    let rangeX = maxX - minX;
+    const rangeX = maxX - minX;
     const func = (x: number) => problem.a * x * x + problem.b * x + problem.c;
     
     let minY = vy;
     let maxY = vy;
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = func(x);
+      const x = minX + (rangeX * i) / 100;
+      const y = func(x);
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
     }
@@ -243,8 +243,8 @@ export default function QuadraticInequalityDrillPage() {
       ctx.fillStyle = problem.ineqSign === '<' || problem.ineqSign === '\\le' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)';
       ctx.beginPath();
       for (let i = 0; i <= 200; i++) {
-        let x = minX + (rangeX * i) / 200;
-        let y = func(x);
+        const x = minX + (rangeX * i) / 200;
+        const y = func(x);
         let condition = false;
         if (problem.ineqSign === '<' || problem.ineqSign === '\\le') condition = y <= 0;
         else condition = y >= 0;
@@ -261,7 +261,7 @@ export default function QuadraticInequalityDrillPage() {
       // Draw Roots Dots
       ctx.fillStyle = '#000';
       problem.roots.forEach(r => {
-        let x = r.num / r.den;
+        const x = r.num / r.den;
         ctx.beginPath();
         if (problem.ineqSign === '<' || problem.ineqSign === '>') {
           ctx.arc(mapX(x), mapY(0), 4, 0, 2 * Math.PI);
@@ -278,7 +278,7 @@ export default function QuadraticInequalityDrillPage() {
         
         ctx.font = '12px sans-serif';
         ctx.textAlign = 'center';
-        let txt = r.den === 1 ? `${r.num}` : `${r.num}/${r.den}`;
+        const txt = r.den === 1 ? `${r.num}` : `${r.num}/${r.den}`;
         ctx.fillText(txt, mapX(x), mapY(0) + 16);
       });
     }
@@ -288,8 +288,8 @@ export default function QuadraticInequalityDrillPage() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = func(x);
+      const x = minX + (rangeX * i) / 100;
+      const y = func(x);
       if (i === 0) ctx.moveTo(mapX(x), mapY(y));
       else ctx.lineTo(mapX(x), mapY(y));
     }
@@ -334,15 +334,15 @@ export default function QuadraticInequalityDrillPage() {
       return simplifyFraction(num, den);
     };
 
-    let u1 = parse(ans1Num, ans1Den);
-    let r1 = problem.roots[0];
+    const u1 = parse(ans1Num, ans1Den);
+    const r1 = problem.roots[0];
     
     if (problem.ansType === 5 || problem.ansType === 6) {
       if (u1.num === r1.num && u1.den === r1.den) setIsCorrect(true);
       else setIsCorrect(false);
     } else {
-      let u2 = parse(ans2Num, ans2Den);
-      let r2 = problem.roots[1];
+      const u2 = parse(ans2Num, ans2Den);
+      const r2 = problem.roots[1];
       if (u1.num === r1.num && u1.den === r1.den && u2.num === r2.num && u2.den === r2.den) setIsCorrect(true);
       else setIsCorrect(false);
     }

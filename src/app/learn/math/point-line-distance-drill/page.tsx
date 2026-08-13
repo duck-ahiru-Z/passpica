@@ -36,10 +36,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   while (true) {
-    let t = triples[Math.floor(Math.random() * triples.length)];
-    let a = t.a * (Math.random() > 0.5 ? 1 : -1);
-    let b = t.b * (Math.random() > 0.5 ? 1 : -1);
-    let dist = Math.sqrt(a*a + b*b);
+    const t = triples[Math.floor(Math.random() * triples.length)];
+    const a = t.a * (Math.random() > 0.5 ? 1 : -1);
+    const b = t.b * (Math.random() > 0.5 ? 1 : -1);
+    const dist = Math.sqrt(a*a + b*b);
     let px = 0, py = 0, c = 0;
     
     if (p === 'pattern1') {
@@ -48,7 +48,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let dStr = `${Math.abs(c)}/${dist}`;
       if (c % dist === 0) dStr = `${Math.abs(c) / dist}`;
       
-      let signC = c > 0 ? `+${c}` : `${c}`;
+      const signC = c > 0 ? `+${c}` : `${c}`;
       return { 
         pattern: p, a, b, c, px: 0, py: 0, 
         ans1: dStr, 
@@ -59,13 +59,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       px = Math.floor(Math.random() * 10) - 5;
       py = Math.floor(Math.random() * 10) - 5;
       c = Math.floor(Math.random() * 50) - 25;
-      let num = Math.abs(a * px + b * py + c);
+      const num = Math.abs(a * px + b * py + c);
       if (num === 0) continue; // point on line
       
       let dStr = `${num}/${dist}`;
       if (num % dist === 0) dStr = `${num / dist}`;
       
-      let signC = c > 0 ? `+${c}` : (c < 0 ? `${c}` : '');
+      const signC = c > 0 ? `+${c}` : (c < 0 ? `${c}` : '');
       return { 
         pattern: p, a, b, c, px, py, 
         ans1: dStr, 
@@ -80,7 +80,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       // ax + by + c = 0 => by = -ax - c => y = (-a/b)x - c/b
       // To make it look like a nice y = mx + n, let's just write the string
-      let num = Math.abs(a * px + b * py + c);
+      const num = Math.abs(a * px + b * py + c);
       if (num === 0) continue;
       
       let dStr = `${num}/${dist}`;
@@ -109,17 +109,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       // distance from (px, py) to ax+by+k=0 is distVal
       px = Math.floor(Math.random() * 10) - 5;
       py = Math.floor(Math.random() * 10) - 5;
-      let distVal = Math.floor(Math.random() * 4) + 1; // distance 1..4
+      const distVal = Math.floor(Math.random() * 4) + 1; // distance 1..4
       // |a*px + b*py + k| / dist = distVal
       // |a*px + b*py + k| = distVal * dist
-      let C_val = distVal * dist;
-      let base = a * px + b * py;
+      const C_val = distVal * dist;
+      const base = a * px + b * py;
       // base + k = C_val => k = C_val - base
       // base + k = -C_val => k = -C_val - base
       let k1 = C_val - base;
       let k2 = -C_val - base;
       // return smaller as ans1, larger as ans2
-      if (k1 > k2) { let t=k1; k1=k2; k2=t; }
+      if (k1 > k2) { const t=k1; k1=k2; k2=t; }
       
       return { 
         pattern: p, a, b, c: k1, px, py, // c is arbitrary here, we'll just store k1 for drawing if needed
@@ -154,14 +154,14 @@ export default function PointLineDistanceDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let uStr = ansVal.trim().replace(/\s+/g, '');
+    const uStr = ansVal.trim().replace(/\s+/g, '');
     let isOk = false;
     if (problem.pattern === 'pattern4') {
       // expect "k1,k2"
-      let parts = uStr.split(',');
+      const parts = uStr.split(',');
       if (parts.length === 2) {
-        let p1 = parts[0];
-        let p2 = parts[1];
+        const p1 = parts[0];
+        const p2 = parts[1];
         if ((p1 === String(problem.ans1) && p2 === String(problem.ans2)) ||
             (p1 === String(problem.ans2) && p2 === String(problem.ans1))) {
           isOk = true;
@@ -186,14 +186,14 @@ export default function PointLineDistanceDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let { a, b, px, py } = problem;
-    let c = problem.pattern === 'pattern4' ? (Number(problem.ans1) || 0) : problem.c;
+    const { a, b, px, py } = problem;
+    const c = problem.pattern === 'pattern4' ? (Number(problem.ans1) || 0) : problem.c;
     // draw line ax+by+c=0
     // find foot of perpendicular from (px, py)
-    let dist2 = a*a + b*b;
-    let base = a*px + b*py + c;
-    let hx = px - (a * base) / dist2;
-    let hy = py - (b * base) / dist2;
+    const dist2 = a*a + b*b;
+    const base = a*px + b*py + c;
+    const hx = px - (a * base) / dist2;
+    const hy = py - (b * base) / dist2;
 
     // determine scale
     let minX = Math.min(0, px, hx);
@@ -203,21 +203,21 @@ export default function PointLineDistanceDrill() {
     
     // add intercepts if possible
     if (a !== 0) {
-      let xInt = -c / a;
+      const xInt = -c / a;
       if (xInt > minX - 10 && xInt < maxX + 10) { minX = Math.min(minX, xInt); maxX = Math.max(maxX, xInt); }
     }
     if (b !== 0) {
-      let yInt = -c / b;
+      const yInt = -c / b;
       if (yInt > minY - 10 && yInt < maxY + 10) { minY = Math.min(minY, yInt); maxY = Math.max(maxY, yInt); }
     }
 
-    let margin = 3;
-    let spanX = Math.max(maxX - minX + margin*2, 10);
-    let spanY = Math.max(maxY - minY + margin*2, 10);
-    let scale = Math.min(W / spanX, H / spanY);
+    const margin = 3;
+    const spanX = Math.max(maxX - minX + margin*2, 10);
+    const spanY = Math.max(maxY - minY + margin*2, 10);
+    const scale = Math.min(W / spanX, H / spanY);
     
-    let cx = (minX + maxX) / 2;
-    let cy = (minY + maxY) / 2;
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
 
     const toScr = (x: number, y: number) => ({
       x: W/2 + (x - cx) * scale,
@@ -227,7 +227,7 @@ export default function PointLineDistanceDrill() {
     // Draw axes
     ctx.strokeStyle = '#e2e8f0';
     ctx.lineWidth = 1;
-    let origin = toScr(0, 0);
+    const origin = toScr(0, 0);
     ctx.beginPath(); ctx.moveTo(0, origin.y); ctx.lineTo(W, origin.y); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(origin.x, 0); ctx.lineTo(origin.x, H); ctx.stroke();
 
@@ -235,19 +235,19 @@ export default function PointLineDistanceDrill() {
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
     // two points far away
-    let p1x = cx - 20; let p1y = b !== 0 ? (-a*p1x - c)/b : 0;
+    const p1x = cx - 20; let p1y = b !== 0 ? (-a*p1x - c)/b : 0;
     if (b === 0) p1y = cy - 20;
-    let p2x = cx + 20; let p2y = b !== 0 ? (-a*p2x - c)/b : 0;
+    const p2x = cx + 20; let p2y = b !== 0 ? (-a*p2x - c)/b : 0;
     if (b === 0) p2y = cy + 20;
-    let sp1 = toScr(p1x, p1y);
-    let sp2 = toScr(p2x, p2y);
+    const sp1 = toScr(p1x, p1y);
+    const sp2 = toScr(p2x, p2y);
     ctx.beginPath(); ctx.moveTo(sp1.x, sp1.y); ctx.lineTo(sp2.x, sp2.y); ctx.stroke();
 
     // Draw dashed perpendicular
     ctx.strokeStyle = '#ef4444';
     ctx.setLineDash([4, 4]);
-    let sP = toScr(px, py);
-    let sH = toScr(hx, hy);
+    const sP = toScr(px, py);
+    const sH = toScr(hx, hy);
     ctx.beginPath(); ctx.moveTo(sP.x, sP.y); ctx.lineTo(sH.x, sH.y); ctx.stroke();
     ctx.setLineDash([]);
 
@@ -275,13 +275,13 @@ export default function PointLineDistanceDrill() {
 
   let explanationEl = <></>;
   if (hasChecked) {
-    let rootPart = `\\sqrt{${problem.a}^2 + ${problem.b}^2}`;
-    let numPart = `|${problem.a} \\cdot (${problem.px}) + ${problem.b} \\cdot (${problem.py}) + ${problem.pattern==='pattern4'?'k':problem.c}|`;
-    let distInt = Math.sqrt(problem.a*problem.a + problem.b*problem.b);
+    const rootPart = `\\sqrt{${problem.a}^2 + ${problem.b}^2}`;
+    const numPart = `|${problem.a} \\cdot (${problem.px}) + ${problem.b} \\cdot (${problem.py}) + ${problem.pattern==='pattern4'?'k':problem.c}|`;
+    const distInt = Math.sqrt(problem.a*problem.a + problem.b*problem.b);
 
     if (problem.pattern === 'pattern4') {
-      let distVal = Math.abs(problem.a*problem.px + problem.b*problem.py + Number(problem.ans1)) / distInt;
-      let baseVal = problem.a*problem.px + problem.b*problem.py;
+      const distVal = Math.abs(problem.a*problem.px + problem.b*problem.py + Number(problem.ans1)) / distInt;
+      const baseVal = problem.a*problem.px + problem.b*problem.py;
       explanationEl = (
         <div className="space-y-4">
           <p>点 <MathEq math={`(${problem.px}, ${problem.py})`} /> と直線 <MathEq math={`${problem.a}x + ${problem.b}y + k = 0`} /> の距離が <MathEq math={`${distVal}`} /> なので、点と直線の距離の公式より：</p>

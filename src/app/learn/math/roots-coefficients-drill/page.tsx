@@ -67,8 +67,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     let a = getRand(-4, 4);
-    let b = getRand(-5, 5, false);
-    let c = getRand(-5, 5);
+    const b = getRand(-5, 5, false);
+    const c = getRand(-5, 5);
 
     if (p === 'pattern2') {
       a = 1; // 3乗は大きくなるのでa=1に固定
@@ -112,7 +112,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
 
     // reduce fraction
-    let g = gcd(num, den);
+    const g = gcd(num, den);
     num /= g;
     den /= g;
     if (den < 0) {
@@ -152,7 +152,7 @@ export default function RootsCoefficientsDrill() {
     if (!problem) return;
     
     let uNum = parseInt(ansNumStr) || 0;
-    let uDen = parseInt(ansDenStr) || 1;
+    const uDen = parseInt(ansDenStr) || 1;
     if (ansSign === '-') uNum = -uNum;
     
     // cross multiply check for fraction equality
@@ -166,7 +166,7 @@ export default function RootsCoefficientsDrill() {
 
   if (!problem) return null;
 
-  let eqStr = formatPoly(problem.a, problem.b, problem.c);
+  const eqStr = formatPoly(problem.a, problem.b, problem.c);
 
   // Math components for explanation
   let sumVal = `\\frac{${-problem.b}}{${problem.a}}`;

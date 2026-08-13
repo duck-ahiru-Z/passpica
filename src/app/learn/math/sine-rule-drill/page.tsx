@@ -49,7 +49,7 @@ function formatTerm(v: TermVal): string {
 }
 
 function simplifyTerm(num: number, root: number, den: number): TermVal {
-  let g = gcd(num, den);
+  const g = gcd(num, den);
   return { num: num / g, root, den: den / g };
 }
 
@@ -71,29 +71,29 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p_type === 'pattern4') {
-    let sets = [
+    const sets = [
       { angles: [30, 60, 90], ratio: "1 : \\sqrt{3} : 2" },
       { angles: [45, 45, 90], ratio: "1 : 1 : \\sqrt{2}" },
       { angles: [30, 30, 120], ratio: "1 : 1 : \\sqrt{3}" }
     ];
-    let set = sets[Math.floor(Math.random() * sets.length)];
-    let angles = [...set.angles];
+    const set = sets[Math.floor(Math.random() * sets.length)];
+    const angles = [...set.angles];
     // shuffle
     for (let i = angles.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [angles[i], angles[j]] = [angles[j], angles[i]];
     }
-    let maxAngle = Math.max(...angles);
+    const maxAngle = Math.max(...angles);
     
     // ratio corresponds to sides a:b:c which is sinA:sinB:sinC
     // we just use the set ratio, assuming it matches the sorted angles.
     // actually, let's build the ratio dynamically to match A, B, C!
-    let sinA = getSinVal(angles[0]);
-    let sinB = getSinVal(angles[1]);
-    let sinC = getSinVal(angles[2]);
+    const sinA = getSinVal(angles[0]);
+    const sinB = getSinVal(angles[1]);
+    const sinC = getSinVal(angles[2]);
     // To format ratio properly, we just multiply by 2.
     const getRatioPart = (s: TermVal) => s.root === 1 ? `${s.num * 2 / s.den}` : `${s.num * 2 / s.den === 1 ? '' : s.num * 2 / s.den}\\sqrt{${s.root}}`;
-    let ratioStr = `${getRatioPart(sinA)} : ${getRatioPart(sinB)} : ${getRatioPart(sinC)}`;
+    const ratioStr = `${getRatioPart(sinA)} : ${getRatioPart(sinB)} : ${getRatioPart(sinC)}`;
 
     return {
       pattern: p_type,
@@ -104,7 +104,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   }
 
   // Common for 1, 2, 3
-  let angles = [30, 45, 60, 90, 120, 135, 150];
+  const angles = [30, 45, 60, 90, 120, 135, 150];
   let A = 0, B = 0, C = 0;
   while (true) {
     A = angles[Math.floor(Math.random() * angles.length)];
@@ -115,15 +115,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
   }
 
-  let R = Math.floor(Math.random() * 5) + 2; // 2 to 6
+  const R = Math.floor(Math.random() * 5) + 2; // 2 to 6
 
-  let sinA = getSinVal(A);
-  let sinB = getSinVal(B);
-  let sinC = getSinVal(C);
+  const sinA = getSinVal(A);
+  const sinB = getSinVal(B);
+  const sinC = getSinVal(C);
 
-  let a = simplifyTerm(2 * R * sinA.num, sinA.root, sinA.den);
-  let b = simplifyTerm(2 * R * sinB.num, sinB.root, sinB.den);
-  let c = simplifyTerm(2 * R * sinC.num, sinC.root, sinC.den);
+  const a = simplifyTerm(2 * R * sinA.num, sinA.root, sinA.den);
+  const b = simplifyTerm(2 * R * sinB.num, sinB.root, sinB.den);
+  const c = simplifyTerm(2 * R * sinC.num, sinC.root, sinC.den);
 
   return {
     pattern: p_type, A, B, C, R, a, b, c,
@@ -159,9 +159,9 @@ export default function SineRuleDrillPage() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let cx = W / 2;
-    let cy = H / 2;
-    let radius = 60;
+    const cx = W / 2;
+    const cy = H / 2;
+    const radius = 60;
 
     // Outer circle
     ctx.strokeStyle = '#94a3b8';
@@ -177,18 +177,18 @@ export default function SineRuleDrillPage() {
     ctx.fill();
 
     // Angles
-    let A_rad = problem.A * Math.PI / 180;
-    let B_rad = problem.B * Math.PI / 180;
-    let C_rad = problem.C * Math.PI / 180;
+    const A_rad = problem.A * Math.PI / 180;
+    const B_rad = problem.B * Math.PI / 180;
+    const C_rad = problem.C * Math.PI / 180;
 
     // A at top
-    let angA = -Math.PI / 2;
-    let angB = angA - 2 * C_rad;
-    let angC = angA + 2 * B_rad;
+    const angA = -Math.PI / 2;
+    const angB = angA - 2 * C_rad;
+    const angC = angA + 2 * B_rad;
 
-    let ax = cx + radius * Math.cos(angA); let ay = cy + radius * Math.sin(angA);
-    let bx = cx + radius * Math.cos(angB); let by = cy + radius * Math.sin(angB);
-    let c_x = cx + radius * Math.cos(angC); let cy_pt = cy + radius * Math.sin(angC);
+    const ax = cx + radius * Math.cos(angA); const ay = cy + radius * Math.sin(angA);
+    const bx = cx + radius * Math.cos(angB); const by = cy + radius * Math.sin(angB);
+    const c_x = cx + radius * Math.cos(angC); const cy_pt = cy + radius * Math.sin(angC);
 
     // Triangle
     ctx.strokeStyle = '#2563eb';

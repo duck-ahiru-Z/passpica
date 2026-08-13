@@ -38,22 +38,22 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1') {
-      let primes = [2, 3, 5];
-      let pr = primes[Math.floor(Math.random() * primes.length)];
-      let a = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
-      let b = Math.floor(Math.random() * 3) + 2;
+      const primes = [2, 3, 5];
+      const pr = primes[Math.floor(Math.random() * primes.length)];
+      const a = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
+      const b = Math.floor(Math.random() * 3) + 2;
       if (a === b) continue;
       
-      let base = Math.pow(pr, a);
-      let arg = Math.pow(pr, b);
+      const base = Math.pow(pr, a);
+      const arg = Math.pow(pr, b);
       
       let num = b;
       let den = a;
-      let g = gcd(num, den);
+      const g = gcd(num, den);
       num /= g; den /= g;
       
-      let qStr = `\\log_{${base}} ${arg}`;
-      let expLines = [
+      const qStr = `\\log_{${base}} ${arg}`;
+      const expLines = [
         `\\log_{${base}} ${arg} = \\frac{\\log_{${pr}} ${arg}}{\\log_{${pr}} ${base}}`,
         `= \\frac{\\log_{${pr}} ${pr}^${b}}{\\log_{${pr}} ${pr}^${a}}`,
         `= \\frac{${b}}{${a}}`
@@ -63,15 +63,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansNum: num, ansDen: den, expLines };
     } 
     else if (p === 'pattern2') {
-      let primes = [2, 3, 5];
-      let b1 = primes[Math.floor(Math.random() * primes.length)];
-      let k = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
-      let a2 = Math.pow(b1, k);
-      let b2 = Math.floor(Math.random() * 6) + 2; // 2..7
+      const primes = [2, 3, 5];
+      const b1 = primes[Math.floor(Math.random() * primes.length)];
+      const k = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
+      const a2 = Math.pow(b1, k);
+      const b2 = Math.floor(Math.random() * 6) + 2; // 2..7
       if (b2 === b1 || b2 === a2) continue; // avoid trivial
       
-      let qStr = `\\log_{${b1}} ${b2} \\cdot \\log_{${b2}} ${a2}`;
-      let expLines = [
+      const qStr = `\\log_{${b1}} ${b2} \\cdot \\log_{${b2}} ${a2}`;
+      const expLines = [
         `\\text{底の変換公式より、底を } ${b1} \\text{ にそろえると：}`,
         `\\log_{${b1}} ${b2} \\cdot \\log_{${b2}} ${a2} = \\log_{${b1}} ${b2} \\cdot \\frac{\\log_{${b1}} ${a2}}{\\log_{${b1}} ${b2}}`,
         `= \\log_{${b1}} ${a2}`,
@@ -81,17 +81,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansNum: k, ansDen: 1, expLines };
     }
     else if (p === 'pattern3') {
-      let primes = [2, 3, 5];
-      let x = primes[Math.floor(Math.random() * primes.length)];
-      let i = Math.floor(Math.random() * 2) + 1; // 1, 2
-      let j = Math.floor(Math.random() * 2) + 1; // 1, 2
-      let k = i + j;
-      let a = Math.pow(x, i);
-      let b = Math.pow(x, j);
+      const primes = [2, 3, 5];
+      const x = primes[Math.floor(Math.random() * primes.length)];
+      const i = Math.floor(Math.random() * 2) + 1; // 1, 2
+      const j = Math.floor(Math.random() * 2) + 1; // 1, 2
+      const k = i + j;
+      const a = Math.pow(x, i);
+      const b = Math.pow(x, j);
       if (a === x || b === x) continue; // to make it non-trivial, wait if x=2, i=1, a=2. 1/log_2 x is just 1. It's fine but slightly trivial.
       
-      let qStr = `\\frac{1}{\\log_{${a}} ${x}} + \\frac{1}{\\log_{${b}} ${x}}`;
-      let expLines = [
+      const qStr = `\\frac{1}{\\log_{${a}} ${x}} + \\frac{1}{\\log_{${b}} ${x}}`;
+      const expLines = [
         `\\text{底の変換公式の逆数の性質 } \\frac{1}{\\log_A B} = \\log_B A \\text{ より：}`,
         `\\frac{1}{\\log_{${a}} ${x}} + \\frac{1}{\\log_{${b}} ${x}} = \\log_{${x}} ${a} + \\log_{${x}} ${b}`,
         `= \\log_{${x}} (${a} \\times ${b})`,
@@ -102,16 +102,16 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansNum: k, ansDen: 1, expLines };
     }
     else if (p === 'pattern4') {
-      let primes = [2, 3, 5];
-      let y = primes[Math.floor(Math.random() * primes.length)];
+      const primes = [2, 3, 5];
+      const y = primes[Math.floor(Math.random() * primes.length)];
       let k = Math.floor(Math.random() * 2) + 1; // 1, 2
       if (y === 5) k = 1; // avoid 25^2 etc if z is large
-      let z = Math.floor(Math.random() * 4) + 2; // 2..5
+      const z = Math.floor(Math.random() * 4) + 2; // 2..5
       if (y === z) continue;
       
-      let x = Math.pow(y, k);
-      let qStr = `${x}^{\\log_{${y}} ${z}}`;
-      let ans = Math.pow(z, k);
+      const x = Math.pow(y, k);
+      const qStr = `${x}^{\\log_{${y}} ${z}}`;
+      const ans = Math.pow(z, k);
       
       let expLines = [];
       if (k === 1) {
@@ -161,9 +161,9 @@ export default function LogarithmDrill() {
     
     // Parse user input as fraction or integer
     let uNum = 0, uDen = 1;
-    let uStr = ansVal.trim().replace(/\s+/g, '');
+    const uStr = ansVal.trim().replace(/\s+/g, '');
     if (uStr.includes('/')) {
-      let parts = uStr.split('/');
+      const parts = uStr.split('/');
       uNum = parseInt(parts[0]);
       uDen = parseInt(parts[1]);
     } else {

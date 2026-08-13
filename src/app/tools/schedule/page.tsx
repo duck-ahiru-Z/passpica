@@ -43,8 +43,10 @@ export default function SchedulePage() {
     const saved = localStorage.getItem('passpica_weekly_schedule');
     if (saved) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSchedule(JSON.parse(saved));
-      } catch (e) {
+      } catch (_e) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSchedule([]);
       }
     }
@@ -69,7 +71,7 @@ export default function SchedulePage() {
     const { day, period } = selectedCell;
 
     const baseSchedule = schedule.filter(c => !(c.day === day && c.period === period));
-    let updated: ScheduleCell[] = [...baseSchedule];
+    const updated: ScheduleCell[] = [...baseSchedule];
 
     if (editSubject !== '') {
       updated.push({

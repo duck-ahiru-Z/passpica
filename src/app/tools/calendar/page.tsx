@@ -42,8 +42,10 @@ export default function CalendarPage() {
     const savedCustoms = localStorage.getItem('passpica_calendar_events');
     if (savedCustoms) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomEvents(JSON.parse(savedCustoms));
-      } catch (e) {
+      } catch (_e) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomEvents([]);
       }
     }
@@ -51,8 +53,10 @@ export default function CalendarPage() {
     const savedMocks = localStorage.getItem('passpica_calendar_selected_mocks');
     if (savedMocks) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedMockIds(JSON.parse(savedMocks));
-      } catch (e) {
+      } catch (_e) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedMockIds([]);
       }
     }
@@ -60,13 +64,16 @@ export default function CalendarPage() {
     const savedNationals = localStorage.getItem('passpica_calendar_selected_nationals');
     if (savedNationals) {
       try {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedNationalIds(JSON.parse(savedNationals));
-      } catch (e) {
+      } catch (_e) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedNationalIds(NATIONAL_MASTER_DATA.map(n => n.id));
       }
     } else {
       // 初回はすべて選択状態にして保存
       const allNationalIds = NATIONAL_MASTER_DATA.map(n => n.id);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedNationalIds(allNationalIds);
       localStorage.setItem('passpica_calendar_selected_nationals', JSON.stringify(allNationalIds));
     }

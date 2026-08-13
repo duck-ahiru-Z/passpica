@@ -44,7 +44,7 @@ function ev(coeffs: number[], x: number): number {
 
 // 多項式の文字列フォーマット (KaTeX用)
 function formatPoly(coeffs: number[]): string {
-  let terms = [];
+  const terms = [];
   for (let i = coeffs.length - 1; i >= 0; i--) {
     const c = coeffs[i];
     if (c === 0) continue;

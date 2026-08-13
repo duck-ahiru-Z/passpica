@@ -64,22 +64,22 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p_type === 'pattern3') {
-    let db = [
+    const db = [
       [3,4,5], [5,12,13], [13,14,15], [4,13,15], 
       [7,24,25], [9,10,17], [5,5,6], [5,5,8], [10,13,13]
     ];
-    let t = db[Math.floor(Math.random() * db.length)];
-    let sides = [...t];
+    const t = db[Math.floor(Math.random() * db.length)];
+    const sides = [...t];
     for (let i = sides.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [sides[i], sides[j]] = [sides[j], sides[i]];
     }
-    let [a, b, c] = sides;
-    let s = (a+b+c)/2;
-    let S_val = Math.sqrt(s*(s-a)*(s-b)*(s-c));
-    let cosA = (b*b + c*c - a*a) / (2*b*c);
-    let A_rad = Math.acos(cosA);
-    let A_deg = Math.round(A_rad * 180 / Math.PI); // approx for display only
+    const [a, b, c] = sides;
+    const s = (a+b+c)/2;
+    const S_val = Math.sqrt(s*(s-a)*(s-b)*(s-c));
+    const cosA = (b*b + c*c - a*a) / (2*b*c);
+    const A_rad = Math.acos(cosA);
+    const A_deg = Math.round(A_rad * 180 / Math.PI); // approx for display only
     
     return { 
       pattern: p_type, 
@@ -109,14 +109,14 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     while ((b * c) % 2 !== 0) c++;
   }
 
-  let sinVal = getSinVal(A);
-  let S_num_raw = b * c * sinVal.num;
-  let S_den_raw = 2 * sinVal.den; 
-  let g = gcd(S_num_raw, S_den_raw);
-  let S = { num: S_num_raw / g, root: sinVal.root, den: S_den_raw / g };
+  const sinVal = getSinVal(A);
+  const S_num_raw = b * c * sinVal.num;
+  const S_den_raw = 2 * sinVal.den; 
+  const g = gcd(S_num_raw, S_den_raw);
+  const S = { num: S_num_raw / g, root: sinVal.root, den: S_den_raw / g };
 
-  let a2 = b*b + c*c - 2*b*c*Math.cos(A * Math.PI / 180);
-  let a_val = Math.sqrt(a2);
+  const a2 = b*b + c*c - 2*b*c*Math.cos(A * Math.PI / 180);
+  const a_val = Math.sqrt(a2);
 
   return { 
     pattern: p_type, 
@@ -153,22 +153,22 @@ export default function TriangleAreaDrillPage() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let cx = W / 2;
-    let cy = H / 2 + 20;
+    const cx = W / 2;
+    const cy = H / 2 + 20;
     
-    let c_val = problem.c.num; // integer
-    let b_val = problem.b.num;
-    let A_rad = problem.A_rad;
+    const c_val = problem.c.num; // integer
+    const b_val = problem.b.num;
+    const A_rad = problem.A_rad;
 
-    let max_x = Math.max(c_val, b_val * Math.cos(A_rad));
-    let min_x = Math.min(0, b_val * Math.cos(A_rad));
-    let max_y = b_val * Math.sin(A_rad);
+    const max_x = Math.max(c_val, b_val * Math.cos(A_rad));
+    const min_x = Math.min(0, b_val * Math.cos(A_rad));
+    const max_y = b_val * Math.sin(A_rad);
     
-    let scale = Math.min(W * 0.8 / (max_x - min_x || 1), H * 0.7 / max_y);
+    const scale = Math.min(W * 0.8 / (max_x - min_x || 1), H * 0.7 / max_y);
     
-    let ptA = { x: cx - (max_x + min_x)/2 * scale, y: cy + (max_y)/2 * scale };
-    let ptC = { x: ptA.x + b_val * Math.cos(A_rad) * scale, y: ptA.y - b_val * Math.sin(A_rad) * scale };
-    let ptB = { x: ptA.x + c_val * scale, y: ptA.y };
+    const ptA = { x: cx - (max_x + min_x)/2 * scale, y: cy + (max_y)/2 * scale };
+    const ptC = { x: ptA.x + b_val * Math.cos(A_rad) * scale, y: ptA.y - b_val * Math.sin(A_rad) * scale };
+    const ptB = { x: ptA.x + c_val * scale, y: ptA.y };
 
     // Draw Triangle Area
     ctx.fillStyle = 'rgba(59, 130, 246, 0.2)'; // semi-transparent blue
@@ -186,7 +186,7 @@ export default function TriangleAreaDrillPage() {
 
     // Pattern 4: Draw altitude
     if (problem.pattern === 'pattern4' && hasChecked) {
-      let ptH = { x: ptC.x, y: ptA.y };
+      const ptH = { x: ptC.x, y: ptA.y };
       ctx.strokeStyle = '#ef4444';
       ctx.lineWidth = 1.5;
       ctx.setLineDash([4, 4]);
@@ -198,7 +198,7 @@ export default function TriangleAreaDrillPage() {
       
       // Right angle
       ctx.strokeStyle = '#ef4444';
-      let dir = ptH.x > ptA.x ? -1 : 1;
+      const dir = ptH.x > ptA.x ? -1 : 1;
       ctx.beginPath();
       ctx.moveTo(ptH.x + 8*dir, ptH.y);
       ctx.lineTo(ptH.x + 8*dir, ptH.y - 8);

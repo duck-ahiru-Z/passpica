@@ -12,7 +12,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 }
 
 function getSquareFactors(n: number): number[] {
-  let factors = [];
+  const factors = [];
   for (let k = 2; k * k <= n; k++) {
     if (n % (k * k) === 0) factors.push(k);
   }
@@ -30,19 +30,19 @@ interface ProblemData {
 
 function generateProblem(): ProblemData {
   while (true) {
-    let a = Math.floor(Math.random() * 15) + 2; // 2 to 16
-    let b = Math.floor(Math.random() * 15) + 1; // 1 to 15
+    const a = Math.floor(Math.random() * 15) + 2; // 2 to 16
+    const b = Math.floor(Math.random() * 15) + 1; // 1 to 15
     if (a <= b) continue;
     
     // a, b がこれ以上簡単にならないようにする
     if (getSquareFactors(a).length > 0 || getSquareFactors(b).length > 0) continue;
     
-    let diff = a - b;
-    let k = Math.floor(Math.random() * 3) + 1; // 1 to 3
-    let C = k * diff;
+    const diff = a - b;
+    const k = Math.floor(Math.random() * 3) + 1; // 1 to 3
+    const C = k * diff;
     
-    let sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-    let ansSign: '+' | '-' = sign === '+' ? '-' : '+';
+    const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
+    const ansSign: '+' | '-' = sign === '+' ? '-' : '+';
     
     return { a, b, C, k, sign, ansSign };
   }

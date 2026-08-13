@@ -63,12 +63,12 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     let ansSin = "";
 
     if (p === 'pattern1' || p === 'pattern2') {
-      let pairs = [
+      const pairs = [
         { c1:1, d1:1, c2:1, d2:3, alpha: "pi/3" }, // 1, sqrt(3) -> r=2, cos=1/2, sin=sq3/2 -> 60deg
         { c1:1, d1:3, c2:1, d2:1, alpha: "pi/6" }, // sqrt(3), 1 -> r=2, cos=sq3/2, sin=1/2 -> 30deg
         { c1:1, d1:1, c2:1, d2:1, alpha: "pi/4" }  // 1, 1 -> r=sqrt(2) -> 45deg
       ];
-      let pair = pairs[Math.floor(Math.random() * pairs.length)];
+      const pair = pairs[Math.floor(Math.random() * pairs.length)];
       
       a = { sign: 1, c: pair.c1, d: pair.d1 };
       b = { sign: 1, c: pair.c2, d: pair.d2 };
@@ -80,10 +80,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       }
 
       // calculate alpha
-      let x = a.sign * Math.sqrt(a.d) * a.c;
-      let y = b.sign * Math.sqrt(b.d) * b.c;
-      let r = Math.sqrt(x*x + y*y);
-      let angle = Math.atan2(y, x);
+      const x = a.sign * Math.sqrt(a.d) * a.c;
+      const y = b.sign * Math.sqrt(b.d) * b.c;
+      const r = Math.sqrt(x*x + y*y);
+      const angle = Math.atan2(y, x);
       
       // format r
       if (Math.abs(r - 2) < 0.01) { rOuter = 2; rInner = 1; }
@@ -106,13 +106,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       else if (Math.abs(angle - (-5*pi/6)) < eps || Math.abs(angle - 7*pi/6) < eps) ansAlpha = "-5pi/6";
       
     } else if (p === 'pattern3') {
-      let pairs = [
+      const pairs = [
         { c1:1, d1:6, c2:1, d2:2, rO:2, rI:2, aStr:"pi/6" }, // sq6, sq2 -> 2sq2, cos=sq3/2, sin=1/2 -> 30deg
         { c1:1, d1:2, c2:1, d2:6, rO:2, rI:2, aStr:"pi/3" }, // sq2, sq6 -> 60deg
         { c1:3, d1:1, c2:1, d2:3, rO:2, rI:3, aStr:"pi/6" }, // 3, sq3 -> r=sqrt(12)=2sq3, cos=3/2sq3=sq3/2 -> 30deg
         { c1:1, d1:3, c2:3, d2:1, rO:2, rI:3, aStr:"pi/3" }
       ];
-      let pair = pairs[Math.floor(Math.random() * pairs.length)];
+      const pair = pairs[Math.floor(Math.random() * pairs.length)];
       a = { sign: 1, c: pair.c1, d: pair.d1 };
       b = { sign: 1, c: pair.c2, d: pair.d2 };
       
@@ -126,9 +126,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       rOuter = pair.rO;
       rInner = pair.rI;
       
-      let x = a.sign * Math.sqrt(a.d) * a.c;
-      let y = b.sign * Math.sqrt(b.d) * b.c;
-      let angle = Math.atan2(y, x);
+      const x = a.sign * Math.sqrt(a.d) * a.c;
+      const y = b.sign * Math.sqrt(b.d) * b.c;
+      const angle = Math.atan2(y, x);
       const pi = Math.PI;
       const eps = 0.01;
       // Re-evaluate angle
@@ -146,14 +146,14 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       else if (Math.abs(angle - (-5*pi/6)) < eps || Math.abs(angle - 7*pi/6) < eps) ansAlpha = "-5pi/6";
 
     } else if (p === 'pattern4') {
-      let triples = [
+      const triples = [
         { x:3, y:4, r:5 }, { x:4, y:3, r:5 },
         { x:5, y:12, r:13 }, { x:12, y:5, r:13 },
         { x:8, y:15, r:17 }
       ];
-      let tr = triples[Math.floor(Math.random() * triples.length)];
-      let signX = Math.random() > 0.5 ? 1 : -1;
-      let signY = Math.random() > 0.5 ? 1 : -1;
+      const tr = triples[Math.floor(Math.random() * triples.length)];
+      const signX = Math.random() > 0.5 ? 1 : -1;
+      const signY = Math.random() > 0.5 ? 1 : -1;
       a = { sign: signX as 1|-1, c: tr.x, d: 1 };
       b = { sign: signY as 1|-1, c: tr.y, d: 1 };
       rOuter = tr.r;
@@ -173,7 +173,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     if (bStr === "+1") bStr = "+";
     if (bStr === "-1") bStr = "-";
 
-    let qStr = `${aStr}\\sin\\theta ${bStr}\\cos\\theta`;
+    const qStr = `${aStr}\\sin\\theta ${bStr}\\cos\\theta`;
 
     return { pattern: p, a, b, rOuter, rInner, ansAlpha, ansCos, ansSin, qStr };
   }
@@ -211,14 +211,14 @@ export default function TrigSynthesisDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let rOut = parseInt(ansROuter) || 1;
-    let rIn = parseInt(ansRInner) || 1;
+    const rOut = parseInt(ansROuter) || 1;
+    const rIn = parseInt(ansRInner) || 1;
     
     let isOk = false;
     // check r
     if (rOut === problem.rOuter && rIn === problem.rInner) {
       // check alpha
-      let uAlp = ansAlpha.trim().replace(/\s+/g, '').toLowerCase();
+      const uAlp = ansAlpha.trim().replace(/\s+/g, '').toLowerCase();
       // allow 11pi/6 or -pi/6
       let okAlp = uAlp === problem.ansAlpha || 
                   (problem.ansAlpha === "-pi/6" && uAlp === "11pi/6") ||
@@ -255,14 +255,14 @@ export default function TrigSynthesisDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let x = problem.a.sign * Math.sqrt(problem.a.d) * problem.a.c;
-    let y = problem.b.sign * Math.sqrt(problem.b.d) * problem.b.c;
+    const x = problem.a.sign * Math.sqrt(problem.a.d) * problem.a.c;
+    const y = problem.b.sign * Math.sqrt(problem.b.d) * problem.b.c;
     
-    let max = Math.max(Math.abs(x), Math.abs(y), 2);
-    let scale = Math.min(W/2 - 30, H/2 - 30) / max;
+    const max = Math.max(Math.abs(x), Math.abs(y), 2);
+    const scale = Math.min(W/2 - 30, H/2 - 30) / max;
     
-    let cx = W/2;
-    let cy = H/2;
+    const cx = W/2;
+    const cy = H/2;
 
     const toScr = (px: number, py: number) => ({
       x: cx + px * scale,
@@ -276,7 +276,7 @@ export default function TrigSynthesisDrill() {
     ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
 
     // Draw point P
-    let sP = toScr(x, y);
+    const sP = toScr(x, y);
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
     ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(sP.x, sP.y); ctx.stroke();
@@ -294,14 +294,14 @@ export default function TrigSynthesisDrill() {
     ctx.font = '12px sans-serif';
     
     // label P
-    let lx = sP.x + (x >= 0 ? 8 : -40);
-    let ly = sP.y + (y >= 0 ? -8 : 16);
-    let lblX = problem.a.d === 1 ? `${problem.a.sign * problem.a.c}` : `${problem.a.sign < 0 ? '-' : ''}${problem.a.c === 1 ? '' : problem.a.c}√${problem.a.d}`;
-    let lblY = problem.b.d === 1 ? `${problem.b.sign * problem.b.c}` : `${problem.b.sign < 0 ? '-' : ''}${problem.b.c === 1 ? '' : problem.b.c}√${problem.b.d}`;
+    const lx = sP.x + (x >= 0 ? 8 : -40);
+    const ly = sP.y + (y >= 0 ? -8 : 16);
+    const lblX = problem.a.d === 1 ? `${problem.a.sign * problem.a.c}` : `${problem.a.sign < 0 ? '-' : ''}${problem.a.c === 1 ? '' : problem.a.c}√${problem.a.d}`;
+    const lblY = problem.b.d === 1 ? `${problem.b.sign * problem.b.c}` : `${problem.b.sign < 0 ? '-' : ''}${problem.b.c === 1 ? '' : problem.b.c}√${problem.b.d}`;
     ctx.fillText(`P(${lblX}, ${lblY})`, lx, ly);
 
     // Draw arc for angle alpha
-    let angle = Math.atan2(y, x);
+    const angle = Math.atan2(y, x);
     ctx.strokeStyle = '#ef4444';
     ctx.lineWidth = 2;
     ctx.beginPath();
@@ -314,9 +314,9 @@ export default function TrigSynthesisDrill() {
 
     // alpha label
     ctx.fillStyle = '#ef4444';
-    let aMid = angle / 2;
-    let ax = cx + 35 * Math.cos(aMid);
-    let ay = cy - 35 * Math.sin(aMid);
+    const aMid = angle / 2;
+    const ax = cx + 35 * Math.cos(aMid);
+    const ay = cy - 35 * Math.sin(aMid);
     ctx.fillText('α', ax, ay);
   };
 
@@ -332,8 +332,8 @@ export default function TrigSynthesisDrill() {
 
   let explanationEl = <></>;
   if (hasChecked) {
-    let xStr = problem.a.d === 1 ? `${problem.a.sign * problem.a.c}` : `${problem.a.sign < 0 ? '-' : ''}${problem.a.c === 1 ? '' : problem.a.c}\\sqrt{${problem.a.d}}`;
-    let yStr = problem.b.d === 1 ? `${problem.b.sign * problem.b.c}` : `${problem.b.sign < 0 ? '-' : ''}${problem.b.c === 1 ? '' : problem.b.c}\\sqrt{${problem.b.d}}`;
+    const xStr = problem.a.d === 1 ? `${problem.a.sign * problem.a.c}` : `${problem.a.sign < 0 ? '-' : ''}${problem.a.c === 1 ? '' : problem.a.c}\\sqrt{${problem.a.d}}`;
+    const yStr = problem.b.d === 1 ? `${problem.b.sign * problem.b.c}` : `${problem.b.sign < 0 ? '-' : ''}${problem.b.c === 1 ? '' : problem.b.c}\\sqrt{${problem.b.d}}`;
 
     if (problem.pattern === 'pattern4') {
       explanationEl = (
@@ -355,7 +355,7 @@ export default function TrigSynthesisDrill() {
       if (aDisplay.startsWith("-1\\pi")) aDisplay = aDisplay.replace("-1\\pi", "-\\pi");
       // proper fraction rendering
       if (aDisplay.includes("/")) {
-        let parts = aDisplay.split("/");
+        const parts = aDisplay.split("/");
         aDisplay = `\\frac{${parts[0]}}{${parts[1]}}`;
       }
 

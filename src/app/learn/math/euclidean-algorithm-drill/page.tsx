@@ -18,12 +18,12 @@ interface Step {
 }
 
 function getSteps(a: number, b: number): Step[] {
-  let steps = [];
+  const steps = [];
   let _a = a;
   let _b = b;
   while (_b > 0) {
-    let q = Math.floor(_a / _b);
-    let r = _a % _b;
+    const q = Math.floor(_a / _b);
+    const r = _a % _b;
     steps.push({ a: _a, b: _b, q, r });
     _a = _b;
     _b = r;
@@ -63,7 +63,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       b = Math.floor(Math.random() * (a - 500)) + 500;
     }
 
-    let steps = getSteps(a, b);
+    const steps = getSteps(a, b);
     let gcd = steps[steps.length - 1]?.a || 1; // wait, if r=0, last step a is the last divisor (which was b in previous step)
     // Actually the last step in getSteps has r=0, so the GCD is the 'b' of the last step
     gcd = steps[steps.length - 1].b;
@@ -108,8 +108,8 @@ export default function EuclideanAlgorithmDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let A = problem.A;
-    let B = problem.B;
+    const A = problem.A;
+    const B = problem.B;
     
     // Scale A and B to fit inside 90% of Canvas
     const padding = 20;
@@ -117,12 +117,12 @@ export default function EuclideanAlgorithmDrill() {
     const availH = H - padding * 2;
     
     // Always map larger number to width
-    let scale = Math.min(availW / A, availH / B);
-    let drawW = A * scale;
-    let drawH = B * scale;
+    const scale = Math.min(availW / A, availH / B);
+    const drawW = A * scale;
+    const drawH = B * scale;
     
-    let offsetX = (W - drawW) / 2;
-    let offsetY = (H - drawH) / 2;
+    const offsetX = (W - drawW) / 2;
+    const offsetY = (H - drawH) / 2;
 
     ctx.fillStyle = '#1e293b';
     ctx.textAlign = 'center';
@@ -134,22 +134,22 @@ export default function EuclideanAlgorithmDrill() {
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 1;
 
-    let colors = ['#eff6ff', '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa'];
+    const colors = ['#eff6ff', '#dbeafe', '#bfdbfe', '#93c5fd', '#60a5fa'];
     
     // Recursive drawing
     const drawEuclid = (x: number, y: number, w: number, h: number, a: number, b: number, isHorizontal: boolean, depth: number) => {
       if (b === 0 || a === 0 || w < 0.5 || h < 0.5) return;
       
-      let q = Math.floor(a / b);
-      let r = a % b;
+      const q = Math.floor(a / b);
+      const r = a % b;
       
-      let stepSize = isHorizontal ? h : w; // pixel size of square
+      const stepSize = isHorizontal ? h : w; // pixel size of square
       
       ctx.fillStyle = colors[Math.min(depth, colors.length - 1)];
       
       for (let i = 0; i < q; i++) {
-        let sx = x + (isHorizontal ? i * stepSize : 0);
-        let sy = y + (isHorizontal ? 0 : i * stepSize);
+        const sx = x + (isHorizontal ? i * stepSize : 0);
+        const sy = y + (isHorizontal ? 0 : i * stepSize);
         ctx.fillRect(sx, sy, stepSize, stepSize);
         ctx.strokeRect(sx, sy, stepSize, stepSize);
         
@@ -157,7 +157,7 @@ export default function EuclideanAlgorithmDrill() {
         if (stepSize > 15) {
           ctx.fillStyle = '#1e293b';
           // only draw b value if it fits nicely
-          let fontSize = Math.max(8, Math.min(12, stepSize * 0.4));
+          const fontSize = Math.max(8, Math.min(12, stepSize * 0.4));
           ctx.font = `${fontSize}px sans-serif`;
           ctx.fillText(`${b}`, sx + stepSize/2, sy + stepSize/2);
           ctx.fillStyle = colors[Math.min(depth, colors.length - 1)]; // reset
@@ -165,10 +165,10 @@ export default function EuclideanAlgorithmDrill() {
       }
       
       if (r > 0) {
-        let nextX = x + (isHorizontal ? q * stepSize : 0);
-        let nextY = y + (isHorizontal ? 0 : q * stepSize);
-        let nextW = isHorizontal ? w - q * stepSize : w;
-        let nextH = isHorizontal ? h : h - q * stepSize;
+        const nextX = x + (isHorizontal ? q * stepSize : 0);
+        const nextY = y + (isHorizontal ? 0 : q * stepSize);
+        const nextW = isHorizontal ? w - q * stepSize : w;
+        const nextH = isHorizontal ? h : h - q * stepSize;
         drawEuclid(nextX, nextY, nextW, nextH, b, r, !isHorizontal, depth + 1);
       }
     };

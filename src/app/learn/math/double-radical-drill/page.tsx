@@ -12,7 +12,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 }
 
 function getSquareFactors(n: number): number[] {
-  let factors = [];
+  const factors = [];
   for (let k = 2; k * k <= n; k++) {
     if (n % (k * k) === 0) factors.push(k);
   }
@@ -40,39 +40,39 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   while (true) {
-    let a = Math.floor(Math.random() * 8) + 2; // 2 to 9
-    let b = Math.floor(Math.random() * 8) + 2; // 2 to 9
+    const a = Math.floor(Math.random() * 8) + 2; // 2 to 9
+    const b = Math.floor(Math.random() * 8) + 2; // 2 to 9
     if (a <= b) continue; // 必ず a > b
     
-    let sum = a + b;
-    let prod = a * b;
+    const sum = a + b;
+    const prod = a * b;
     
     if (p === 'pattern1' || p === 'pattern2') {
       // ユーザー要望: 答えが整数になる場合はそのまま √の中身として扱っても良いが、
       // 逆算ロジックとしては単に a+b, ab を使えばOK
-      let sign: '+' | '-' = p === 'pattern1' ? '+' : '-';
-      let eq = `\\sqrt{${sum} ${sign} 2\\sqrt{${prod}}}`;
+      const sign: '+' | '-' = p === 'pattern1' ? '+' : '-';
+      const eq = `\\sqrt{${sum} ${sign} 2\\sqrt{${prod}}}`;
       return { pattern: p, a, b, eq, sign, sum, prod };
     }
     
     if (p === 'pattern3') {
-      let kFactors = getSquareFactors(prod);
+      const kFactors = getSquareFactors(prod);
       if (kFactors.length === 0) continue; // 係数として外に出せる数がない場合はやり直し
-      let k = kFactors[kFactors.length - 1]; // 最大の平方因数のルート
-      let inner = prod / (k * k);
-      let sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      let coef = 2 * k; // 2以外の偶数係数 (4, 6, 8...)
-      let eq = `\\sqrt{${sum} ${sign} ${coef}\\sqrt{${inner}}}`;
+      const k = kFactors[kFactors.length - 1]; // 最大の平方因数のルート
+      const inner = prod / (k * k);
+      const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
+      const coef = 2 * k; // 2以外の偶数係数 (4, 6, 8...)
+      const eq = `\\sqrt{${sum} ${sign} ${coef}\\sqrt{${inner}}}`;
       return { pattern: p, a, b, eq, sign, sum, prod, k, inner };
     }
     
     if (p === 'pattern4') {
       if (a % 2 === 0 || b % 2 === 0) continue; // a, b は奇数（和が偶数になるように）
-      let X = sum / 2;
+      const X = sum / 2;
       // prodが4で割り切れると係数が出てしまうので除外
       if (prod % 4 === 0) continue;
-      let sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      let eq = `\\sqrt{${X} ${sign} \\sqrt{${prod}}}`;
+      const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
+      const eq = `\\sqrt{${X} ${sign} \\sqrt{${prod}}}`;
       return { pattern: p, a, b, eq, sign, sum, prod, X };
     }
   }

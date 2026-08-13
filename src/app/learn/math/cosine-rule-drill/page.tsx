@@ -44,7 +44,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
     : selectedPattern;
 
-  let angles = [30, 45, 60, 90, 120, 135, 150];
+  const angles = [30, 45, 60, 90, 120, 135, 150];
   let A = angles[Math.floor(Math.random() * angles.length)];
   
   if (p_type === 'pattern1') A = [60, 120][Math.floor(Math.random() * 2)];
@@ -59,36 +59,36 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       b.num = Math.floor(Math.random() * 8) + 2;
       c.num = Math.floor(Math.random() * 8) + 2;
       b.root = 1; c.root = 1;
-      let cosA = A === 60 ? 1/2 : A === 120 ? -1/2 : 0;
+      const cosA = A === 60 ? 1/2 : A === 120 ? -1/2 : 0;
       a2 = b.num*b.num + c.num*c.num - 2*b.num*c.num*cosA;
     } else if (A === 45 || A === 135) {
       b.num = Math.floor(Math.random() * 4) + 1;
       b.root = 2;
       c.num = Math.floor(Math.random() * 8) + 2;
       c.root = 1;
-      if (p_type !== 'pattern4' && Math.random() < 0.5) { let t = b; b = c; c = t; }
-      let cosA_sign = A === 45 ? 1 : -1;
-      let b_is_root2 = b.root === 2;
-      let b_coef = b_is_root2 ? b.num : c.num;
-      let c_coef = b_is_root2 ? c.num : b.num;
+      if (p_type !== 'pattern4' && Math.random() < 0.5) { const t = b; b = c; c = t; }
+      const cosA_sign = A === 45 ? 1 : -1;
+      const b_is_root2 = b.root === 2;
+      const b_coef = b_is_root2 ? b.num : c.num;
+      const c_coef = b_is_root2 ? c.num : b.num;
       a2 = b.num*b.num*b.root + c.num*c.num*c.root - 2 * b_coef * c_coef * cosA_sign;
     } else if (A === 30 || A === 150) {
       b.num = Math.floor(Math.random() * 4) + 1;
       b.root = 3;
       c.num = Math.floor(Math.random() * 8) + 2;
       c.root = 1;
-      if (p_type !== 'pattern4' && Math.random() < 0.5) { let t = b; b = c; c = t; }
-      let cosA_sign = A === 30 ? 1 : -1;
-      let b_is_root3 = b.root === 3;
-      let b_coef = b_is_root3 ? b.num : c.num;
-      let c_coef = b_is_root3 ? c.num : b.num;
+      if (p_type !== 'pattern4' && Math.random() < 0.5) { const t = b; b = c; c = t; }
+      const cosA_sign = A === 30 ? 1 : -1;
+      const b_is_root3 = b.root === 3;
+      const b_coef = b_is_root3 ? b.num : c.num;
+      const c_coef = b_is_root3 ? c.num : b.num;
       a2 = b.num*b.num*b.root + c.num*c.num*c.root - 3 * b_coef * c_coef * cosA_sign;
     }
     
     if (a2 > 0) break;
   }
   
-  let a = { num: 1, root: 1, den: 1 };
+  const a = { num: 1, root: 1, den: 1 };
   let inside = a2;
   let coeff = 1;
   for (let i = 2; i * i <= inside; i++) {
@@ -114,8 +114,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     else if (A === 45 || A === 135) two_b_cosA = 2 * b.num * (A === 45 ? 1 : -1);
     else if (A === 30 || A === 150) two_b_cosA = 3 * b.num * (A === 30 ? 1 : -1);
     
-    let c_orig = c.num;
-    let c_other = two_b_cosA - c_orig;
+    const c_orig = c.num;
+    const c_other = two_b_cosA - c_orig;
     
     ansTerms = [c];
     if (c_other > 0 && c_other !== c_orig) {
@@ -154,25 +154,25 @@ export default function CosineRuleDrillPage() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let cx = W / 2;
-    let cy = H / 2 + 20;
+    const cx = W / 2;
+    const cy = H / 2 + 20;
     
-    let c_val = problem.c.num * Math.sqrt(problem.c.root);
-    let b_val = problem.b.num * Math.sqrt(problem.b.root);
+    const c_val = problem.c.num * Math.sqrt(problem.c.root);
+    const b_val = problem.b.num * Math.sqrt(problem.b.root);
     
     // For pattern4 with 2 answers, draw the first one, or draw both if checked
-    let c2_val = problem.ansTerms && problem.ansTerms.length > 1 ? problem.ansTerms[1].num * Math.sqrt(problem.ansTerms[1].root) : 0;
+    const c2_val = problem.ansTerms && problem.ansTerms.length > 1 ? problem.ansTerms[1].num * Math.sqrt(problem.ansTerms[1].root) : 0;
 
     // Scale
-    let max_x = Math.max(c_val, b_val * Math.cos(problem.A * Math.PI / 180), c2_val);
-    let min_x = Math.min(0, b_val * Math.cos(problem.A * Math.PI / 180));
-    let max_y = b_val * Math.sin(problem.A * Math.PI / 180);
+    const max_x = Math.max(c_val, b_val * Math.cos(problem.A * Math.PI / 180), c2_val);
+    const min_x = Math.min(0, b_val * Math.cos(problem.A * Math.PI / 180));
+    const max_y = b_val * Math.sin(problem.A * Math.PI / 180);
     
-    let scale = Math.min(W * 0.8 / (max_x - min_x || 1), H * 0.7 / max_y);
+    const scale = Math.min(W * 0.8 / (max_x - min_x || 1), H * 0.7 / max_y);
     
-    let ptA = { x: cx - (max_x + min_x)/2 * scale, y: cy + (max_y)/2 * scale }; // Shift origin to center
-    let ptC = { x: ptA.x + b_val * Math.cos(problem.A * Math.PI / 180) * scale, y: ptA.y - b_val * Math.sin(problem.A * Math.PI / 180) * scale };
-    let ptB = { x: ptA.x + c_val * scale, y: ptA.y };
+    const ptA = { x: cx - (max_x + min_x)/2 * scale, y: cy + (max_y)/2 * scale }; // Shift origin to center
+    const ptC = { x: ptA.x + b_val * Math.cos(problem.A * Math.PI / 180) * scale, y: ptA.y - b_val * Math.sin(problem.A * Math.PI / 180) * scale };
+    const ptB = { x: ptA.x + c_val * scale, y: ptA.y };
 
     // Triangle 1
     ctx.strokeStyle = '#2563eb';
@@ -186,7 +186,7 @@ export default function CosineRuleDrillPage() {
 
     // Triangle 2 (if exists)
     if (hasChecked && c2_val > 0) {
-      let ptB2 = { x: ptA.x + c2_val * scale, y: ptA.y };
+      const ptB2 = { x: ptA.x + c2_val * scale, y: ptA.y };
       ctx.strokeStyle = '#ef4444';
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
@@ -200,7 +200,7 @@ export default function CosineRuleDrillPage() {
       // Draw arc to show it's the same 'a' length
       ctx.strokeStyle = '#9ca3af';
       ctx.beginPath();
-      let r = Math.sqrt((ptB.x - ptC.x)**2 + (ptB.y - ptC.y)**2);
+      const r = Math.sqrt((ptB.x - ptC.x)**2 + (ptB.y - ptC.y)**2);
       ctx.arc(ptC.x, ptC.y, r, 0, Math.PI, false);
       ctx.stroke();
       
@@ -247,15 +247,15 @@ export default function CosineRuleDrillPage() {
     if (problem.pattern === 'pattern3') {
       isOk = parseInt(ansDeg) === problem.ansAngle;
     } else {
-      let ok1 = false, ok2 = false;
+      const ok1 = false, ok2 = false;
       if (problem.ansTerms && problem.ansTerms.length === 1) {
         isOk = checkFractionRoot(ansVal1, 1, problem.ansTerms[0].num, problem.ansTerms[0].root, problem.ansTerms[0].den);
       } else if (problem.ansTerms && problem.ansTerms.length === 2) {
-        let t1 = problem.ansTerms[0]; let t2 = problem.ansTerms[1];
-        let c1_is_t1 = checkFractionRoot(ansVal1, 1, t1.num, t1.root, t1.den);
-        let c1_is_t2 = checkFractionRoot(ansVal1, 1, t2.num, t2.root, t2.den);
-        let c2_is_t1 = checkFractionRoot(ansVal2, 1, t1.num, t1.root, t1.den);
-        let c2_is_t2 = checkFractionRoot(ansVal2, 1, t2.num, t2.root, t2.den);
+        const t1 = problem.ansTerms[0]; const t2 = problem.ansTerms[1];
+        const c1_is_t1 = checkFractionRoot(ansVal1, 1, t1.num, t1.root, t1.den);
+        const c1_is_t2 = checkFractionRoot(ansVal1, 1, t2.num, t2.root, t2.den);
+        const c2_is_t1 = checkFractionRoot(ansVal2, 1, t1.num, t1.root, t1.den);
+        const c2_is_t2 = checkFractionRoot(ansVal2, 1, t2.num, t2.root, t2.den);
         isOk = (c1_is_t1 && c2_is_t2) || (c1_is_t2 && c2_is_t1);
       }
     }

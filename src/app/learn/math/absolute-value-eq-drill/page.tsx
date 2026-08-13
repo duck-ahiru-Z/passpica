@@ -29,7 +29,7 @@ interface Root {
 
 function simplifyFraction(n: number, d: number): Root {
   if (d === 0) return { num: 0, den: 1 };
-  let g = gcd(n, d);
+  const g = gcd(n, d);
   let num = n / g;
   let den = d / g;
   if (den < 0) {
@@ -59,9 +59,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p === 'pattern1') {
-    let a = Math.floor(Math.random() * 19) - 9; // -9 to 9
-    let b = Math.floor(Math.random() * 9) + 1;  // 1 to 9 (b > 0)
-    let roots = [
+    const a = Math.floor(Math.random() * 19) - 9; // -9 to 9
+    const b = Math.floor(Math.random() * 9) + 1;  // 1 to 9 (b > 0)
+    const roots = [
       simplifyFraction(a + b, 1),
       simplifyFraction(a - b, 1)
     ];
@@ -71,10 +71,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   }
   
   if (p === 'pattern2') {
-    let a = Math.floor(Math.random() * 8) + 2; // 2 to 9
-    let b = Math.floor(Math.random() * 19) - 9;
-    let c = Math.floor(Math.random() * 9) + 1; // 1 to 9
-    let roots = [
+    const a = Math.floor(Math.random() * 8) + 2; // 2 to 9
+    const b = Math.floor(Math.random() * 19) - 9;
+    const c = Math.floor(Math.random() * 9) + 1; // 1 to 9
+    const roots = [
       simplifyFraction(b + c, a),
       simplifyFraction(b - c, a)
     ];
@@ -85,23 +85,23 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   
   if (p === 'pattern3') {
     while (true) {
-      let a = Math.floor(Math.random() * 8) + 2;
-      let b = Math.floor(Math.random() * 19) - 9;
-      let c = Math.floor(Math.random() * 19) - 9;
-      let d = Math.floor(Math.random() * 19) - 9;
+      const a = Math.floor(Math.random() * 8) + 2;
+      const b = Math.floor(Math.random() * 19) - 9;
+      const c = Math.floor(Math.random() * 19) - 9;
+      const d = Math.floor(Math.random() * 19) - 9;
       
       if (a === c || a === -c) continue;
       
-      let x1 = simplifyFraction(b + d, a - c); // ax-b >= 0 の場合: (a-c)x = b+d
-      let x2 = simplifyFraction(b - d, a + c); // ax-b < 0 の場合: (a+c)x = b-d
+      const x1 = simplifyFraction(b + d, a - c); // ax-b >= 0 の場合: (a-c)x = b+d
+      const x2 = simplifyFraction(b - d, a + c); // ax-b < 0 の場合: (a+c)x = b-d
       
-      let v1 = (a * x1.num / x1.den - b) >= 0;
-      let v2 = (a * x2.num / x2.den - b) < 0;
+      const v1 = (a * x1.num / x1.den - b) >= 0;
+      const v2 = (a * x2.num / x2.den - b) < 0;
       
       // 無縁根が確実に1つ出る（解が1つになる）組み合わせを探す
       if ((v1 && !v2) || (!v1 && v2)) {
-        let validRoot = v1 ? x1 : x2;
-        let invalidRoot = v1 ? x2 : x1;
+        const validRoot = v1 ? x1 : x2;
+        const invalidRoot = v1 ? x2 : x1;
         
         let eqLeft = `|${a}x ${b < 0 ? '+' : '-'} ${Math.abs(b)}|`;
         if (b === 0) eqLeft = `|${a}x|`;
@@ -116,7 +116,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         else if (c === 0) eqRight = `${d}`;
         else if (d > 0 && c === 0) eqRight = `${d}`;
         
-        let eqStr = `${eqLeft} = ${eqRight}`;
+        const eqStr = `${eqLeft} = ${eqRight}`;
         
         return { pattern: p, a, b, c, d, roots: [validRoot], invalidRoot, v1, eqStr };
       }
@@ -125,13 +125,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   
   if (p === 'pattern4') {
     while (true) {
-      let a = Math.floor(Math.random() * 19) - 9;
-      let b = Math.floor(Math.random() * 19) - 9;
+      const a = Math.floor(Math.random() * 19) - 9;
+      const b = Math.floor(Math.random() * 19) - 9;
       if (a >= b) continue;
-      let c = Math.floor(Math.random() * 15) + 1;
+      const c = Math.floor(Math.random() * 15) + 1;
       if (c <= b - a) continue; // 解が存在する条件
       
-      let roots = [
+      const roots = [
         simplifyFraction(a + b + c, 2),
         simplifyFraction(a + b - c, 2)
       ];
@@ -141,7 +141,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (a === 0) left1 = '';
       if (b === 0) left2 = '';
       
-      let eqStr = `|x ${left1}| + |x ${left2}| = ${c}`;
+      const eqStr = `|x ${left1}| + |x ${left2}| = ${c}`;
       return { pattern: p, a, b, c, roots, eqStr };
     }
   }
@@ -219,9 +219,9 @@ export default function AbsoluteValueEqDrillPage() {
     let maxY = 2;
     // Sample points to find max Y
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let yL = funcL(x);
-      let yR = funcR(x);
+      const x = minX + (rangeX * i) / 100;
+      const yL = funcL(x);
+      const yR = funcR(x);
       maxY = Math.max(maxY, yL, yR);
       minY = Math.min(minY, yL, yR);
     }
@@ -251,7 +251,7 @@ export default function AbsoluteValueEqDrillPage() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i <= 200; i++) {
-      let x = minX + (rangeX * i) / 200;
+      const x = minX + (rangeX * i) / 200;
       if (i === 0) ctx.moveTo(mapX(x), mapY(funcL(x)));
       else ctx.lineTo(mapX(x), mapY(funcL(x)));
     }
@@ -262,7 +262,7 @@ export default function AbsoluteValueEqDrillPage() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i <= 200; i++) {
-      let x = minX + (rangeX * i) / 200;
+      const x = minX + (rangeX * i) / 200;
       if (i === 0) ctx.moveTo(mapX(x), mapY(funcR(x)));
       else ctx.lineTo(mapX(x), mapY(funcR(x)));
     }
@@ -272,8 +272,8 @@ export default function AbsoluteValueEqDrillPage() {
       // 交点プロット (有効な解)
       ctx.fillStyle = '#10b981';
       problem.roots.forEach(r => {
-        let x = r.num / r.den;
-        let y = funcL(x);
+        const x = r.num / r.den;
+        const y = funcL(x);
         ctx.beginPath();
         ctx.arc(mapX(x), mapY(y), 5, 0, 2 * Math.PI);
         ctx.fill();
@@ -294,9 +294,9 @@ export default function AbsoluteValueEqDrillPage() {
 
       // 無縁根プロット (パターン3)
       if (problem.pattern === 'pattern3' && problem.invalidRoot) {
-        let x = problem.invalidRoot.num / problem.invalidRoot.den;
-        let yL = funcL(x);
-        let yR = funcR(x);
+        const x = problem.invalidRoot.num / problem.invalidRoot.den;
+        const yL = funcL(x);
+        const yR = funcR(x);
         
         // 偽の交点 (赤い直線上の点)
         ctx.fillStyle = '#f59e0b'; // amber-500
@@ -336,13 +336,13 @@ export default function AbsoluteValueEqDrillPage() {
     // 入力をパース
     const parseInput = (nStr: string, dStr: string) => {
       if (!nStr) return null;
-      let num = parseInt(nStr);
-      let den = dStr ? parseInt(dStr) : 1;
+      const num = parseInt(nStr);
+      const den = dStr ? parseInt(dStr) : 1;
       if (isNaN(num) || isNaN(den) || den === 0) return null;
       return simplifyFraction(num, den);
     };
 
-    let userRoots = [parseInput(ans1Num, ans1Den), parseInput(ans2Num, ans2Den)].filter(r => r !== null) as Root[];
+    const userRoots = [parseInput(ans1Num, ans1Den), parseInput(ans2Num, ans2Den)].filter(r => r !== null) as Root[];
     
     if (userRoots.length !== problem.roots.length) {
       setIsCorrect(false);
@@ -352,11 +352,11 @@ export default function AbsoluteValueEqDrillPage() {
 
     // 一致確認
     let matchCount = 0;
-    let matchedIndices = new Set();
-    for (let ur of userRoots) {
+    const matchedIndices = new Set();
+    for (const ur of userRoots) {
       for (let i = 0; i < problem.roots.length; i++) {
         if (matchedIndices.has(i)) continue;
-        let pr = problem.roots[i];
+        const pr = problem.roots[i];
         if (ur.num === pr.num && ur.den === pr.den) {
           matchCount++;
           matchedIndices.add(i);

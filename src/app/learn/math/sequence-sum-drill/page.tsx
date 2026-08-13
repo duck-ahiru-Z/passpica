@@ -38,15 +38,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1') {
-      let a = Math.floor(Math.random() * 21) - 10;
-      let d = Math.floor(Math.random() * 21) - 10;
-      let n = Math.floor(Math.random() * 16) + 5; // 5..20
+      const a = Math.floor(Math.random() * 21) - 10;
+      const d = Math.floor(Math.random() * 21) - 10;
+      const n = Math.floor(Math.random() * 16) + 5; // 5..20
       if (d === 0) continue;
       
-      let sum = (n * (2 * a + (n - 1) * d)) / 2;
-      let qStr = `初項 ${a} 、公差 ${d} の等差数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
+      const sum = (n * (2 * a + (n - 1) * d)) / 2;
+      const qStr = `初項 ${a} 、公差 ${d} の等差数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{等差数列の和の公式 } S_n = \\frac{n}{2}\\{2a + (n-1)d\\} \\text{ に代入します。}`,
         `S_{${n}} = \\frac{${n}}{2} \\{ 2 \\cdot (${a}) + (${n}-1) \\cdot (${d}) \\}`,
         `= \\frac{${n}}{2} \\{ ${2*a} + ${n-1} \\cdot (${d}) \\}`,
@@ -57,20 +57,20 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansNum: sum, ansDen: 1, expLines };
     } 
     else if (p === 'pattern2') {
-      let a = Math.floor(Math.random() * 21) - 10;
-      let l = Math.floor(Math.random() * 41) - 20;
-      let n = Math.floor(Math.random() * 16) + 5; // 5..20
+      const a = Math.floor(Math.random() * 21) - 10;
+      const l = Math.floor(Math.random() * 41) - 20;
+      const n = Math.floor(Math.random() * 16) + 5; // 5..20
       if (a === l) continue;
       
       let sumNum = n * (a + l);
       let sumDen = 2;
-      let g = gcd(sumNum, sumDen);
+      const g = gcd(sumNum, sumDen);
       sumNum /= g; sumDen /= g;
       if (sumDen < 0) { sumNum = -sumNum; sumDen = -sumDen; }
       
-      let qStr = `初項 ${a} 、末項 ${l} 、項数 ${n} の等差数列の和 S_{${n}} を求めよ。`;
+      const qStr = `初項 ${a} 、末項 ${l} 、項数 ${n} の等差数列の和 S_{${n}} を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{末項がわかっている場合の公式 } S_n = \\frac{n}{2}(a+l) \\text{ を用います。}`,
         `S_{${n}} = \\frac{${n}}{2} ( ${a} + (${l}) )`,
         `= \\frac{${n}}{2} \\cdot (${a+l})`
@@ -84,15 +84,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ansNum: sumNum, ansDen: sumDen, expLines };
     }
     else if (p === 'pattern3') {
-      let a = Math.floor(Math.random() * 5) + 1; // 1..5
-      let r = Math.floor(Math.random() * 3) + 2; // 2..4
-      let n = Math.floor(Math.random() * 4) + 4; // 4..7
+      const a = Math.floor(Math.random() * 5) + 1; // 1..5
+      const r = Math.floor(Math.random() * 3) + 2; // 2..4
+      const n = Math.floor(Math.random() * 4) + 4; // 4..7
       
-      let sum = a * (Math.pow(r, n) - 1) / (r - 1);
+      const sum = a * (Math.pow(r, n) - 1) / (r - 1);
       
-      let qStr = `初項 ${a} 、公比 ${r} の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
+      const qStr = `初項 ${a} 、公比 ${r} の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{等比数列の和の公式 } S_n = \\frac{a(r^n - 1)}{r - 1} \\text{ に代入します。}`,
         `S_{${n}} = \\frac{${a} \\cdot (${r}^{${n}} - 1)}{${r} - 1}`,
         `= \\frac{${a} \\cdot (${Math.pow(r, n)} - 1)}{${r - 1}}`,
@@ -104,8 +104,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       // r = -2 or 1/2 or -1/2
-      let choices = [-2, 0.5, -0.5];
-      let r_val = choices[Math.floor(Math.random() * choices.length)];
+      const choices = [-2, 0.5, -0.5];
+      const r_val = choices[Math.floor(Math.random() * choices.length)];
       let a = 0, n = 0;
       let rStr = "";
       
@@ -114,20 +114,20 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         n = Math.floor(Math.random() * 4) + 5; // 5..8
         rStr = "-2";
       } else if (r_val === 0.5) {
-        let powers = [8, 16, 32, 64];
+        const powers = [8, 16, 32, 64];
         a = powers[Math.floor(Math.random() * powers.length)];
         n = Math.floor(Math.random() * 4) + 4; // 4..7
         rStr = "\\frac{1}{2}";
       } else if (r_val === -0.5) {
-        let powers = [8, 16, 32];
+        const powers = [8, 16, 32];
         a = powers[Math.floor(Math.random() * powers.length)];
         n = Math.floor(Math.random() * 3) + 4; // 4..6
         rStr = "-\\frac{1}{2}";
       }
       
-      let qStr = `初項 ${a} 、公比 $${rStr}$ の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
+      const qStr = `初項 ${a} 、公比 $${rStr}$ の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
       
-      let rPowN = 0;
+      const rPowN = 0;
       let rNum = 0, rDen = 1;
       let powNum = 0, powDen = 1;
 
@@ -150,7 +150,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       let num = a * (powDen - powNum) * rDen;
       let den = powDen * (rDen - rNum);
-      let g = gcd(num, den);
+      const g = gcd(num, den);
       num /= g; den /= g;
       if (den < 0) { num = -num; den = -den; }
 
@@ -207,9 +207,9 @@ export default function SequenceSumDrill() {
     if (!problem) return;
     
     let uNum = 0, uDen = 1;
-    let uStr = ansVal.trim().replace(/\s+/g, '');
+    const uStr = ansVal.trim().replace(/\s+/g, '');
     if (uStr.includes('/')) {
-      let parts = uStr.split('/');
+      const parts = uStr.split('/');
       uNum = parseInt(parts[0]);
       uDen = parseInt(parts[1]);
     } else {

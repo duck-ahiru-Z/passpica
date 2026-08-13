@@ -25,10 +25,10 @@ function extGCD(a: number, b: number): { g: number, x: number, y: number } {
   let x0 = 1, y0 = 0, x1 = 0, y1 = 1;
   let r0 = a, r1 = b;
   while (r1 !== 0) {
-    let q = Math.floor(r0 / r1);
-    let r2 = r0 % r1;
-    let x2 = x0 - q * x1;
-    let y2 = y0 - q * y1;
+    const q = Math.floor(r0 / r1);
+    const r2 = r0 % r1;
+    const x2 = x0 - q * x1;
+    const y2 = y0 - q * y1;
     r0 = r1; r1 = r2;
     x0 = x1; x1 = x2;
     y0 = y1; y1 = y2;
@@ -112,25 +112,25 @@ export default function LinearDiophantineDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let { A, B, C, x0, y0 } = problem;
+    const { A, B, C, x0, y0 } = problem;
     
     // Determine a reasonable scale to show a few lattice points around (x0, y0)
-    let cx = x0;
-    let cy = y0;
+    const cx = x0;
+    const cy = y0;
     
     // We want to show the line passing through (x0, y0) and (x0 + B, y0 - A)
     // Step size for lattice points
-    let dx = B;
-    let dy = -A;
+    const dx = B;
+    const dy = -A;
     
     // Scale so that dx, dy is visible
-    let margin = 2.5; // see 2.5 steps in each direction
-    let maxDistX = Math.max(Math.abs(dx), 1) * margin;
-    let maxDistY = Math.max(Math.abs(dy), 1) * margin;
+    const margin = 2.5; // see 2.5 steps in each direction
+    const maxDistX = Math.max(Math.abs(dx), 1) * margin;
+    const maxDistY = Math.max(Math.abs(dy), 1) * margin;
     
-    let scaleX = (W / 2) / maxDistX;
-    let scaleY = (H / 2) / maxDistY;
-    let scale = Math.min(scaleX, scaleY);
+    const scaleX = (W / 2) / maxDistX;
+    const scaleY = (H / 2) / maxDistY;
+    const scale = Math.min(scaleX, scaleY);
     
     // Center at (cx, cy) -> Screen (W/2, H/2)
     const toScreen = (lx: number, ly: number) => {
@@ -145,20 +145,20 @@ export default function LinearDiophantineDrill() {
     ctx.lineWidth = 1;
     // We can just draw a light grid
     for (let i = -10; i <= 10; i++) {
-      let p1 = toScreen(cx - maxDistX, cy + i * Math.abs(dy) / 2);
-      let p2 = toScreen(cx + maxDistX, cy + i * Math.abs(dy) / 2);
+      const p1 = toScreen(cx - maxDistX, cy + i * Math.abs(dy) / 2);
+      const p2 = toScreen(cx + maxDistX, cy + i * Math.abs(dy) / 2);
       ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
       
-      let p3 = toScreen(cx + i * Math.abs(dx) / 2, cy - maxDistY);
-      let p4 = toScreen(cx + i * Math.abs(dx) / 2, cy + maxDistY);
+      const p3 = toScreen(cx + i * Math.abs(dx) / 2, cy - maxDistY);
+      const p4 = toScreen(cx + i * Math.abs(dx) / 2, cy + maxDistY);
       ctx.beginPath(); ctx.moveTo(p3.x, p3.y); ctx.lineTo(p4.x, p4.y); ctx.stroke();
     }
 
     // Draw the line Ax + By = C
     ctx.strokeStyle = '#3b82f6';
     ctx.lineWidth = 2;
-    let pStart = toScreen(cx - dx * 10, cy - dy * 10);
-    let pEnd = toScreen(cx + dx * 10, cy + dy * 10);
+    const pStart = toScreen(cx - dx * 10, cy - dy * 10);
+    const pEnd = toScreen(cx + dx * 10, cy + dy * 10);
     ctx.beginPath();
     ctx.moveTo(pStart.x, pStart.y);
     ctx.lineTo(pEnd.x, pEnd.y);
@@ -166,9 +166,9 @@ export default function LinearDiophantineDrill() {
 
     // Draw lattice points
     for (let k = -5; k <= 5; k++) {
-      let px = x0 + k * dx;
-      let py = y0 + k * dy;
-      let sp = toScreen(px, py);
+      const px = x0 + k * dx;
+      const py = y0 + k * dy;
+      const sp = toScreen(px, py);
       
       // Draw point
       ctx.beginPath();
@@ -207,8 +207,8 @@ export default function LinearDiophantineDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let ux = parseInt(ansX);
-    let uy = parseInt(ansY);
+    const ux = parseInt(ansX);
+    const uy = parseInt(ansY);
     
     if (isNaN(ux) || isNaN(uy)) {
       alert("整数を入力してください");

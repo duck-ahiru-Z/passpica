@@ -11,7 +11,8 @@ import { exam2025TsuishiFig6 } from './exam2025TsuishiFig6';
 import { exam2026Honshi } from './exam2026Honshi';
 import { exam2026Tsuishi } from './exam2026Tsuishi';
 
-export const TEMPLATES: Record<string, any> = {
+export type TemplateValue = string | { code: string; isOneBased?: boolean };
+export const TEMPLATES: Record<string, TemplateValue> = {
   "blank": { code: "", isOneBased: false },
   "sample_basic": { code: sampleBasic, isOneBased: false },
   "sample_if": { code: sampleIf, isOneBased: false },

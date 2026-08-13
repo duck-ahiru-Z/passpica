@@ -29,7 +29,7 @@ interface TermVal {
 }
 
 function simplifyTerm(num: number, root: number, den: number): TermVal {
-  let g = gcd(num, den);
+  const g = gcd(num, den);
   return { num: num / g, root, den: den / g };
 }
 
@@ -66,20 +66,20 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   let isRight = false;
 
   if (p_type === 'pattern1') {
-    let db = [
+    const db = [
       [3,4,5], [5,12,13], [8,15,17], [7,24,25], [9,40,41]
     ];
-    let t = db[Math.floor(Math.random() * db.length)];
+    const t = db[Math.floor(Math.random() * db.length)];
     c = t[2]; a = t[0]; b = t[1];
-    if (Math.random() < 0.5) { let temp = a; a = b; b = temp; }
+    if (Math.random() < 0.5) { const temp = a; a = b; b = temp; }
     isRight = true;
   } else {
-    let db = [
+    const db = [
       [3,4,5], [5,12,13], [13,14,15], [4,13,15], 
       [7,24,25], [9,10,17], [5,5,6], [5,5,8], [10,13,13]
     ];
-    let t = db[Math.floor(Math.random() * db.length)];
-    let sides = [...t];
+    const t = db[Math.floor(Math.random() * db.length)];
+    const sides = [...t];
     for (let i = sides.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [sides[i], sides[j]] = [sides[j], sides[i]];
@@ -88,17 +88,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     if (a*a+b*b===c*c || b*b+c*c===a*a || c*c+a*a===b*b) isRight = true;
   }
 
-  let s_val = (a+b+c)/2;
-  let S_val = Math.sqrt(s_val*(s_val-a)*(s_val-b)*(s_val-c));
+  const s_val = (a+b+c)/2;
+  const S_val = Math.sqrt(s_val*(s_val-a)*(s_val-b)*(s_val-c));
   
-  let r_val = S_val / s_val;
-  let r_term = simplifyTerm(S_val * 2, 1, a+b+c);
+  const r_val = S_val / s_val;
+  const r_term = simplifyTerm(S_val * 2, 1, a+b+c);
 
-  let R_val = (a*b*c) / (4*S_val);
-  let R_term = simplifyTerm(a*b*c, 1, 4*S_val);
+  const R_val = (a*b*c) / (4*S_val);
+  const R_term = simplifyTerm(a*b*c, 1, 4*S_val);
 
-  let ra_val = S_val / (s_val-a);
-  let ra_term = simplifyTerm(S_val * 2, 1, b+c-a);
+  const ra_val = S_val / (s_val-a);
+  const ra_term = simplifyTerm(S_val * 2, 1, b+c-a);
 
   return {
     pattern: p_type,
@@ -136,28 +136,28 @@ export default function InscribedCircleDrillPage() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let { a, b, c } = problem;
-    let cosA = (b*b + c*c - a*a) / (2*b*c);
-    let sinA = Math.sqrt(1 - cosA*cosA);
+    const { a, b, c } = problem;
+    const cosA = (b*b + c*c - a*a) / (2*b*c);
+    const sinA = Math.sqrt(1 - cosA*cosA);
     
     // Use y-up coordinates first, then map to canvas (y-down)
-    let ptA = { x: 0, y: 0 };
-    let ptB = { x: c, y: 0 };
-    let ptC = { x: b*cosA, y: b*sinA };
+    const ptA = { x: 0, y: 0 };
+    const ptB = { x: c, y: 0 };
+    const ptC = { x: b*cosA, y: b*sinA };
     
-    let I_x = (a*ptA.x + b*ptB.x + c*ptC.x) / (a+b+c);
-    let I_y = (a*ptA.y + b*ptB.y + c*ptC.y) / (a+b+c);
-    let r = problem.r_val;
+    const I_x = (a*ptA.x + b*ptB.x + c*ptC.x) / (a+b+c);
+    const I_y = (a*ptA.y + b*ptB.y + c*ptC.y) / (a+b+c);
+    const r = problem.r_val;
 
-    let O_x = c / 2;
-    let O_y = (b - c*cosA) / (2*sinA);
-    let R = problem.R_val;
+    const O_x = c / 2;
+    const O_y = (b - c*cosA) / (2*sinA);
+    const R = problem.R_val;
 
-    let Ia_x = (-a*ptA.x + b*ptB.x + c*ptC.x) / (-a+b+c);
-    let Ia_y = (-a*ptA.y + b*ptB.y + c*ptC.y) / (-a+b+c);
-    let ra = problem.ra_val;
+    const Ia_x = (-a*ptA.x + b*ptB.x + c*ptC.x) / (-a+b+c);
+    const Ia_y = (-a*ptA.y + b*ptB.y + c*ptC.y) / (-a+b+c);
+    const ra = problem.ra_val;
 
-    let objects = [ptA, ptB, ptC];
+    const objects = [ptA, ptB, ptC];
     if (problem.pattern === 'pattern4') {
       objects.push({x: Ia_x, y: Ia_y + ra});
       objects.push({x: Ia_x, y: Ia_y - ra});
@@ -175,26 +175,26 @@ export default function InscribedCircleDrillPage() {
       objects.push({x: I_x, y: I_y - r});
     }
 
-    let minX = Math.min(...objects.map(o => o.x));
-    let maxX = Math.max(...objects.map(o => o.x));
-    let minY = Math.min(...objects.map(o => o.y));
-    let maxY = Math.max(...objects.map(o => o.y));
+    const minX = Math.min(...objects.map(o => o.x));
+    const maxX = Math.max(...objects.map(o => o.x));
+    const minY = Math.min(...objects.map(o => o.y));
+    const maxY = Math.max(...objects.map(o => o.y));
 
-    let cx = (minX + maxX) / 2;
-    let cy = (minY + maxY) / 2;
-    let scale = Math.min(W * 0.8 / (maxX - minX || 1), H * 0.8 / (maxY - minY || 1));
+    const cx = (minX + maxX) / 2;
+    const cy = (minY + maxY) / 2;
+    const scale = Math.min(W * 0.8 / (maxX - minX || 1), H * 0.8 / (maxY - minY || 1));
 
     const mapPt = (pt: {x: number, y: number}) => ({
       x: W/2 + (pt.x - cx) * scale,
       y: H/2 - (pt.y - cy) * scale // invert y for canvas
     });
 
-    let mA = mapPt(ptA);
-    let mB = mapPt(ptB);
-    let mC = mapPt(ptC);
-    let mI = mapPt({x: I_x, y: I_y});
-    let mO = mapPt({x: O_x, y: O_y});
-    let mIa = mapPt({x: Ia_x, y: Ia_y});
+    const mA = mapPt(ptA);
+    const mB = mapPt(ptB);
+    const mC = mapPt(ptC);
+    const mI = mapPt({x: I_x, y: I_y});
+    const mO = mapPt({x: O_x, y: O_y});
+    const mIa = mapPt({x: Ia_x, y: Ia_y});
 
     // Pattern 4: Extend lines for excircle
     if (problem.pattern === 'pattern4') {
@@ -202,10 +202,10 @@ export default function InscribedCircleDrillPage() {
       ctx.lineWidth = 1;
       ctx.beginPath();
       // extend AB
-      let extB = mapPt({x: c + 1000, y: 0});
+      const extB = mapPt({x: c + 1000, y: 0});
       ctx.moveTo(mB.x, mB.y); ctx.lineTo(extB.x, extB.y);
       // extend AC
-      let extC = mapPt({x: b*cosA + 1000*cosA, y: b*sinA + 1000*sinA});
+      const extC = mapPt({x: b*cosA + 1000*cosA, y: b*sinA + 1000*sinA});
       ctx.moveTo(mC.x, mC.y); ctx.lineTo(extC.x, extC.y);
       ctx.stroke();
 
@@ -308,8 +308,8 @@ export default function InscribedCircleDrillPage() {
     if (problem.pattern === 'pattern4') {
       isOk = checkFractionRoot(ansVal1, 1, problem.ra.num, problem.ra.root, problem.ra.den);
     } else if (problem.pattern === 'pattern3') {
-      let okR = checkFractionRoot(ansVal1, 1, problem.R.num, problem.R.root, problem.R.den);
-      let okr = checkFractionRoot(ansVal2, 1, problem.r.num, problem.r.root, problem.r.den);
+      const okR = checkFractionRoot(ansVal1, 1, problem.R.num, problem.R.root, problem.R.den);
+      const okr = checkFractionRoot(ansVal2, 1, problem.r.num, problem.r.root, problem.r.den);
       isOk = okR && okr;
     } else {
       isOk = checkFractionRoot(ansVal1, 1, problem.r.num, problem.r.root, problem.r.den);

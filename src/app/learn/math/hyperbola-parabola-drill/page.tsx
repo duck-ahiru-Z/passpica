@@ -62,16 +62,16 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1' || p === 'pattern2') {
-      let isH = p === 'pattern1';
-      let tr = triples[Math.floor(Math.random() * triples.length)];
-      let a = tr.a, b = tr.b, c = tr.c;
+      const isH = p === 'pattern1';
+      const tr = triples[Math.floor(Math.random() * triples.length)];
+      const a = tr.a, b = tr.b, c = tr.c;
       
-      let a2 = a*a;
-      let b2 = b*b;
+      const a2 = a*a;
+      const b2 = b*b;
       
-      let qStr = `$\\frac{x^2}{${a2}} - \\frac{y^2}{${b2}} = ${isH ? '1' : '-1'}$ の焦点の座標と、漸近線の方程式 $y = \\pm mx$ の $m$ を求めよ。`;
+      const qStr = `$\\frac{x^2}{${a2}} - \\frac{y^2}{${b2}} = ${isH ? '1' : '-1'}$ の焦点の座標と、漸近線の方程式 $y = \\pm mx$ の $m$ を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{与えられた方程式は双曲線の標準形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,
         `\\text{右辺が } ${isH ? '1 なので、焦点は x 軸上にあります。' : '-1 なので、焦点は y 軸上にあります。'}`,
         `c^2 = a^2 + b^2 = ${a2} + ${b2} = ${c*c} \\implies c = ${c}`,
@@ -80,55 +80,55 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         `m = \\frac{${b}}{${a}} \\text{ です。}`
       ];
       
-      let g = gcd(b, a);
-      let mNum = b/g; let mDen = a/g;
-      let mStr = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
+      const g = gcd(b, a);
+      const mNum = b/g; const mDen = a/g;
+      const mStr = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
       
-      let ans1 = isH ? c.toString() : "0";
-      let ans2 = isH ? "0" : c.toString();
+      const ans1 = isH ? c.toString() : "0";
+      const ans2 = isH ? "0" : c.toString();
       
       return { pattern: p, qStr, type: isH ? 'hyperbolaH' : 'hyperbolaV', a, b, c, cx: 0, cy: 0, ans1, ans2, ans3: mStr, expLines };
     }
     else if (p === 'pattern3') {
-      let isH = Math.random() > 0.5; // y^2 = 4px (Horizontal) or x^2 = 4py (Vertical)
+      const isH = Math.random() > 0.5; // y^2 = 4px (Horizontal) or x^2 = 4py (Vertical)
       let p_val = Math.floor(Math.random() * 9) - 4; // -4..4
       if (p_val === 0) p_val = 2;
       
-      let qStr = isH ? `$y^2 = ${4*p_val}x$ の焦点の座標と、準線の方程式を求めよ。` : `$x^2 = ${4*p_val}y$ の焦点の座標と、準線の方程式を求めよ。`;
+      const qStr = isH ? `$y^2 = ${4*p_val}x$ の焦点の座標と、準線の方程式を求めよ。` : `$x^2 = ${4*p_val}y$ の焦点の座標と、準線の方程式を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{基本形 } ${isH ? 'y^2 = 4px' : 'x^2 = 4py'} \\text{ と比較します。}`,
         `4p = ${4*p_val} \\implies p = ${p_val}`,
         `\\text{よって焦点は } ${isH ? `(${p_val}, 0)` : `(0, ${p_val})`} \\text{ となります。}`,
         `\\text{準線の方程式は } ${isH ? 'x = -p' : 'y = -p'} \\text{ より、} ${isH ? `x = ${-p_val}` : `y = ${-p_val}`} \\text{ です。}`
       ];
       
-      let ans1 = isH ? p_val.toString() : "0";
-      let ans2 = isH ? "0" : p_val.toString();
-      let ans3 = (-p_val).toString();
+      const ans1 = isH ? p_val.toString() : "0";
+      const ans2 = isH ? "0" : p_val.toString();
+      const ans3 = (-p_val).toString();
       
       return { pattern: p, qStr, type: isH ? 'parabolaH' : 'parabolaV', p_val, cx: 0, cy: 0, ans1, ans2, ans3, expLines };
     }
     else if (p === 'pattern4') {
       // (y-cy)^2 = 4p(x-cx) -> y^2 - 2cy y + cy^2 = 4p x - 4p cx -> y^2 - 2cy y - 4p x + (cy^2 + 4p cx) = 0
-      let isH = true; // keep it simple, horizontal only for completing square
+      const isH = true; // keep it simple, horizontal only for completing square
       let p_val = Math.floor(Math.random() * 5) - 2; // -2..2
       if (p_val === 0) p_val = 1;
-      let cx = Math.floor(Math.random() * 7) - 3; // -3..3
-      let cy = Math.floor(Math.random() * 7) - 3;
+      const cx = Math.floor(Math.random() * 7) - 3; // -3..3
+      const cy = Math.floor(Math.random() * 7) - 3;
       
-      let A = 1; // y^2
-      let B = -2 * cy; // y
-      let C = -4 * p_val; // x
-      let D = cy*cy + 4*p_val*cx; // const
+      const A = 1; // y^2
+      const B = -2 * cy; // y
+      const C = -4 * p_val; // x
+      const D = cy*cy + 4*p_val*cx; // const
       
-      let strB = B > 0 ? `+${B}y` : (B < 0 ? `${B}y` : "");
-      let strC = C > 0 ? `+${C}x` : (C < 0 ? `${C}x` : "");
-      let strD = D > 0 ? `+${D}` : (D < 0 ? `${D}` : "");
+      const strB = B > 0 ? `+${B}y` : (B < 0 ? `${B}y` : "");
+      const strC = C > 0 ? `+${C}x` : (C < 0 ? `${C}x` : "");
+      const strD = D > 0 ? `+${D}` : (D < 0 ? `${D}` : "");
       
-      let qStr = `$y^2 ${strB} ${strC} ${strD} = 0$ の頂点と焦点の座標を求めよ。`;
+      const qStr = `$y^2 ${strB} ${strC} ${strD} = 0$ の頂点と焦点の座標を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{平方完成を行って基本形を変形します。}`,
         `y^2 ${strB} = ${-C}x ${D > 0 ? '-' : '+'}${Math.abs(D)}`,
         `(y ${cy > 0 ? '-' : '+'}${Math.abs(cy)})^2 - ${cy*cy} = ${-C}x ${D > 0 ? '-' : '+'}${Math.abs(D)}`,
@@ -177,21 +177,21 @@ export default function HyperbolaParabolaDrill() {
     let isOk = false;
     
     if (problem.pattern === 'pattern1' || problem.pattern === 'pattern2') {
-      let v1 = Math.abs(parseInt(ans1.trim() || '0'));
-      let v2 = Math.abs(parseInt(ans2.trim() || '0'));
-      let m = ans3.trim().replace(/\s+/g, '');
+      const v1 = Math.abs(parseInt(ans1.trim() || '0'));
+      const v2 = Math.abs(parseInt(ans2.trim() || '0'));
+      const m = ans3.trim().replace(/\s+/g, '');
       if (problem.pattern === 'pattern1' && v1 === parseInt(problem.ans1!) && v2 === 0 && m === problem.ans3) isOk = true;
       if (problem.pattern === 'pattern2' && v1 === 0 && v2 === parseInt(problem.ans2!) && m === problem.ans3) isOk = true;
     } else if (problem.pattern === 'pattern3') {
-      let v1 = parseInt(ans1.trim());
-      let v2 = parseInt(ans2.trim());
-      let dir = parseInt(ans3.trim());
+      const v1 = parseInt(ans1.trim());
+      const v2 = parseInt(ans2.trim());
+      const dir = parseInt(ans3.trim());
       if (v1 === parseInt(problem.ans1!) && v2 === parseInt(problem.ans2!) && dir === parseInt(problem.ans3!)) isOk = true;
     } else if (problem.pattern === 'pattern4') {
-      let vx = parseInt(ans1.trim());
-      let vy = parseInt(ans2.trim());
-      let fx = parseInt(ans3.trim());
-      let fy = parseInt(ans4.trim());
+      const vx = parseInt(ans1.trim());
+      const vy = parseInt(ans2.trim());
+      const fx = parseInt(ans3.trim());
+      const fy = parseInt(ans4.trim());
       if (vx === parseInt(problem.ans1!) && vy === parseInt(problem.ans2!) && fx === parseInt(problem.ans3!) && fy === parseInt(problem.ans4!)) isOk = true;
     }
     
@@ -216,9 +216,9 @@ export default function HyperbolaParabolaDrill() {
       maxR = Math.max(Math.abs(problem.cx!), Math.abs(problem.cy!)) + Math.abs(problem.p_val!) + 4;
     }
 
-    let scale = Math.min(W/2 - 20, H/2 - 20) / maxR;
-    let originX = W/2;
-    let originY = H/2;
+    const scale = Math.min(W/2 - 20, H/2 - 20) / maxR;
+    const originX = W/2;
+    const originY = H/2;
 
     const toScr = (x: number, y: number) => ({
       x: originX + x * scale,
@@ -235,21 +235,21 @@ export default function HyperbolaParabolaDrill() {
     ctx.strokeStyle = '#3b82f6';
 
     if (problem.type.startsWith('hyperbola')) {
-      let a = problem.a!;
-      let b = problem.b!;
-      let isH = problem.type === 'hyperbolaH';
+      const a = problem.a!;
+      const b = problem.b!;
+      const isH = problem.type === 'hyperbolaH';
       
       // Draw asymptotes if checked
       if (hasChecked) {
         ctx.strokeStyle = '#94a3b8';
         ctx.setLineDash([4, 4]);
         ctx.lineWidth = 1;
-        let p1 = toScr(maxR, maxR * b / a);
-        let p2 = toScr(-maxR, -maxR * b / a);
+        const p1 = toScr(maxR, maxR * b / a);
+        const p2 = toScr(-maxR, -maxR * b / a);
         ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y); ctx.stroke();
         
-        let p3 = toScr(maxR, -maxR * b / a);
-        let p4 = toScr(-maxR, maxR * b / a);
+        const p3 = toScr(maxR, -maxR * b / a);
+        const p4 = toScr(-maxR, maxR * b / a);
         ctx.beginPath(); ctx.moveTo(p3.x, p3.y); ctx.lineTo(p4.x, p4.y); ctx.stroke();
         ctx.setLineDash([]);
       }
@@ -260,13 +260,13 @@ export default function HyperbolaParabolaDrill() {
       ctx.beginPath();
       for (let y = -maxR; y <= maxR; y += 0.5) {
         if (isH) {
-          let x = a * Math.sqrt(1 + (y*y)/(b*b));
-          let s1 = toScr(x, y);
+          const x = a * Math.sqrt(1 + (y*y)/(b*b));
+          const s1 = toScr(x, y);
           if (y === -maxR) ctx.moveTo(s1.x, s1.y); else ctx.lineTo(s1.x, s1.y);
         } else {
-          let x = y; // swap role for looping
-          let yy = b * Math.sqrt(1 + (x*x)/(a*a));
-          let s1 = toScr(x, yy);
+          const x = y; // swap role for looping
+          const yy = b * Math.sqrt(1 + (x*x)/(a*a));
+          const s1 = toScr(x, yy);
           if (x === -maxR) ctx.moveTo(s1.x, s1.y); else ctx.lineTo(s1.x, s1.y);
         }
       }
@@ -275,58 +275,58 @@ export default function HyperbolaParabolaDrill() {
       ctx.beginPath();
       for (let y = -maxR; y <= maxR; y += 0.5) {
         if (isH) {
-          let x = -a * Math.sqrt(1 + (y*y)/(b*b));
-          let s1 = toScr(x, y);
+          const x = -a * Math.sqrt(1 + (y*y)/(b*b));
+          const s1 = toScr(x, y);
           if (y === -maxR) ctx.moveTo(s1.x, s1.y); else ctx.lineTo(s1.x, s1.y);
         } else {
-          let x = y; 
-          let yy = -b * Math.sqrt(1 + (x*x)/(a*a));
-          let s1 = toScr(x, yy);
+          const x = y; 
+          const yy = -b * Math.sqrt(1 + (x*x)/(a*a));
+          const s1 = toScr(x, yy);
           if (x === -maxR) ctx.moveTo(s1.x, s1.y); else ctx.lineTo(s1.x, s1.y);
         }
       }
       ctx.stroke();
 
       // Foci
-      let c = problem.c!;
-      let sf1 = isH ? toScr(c, 0) : toScr(0, c);
-      let sf2 = isH ? toScr(-c, 0) : toScr(0, -c);
+      const c = problem.c!;
+      const sf1 = isH ? toScr(c, 0) : toScr(0, c);
+      const sf2 = isH ? toScr(-c, 0) : toScr(0, -c);
       ctx.fillStyle = '#ef4444';
       ctx.beginPath(); ctx.arc(sf1.x, sf1.y, 4, 0, Math.PI*2); ctx.fill();
       ctx.beginPath(); ctx.arc(sf2.x, sf2.y, 4, 0, Math.PI*2); ctx.fill();
 
     } else {
       // Parabola
-      let cx = problem.cx!;
-      let cy = problem.cy!;
-      let p_val = problem.p_val!;
-      let isH = problem.type === 'parabolaH';
+      const cx = problem.cx!;
+      const cy = problem.cy!;
+      const p_val = problem.p_val!;
+      const isH = problem.type === 'parabolaH';
       
       ctx.beginPath();
       for (let t = -maxR; t <= maxR; t += 0.5) {
         if (isH) {
-          let y = cy + t;
-          let x = cx + (t*t) / (4*p_val);
-          let s1 = toScr(x, y);
+          const y = cy + t;
+          const x = cx + (t*t) / (4*p_val);
+          const s1 = toScr(x, y);
           if (t === -maxR) ctx.moveTo(s1.x, s1.y); else ctx.lineTo(s1.x, s1.y);
         } else {
-          let x = cx + t;
-          let y = cy + (t*t) / (4*p_val);
-          let s1 = toScr(x, y);
+          const x = cx + t;
+          const y = cy + (t*t) / (4*p_val);
+          const s1 = toScr(x, y);
           if (t === -maxR) ctx.moveTo(s1.x, s1.y); else ctx.lineTo(s1.x, s1.y);
         }
       }
       ctx.stroke();
 
       // Focus
-      let fx = cx + (isH ? p_val : 0);
-      let fy = cy + (isH ? 0 : p_val);
-      let sf = toScr(fx, fy);
+      const fx = cx + (isH ? p_val : 0);
+      const fy = cy + (isH ? 0 : p_val);
+      const sf = toScr(fx, fy);
       ctx.fillStyle = '#ef4444';
       ctx.beginPath(); ctx.arc(sf.x, sf.y, 4, 0, Math.PI*2); ctx.fill();
 
       // Vertex
-      let sv = toScr(cx, cy);
+      const sv = toScr(cx, cy);
       ctx.fillStyle = '#10b981';
       ctx.beginPath(); ctx.arc(sv.x, sv.y, 4, 0, Math.PI*2); ctx.fill();
 
@@ -337,14 +337,14 @@ export default function HyperbolaParabolaDrill() {
         ctx.lineWidth = 2;
         ctx.beginPath();
         if (isH) {
-          let dirX = cx - p_val;
-          let p1 = toScr(dirX, maxR);
-          let p2 = toScr(dirX, -maxR);
+          const dirX = cx - p_val;
+          const p1 = toScr(dirX, maxR);
+          const p2 = toScr(dirX, -maxR);
           ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
         } else {
-          let dirY = cy - p_val;
-          let p1 = toScr(maxR, dirY);
-          let p2 = toScr(-maxR, dirY);
+          const dirY = cy - p_val;
+          const p1 = toScr(maxR, dirY);
+          const p2 = toScr(-maxR, dirY);
           ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);
         }
         ctx.stroke();

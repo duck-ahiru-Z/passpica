@@ -50,17 +50,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
   while (true) {
     if (p === 'pattern1') {
-      let tr = triples[Math.floor(Math.random() * triples.length)];
+      const tr = triples[Math.floor(Math.random() * triples.length)];
       let a = tr.a, b = tr.b, c = tr.c;
       // swap b and c randomly to get different shapes
       if (Math.random() > 0.5) { b = tr.c; c = tr.b; }
       
-      let a2 = a*a;
-      let b2 = b*b;
+      const a2 = a*a;
+      const b2 = b*b;
       
-      let qStr = `\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}`;
+      const qStr = `\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{与えられた方程式は } \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 \\text{ の形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,
         `a^2 > b^2 \\text{ より、これは横長の楕円です。}`,
         `\\text{焦点は } x \\text{ 軸上にあり、その座標を } (\\pm c, 0) \\text{ とすると、}`,
@@ -71,16 +71,16 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ans1: c.toString(), ans2: "0", a, b, cx: 0, cy: 0, c, isHorizontal: true, expLines };
     } 
     else if (p === 'pattern2') {
-      let tr = triples[Math.floor(Math.random() * triples.length)];
+      const tr = triples[Math.floor(Math.random() * triples.length)];
       let a = tr.b, b = tr.a, c = tr.c;
       if (Math.random() > 0.5) { a = tr.c; c = tr.b; }
       
-      let a2 = a*a;
-      let b2 = b*b;
+      const a2 = a*a;
+      const b2 = b*b;
       
-      let qStr = `\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}`;
+      const qStr = `\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}`;
       
-      let expLines = [
+      const expLines = [
         `\\text{与えられた方程式は } \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 \\text{ の形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,
         `b^2 > a^2 \\text{ より、これは縦長の楕円です。}`,
         `\\text{焦点は } y \\text{ 軸上にあり、その座標を } (0, \\pm c) \\text{ とすると、}`,
@@ -92,30 +92,30 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern3') {
       // Small ones to keep A, B small
-      let sm = [{c:3,b:4,a:5}, {c:4,b:3,a:5}];
-      let tr = sm[Math.floor(Math.random() * sm.length)];
-      let a = tr.a, b = tr.b;
+      const sm = [{c:3,b:4,a:5}, {c:4,b:3,a:5}];
+      const tr = sm[Math.floor(Math.random() * sm.length)];
+      const a = tr.a, b = tr.b;
       
-      let a2 = a*a, b2 = b*b;
-      let cx = Math.floor(Math.random() * 7) - 3; // -3..3
-      let cy = Math.floor(Math.random() * 7) - 3;
+      const a2 = a*a, b2 = b*b;
+      const cx = Math.floor(Math.random() * 7) - 3; // -3..3
+      const cy = Math.floor(Math.random() * 7) - 3;
       
       // b^2 (x-cx)^2 + a^2 (y-cy)^2 = a^2 b^2
-      let A = b2;
-      let B = a2;
-      let C = -2 * b2 * cx;
-      let D = -2 * a2 * cy;
-      let E = b2 * cx * cx + a2 * cy * cy - a2 * b2;
+      const A = b2;
+      const B = a2;
+      const C = -2 * b2 * cx;
+      const D = -2 * a2 * cy;
+      const E = b2 * cx * cx + a2 * cy * cy - a2 * b2;
       
-      let strA = A === 1 ? "" : A;
-      let strB = B === 1 ? "+y^2" : `+${B}y^2`;
-      let strC = C > 0 ? `+${C}x` : (C < 0 ? `${C}x` : "");
-      let strD = D > 0 ? `+${D}y` : (D < 0 ? `${D}y` : "");
-      let strE = E > 0 ? `+${E}` : (E < 0 ? `${E}` : "");
+      const strA = A === 1 ? "" : A;
+      const strB = B === 1 ? "+y^2" : `+${B}y^2`;
+      const strC = C > 0 ? `+${C}x` : (C < 0 ? `${C}x` : "");
+      const strD = D > 0 ? `+${D}y` : (D < 0 ? `${D}y` : "");
+      const strE = E > 0 ? `+${E}` : (E < 0 ? `${E}` : "");
       
-      let qStr = `$${strA}x^2 ${strB} ${strC} ${strD} ${strE} = 0$ の中心の座標 $(p, q)$ を求めよ。`;
+      const qStr = `$${strA}x^2 ${strB} ${strC} ${strD} ${strE} = 0$ の中心の座標 $(p, q)$ を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{平方完成を行って基本形に変形します。}`,
         `${A}(x^2 ${C !== 0 ? (C > 0 ? '+' : '-') + Math.abs(C/A) + 'x' : ''}) + ${B}(y^2 ${D !== 0 ? (D > 0 ? '+' : '-') + Math.abs(D/B) + 'y' : ''}) = ${-E}`,
         `${A}(x ${cx > 0 ? '-' : '+'} ${Math.abs(cx)})^2 - ${A * cx * cx} + ${B}(y ${cy > 0 ? '-' : '+'} ${Math.abs(cy)})^2 - ${B * cy * cy} = ${-E}`,
@@ -128,16 +128,16 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       return { pattern: p, qStr, ans1: cx.toString(), ans2: cy.toString(), a, b, cx, cy, c: tr.c, isHorizontal: a > b, expLines };
     }
     else if (p === 'pattern4') {
-      let tr = triples[Math.floor(Math.random() * triples.length)];
+      const tr = triples[Math.floor(Math.random() * triples.length)];
       let a = tr.a, b = tr.b, c = tr.c;
       if (Math.random() > 0.5) { b = tr.c; c = tr.b; }
       
-      let a2 = a*a;
-      let b2 = b*b;
+      const a2 = a*a;
+      const b2 = b*b;
       
-      let qStr = `2点 $(${c}, 0), (-${c}, 0)$ からの距離の和が $${2*a}$ である楕円の方程式を $\\frac{x^2}{A} + \\frac{y^2}{B} = 1$ とするとき、$A, B$ の値を求めよ。`;
+      const qStr = `2点 $(${c}, 0), (-${c}, 0)$ からの距離の和が $${2*a}$ である楕円の方程式を $\\frac{x^2}{A} + \\frac{y^2}{B} = 1$ とするとき、$A, B$ の値を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{焦点が } x \\text{ 軸上にあり、中心が原点であるため、求める楕円の方程式は}`,
         `\\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 \\quad (a > b > 0)`,
         `\\text{とおけます。距離の和が } ${2*a} \\text{ なので } 2a = ${2*a} \\implies a = ${a}`,
@@ -184,13 +184,13 @@ export default function EllipseDrill() {
     // In Pattern 1: ans1 is c, ans2 is 0.
     // If they type -c, we should accept it.
     if (problem.pattern === 'pattern1') {
-      let v1 = Math.abs(parseInt(ans1.trim()));
-      let v2 = parseInt(ans2.trim());
+      const v1 = Math.abs(parseInt(ans1.trim()));
+      const v2 = parseInt(ans2.trim());
       if (v1 === parseInt(problem.ans1!) && v2 === 0) isOk = true;
     }
     if (problem.pattern === 'pattern2') {
-      let v1 = parseInt(ans1.trim());
-      let v2 = Math.abs(parseInt(ans2.trim()));
+      const v1 = parseInt(ans1.trim());
+      const v2 = Math.abs(parseInt(ans2.trim()));
       if (v1 === 0 && v2 === parseInt(problem.ans2!)) isOk = true;
     }
     
@@ -208,11 +208,11 @@ export default function EllipseDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let maxR = Math.max(problem.a, problem.b) + Math.max(Math.abs(problem.cx), Math.abs(problem.cy)) + 2;
+    const maxR = Math.max(problem.a, problem.b) + Math.max(Math.abs(problem.cx), Math.abs(problem.cy)) + 2;
 
-    let scale = Math.min(W/2 - 20, H/2 - 20) / maxR;
-    let originX = W/2;
-    let originY = H/2;
+    const scale = Math.min(W/2 - 20, H/2 - 20) / maxR;
+    const originX = W/2;
+    const originY = H/2;
 
     const toScr = (x: number, y: number) => ({
       x: originX + x * scale,
@@ -226,7 +226,7 @@ export default function EllipseDrill() {
     ctx.beginPath(); ctx.moveTo(originX, 0); ctx.lineTo(originX, H); ctx.stroke();
 
     // Center
-    let cc = toScr(problem.cx, problem.cy);
+    const cc = toScr(problem.cx, problem.cy);
 
     // Draw ellipse
     ctx.strokeStyle = '#3b82f6';
@@ -236,13 +236,13 @@ export default function EllipseDrill() {
     ctx.stroke();
 
     // Foci
-    let f1x = problem.cx + (problem.isHorizontal ? problem.c : 0);
-    let f1y = problem.cy + (problem.isHorizontal ? 0 : problem.c);
-    let f2x = problem.cx - (problem.isHorizontal ? problem.c : 0);
-    let f2y = problem.cy - (problem.isHorizontal ? 0 : problem.c);
+    const f1x = problem.cx + (problem.isHorizontal ? problem.c : 0);
+    const f1y = problem.cy + (problem.isHorizontal ? 0 : problem.c);
+    const f2x = problem.cx - (problem.isHorizontal ? problem.c : 0);
+    const f2y = problem.cy - (problem.isHorizontal ? 0 : problem.c);
     
-    let sf1 = toScr(f1x, f1y);
-    let sf2 = toScr(f2x, f2y);
+    const sf1 = toScr(f1x, f1y);
+    const sf2 = toScr(f2x, f2y);
     
     ctx.fillStyle = '#ef4444';
     ctx.beginPath(); ctx.arc(sf1.x, sf1.y, 4, 0, Math.PI*2); ctx.fill();
@@ -257,10 +257,10 @@ export default function EllipseDrill() {
       ctx.strokeStyle = '#94a3b8';
       ctx.setLineDash([4, 4]);
       ctx.lineWidth = 1;
-      let top = toScr(problem.cx, problem.cy + problem.b);
-      let bottom = toScr(problem.cx, problem.cy - problem.b);
-      let right = toScr(problem.cx + problem.a, problem.cy);
-      let left = toScr(problem.cx - problem.a, problem.cy);
+      const top = toScr(problem.cx, problem.cy + problem.b);
+      const bottom = toScr(problem.cx, problem.cy - problem.b);
+      const right = toScr(problem.cx + problem.a, problem.cy);
+      const left = toScr(problem.cx - problem.a, problem.cy);
       
       ctx.beginPath(); ctx.moveTo(top.x, top.y); ctx.lineTo(bottom.x, bottom.y); ctx.stroke();
       ctx.beginPath(); ctx.moveTo(left.x, left.y); ctx.lineTo(right.x, right.y); ctx.stroke();

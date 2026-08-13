@@ -48,8 +48,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   while (true) {
-    let p = Math.floor(Math.random() * 5) + 1; // 1 to 5
-    let r = Math.floor(Math.random() * 5) + 1;
+    const p = Math.floor(Math.random() * 5) + 1; // 1 to 5
+    const r = Math.floor(Math.random() * 5) + 1;
     let q = 1, s = 1, k = 1;
     
     if (p_type === 'pattern1') {
@@ -84,7 +84,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       C *= k;
     }
     
-    let hasY = p_type === 'pattern3';
+    const hasY = p_type === 'pattern3';
     let eq = '';
     
     if (A === 1) eq += 'x^2';
@@ -92,16 +92,16 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     else eq += `${A}x^2`;
     
     if (B !== 0) {
-      let B_abs = Math.abs(B);
-      let sign = B > 0 ? ' + ' : ' - ';
-      let term = B_abs === 1 ? (hasY ? 'xy' : 'x') : `${B_abs}${hasY ? 'xy' : 'x'}`;
+      const B_abs = Math.abs(B);
+      const sign = B > 0 ? ' + ' : ' - ';
+      const term = B_abs === 1 ? (hasY ? 'xy' : 'x') : `${B_abs}${hasY ? 'xy' : 'x'}`;
       eq += sign + term;
     }
     
     if (C !== 0) {
-      let C_abs = Math.abs(C);
-      let sign = C > 0 ? ' + ' : ' - ';
-      let term = C_abs === 1 && hasY ? 'y^2' : `${C_abs}${hasY ? 'y^2' : ''}`;
+      const C_abs = Math.abs(C);
+      const sign = C > 0 ? ' + ' : ' - ';
+      const term = C_abs === 1 && hasY ? 'y^2' : `${C_abs}${hasY ? 'y^2' : ''}`;
       eq += sign + term;
     }
     
@@ -138,11 +138,11 @@ export default function CrossMultiplyDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let uk = ansK.trim() === '' ? 1 : parseInt(ansK);
-    let up = parseInt(ansP);
-    let uq = parseInt(ansQ);
-    let ur = parseInt(ansR);
-    let us = parseInt(ansS);
+    const uk = ansK.trim() === '' ? 1 : parseInt(ansK);
+    const up = parseInt(ansP);
+    const uq = parseInt(ansQ);
+    const ur = parseInt(ansR);
+    const us = parseInt(ansS);
     
     if (isNaN(uk) || isNaN(up) || isNaN(uq) || isNaN(ur) || isNaN(us)) {
       alert('枠に整数を入力してください。（先頭の括り出しがない場合は空欄または1）');
@@ -150,12 +150,12 @@ export default function CrossMultiplyDrillPage() {
     }
     
     // 代数的に一致するか確認
-    let matchA = uk * up * ur === problem.A;
-    let matchB = uk * (up * us + uq * ur) === problem.B;
-    let matchC = uk * uq * us === problem.C;
+    const matchA = uk * up * ur === problem.A;
+    const matchB = uk * (up * us + uq * ur) === problem.B;
+    const matchC = uk * uq * us === problem.C;
     
     // 完全に括り出されているか（カッコ内に共通因数がないか）確認
-    let fullyFactored = gcd(up, uq) === 1 && gcd(ur, us) === 1;
+    const fullyFactored = gcd(up, uq) === 1 && gcd(ur, us) === 1;
     
     if (matchA && matchB && matchC && fullyFactored) {
       setIsCorrect(true);

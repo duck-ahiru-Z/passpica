@@ -84,6 +84,7 @@ export default function VectorDrillPage() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     generateProblem();
   }, []);
 
@@ -116,7 +117,7 @@ export default function VectorDrillPage() {
       y: O.y + (A.y - O.y) * (problem.xNum / problem.xDen) + (B.y - O.y) * (problem.yNum / problem.yDen)
     };
 
-    const drawLine = (p1: any, p2: any, color: string, width = 1) => {
+    const drawLine = (p1: {x: number, y: number}, p2: {x: number, y: number}, color: string, width = 1) => {
       ctx.beginPath();
       ctx.moveTo(p1.x, p1.y);
       ctx.lineTo(p2.x, p2.y);
@@ -125,7 +126,7 @@ export default function VectorDrillPage() {
       ctx.stroke();
     };
 
-    const drawPoint = (p: any, label: string, color = '#1e293b') => {
+    const drawPoint = (p: {x: number, y: number}, label: string, color = '#1e293b') => {
       ctx.beginPath();
       ctx.arc(p.x, p.y, 4, 0, 2 * Math.PI);
       ctx.fillStyle = color;

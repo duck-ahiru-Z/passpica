@@ -29,21 +29,21 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   while (true) {
     if (p === 'pattern1') {
       // 10進数 -> n進数
-      let dec = Math.floor(Math.random() * 191) + 10; // 10 - 200
-      let n = Math.floor(Math.random() * 8) + 2; // 2 - 9
+      const dec = Math.floor(Math.random() * 191) + 10; // 10 - 200
+      const n = Math.floor(Math.random() * 8) + 2; // 2 - 9
       return { pattern: p, n, q_val: dec, a_val: dec.toString(n), dec_val: dec };
     } 
     else if (p === 'pattern2') {
       // n進数 -> 10進数
-      let n = Math.floor(Math.random() * 8) + 2; // 2 - 9
+      const n = Math.floor(Math.random() * 8) + 2; // 2 - 9
       // 桁数 3〜4
-      let len = Math.floor(Math.random() * 2) + 3;
+      const len = Math.floor(Math.random() * 2) + 3;
       let dec = 0;
       let n_str = '';
       for (let i = 0; i < len; i++) {
-        let maxDig = i === 0 ? n - 1 : n;
-        let minDig = i === 0 ? 1 : 0;
-        let d = Math.floor(Math.random() * (maxDig - minDig + 1)) + minDig;
+        const maxDig = i === 0 ? n - 1 : n;
+        const minDig = i === 0 ? 1 : 0;
+        const d = Math.floor(Math.random() * (maxDig - minDig + 1)) + minDig;
         n_str += d.toString();
       }
       dec = parseInt(n_str, n);
@@ -51,23 +51,23 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern3') {
       // n進数 -> m進数
-      let n = Math.floor(Math.random() * 8) + 2;
-      let m = Math.floor(Math.random() * 8) + 2;
+      const n = Math.floor(Math.random() * 8) + 2;
+      const m = Math.floor(Math.random() * 8) + 2;
       if (n === m) continue;
-      let dec = Math.floor(Math.random() * 40) + 10; // 10 - 50 (小さめ)
+      const dec = Math.floor(Math.random() * 40) + 10; // 10 - 50 (小さめ)
       return { pattern: p, n, m, q_val: dec.toString(n), a_val: dec.toString(m), dec_val: dec };
     }
     else if (p === 'pattern4') {
       // 10進数の小数 -> n進数
-      let allowedN = [2, 4, 5, 8];
-      let n = allowedN[Math.floor(Math.random() * allowedN.length)];
+      const allowedN = [2, 4, 5, 8];
+      const n = allowedN[Math.floor(Math.random() * allowedN.length)];
       // 2 digits max in base n for simplicity
-      let d1 = Math.floor(Math.random() * n);
+      const d1 = Math.floor(Math.random() * n);
       let d2 = Math.floor(Math.random() * n);
       if (d1 === 0 && d2 === 0) continue;
       if (d2 === 0) d2 = 1; // force 2 digits or handle
       
-      let val = d1 / n + d2 / (n * n);
+      const val = d1 / n + d2 / (n * n);
       let a_str = `0.${d1}${d2}`;
       // Clean up trailing zeros
       if (d2 === 0) a_str = `0.${d1}`;
@@ -127,11 +127,11 @@ export default function BaseNConversionDrill() {
   if (hasChecked) {
     if (problem.pattern === 'pattern1') {
       let v = problem.dec_val;
-      let lines = [];
-      let remainders = [];
+      const lines = [];
+      const remainders = [];
       while (v >= problem.n) {
-        let q = Math.floor(v / problem.n);
-        let r = v % problem.n;
+        const q = Math.floor(v / problem.n);
+        const r = v % problem.n;
         lines.push({ div: problem.n, val: v, rem: r });
         remainders.push(r);
         v = q;
@@ -161,14 +161,14 @@ export default function BaseNConversionDrill() {
       );
     } 
     else if (problem.pattern === 'pattern2') {
-      let s = problem.q_val.toString();
-      let n = problem.n;
-      let terms = [];
+      const s = problem.q_val.toString();
+      const n = problem.n;
+      const terms = [];
       for (let i = 0; i < s.length; i++) {
-        let p = s.length - 1 - i;
+        const p = s.length - 1 - i;
         terms.push(`${s[i]} \\times ${n}^${p}`);
       }
-      let sumTex = terms.join(' + ');
+      const sumTex = terms.join(' + ');
       
       explanationEl = (
         <div className="space-y-4">
@@ -180,21 +180,21 @@ export default function BaseNConversionDrill() {
       );
     }
     else if (problem.pattern === 'pattern3') {
-      let s = problem.q_val.toString();
-      let n = problem.n;
-      let m = problem.m!;
-      let terms = [];
+      const s = problem.q_val.toString();
+      const n = problem.n;
+      const m = problem.m!;
+      const terms = [];
       for (let i = 0; i < s.length; i++) {
-        let p = s.length - 1 - i;
+        const p = s.length - 1 - i;
         terms.push(`${s[i]} \\times ${n}^${p}`);
       }
       
       let v = problem.dec_val;
-      let lines = [];
-      let remainders = [];
+      const lines = [];
+      const remainders = [];
       while (v >= m) {
-        let q = Math.floor(v / m);
-        let r = v % m;
+        const q = Math.floor(v / m);
+        const r = v % m;
         lines.push({ div: m, val: v, rem: r });
         remainders.push(r);
         v = q;
@@ -227,16 +227,16 @@ export default function BaseNConversionDrill() {
       );
     }
     else if (problem.pattern === 'pattern4') {
-      let n = problem.n;
-      let q = problem.q_val as number;
-      let ansParts = problem.a_val.split('.')[1].split('');
+      const n = problem.n;
+      const q = problem.q_val as number;
+      const ansParts = problem.a_val.split('.')[1].split('');
       
-      let mulSteps = [];
+      const mulSteps = [];
       let cur = q;
       for (let i = 0; i < ansParts.length; i++) {
-        let next = cur * n;
-        let intPart = Math.floor(next);
-        let fracPart = next - intPart;
+        const next = cur * n;
+        const intPart = Math.floor(next);
+        const fracPart = next - intPart;
         mulSteps.push(`${cur} \\times ${n} = \\mathbf{${intPart}} + ${fracPart.toFixed(3).replace(/0+$/, '').replace(/\\.$/, '')}`);
         cur = fracPart;
       }

@@ -109,19 +109,19 @@ export default function PseudoLangPage() {
       } };\n`;
     };
 
-    let blockStack: number[] = [];
+    const blockStack: number[] = [];
 
     for (let i = 0; i < lines.length; i++) {
-      let rawLine = lines[i];
-      let text = rawLine.replace(/[｜\|L⎿└│]/g, ' ').replace(/　/g, ' ');
-      let indent = text.length - text.trimStart().length;
+      const rawLine = lines[i];
+      const text = rawLine.replace(/[｜\|L⎿└│]/g, ' ').replace(/　/g, ' ');
+      const indent = text.length - text.trimStart().length;
       let content = text.trim();
 
       content = content.replace(/(#|\/\/).*/, '').trim();
 
       if (!content) continue;
 
-      let isElseOrElif = content.startsWith('そうでなくもし') || content.startsWith('そうでなければ');
+      const isElseOrElif = content.startsWith('そうでなくもし') || content.startsWith('そうでなければ');
 
       while (blockStack.length > 0 && indent < blockStack[blockStack.length - 1]) {
         blockStack.pop();
@@ -161,30 +161,30 @@ export default function PseudoLangPage() {
       content = content.replace(/([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+(?:\[[^\]]+\])?|\([^\)]+\))\s*÷\s*([a-zA-Z0-9_\u3040-\u309f\u30a0-\u30ff\u4e00-\u9faf]+(?:\[[^\]]+\])?|\([^\)]+\))/g, 'Math.trunc($1 / $2)');
 
       if (content.startsWith('もし') && content.match(/ならば:?\s*$/)) {
-        let cond = content.substring(2).replace(/ならば:?\s*$/, '').trim();
+        const cond = content.substring(2).replace(/ならば:?\s*$/, '').trim();
         parsed = `if (${cond}) {`;
         opensBlock = true;
       } else if (content.startsWith('そうでなくもし') && content.match(/ならば:?\s*$/)) {
-        let cond = content.substring(7).replace(/ならば:?\s*$/, '').trim();
+        const cond = content.substring(7).replace(/ならば:?\s*$/, '').trim();
         parsed = `else if (${cond}) {`;
         opensBlock = true;
       } else if (content.match(/^そうでなければ:?\s*$/)) {
         parsed = `else {`;
         opensBlock = true;
       } else if (content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:?/)) {
-        let m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:?/);
+        const m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ増やしながら繰り返す:?/);
         parsed = `for (${m![1].trim()} = (${m![2]}); ${m![1].trim()} <= (${m![3]}); ${m![1].trim()} += (${m![4]})) {`;
         opensBlock = true;
       } else if (content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:?/)) {
-        let m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:?/);
+        const m = content.match(/(.+)を(.+)から(.+)まで(.+)ずつ減らしながら繰り返す:?/);
         parsed = `for (${m![1].trim()} = (${m![2]}); ${m![1].trim()} >= (${m![3]}); ${m![1].trim()} -= (${m![4]})) {`;
         opensBlock = true;
       } else if (content.match(/(.+)の間繰り返す:?/)) {
-        let m = content.match(/(.+)の間繰り返す:?/);
+        const m = content.match(/(.+)の間繰り返す:?/);
         parsed = `while (${m![1].trim()}) {`;
         opensBlock = true;
       } else if (content.match(/^表示する\s*\(/)) {
-        let args = content.replace(/^表示する\s*/, '');
+        const args = content.replace(/^表示する\s*/, '');
         parsed = `sys_print${args};`;
       } else {
         parsed = content + ';';

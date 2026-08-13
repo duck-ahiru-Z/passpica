@@ -65,11 +65,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   while (true) {
     if (p === 'pattern1') {
       // Covariance. Means are integers.
-      let meanX = Math.floor(Math.random() * 5) + 10;
-      let meanY = Math.floor(Math.random() * 5) + 20;
+      const meanX = Math.floor(Math.random() * 5) + 10;
+      const meanY = Math.floor(Math.random() * 5) + 20;
       
-      let devsX = [-2, -1, 0, 1, 2];
-      let devsY = [
+      const devsX = [-2, -1, 0, 1, 2];
+      const devsY = [
         [-1, -2, 0, 2, 1],
         [2, -1, 0, 1, -2],
         [1, -2, 0, 2, -1]
@@ -79,18 +79,18 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let dataY = devsY.map(d => meanY + d);
       
       // Shuffle together
-      let zipped = dataX.map((x, i) => ({x, y: dataY[i]}));
+      const zipped = dataX.map((x, i) => ({x, y: dataY[i]}));
       zipped.sort(() => Math.random() - 0.5);
       dataX = zipped.map(z => z.x);
       dataY = zipped.map(z => z.y);
       
       let sumProd = 0;
       for (let i = 0; i < 5; i++) sumProd += (dataX[i] - meanX) * (dataY[i] - meanY);
-      let cov = sumProd / 5;
+      const cov = sumProd / 5;
       
-      let qStr = `次の2つの変量 $x, y$ のデータについて、共分散 $s_{xy}$ を求めよ。\n\n$x$: $${dataX.join(', ')}$\n$y$: $${dataY.join(', ')}$`;
+      const qStr = `次の2つの変量 $x, y$ のデータについて、共分散 $s_{xy}$ を求めよ。\n\n$x$: $${dataX.join(', ')}$\n$y$: $${dataY.join(', ')}$`;
       
-      let expLines = [
+      const expLines = [
         `\\text{平均値 } \\bar{x} = ${meanX}, \\quad \\bar{y} = ${meanY}`,
         `\\text{各データの偏差の積 } (x_i - \\bar{x})(y_i - \\bar{y}) \\text{ は、}`,
         dataX.map((x, i) => `(${x - meanX}) \\times (${dataY[i] - meanY})`).join(' + '),
@@ -102,28 +102,28 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern2') {
       // Correlation coefficient.
-      let db = correlationDB[Math.floor(Math.random() * correlationDB.length)];
+      const db = correlationDB[Math.floor(Math.random() * correlationDB.length)];
       let dataX = [...db.x];
       let dataY = [...db.y];
       
       // Shuffle together
-      let zipped = dataX.map((x, i) => ({x, y: dataY[i]}));
+      const zipped = dataX.map((x, i) => ({x, y: dataY[i]}));
       zipped.sort(() => Math.random() - 0.5);
       dataX = zipped.map(z => z.x);
       dataY = zipped.map(z => z.y);
       
-      let sumX = dataX.reduce((a,b)=>a+b, 0);
-      let sumY = dataY.reduce((a,b)=>a+b, 0);
-      let meanX = sumX/5;
-      let meanY = sumY/5;
+      const sumX = dataX.reduce((a,b)=>a+b, 0);
+      const sumY = dataY.reduce((a,b)=>a+b, 0);
+      const meanX = sumX/5;
+      const meanY = sumY/5;
       
-      let sumSqX = dataX.reduce((a,b)=>a+Math.pow(b-meanX, 2), 0);
-      let sumSqY = dataY.reduce((a,b)=>a+Math.pow(b-meanY, 2), 0);
-      let sumProd = dataX.reduce((a,b,i)=>a+(b-meanX)*(dataY[i]-meanY), 0);
+      const sumSqX = dataX.reduce((a,b)=>a+Math.pow(b-meanX, 2), 0);
+      const sumSqY = dataY.reduce((a,b)=>a+Math.pow(b-meanY, 2), 0);
+      const sumProd = dataX.reduce((a,b,i)=>a+(b-meanX)*(dataY[i]-meanY), 0);
       
-      let qStr = `次のデータについて、相関係数 $r$ を求めよ。\n\n$x$: $${dataX.join(', ')}$\n$y$: $${dataY.join(', ')}$`;
+      const qStr = `次のデータについて、相関係数 $r$ を求めよ。\n\n$x$: $${dataX.join(', ')}$\n$y$: $${dataY.join(', ')}$`;
       
-      let expLines = [
+      const expLines = [
         `\\text{平均値 } \\bar{x} = ${meanX}, \\quad \\bar{y} = ${meanY}`,
         `x \\text{ の偏差の2乗和は } ${sumSqX}`,
         `y \\text{ の偏差の2乗和は } ${sumSqY}`,
@@ -135,19 +135,19 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern3') {
       // Scatter plot correlation guess
-      let trueR = (Math.random() * 1.8 - 0.9).toFixed(1); // -0.9 to 0.9
-      let rNum = parseFloat(trueR);
+      const trueR = (Math.random() * 1.8 - 0.9).toFixed(1); // -0.9 to 0.9
+      const rNum = parseFloat(trueR);
       
       // Generate scatter points with approx correlation rNum
-      let pts = [];
+      const pts = [];
       for (let i = 0; i < 30; i++) {
-        let x = Math.random() * 10;
-        let err = (Math.random() - 0.5) * 5 * Math.sqrt(1 - rNum*rNum);
-        let y = rNum > 0 ? (x * rNum + err) : ((10 - x) * Math.abs(rNum) + err);
+        const x = Math.random() * 10;
+        const err = (Math.random() - 0.5) * 5 * Math.sqrt(1 - rNum*rNum);
+        const y = rNum > 0 ? (x * rNum + err) : ((10 - x) * Math.abs(rNum) + err);
         pts.push({x, y: y + 5});
       }
       
-      let choices = [
+      const choices = [
         rNum,
         parseFloat((Math.random() * 1.8 - 0.9).toFixed(1)),
         parseFloat((Math.random() * 1.8 - 0.9).toFixed(1))
@@ -158,11 +158,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       choices.sort((a,b) => a-b);
       
-      let qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('　/　')}$`;
+      const qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('　/　')}$`;
       
-      let dir = rNum > 0.4 ? '右上がり（正の相関）' : (rNum < -0.4 ? '右下がり（負の相関）' : 'バラバラ（無相関）');
+      const dir = rNum > 0.4 ? '右上がり（正の相関）' : (rNum < -0.4 ? '右下がり（負の相関）' : 'バラバラ（無相関）');
       
-      let expLines = [
+      const expLines = [
         `\\text{散布図の点の分布を見ると、全体的に}${dir}\\text{の傾向があります。}`,
         `\\text{したがって、相関係数は } ${trueR} \\text{ 付近であると推定できます。}`
       ];
@@ -172,23 +172,23 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     else if (p === 'pattern4') {
       // Cross table
       // Let's do a simple 2x2 table
-      let a = Math.floor(Math.random() * 30) + 10;
-      let b = Math.floor(Math.random() * 30) + 10;
-      let c = Math.floor(Math.random() * 30) + 10;
-      let d = Math.floor(Math.random() * 30) + 10;
+      const a = Math.floor(Math.random() * 30) + 10;
+      const b = Math.floor(Math.random() * 30) + 10;
+      const c = Math.floor(Math.random() * 30) + 10;
+      const d = Math.floor(Math.random() * 30) + 10;
       
-      let cells = ['a', 'b', 'c', 'd'] as const;
-      let targetCell = cells[Math.floor(Math.random() * 4)];
+      const cells = ['a', 'b', 'c', 'd'] as const;
+      const targetCell = cells[Math.floor(Math.random() * 4)];
       
-      let totA = a + b;
-      let totB = c + d;
-      let totC = a + c;
-      let totD = b + d;
-      let tot = a + b + c + d;
+      const totA = a + b;
+      const totB = c + d;
+      const totC = a + c;
+      const totD = b + d;
+      const tot = a + b + c + d;
       
-      let qStr = `次のクロス集計表において、空欄 [ A ] に入る数値を求めよ。`;
+      const qStr = `次のクロス集計表において、空欄 [ A ] に入る数値を求めよ。`;
       
-      let expLines = [
+      const expLines = [
         `\\text{表の縦と横の合計が一致することを利用します。}`,
         `\\text{例えば、}[A]\\text{ を含む行または列の合計値から、他の数値を引くことで求まります。}`
       ];
@@ -249,7 +249,7 @@ export default function DataAnalysis2DDrill() {
     const H = canvas.height;
     ctx.clearRect(0, 0, W, H);
 
-    let pts = problem.scatterPoints;
+    const pts = problem.scatterPoints;
     if (!pts || pts.length === 0) return;
 
     // Find bounds
@@ -259,16 +259,16 @@ export default function DataAnalysis2DDrill() {
     let maxY = Math.max(...pts.map(p => p.y));
 
     // Pad
-    let padX = (maxX - minX) * 0.2 || 1;
-    let padY = (maxY - minY) * 0.2 || 1;
+    const padX = (maxX - minX) * 0.2 || 1;
+    const padY = (maxY - minY) * 0.2 || 1;
     minX -= padX; maxX += padX;
     minY -= padY; maxY += padY;
 
     // Axis
     ctx.strokeStyle = '#cbd5e1';
     ctx.lineWidth = 1;
-    let bx = 30;
-    let by = H - 30;
+    const bx = 30;
+    const by = H - 30;
     ctx.beginPath(); ctx.moveTo(bx, 10); ctx.lineTo(bx, by); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(bx, by); ctx.lineTo(W - 10, by); ctx.stroke();
 
@@ -278,14 +278,14 @@ export default function DataAnalysis2DDrill() {
     ctx.fillText('y', bx + 5, 20);
 
     const toScr = (x: number, y: number) => {
-      let px = bx + ((x - minX) / (maxX - minX)) * (W - bx - 20);
-      let py = by - ((y - minY) / (maxY - minY)) * (by - 20);
+      const px = bx + ((x - minX) / (maxX - minX)) * (W - bx - 20);
+      const py = by - ((y - minY) / (maxY - minY)) * (by - 20);
       return {x: px, y: py};
     };
 
     ctx.fillStyle = '#3b82f6';
-    for (let p of pts) {
-      let s = toScr(p.x, p.y);
+    for (const p of pts) {
+      const s = toScr(p.x, p.y);
       ctx.beginPath(); ctx.arc(s.x, s.y, 4, 0, Math.PI*2); ctx.fill();
     }
   };

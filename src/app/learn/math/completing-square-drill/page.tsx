@@ -29,7 +29,7 @@ interface Root {
 
 function simplifyFraction(n: number, d: number): Root {
   if (d === 0) return { num: 0, den: 1 };
-  let g = gcd(n, d);
+  const g = gcd(n, d);
   let num = n / g;
   let den = d / g;
   if (den < 0) {
@@ -67,7 +67,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     } else if (p_type === 'pattern2') {
       a = Math.floor(Math.random() * 9) - 4; // -4 to 4
       if (a === 0 || a === 1) continue;
-      let p_int = Math.floor(Math.random() * 9) - 4;
+      const p_int = Math.floor(Math.random() * 9) - 4;
       if (p_int === 0) continue;
       b = -2 * a * p_int;
       c = Math.floor(Math.random() * 19) - 9;
@@ -85,8 +85,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       c = Math.floor(Math.random() * 19) - 9;
     }
 
-    let P = simplifyFraction(b, 2 * a);
-    let Q = simplifyFraction(4 * a * c - b * b, 4 * a);
+    const P = simplifyFraction(b, 2 * a);
+    const Q = simplifyFraction(4 * a * c - b * b, 4 * a);
     
     let eq = 'y = ';
     if (a === 1) eq += 'x^2';
@@ -137,21 +137,21 @@ export default function CompletingSquareDrillPage() {
     ctx.clearRect(0, 0, W, H);
 
     // vertex coordinates
-    let vx = -problem.P.num / problem.P.den;
-    let vy = problem.Q.num / problem.Q.den;
+    const vx = -problem.P.num / problem.P.den;
+    const vy = problem.Q.num / problem.Q.den;
 
     // determine range
-    let rangeX = Math.max(8, Math.abs(vx) * 3);
-    let minX = vx - rangeX / 2;
-    let maxX = vx + rangeX / 2;
+    const rangeX = Math.max(8, Math.abs(vx) * 3);
+    const minX = vx - rangeX / 2;
+    const maxX = vx + rangeX / 2;
     
-    let func = (x: number) => problem.a * x * x + problem.b * x + problem.c;
+    const func = (x: number) => problem.a * x * x + problem.b * x + problem.c;
     
     let minY = vy;
     let maxY = vy;
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = func(x);
+      const x = minX + (rangeX * i) / 100;
+      const y = func(x);
       minY = Math.min(minY, y);
       maxY = Math.max(maxY, y);
     }
@@ -185,8 +185,8 @@ export default function CompletingSquareDrillPage() {
     ctx.lineWidth = 2;
     ctx.beginPath();
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = func(x);
+      const x = minX + (rangeX * i) / 100;
+      const y = func(x);
       if (i === 0) ctx.moveTo(mapX(x), mapY(y));
       else ctx.lineTo(mapX(x), mapY(y));
     }
@@ -214,10 +214,10 @@ export default function CompletingSquareDrillPage() {
       ctx.font = '12px sans-serif';
       ctx.textAlign = 'center';
       
-      let pStr = problem.P.den === 1 ? `${-problem.P.num}` : `${-problem.P.num}/${problem.P.den}`;
-      let qStr = problem.Q.den === 1 ? `${problem.Q.num}` : `${problem.Q.num}/${problem.Q.den}`;
+      const pStr = problem.P.den === 1 ? `${-problem.P.num}` : `${-problem.P.num}/${problem.P.den}`;
+      const qStr = problem.Q.den === 1 ? `${problem.Q.num}` : `${problem.Q.num}/${problem.Q.den}`;
       
-      let textY = problem.a > 0 ? mapY(vy) + 16 : mapY(vy) - 8;
+      const textY = problem.a > 0 ? mapY(vy) + 16 : mapY(vy) - 8;
       ctx.fillText(`頂点 (${pStr}, ${qStr})`, mapX(vx), textY);
     }
   };
@@ -238,17 +238,17 @@ export default function CompletingSquareDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let aVal = ansA.trim() === '' ? 1 : ansA.trim() === '-' ? -1 : parseInt(ansA);
+    const aVal = ansA.trim() === '' ? 1 : ansA.trim() === '-' ? -1 : parseInt(ansA);
     
     let pNum = parseInt(ansPNum);
-    let pDen = ansPDen.trim() === '' ? 1 : parseInt(ansPDen);
+    const pDen = ansPDen.trim() === '' ? 1 : parseInt(ansPDen);
     if (isNaN(pNum)) pNum = 0; // if empty, treat as 0
-    let userP = simplifyFraction((ansPSign === '+' ? 1 : -1) * pNum, pDen);
+    const userP = simplifyFraction((ansPSign === '+' ? 1 : -1) * pNum, pDen);
     
     let qNum = parseInt(ansQNum);
-    let qDen = ansQDen.trim() === '' ? 1 : parseInt(ansQDen);
+    const qDen = ansQDen.trim() === '' ? 1 : parseInt(ansQDen);
     if (isNaN(qNum)) qNum = 0;
-    let userQ = simplifyFraction((ansQSign === '+' ? 1 : -1) * qNum, qDen);
+    const userQ = simplifyFraction((ansQSign === '+' ? 1 : -1) * qNum, qDen);
     
     if (isNaN(aVal) || isNaN(userP.num) || isNaN(userQ.num)) {
       alert('正しく数値を入力してください。');

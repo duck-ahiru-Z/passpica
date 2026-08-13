@@ -41,18 +41,18 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   while (true) {
-    let a = Math.floor(Math.random() * 5) + 1;
-    let b = Math.floor(Math.random() * 5) + 1;
-    let c = Math.floor(Math.random() * 5) + 1;
-    let d = Math.floor(Math.random() * 5) + 1;
+    const a = Math.floor(Math.random() * 5) + 1;
+    const b = Math.floor(Math.random() * 5) + 1;
+    const c = Math.floor(Math.random() * 5) + 1;
+    const d = Math.floor(Math.random() * 5) + 1;
 
     // We need (a/b) * (c/d) * (e/f) = 1
     // So e/f = (b*d) / (a*c)
-    let e_raw = b * d;
-    let f_raw = a * c;
-    let g = gcd(e_raw, f_raw);
-    let e = e_raw / g;
-    let f = f_raw / g;
+    const e_raw = b * d;
+    const f_raw = a * c;
+    const g = gcd(e_raw, f_raw);
+    const e = e_raw / g;
+    const f = f_raw / g;
 
     if (p === 'pattern1') {
       // Ceva: Find AF:FB = e:f
@@ -71,13 +71,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     else if (p === 'pattern4') {
       // Area ratio: Ceva. Find Area(PAB) : Area(ABC)
       // mC = a*c, mB = b*c, mA = a*d
-      let mC = a * c;
-      let mB = b * c;
-      let mA = a * d;
-      let M = mC + mB + mA;
-      let areaPAB = mC;
-      let areaABC = M;
-      let g2 = gcd(areaPAB, areaABC);
+      const mC = a * c;
+      const mB = b * c;
+      const mA = a * d;
+      const M = mC + mB + mA;
+      const areaPAB = mC;
+      const areaABC = M;
+      const g2 = gcd(areaPAB, areaABC);
       return { pattern: p, a, b, c, d, e, f, ansX: areaPAB / g2, ansY: areaABC / g2 };
     }
   }
@@ -108,8 +108,8 @@ export default function MenelausCevaDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let ux = parseInt(ansX);
-    let uy = parseInt(ansY);
+    const ux = parseInt(ansX);
+    const uy = parseInt(ansY);
     
     // allow multiples (e.g. 2:4 for 1:2 is correct geometrically, though we usually want simplest form)
     // we'll enforce simplest form or proportional. Let's do proportional.
@@ -165,7 +165,7 @@ export default function MenelausCevaDrill() {
   // --- SVG Drawing Logic ---
   const W = 360;
   const H = 220;
-  let svgNodes = [];
+  const svgNodes = [];
 
   // Define base points
   let A = { x: 180, y: 30 };
@@ -196,15 +196,15 @@ export default function MenelausCevaDrill() {
 
   if (problem.pattern === 'pattern1' || problem.pattern === 'pattern4') {
     // Ceva
-    let D = getPt(B, C, problem.a, problem.b);
-    let E = getPt(C, A, problem.c, problem.d);
-    let F = getPt(A, B, problem.e, problem.f);
-    let P = { x: 0, y: 0 }; // intersection of AD and BE
+    const D = getPt(B, C, problem.a, problem.b);
+    const E = getPt(C, A, problem.c, problem.d);
+    const F = getPt(A, B, problem.e, problem.f);
+    const P = { x: 0, y: 0 }; // intersection of AD and BE
     // Just use mass points for P
-    let mA = problem.a * problem.d;
-    let mB = problem.b * problem.c;
-    let mC = problem.a * problem.c;
-    let M = mA + mB + mC;
+    const mA = problem.a * problem.d;
+    const mB = problem.b * problem.c;
+    const mC = problem.a * problem.c;
+    const M = mA + mB + mC;
     P.x = (mA * A.x + mB * B.x + mC * C.x) / M;
     P.y = (mA * A.y + mB * B.y + mC * C.y) / M;
 
@@ -237,8 +237,8 @@ export default function MenelausCevaDrill() {
     // a:b external division. D = (a*C - b*B)/(a-b)
     // If a > b, D is to the right of C.
     // If a < b, D is to the left of B.
-    let m = problem.a;
-    let n = -problem.b;
+    const m = problem.a;
+    const n = -problem.b;
     
     // Scale triangle width to fit D
     let W_tri = 150;
@@ -253,9 +253,9 @@ export default function MenelausCevaDrill() {
       B.x -= 40; C.x -= 40; // shift left
     }
 
-    let D = getPt(B, C, m, n);
-    let E = getPt(C, A, problem.c, problem.d);
-    let F = getPt(A, B, problem.e, problem.f);
+    const D = getPt(B, C, m, n);
+    const E = getPt(C, A, problem.c, problem.d);
+    const F = getPt(A, B, problem.e, problem.f);
 
     // Draw triangle
     drawLine(A, B, "#334155", false, 2);
@@ -264,9 +264,9 @@ export default function MenelausCevaDrill() {
 
     // Draw Menelaus line DEF
     // Extend DEF a bit
-    let vX = E.x - F.x;
-    let vY = E.y - F.y;
-    let startLine = { x: F.x - vX*0.5, y: F.y - vY*0.5 };
+    const vX = E.x - F.x;
+    const vY = E.y - F.y;
+    const startLine = { x: F.x - vX*0.5, y: F.y - vY*0.5 };
     let endLine = { x: D.x + vX*0.5, y: D.y + vY*0.5 };
     if (m < Math.abs(n)) { // D is on the left
       endLine = { x: D.x - vX*0.5, y: D.y - vY*0.5 };
@@ -290,8 +290,8 @@ export default function MenelausCevaDrill() {
     if (hasChecked && problem.pattern === 'pattern3') {
       // Highlight route B -> D -> C
       // Using an arc or curve to show the jump
-      let pathD = `M ${B.x} ${B.y + 15} Q ${(B.x+D.x)/2} ${B.y + 40} ${D.x} ${D.y + 15}`;
-      let pathC = `M ${D.x} ${D.y + 15} Q ${(D.x+C.x)/2} ${C.y + 30} ${C.x} ${C.y + 15}`;
+      const pathD = `M ${B.x} ${B.y + 15} Q ${(B.x+D.x)/2} ${B.y + 40} ${D.x} ${D.y + 15}`;
+      const pathC = `M ${D.x} ${D.y + 15} Q ${(D.x+C.x)/2} ${C.y + 30} ${C.x} ${C.y + 15}`;
       svgNodes.push(<path key="jump1" d={pathD} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="4,2" markerEnd="url(#arrow)" />);
       svgNodes.push(<path key="jump2" d={pathC} fill="none" stroke="#f59e0b" strokeWidth="2" strokeDasharray="4,2" markerEnd="url(#arrow)" />);
     }

@@ -28,7 +28,7 @@ interface Root {
 
 function simplifyFraction(n: number, d: number): Root {
   if (d === 0) return { num: 0, den: 1 };
-  let g = gcd(n, d);
+  const g = gcd(n, d);
   let num = n / g;
   let den = d / g;
   if (den < 0) {
@@ -58,11 +58,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     while (true) {
       a = Math.floor(Math.random() * 4) + 1;
       c = Math.floor(Math.random() * 9) + 1;
-      let sqrt = Math.sqrt(4 * a * c);
+      const sqrt = Math.sqrt(4 * a * c);
       if (Number.isInteger(sqrt)) {
-        let k1 = sqrt;
-        let k2 = -sqrt;
-        let eq = `y = ${a === 1 ? '' : a}x^2 + kx + ${c}`;
+        const k1 = sqrt;
+        const k2 = -sqrt;
+        const eq = `y = ${a === 1 ? '' : a}x^2 + kx + ${c}`;
         return { 
           pattern: p_type, eq, ansType: 'values', conditionText: "x軸と接する（共有点が1つ）",
           params: { a, c, k_ans: [k1, k2] }
@@ -76,9 +76,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     if (Math.random() < 0.5) a = -a;
     let b = Math.floor(Math.random() * 11) - 5;
     if (b === 0) b = 1;
-    let eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}x^2 ${b > 0 ? '+' : '-'} ${Math.abs(b) === 1 ? '' : Math.abs(b)}x + k`;
-    let boundary = simplifyFraction(b * b, 4 * a);
-    let sign = a > 0 ? '<' : '>';
+    const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}x^2 ${b > 0 ? '+' : '-'} ${Math.abs(b) === 1 ? '' : Math.abs(b)}x + k`;
+    const boundary = simplifyFraction(b * b, 4 * a);
+    const sign = a > 0 ? '<' : '>';
     return { 
       pattern: p_type, eq, ansType: 'ineq', conditionText: "x軸と異なる2点で交わる",
       params: { a, b, k_boundary: boundary, k_ineq_sign: sign }
@@ -89,8 +89,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     let r1 = Math.floor(Math.random() * 9) - 4;
     let r2 = Math.floor(Math.random() * 9) - 4;
     if (r1 >= r2) { r1--; r2++; }
-    let sum = r1 + r2;
-    let mProd = - (r1 * r2);
+    const sum = r1 + r2;
+    const mProd = - (r1 * r2);
     let cStr = '';
     if (sum !== 0) cStr += `${sum === 1 ? '' : sum === -1 ? '-' : sum}k`;
     if (mProd !== 0) {
@@ -98,8 +98,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       else cStr += `${mProd}`;
     }
     if (cStr === '') cStr = '0';
-    let hasParens = sum !== 0 && mProd !== 0;
-    let eq = `y = x^2 + 2kx + ${hasParens ? `(${cStr})` : cStr}`;
+    const hasParens = sum !== 0 && mProd !== 0;
+    const eq = `y = x^2 + 2kx + ${hasParens ? `(${cStr})` : cStr}`;
     return { 
       pattern: p_type, eq, ansType: 'between', conditionText: "x軸と共有点をもたない",
       params: { sum, mProd, k_r1: r1, k_r2: r2, cStr }
@@ -107,11 +107,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   }
   
   if (p_type === 'pattern4') {
-    let b = Math.floor(Math.random() * 8) + 2;
+    const b = Math.floor(Math.random() * 8) + 2;
     let c = Math.floor(Math.random() * 4) + 1;
     if (Math.random() < 0.5) c = -c;
-    let eq = `y = kx^2 ${b > 0 ? '+' : '-'} ${Math.abs(b)}x ${c > 0 ? '+' : '-'} ${Math.abs(c)}`;
-    let k_ans = simplifyFraction(b * b, 4 * c);
+    const eq = `y = kx^2 ${b > 0 ? '+' : '-'} ${Math.abs(b)}x ${c > 0 ? '+' : '-'} ${Math.abs(c)}`;
+    const k_ans = simplifyFraction(b * b, 4 * c);
     return { 
       pattern: p_type, eq, ansType: 'value', conditionText: "x軸と接する（共有点が1つ）",
       params: { b, c, k_ans }
@@ -170,12 +170,12 @@ export default function DiscriminantDrillPage() {
     ctx.clearRect(0, 0, W, H);
 
     // Calculate dynamic range based on current k
-    let minX = -6; let maxX = 6;
-    let rangeX = maxX - minX;
+    const minX = -6; const maxX = 6;
+    const rangeX = maxX - minX;
     
     // Y range fixed to prevent jumpy graphs, or slightly dynamic
-    let minY = -15; let maxY = 15;
-    let rangeY = maxY - minY;
+    const minY = -15; const maxY = 15;
+    const rangeY = maxY - minY;
 
     const mapX = (x: number) => ((x - minX) / rangeX) * W;
     const mapY = (y: number) => H - ((y - minY) / rangeY) * H;
@@ -199,8 +199,8 @@ export default function DiscriminantDrillPage() {
     }
 
     for (let i = 0; i <= 100; i++) {
-      let x = minX + (rangeX * i) / 100;
-      let y = evaluateFunction(problem, kVal, x);
+      const x = minX + (rangeX * i) / 100;
+      const y = evaluateFunction(problem, kVal, x);
       if (i === 0) ctx.moveTo(mapX(x), mapY(y));
       else ctx.lineTo(mapX(x), mapY(y));
     }
@@ -217,7 +217,7 @@ export default function DiscriminantDrillPage() {
   }, [problem, kVal]);
 
   const handleNext = () => {
-    let p = generateProblem(selectedPattern);
+    const p = generateProblem(selectedPattern);
     setProblem(p);
     setAns1Num(''); setAns1Den('');
     setAns2Num(''); setAns2Den('');
@@ -237,41 +237,41 @@ export default function DiscriminantDrillPage() {
     if (!problem) return;
     
     const parse = (nStr: string, dStr: string) => {
-      let num = parseInt(nStr);
+      const num = parseInt(nStr);
       let den = dStr.trim() === '' ? 1 : parseInt(dStr);
       if (isNaN(num)) return null;
       if (isNaN(den) || den === 0) den = 1;
       return simplifyFraction(num, den);
     };
 
-    let u1 = parse(ans1Num, ans1Den);
-    let u2 = parse(ans2Num, ans2Den);
+    const u1 = parse(ans1Num, ans1Den);
+    const u2 = parse(ans2Num, ans2Den);
 
     let correct = false;
 
     if (problem.ansType === 'values') {
       if (u1 && u2) {
-        let v1 = u1.num / u1.den;
-        let v2 = u2.num / u2.den;
-        let ans = problem.params.k_ans;
+        const v1 = u1.num / u1.den;
+        const v2 = u2.num / u2.den;
+        const ans = problem.params.k_ans;
         if ((v1 === ans[0] && v2 === ans[1]) || (v1 === ans[1] && v2 === ans[0])) correct = true;
       }
     } else if (problem.ansType === 'value') {
       if (u1) {
-        let ans = problem.params.k_ans;
+        const ans = problem.params.k_ans;
         if (u1.num === ans.num && u1.den === ans.den) correct = true;
       }
     } else if (problem.ansType === 'ineq') {
       if (u1) {
-        let ans = problem.params.k_boundary;
+        const ans = problem.params.k_boundary;
         if (u1.num === ans.num && u1.den === ans.den && ansIneqSign === problem.params.k_ineq_sign) correct = true;
       }
     } else if (problem.ansType === 'between') {
       if (u1 && u2) {
-        let v1 = u1.num / u1.den;
-        let v2 = u2.num / u2.den;
-        let ans1 = problem.params.k_r1;
-        let ans2 = problem.params.k_r2;
+        const v1 = u1.num / u1.den;
+        const v2 = u2.num / u2.den;
+        const ans1 = problem.params.k_r1;
+        const ans2 = problem.params.k_r2;
         if (v1 === ans1 && v2 === ans2) correct = true; // since r1 < r2
       }
     }
