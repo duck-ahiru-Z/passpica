@@ -249,6 +249,7 @@ export default function VectorDotProductDrill() {
     ctx.beginPath(); ctx.moveTo(origin.x, 0); ctx.lineTo(origin.x, H); ctx.stroke();
 
     // Helper for arrows
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const drawArrow = (from: any, to: any, color: string, label: string) => {
       ctx.strokeStyle = color;
       ctx.fillStyle = color;

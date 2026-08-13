@@ -45,6 +45,7 @@ interface ProblemData {
   eq: string;
   conditionText: string;
   ansType: 'values' | 'value' | 'ineq' | 'between';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   params: any;
 }
 

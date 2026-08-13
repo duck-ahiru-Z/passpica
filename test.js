@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs');
 const code = fs.readFileSync('./src/data/pseudo-lang/exam2025TsuishiFig4.ts', 'utf8').split('\`')[1];
 

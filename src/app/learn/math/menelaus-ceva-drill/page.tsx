@@ -172,6 +172,7 @@ export default function MenelausCevaDrill() {
   let B = { x: 60, y: 190 };
   let C = { x: 260, y: 190 };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPt = (p1: any, p2: any, m: number, n: number) => {
     return {
       x: (n * p1.x + m * p2.x) / (m + n),
@@ -179,6 +180,7 @@ export default function MenelausCevaDrill() {
     };
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const drawPoint = (pt: any, label: string, dx = 0, dy = -10, color = "#1e293b") => {
     svgNodes.push(
       <g key={label}>
@@ -188,6 +190,7 @@ export default function MenelausCevaDrill() {
     );
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const drawLine = (p1: any, p2: any, color = "#94a3b8", dash = false, strokeWidth = 1) => {
     svgNodes.push(
       <line key={`${p1.x}-${p1.y}-${p2.x}-${p2.y}`} x1={p1.x} y1={p1.y} x2={p2.x} y2={p2.y} stroke={color} strokeWidth={strokeWidth} strokeDasharray={dash ? "4,4" : "none"} />

@@ -385,6 +385,7 @@ export default function Organic3DPage() {
   interface RenderItem {
     type: 'bond' | 'atom';
     z: number;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     payload: any;
   }
 
@@ -424,6 +425,7 @@ export default function Organic3DPage() {
   const sortedRenderItems = getRenderItems();
 
   // ボンドの二重線・三重線・通常の並行線オフセットを描画
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderBond = (payload: any, index: number) => {
     const { u, v, bondType } = payload;
     const dx = v.px - u.px;
@@ -493,6 +495,7 @@ export default function Organic3DPage() {
   };
 
   // 原子球の描画
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const renderAtom = (atom: any, index: number) => {
     let r = 11;
     let fill = '#334155'; // C (Slate-700)

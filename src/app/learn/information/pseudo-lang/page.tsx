@@ -222,9 +222,12 @@ export default function PseudoLangPage() {
     );
 
     return makeGen(
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (...args: any[]) => { setOutput(prev => [...prev, args.join("")]); },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (arr: any[]) => isOneBased ? arr.length - 1 : arr.length,
       () => Math.random(),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (arr: any[]) => isOneBased ? [undefined, ...arr] : arr
     );
   };
@@ -235,6 +238,7 @@ export default function PseudoLangPage() {
       const gen = createRunner();
       let res = gen.next();
       while (!res.done) res = gen.next();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(`構文エラー: 記述内容を確認してください。(${err.message})`);
     }
@@ -247,6 +251,7 @@ export default function PseudoLangPage() {
       generatorRef.current = gen;
       setIsDebugging(true);
       handleNextStep(gen);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(`構文エラー: 記述内容を確認してください。(${err.message})`);
     }
@@ -267,6 +272,7 @@ export default function PseudoLangPage() {
         setCurrentLine(val.line);
         setVariables(val.getVars());
       }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       setError(`実行エラー: ${err.message}`);
       setIsDebugging(false);
