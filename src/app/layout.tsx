@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import Header from "../components/layout/Header";
@@ -26,7 +27,9 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${notoSansJP.variable}`}>
       <body className="flex flex-col min-h-screen bg-white text-slate-800 antialiased">
-        <GoogleAnalytics />
+        <Suspense fallback={null}>
+          <GoogleAnalytics />
+        </Suspense>
         <ServiceWorkerCleanser />
         <Header />
         
