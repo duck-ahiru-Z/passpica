@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import ServiceWorkerCleanser from "../components/utils/ServiceWorkerCleanser";
+import GoogleAnalytics from "../components/analytics/GoogleAnalytics";
 
 const notoSansJP = Noto_Sans_JP({
   subsets: ["latin"],
@@ -25,6 +26,7 @@ export default function RootLayout({
   return (
     <html lang="ja" className={`${notoSansJP.variable}`}>
       <body className="flex flex-col min-h-screen bg-white text-slate-800 antialiased">
+        <GoogleAnalytics />
         <ServiceWorkerCleanser />
         <Header />
         
