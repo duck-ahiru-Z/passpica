@@ -4,6 +4,7 @@ export type AnalyticsEventParams = Record<string, string | number | boolean>;
 
 const MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA4_MEASUREMENT_ID;
 const ALLOWED_EVENT_PARAMS = new Set([
+  "app_id",
   "tool_id",
   "tool_name",
   "page_location",

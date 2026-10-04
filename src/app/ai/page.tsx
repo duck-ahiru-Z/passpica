@@ -27,7 +27,11 @@ export default function AiToolsPage() {
           target="_blank"
           rel="noopener noreferrer"
           className="retro-btn-classic inline-block font-bold"
-          onClick={() => trackEvent("ai_tool_launch", { tool_id: AI_TOOLS[0].id, tool_name: AI_TOOLS[0].name })}
+          onClick={() => trackEvent("ai_tool_launch", {
+            app_id: AI_TOOLS[0].id,
+            tool_id: AI_TOOLS[0].id,
+            tool_name: AI_TOOLS[0].name,
+          })}
         >
           英訳添削を使う ➔
         </a>
