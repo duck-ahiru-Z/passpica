@@ -4,6 +4,12 @@ import { trackEvent } from "../../lib/analytics";
 
 const AI_TOOLS = [
   {
+    id: "ai_chat",
+    name: "AI質問チャット",
+    description: "勉強でも、日常の疑問でも。なんでもAIに質問できます。画像での質問にも対応。",
+    url: "https://share.gemini.google/77phfite9hGB",
+  },
+  {
     id: "eiyaku",
     name: "英訳添削",
     description: "大学受験の和文英訳をAIが採点・添削。修正点の解説、模範解答、再提出比較、AIへの質問に対応します。",
