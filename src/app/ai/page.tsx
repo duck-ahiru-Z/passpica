@@ -15,6 +15,12 @@ const AI_TOOLS = [
     description: "大学受験の英文和訳をAIが採点・添削。修正点の解説、模範解答、再提出比較、AIへの質問に対応します。",
     url: "https://share.gemini.google/RSCIT3J0wx5m",
   },
+  {
+    id: "free_writing",
+    name: "自由英作文添削",
+    description: "大学受験の自由英作文をAIが添削。内容・構成・文法・語彙を確認できます。",
+    url: "https://share.gemini.google/nni9DMibrNAq",
+  },
 ] as const;
 
 export default function AiToolsPage() {
