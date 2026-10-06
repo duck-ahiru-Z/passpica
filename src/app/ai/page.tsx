@@ -7,7 +7,7 @@ const AI_TOOLS = [
     id: "ai_chat",
     name: "AI質問チャット",
     description: "勉強でも、日常の疑問でも。なんでもAIに質問できます。画像での質問にも対応。",
-    url: "https://share.gemini.google/77phfite9hGB",
+    url: "https://share.gemini.google/ibz2WXmUyA6J",
   },
   {
     id: "eiyaku",
@@ -26,12 +26,6 @@ const AI_TOOLS = [
     name: "自由英作文添削",
     description: "大学受験の自由英作文をAIが添削。内容・構成・文法・語彙を確認できます。",
     url: "https://share.gemini.google/nni9DMibrNAq",
-  },
-  {
-    id: "ai_chat_new",
-    name: "AI質問チャット（新）",
-    description: "勉強でも、日常の疑問でも。なんでもAIに質問できます。",
-    url: "https://share.gemini.google/ibz2WXmUyA6J",
   },
   {
     id: "math_description",
