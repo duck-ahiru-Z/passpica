@@ -27,6 +27,30 @@ const AI_TOOLS = [
     description: "大学受験の自由英作文をAIが添削。内容・構成・文法・語彙を確認できます。",
     url: "https://share.gemini.google/nni9DMibrNAq",
   },
+  {
+    id: "ai_chat_new",
+    name: "AI質問チャット（新）",
+    description: "勉強でも、日常の疑問でも。なんでもAIに質問できます。",
+    url: "https://share.gemini.google/ibz2WXmUyA6J",
+  },
+  {
+    id: "math_description",
+    name: "数学記述添削システム",
+    description: "大学受験の数学記述答案をAIが添削します。",
+    url: "https://share.gemini.google/STCkRJvft5qO",
+  },
+  {
+    id: "math_variations",
+    name: "数学類題作成システム",
+    description: "大学受験の数学問題から類題をAIが作成します。",
+    url: "https://share.gemini.google/mwNjLZg0CNAH",
+  },
+  {
+    id: "english_summary",
+    name: "英文要約添削システム",
+    description: "大学受験の英文要約をAIが添削します。",
+    url: "https://share.gemini.google/VKE6pB5Cv8Rb",
+  },
 ] as const;
 
 export default function AiToolsPage() {
