@@ -45,6 +45,54 @@ const AI_TOOLS = [
     description: "大学受験の英文要約をAIが添削します。",
     url: "https://share.gemini.google/VKE6pB5Cv8Rb",
   },
+  {
+    id: "geography",
+    name: "地理添削システム",
+    description: "大学受験の地理答案をAIが添削します。",
+    url: "https://share.gemini.google/DXlzL5KXmlqh",
+  },
+  {
+    id: "world_history",
+    name: "世界史添削システム",
+    description: "大学受験の世界史答案をAIが添削します。",
+    url: "https://share.gemini.google/ru4PEKjluMly",
+  },
+  {
+    id: "japanese_history",
+    name: "日本史添削システム",
+    description: "大学受験の日本史答案をAIが添削します。",
+    url: "https://share.gemini.google/wBVkauKj6Kfq",
+  },
+  {
+    id: "biology",
+    name: "生物添削システム",
+    description: "大学受験の生物答案をAIが添削します。",
+    url: "https://share.gemini.google/DAAkqLzCH2tk",
+  },
+  {
+    id: "physics",
+    name: "物理添削システム",
+    description: "大学受験の物理答案をAIが添削します。",
+    url: "https://share.gemini.google/jHc8XLwzcHBG",
+  },
+  {
+    id: "chemistry",
+    name: "化学添削システム",
+    description: "大学受験の化学答案をAIが添削します。",
+    url: "https://share.gemini.google/xqOKP6EIXyIM",
+  },
+  {
+    id: "japanese_language",
+    name: "国語添削システム",
+    description: "大学受験の国語答案をAIが添削します。",
+    url: "https://share.gemini.google/pLgKq6VseXn7",
+  },
+  {
+    id: "essay",
+    name: "小論文添削システム",
+    description: "大学受験の小論文をAIが添削します。",
+    url: "https://share.gemini.google/xQ2zSnINqBHj",
+  },
 ] as const;
 
 export default function AiToolsPage() {
