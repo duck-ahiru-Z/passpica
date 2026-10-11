@@ -50,6 +50,17 @@ const CONTENTS: LearningContent[] = [
     type: 'ビジュアル図解',
     link: '/learn/math/unit-circle-complex'
   },
+  {
+    slug: 'derivative-graph',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分法（導関数とグラフ）',
+    title: '導関数とグラフ・接線の傾きビジュアル装置',
+    description: '点を動かしながら、関数の値・導関数・接線の傾きと増減の関係を同時に確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/math/derivative-graph'
+  },
 
   // 化学基礎・化学（新設含む）
   {
