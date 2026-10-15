@@ -1,0 +1,12 @@
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+
+export default function ConcentrationVisual() {
+  const [volume, setVolume] = useState(0.5);
+  const moles = 0.2;
+  const concentration = moles / volume;
+  const fill = Math.min(180, volume * 140);
+  return <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs"><Link href="/learn" className="text-blue-600 hover:underline">← 学習室ポータルへ戻る</Link><h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2">モル濃度・希釈ビジュアル装置</h1><p className="text-gray-500">溶質の物質量を一定にして体積を変え、モル濃度 c=n/V がどう変化するかを観察します。</p><section className="retro-box bg-white p-5 space-y-4"><div className="flex justify-center items-end h-52"><div className="relative w-32 h-48 border-4 border-slate-500 border-t-0 rounded-b-2xl overflow-hidden bg-slate-50"><div className="absolute bottom-0 w-full bg-blue-200" style={{ height: `${fill}px` }} /><div className="absolute inset-x-0 bottom-2 text-center font-bold text-blue-800">溶液</div></div></div><label className="block text-center font-bold">体積 V = {volume.toFixed(2)} L<input aria-label="溶液の体積" type="range" min="0.2" max="1.2" step="0.01" value={volume} onChange={e => setVolume(Number(e.target.value))} className="w-full mt-2" /></label><div className="grid sm:grid-cols-3 gap-2 text-center"><div className="border p-3 bg-amber-50"><div className="text-gray-500">物質量 n</div><strong>{moles.toFixed(2)} mol</strong></div><div className="border p-3 bg-blue-50"><div className="text-gray-500">体積 V</div><strong>{volume.toFixed(2)} L</strong></div><div className="border p-3 bg-emerald-50"><div className="text-gray-500">モル濃度 c=n/V</div><strong>{concentration.toFixed(3)} mol/L</strong></div></div><p className="text-center text-slate-600">水を加えて体積を増やすと、物質量は変わらずモル濃度だけが下がります。</p></section></main>;
+}

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -31,8 +32,12 @@ interface CircleProblem {
   x1: number; y1: number;
   x2: number; y2: number;
 }
+type StrategyMode = 'mix' | 'contact' | 'distance';
+const strategyPicker = new BalancedRandom<'contact' | 'distance'>(['contact', 'distance']);
 
 export default function CircleTangentDrillPage() {
+  const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
+  const [strategy, setStrategy] = useState<'contact' | 'distance'>('contact');
   const [problem, setProblem] = useState<CircleProblem | null>(null);
   
   // 入力状態
@@ -51,7 +56,8 @@ export default function CircleTangentDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateProblem = () => {
+  const generateProblem = (nextMode: StrategyMode = strategyMode) => {
+    setStrategy(nextMode === 'mix' ? strategyPicker.next() : nextMode);
     // 適当な格子点(x1, y1)
     const basePoints = [
       [3, 4], [4, 3], [-3, 4], [4, -3], [3, -4], [-4, 3],
@@ -265,6 +271,16 @@ export default function CircleTangentDrillPage() {
         </p>
       </div>
 
+      <section className="retro-box bg-gray-50 p-4 space-y-2">
+        <label className="font-bold block">■ 解法方針の練習モード</label>
+        <select aria-label="円の接線の解法モード" value={strategyMode} onChange={event => { const nextMode = event.target.value as StrategyMode; setStrategyMode(nextMode); generateProblem(nextMode); }} className="border p-2 bg-white">
+          <option value="mix">実戦練習：接線の解法を全方針ランダム</option>
+          <option value="contact">基礎練習：接点の座標を置く方法だけ</option>
+          <option value="distance">基礎練習：中心からの距離を使う方法だけ</option>
+        </select>
+        <p className="text-gray-600">今回の最初の方針：<span className="font-bold text-blue-700">{strategy === 'contact' ? '接点の座標を置く' : '中心から接線までの距離を使う'}</span></p>
+      </section>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* 左カラム：問題と解答入力 */}
@@ -313,7 +329,7 @@ export default function CircleTangentDrillPage() {
                 <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
                   {showExplanation ? '解説を隠す' : '正解と解説を見る'}
                 </button>
-                <button type="button" onClick={generateProblem} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
+                <button type="button" onClick={() => generateProblem()} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
                   ランダムに次の問題を生成 ➔
                 </button>
               </div>

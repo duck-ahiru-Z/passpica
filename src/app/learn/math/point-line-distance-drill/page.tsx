@@ -4,13 +4,25 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+function MathText({ text }: { text: string }) {
+  return (
+    <>
+      {text.split('$').map((part, index) =>
+        index % 2 === 1 ? <MathEq key={index} math={part} /> : <span key={index}>{part}</span>,
+      )}
+    </>
+  );
+}
+
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface ProblemData {
   pattern: Pattern;
@@ -32,7 +44,7 @@ const triples = [
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {
@@ -361,7 +373,7 @@ export default function PointLineDistanceDrill() {
             </div>
 
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[100px] gap-2 text-base font-bold text-slate-700 leading-relaxed">
-              <MathEq math={problem.questionText} />
+              <MathText text={problem.questionText} />
             </div>
             
             <div className="space-y-4">

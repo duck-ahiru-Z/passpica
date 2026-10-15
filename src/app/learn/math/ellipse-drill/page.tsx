@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -11,6 +12,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface ProblemData {
   pattern: Pattern;
@@ -45,13 +47,13 @@ const triples = [
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {
     if (p === 'pattern1') {
       const tr = triples[Math.floor(Math.random() * triples.length)];
-      let a = tr.a, b = tr.b, c = tr.c;
+      const a = tr.a; let b = tr.b, c = tr.c;
       // swap b and c randomly to get different shapes
       if (Math.random() > 0.5) { b = tr.c; c = tr.b; }
       
@@ -72,7 +74,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     } 
     else if (p === 'pattern2') {
       const tr = triples[Math.floor(Math.random() * triples.length)];
-      let a = tr.b, b = tr.a, c = tr.c;
+      let a = tr.b, c = tr.c;
+      const b = tr.a;
       if (Math.random() > 0.5) { a = tr.c; c = tr.b; }
       
       const a2 = a*a;
@@ -129,7 +132,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       const tr = triples[Math.floor(Math.random() * triples.length)];
-      let a = tr.a, b = tr.b, c = tr.c;
+      const a = tr.a; let b = tr.b, c = tr.c;
       if (Math.random() > 0.5) { b = tr.c; c = tr.b; }
       
       const a2 = a*a;
@@ -303,7 +306,7 @@ export default function EllipseDrill() {
           2次曲線の焦点と方程式（楕円）ドリル
         </h1>
         <p className="text-gray-500">
-          楕円の方程式と焦点座標、長軸・短軸の関係 $a^2 = b^2 + c^2$ などを視覚的に結びつけ、定義に基づく計算力を養います。
+          楕円の方程式と焦点座標、長軸・短軸の関係 <MathEq math="a^2=b^2+c^2" /> などを視覚的に結びつけ、定義に基づく計算力を養います。
         </p>
       </div>
 

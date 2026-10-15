@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -19,7 +20,10 @@ interface ProblemData {
   answer: number;
 }
 
-function generateProblem(): ProblemData {
+type DrillMode = 'mix' | ProblemData['type'];
+const mixedTypePicker = new BalancedRandom<ProblemData['type']>(['x2+y2', 'x3+y3', 'x2y+xy2']);
+
+function generateProblem(mode: DrillMode = 'mix'): ProblemData {
   let S = 1, P = 1;
   while (true) {
     S = Math.floor(Math.random() * 11) - 5; // -5 to 5
@@ -30,8 +34,7 @@ function generateProblem(): ProblemData {
     break;
   }
   
-  const types: Array<'x2+y2' | 'x3+y3' | 'x2y+xy2'> = ['x2+y2', 'x3+y3', 'x2y+xy2'];
-  const type = types[Math.floor(Math.random() * types.length)];
+  const type = mode === 'mix' ? mixedTypePicker.next() : mode;
   
   let answer = 0;
   if (type === 'x2+y2') {
@@ -46,6 +49,7 @@ function generateProblem(): ProblemData {
 }
 
 export default function SymmetricPolynomialDrillPage() {
+  const [mode, setMode] = useState<DrillMode>('mix');
   const [problem, setProblem] = useState<ProblemData | null>(null);
   const [ansStr, setAnsStr] = useState<string>('');
   
@@ -54,14 +58,19 @@ export default function SymmetricPolynomialDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
   useEffect(() => {
-    handleNext();
+    handleNext('mix');
   }, []);
 
-  const handleNext = () => {
-    setProblem(generateProblem());
+  const handleNext = (nextMode: DrillMode = mode) => {
+    setProblem(generateProblem(nextMode));
     setAnsStr('');
     setHasChecked(false);
     setIsCorrect(false);
+  };
+
+  const handleModeChange = (nextMode: DrillMode) => {
+    setMode(nextMode);
+    handleNext(nextMode);
   };
 
   const handleCheck = () => {
@@ -101,6 +110,20 @@ export default function SymmetricPolynomialDrillPage() {
         <p className="text-gray-500">
           基本対称式（和と積）を用いて、与えられた対称式の値をスピーディに計算する反復練習です。
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-bold text-slate-700">演習モード：</span>
+          <select
+            aria-label="対称式の演習モード"
+            value={mode}
+            onChange={e => handleModeChange(e.target.value as DrillMode)}
+            className="border border-slate-300 rounded px-2 py-1 bg-white"
+          >
+            <option value="mix">実戦練習：対称式 全パターンランダム</option>
+            <option value="x2+y2">基礎練習：x²＋y²だけ</option>
+            <option value="x3+y3">基礎練習：x³＋y³だけ</option>
+            <option value="x2y+xy2">基礎練習：x²y＋xy²だけ</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -140,7 +163,7 @@ export default function SymmetricPolynomialDrillPage() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔

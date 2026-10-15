@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -37,8 +38,12 @@ interface VectorProblem {
   xNum: number; xDen: number;
   yNum: number; yDen: number;
 }
+type StrategyMode = 'mix' | 'menelaus' | 'coefficient';
+const strategyPicker = new BalancedRandom<'menelaus' | 'coefficient'>(['menelaus', 'coefficient']);
 
 export default function VectorDrillPage() {
+  const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
+  const [strategy, setStrategy] = useState<'menelaus' | 'coefficient'>('menelaus');
   const [problem, setProblem] = useState<VectorProblem | null>(null);
   
   // 入力状態
@@ -55,7 +60,8 @@ export default function VectorDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateProblem = () => {
+  const generateProblem = (nextMode: StrategyMode = strategyMode) => {
+    setStrategy(nextMode === 'mix' ? strategyPicker.next() : nextMode);
     // 1〜5程度のシンプルな比を生成
     const [m, n] = generateCoprimePair(5);
     const [s, t] = generateCoprimePair(5);
@@ -201,6 +207,16 @@ export default function VectorDrillPage() {
         </p>
       </div>
 
+      <section className="retro-box bg-gray-50 p-4 space-y-2">
+        <label className="font-bold block">■ 交点の求め方・練習モード</label>
+        <select aria-label="ベクトルの解法モード" value={strategyMode} onChange={event => { const nextMode = event.target.value as StrategyMode; setStrategyMode(nextMode); generateProblem(nextMode); }} className="border p-2 bg-white">
+          <option value="mix">実戦練習：交点の解法を全方針ランダム</option>
+          <option value="menelaus">基礎練習：メネラウスの定理だけ</option>
+          <option value="coefficient">基礎練習：係数比較と連立方程式だけ</option>
+        </select>
+        <p className="text-gray-600">今回の最初の方針：<span className="font-bold text-blue-700">{strategy === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}</span></p>
+      </section>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         {/* 左カラム：問題と解答入力 */}
@@ -257,7 +273,7 @@ export default function VectorDrillPage() {
                 <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
                   {showExplanation ? '解説を隠す' : '正解と解説を見る'}
                 </button>
-                <button type="button" onClick={generateProblem} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
+                <button type="button" onClick={() => generateProblem()} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
                   ランダムに次の問題を生成 ➔
                 </button>
               </div>

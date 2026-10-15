@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "test:random": "node --experimental-strip-types scripts/verify-balanced-random.mjs",
+    "test:coverage": "node scripts/verify-learning-coverage.mjs"
   },
   "dependencies": {
     "@types/katex": "^0.16.8",

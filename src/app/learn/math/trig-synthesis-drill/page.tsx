@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -11,6 +12,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface Term {
   sign: 1 | -1;
@@ -28,6 +30,19 @@ interface ProblemData {
   ansCos?: string;  // e.g. "3/5"
   ansSin?: string;  // e.g. "4/5"
   qStr: string;
+}
+
+function fractionEquivalent(input: string, expected: string): boolean {
+  const parse = (value: string) => {
+    const normalized = value.trim().replace(/\s+/g, '');
+    const parts = normalized.split('/');
+    if (parts.length === 1) return Number(parts[0]);
+    if (parts.length !== 2 || Number(parts[1]) === 0) return Number.NaN;
+    return Number(parts[0]) / Number(parts[1]);
+  };
+  const actual = parse(input);
+  const target = parse(expected);
+  return Number.isFinite(actual) && Number.isFinite(target) && Math.abs(actual - target) < 1e-10;
 }
 
 function termStr(t: Term, isFirst: boolean): string {
@@ -50,7 +65,7 @@ function termStr(t: Term, isFirst: boolean): string {
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {
@@ -232,7 +247,7 @@ export default function TrigSynthesisDrill() {
 
       if (okAlp) {
         if (problem.pattern === 'pattern4') {
-          if (ansCos.trim() === problem.ansCos && ansSin.trim() === problem.ansSin) {
+          if (fractionEquivalent(ansCos, problem.ansCos ?? '') && fractionEquivalent(ansSin, problem.ansSin ?? '')) {
             isOk = true;
           }
         } else {

@@ -4,6 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
+
+const formulaTypes = ['1/6_line', '1/6_para', '1/12', '1/20', '1/30'] as const;
+const mixedFormulaPicker = new BalancedRandom<string>(formulaTypes);
 
 // --- 数学ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -135,8 +139,7 @@ export default function CalculusDrillPage() {
   const generateProblem = (mode: string) => {
     let type = mode;
     if (type === 'mix') {
-      const types = ['1/6_line', '1/6_para', '1/12', '1/20', '1/30'];
-      type = types[Math.floor(Math.random() * types.length)];
+      type = mixedFormulaPicker.next();
     }
 
     const aChoices = [-3, -2, -1, 1, 2, 3];

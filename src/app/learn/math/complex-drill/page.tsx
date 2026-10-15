@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -27,7 +28,24 @@ const PROBLEMS = [
   { zStr: '-\\frac{\\sqrt{3}}{2} + \\frac{1}{2}i', r: 1, rStr: '1', theta: 5 * Math.PI / 6, thetaStr: '\\frac{5\\pi}{6}', n: 12, zn: 1 },
 ];
 
+type DrillMode = 'mix' | 'sqrt2' | 'two' | 'unit';
+
+function problemMatchesMode(problem: typeof PROBLEMS[0], mode: DrillMode) {
+  if (mode === 'mix') return true;
+  if (mode === 'unit') return problem.r === 1;
+  if (mode === 'sqrt2') return problem.r === Math.sqrt(2);
+  return problem.r === 2;
+}
+
+const problemPickers: Record<DrillMode, BalancedRandom<typeof PROBLEMS[number]>> = {
+  mix: new BalancedRandom(PROBLEMS),
+  sqrt2: new BalancedRandom(PROBLEMS.filter(p => p.r === Math.sqrt(2))),
+  two: new BalancedRandom(PROBLEMS.filter(p => p.r === 2)),
+  unit: new BalancedRandom(PROBLEMS.filter(p => p.r === 1)),
+};
+
 export default function ComplexDrillPage() {
+  const [mode, setMode] = useState<DrillMode>('mix');
   const [problem, setProblem] = useState<typeof PROBLEMS[0] | null>(null);
   
   // 入力状態
@@ -42,8 +60,8 @@ export default function ComplexDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateProblem = () => {
-    const p = PROBLEMS[Math.floor(Math.random() * PROBLEMS.length)];
+  const generateProblem = (nextMode: DrillMode = mode) => {
+    const p = problemPickers[nextMode].next();
     setProblem(p);
     setInN('');
     setInZn('');
@@ -51,6 +69,11 @@ export default function ComplexDrillPage() {
     setIsCorrect(false);
     setShowExplanation(false);
     setShowGraph(true);
+  };
+
+  const handleModeChange = (nextMode: DrillMode) => {
+    setMode(nextMode);
+    generateProblem(nextMode);
   };
 
   useEffect(() => {
@@ -182,6 +205,20 @@ export default function ComplexDrillPage() {
         <p className="text-xs text-gray-500 mt-1">
           極形式とド・モアブルの定理を用いて、複素数の累乗が実数となる最小の自然数を求める演習を行います。
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-bold text-slate-700">演習モード：</span>
+          <select
+            aria-label="複素数の演習モード"
+            value={mode}
+            onChange={e => handleModeChange(e.target.value as DrillMode)}
+            className="border border-slate-300 rounded px-2 py-1 bg-white"
+          >
+            <option value="mix">実戦練習：複素数 全パターンランダム</option>
+            <option value="sqrt2">基礎練習：絶対値 √2 型だけ</option>
+            <option value="two">基礎練習：絶対値 2 型だけ</option>
+            <option value="unit">基礎練習：単位円型だけ</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -227,7 +264,7 @@ export default function ComplexDrillPage() {
                 <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
                   {showExplanation ? '解説を隠す' : '正解と解説を見る'}
                 </button>
-                <button type="button" onClick={generateProblem} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
+                <button type="button" onClick={() => generateProblem()} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
                   ランダムに次の問題を生成 ➔
                 </button>
               </div>

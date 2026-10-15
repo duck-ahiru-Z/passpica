@@ -62,6 +62,95 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/math/derivative-graph'
   },
 
+  {
+    slug: 'calculus3-limit-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '極限の直感',
+    title: '極限の直感：sin x / x ビジュアル装置',
+    description: 'xを0へ近づけたとき、sin x / x の値が1へ近づく様子をグラフとスライダーで観察します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-limit-visual'
+  },
+  {
+    slug: 'calculus3-derivative-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分法（接線・増減）',
+    title: '導関数と接線・増減ビジュアル装置',
+    description: '三次関数上の点を動かし、接線の傾き・導関数の符号・増減・極値候補の関係を同時に観察します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-derivative-visual'
+  },
+  {
+    slug: 'calculus3-integral-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '積分法（面積）',
+    title: '定積分と面積ビジュアル装置',
+    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-integral-visual'
+  },
+  {
+    slug: 'calculus3-curvature-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分法（凹凸・変曲点）',
+    title: '凹凸と変曲点ビジュアル装置',
+    description: '四次関数上の点を動かし、接線の傾き・二階導関数の符号・凹凸の切り替わりを観察します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-curvature-visual'
+  },
+  {
+    slug: 'calculus3-parametric-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '媒介変数表示',
+    title: '媒介変数表示された曲線ビジュアル装置',
+    description: '楕円上を動く点の座標と、dx/dt・dy/dtから求める接線の傾きをスライダーで観察します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-parametric-visual'
+  },
+  {
+    slug: 'projectile-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（水平投射）',
+    title: '水平投射と放物運動ビジュアル装置',
+    description: '時間スライダーで水平位置・高さ・鉛直速度を追跡し、水平運動と自由落下の分解を視覚的に理解します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/projectile-visual'
+  },
+  {
+    slug: 'motion-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（運動）',
+    title: '等加速度運動ビジュアル装置',
+    description: '時刻スライダーで位置・速度・加速度の変化を同時に観察し、運動方程式の関係を直感的に理解します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/motion-visual'
+  },
+  {
+    slug: 'concentration-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質量・溶液',
+    title: 'モル濃度・希釈ビジュアル装置',
+    description: '体積スライダーで物質量を一定にした希釈を再現し、モル濃度 c=n/V の変化を観察します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/concentration-visual'
+  },
+
   // 化学基礎・化学（新設含む）
   {
     slug: 'inorganic-colors',

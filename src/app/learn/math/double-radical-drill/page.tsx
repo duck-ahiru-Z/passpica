@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -20,6 +21,7 @@ function getSquareFactors(n: number): number[] {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface ProblemData {
   pattern: Pattern;
@@ -36,7 +38,7 @@ interface ProblemData {
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {

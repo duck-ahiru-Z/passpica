@@ -13,7 +13,7 @@ export default function PseudoLangPage() {
   
   const [isDebugging, setIsDebugging] = useState(false);
   const [currentLine, setCurrentLine] = useState<number | null>(null);
-  const [variables, setVariables] = useState<Record<string, any>>({});
+  const [variables, setVariables] = useState<Record<string, unknown>>({});
   const [isOneBased, setIsOneBased] = useState<boolean>(typeof initialTmpl !== 'string' && initialTmpl.isOneBased ? true : false);
 
   
@@ -208,6 +208,8 @@ export default function PseudoLangPage() {
       jsCode += '}\n';
     }
 
+    // The generated function is intentionally dynamic because the editor executes user-selected pseudocode.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor as any;
     
     const makeGen = new GeneratorFunction(
@@ -268,6 +270,7 @@ export default function PseudoLangPage() {
         generatorRef.current = null;
         setCurrentLine(null);
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const val = res.value as any;
         setCurrentLine(val.line);
         setVariables(val.getVars());
@@ -449,7 +452,7 @@ export default function PseudoLangPage() {
                           ) : typeof val === 'boolean' ? (
                             <span className="text-teal-600">{val ? '真' : '偽'}</span>
                           ) : (
-                            <span className="text-emerald-600">"{val}"</span>
+                            <span className="text-emerald-600">&quot;{String(val)}&quot;</span>
                           )}
                         </td>
                       </tr>

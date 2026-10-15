@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -19,6 +20,9 @@ function getSquareFactors(n: number): number[] {
   return factors;
 }
 
+type DrillMode = 'mix' | '+' | '-';
+const mixedSignPicker = new BalancedRandom<'+' | '-'>(['+', '-']);
+
 interface ProblemData {
   a: number;
   b: number;
@@ -28,7 +32,7 @@ interface ProblemData {
   ansSign: '+' | '-';
 }
 
-function generateProblem(): ProblemData {
+function generateProblem(mode: DrillMode = 'mix'): ProblemData {
   while (true) {
     const a = Math.floor(Math.random() * 15) + 2; // 2 to 16
     const b = Math.floor(Math.random() * 15) + 1; // 1 to 15
@@ -41,7 +45,7 @@ function generateProblem(): ProblemData {
     const k = Math.floor(Math.random() * 3) + 1; // 1 to 3
     const C = k * diff;
     
-    const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
+    const sign: '+' | '-' = mode === 'mix' ? mixedSignPicker.next() : mode;
     const ansSign: '+' | '-' = sign === '+' ? '-' : '+';
     
     return { a, b, C, k, sign, ansSign };
@@ -49,6 +53,7 @@ function generateProblem(): ProblemData {
 }
 
 export default function RationalizationDrillPage() {
+  const [mode, setMode] = useState<DrillMode>('mix');
   const [problem, setProblem] = useState<ProblemData | null>(null);
   
   // ユーザー入力
@@ -65,17 +70,22 @@ export default function RationalizationDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
   useEffect(() => {
-    handleNext();
+    handleNext('mix');
   }, []);
 
-  const handleNext = () => {
-    setProblem(generateProblem());
+  const handleNext = (nextMode: DrillMode = mode) => {
+    setProblem(generateProblem(nextMode));
     setAnsA('');
     setAns_a('');
     setAnsB('');
     setAns_b('');
     setHasChecked(false);
     setIsCorrect(false);
+  };
+
+  const handleModeChange = (nextMode: DrillMode) => {
+    setMode(nextMode);
+    handleNext(nextMode);
   };
 
   const handleCheck = () => {
@@ -117,6 +127,19 @@ export default function RationalizationDrillPage() {
         <p className="text-gray-500">
           分母にルートの足し算・引き算が含まれる分数を、共役な無理数を掛けて有理化する反復練習です。
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-bold text-slate-700">演習モード：</span>
+          <select
+            aria-label="有理化の演習モード"
+            value={mode}
+            onChange={e => handleModeChange(e.target.value as DrillMode)}
+            className="border border-slate-300 rounded px-2 py-1 bg-white"
+          >
+            <option value="mix">実戦練習：足し算・引き算ランダム</option>
+            <option value="+">基礎練習：足し算型だけ</option>
+            <option value="-">基礎練習：引き算型だけ</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -160,7 +183,7 @@ export default function RationalizationDrillPage() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔

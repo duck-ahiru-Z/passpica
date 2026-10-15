@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -22,6 +23,7 @@ function gcd(x: number, y: number): number {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface ProblemData {
   pattern: Pattern;
@@ -37,7 +39,7 @@ interface ProblemData {
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {
@@ -138,7 +140,7 @@ export default function MenelausCevaDrill() {
     questionEl = (
       <>
         三角形ABCにおいて、辺BCを <MathEq math={`${problem.a}:${problem.b}`} /> に外分する点をD、<br/>
-        辺ACを <MathEq math={`${problem.c}:${problem.d}`} /> に内分する点をEとする。<br/>
+        <MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> となる辺AC上の点をEとする。<br/>
         直線DEと辺ABの交点をFとするとき、<MathEq math="AF:FB" /> を求めよ。
       </>
     );
@@ -146,8 +148,8 @@ export default function MenelausCevaDrill() {
   } else if (problem.pattern === 'pattern3') {
     questionEl = (
       <>
-        三角形ABCにおいて、辺ACを <MathEq math={`${problem.c}:${problem.d}`} /> に内分する点をE、<br/>
-        辺ABを <MathEq math={`${problem.e}:${problem.f}`} /> に内分する点をFとする。<br/>
+        三角形ABCにおいて、<MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> となる辺AC上の点E、<br/>
+        <MathEq math={`AF:FB = ${problem.e}:${problem.f}`} /> となる辺AB上の点Fをとる。<br/>
         直線FEと直線BCの交点をDとするとき、<MathEq math="BD:DC" /> を求めよ。
       </>
     );

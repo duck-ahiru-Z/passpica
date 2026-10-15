@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -19,7 +20,11 @@ interface SequenceProblem {
   C: number;
 }
 
+type DrillMode = 'mix' | 'positive' | 'negative';
+const signPicker = new BalancedRandom<'positive' | 'negative'>(['positive', 'negative']);
+
 export default function SequenceDrillPage() {
+  const [mode, setMode] = useState<DrillMode>('mix');
   const [problem, setProblem] = useState<SequenceProblem | null>(null);
   
   // 入力状態
@@ -35,10 +40,11 @@ export default function SequenceDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateProblem = () => {
+  const generateProblem = (nextMode: DrillMode = mode) => {
     const alpha = Math.floor(Math.random() * 11) - 5; // -5 to 5
     
-    const pChoices = [-3, -2, 2, 3, 4, 5];
+    const mixedSign = signPicker.next();
+    const pChoices = nextMode === 'positive' ? [2, 3, 4, 5] : nextMode === 'negative' ? [-3, -2] : mixedSign === 'positive' ? [2, 3, 4, 5] : [-3, -2];
     const p = pChoices[Math.floor(Math.random() * pChoices.length)];
     
     const q = alpha * (1 - p);
@@ -58,6 +64,11 @@ export default function SequenceDrillPage() {
     setIsCorrect(false);
     setShowExplanation(false);
     setShowGraph(true);
+  };
+
+  const handleModeChange = (nextMode: DrillMode) => {
+    setMode(nextMode);
+    generateProblem(nextMode);
   };
 
   useEffect(() => {
@@ -198,6 +209,19 @@ export default function SequenceDrillPage() {
         <p className="text-xs text-gray-500 mt-1">
           特性方程式を用いて漸化式を解き、一般項を求める計算演習と、その収束・発散をコブウェブプロットで視覚化します。
         </p>
+        <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-bold text-slate-700">演習モード：</span>
+          <select
+            aria-label="数列の演習モード"
+            value={mode}
+            onChange={e => handleModeChange(e.target.value as DrillMode)}
+            className="border border-slate-300 rounded px-2 py-1 bg-white"
+          >
+            <option value="mix">実戦練習：公比の符号 全パターンランダム</option>
+            <option value="positive">基礎練習：公比が正の型だけ</option>
+            <option value="negative">基礎練習：公比が負の型だけ</option>
+          </select>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -246,7 +270,7 @@ export default function SequenceDrillPage() {
                 <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
                   {showExplanation ? '解説を隠す' : '正解と解説を見る'}
                 </button>
-                <button type="button" onClick={generateProblem} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
+              <button type="button" onClick={() => generateProblem()} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
                   ランダムに次の問題を生成 ➔
                 </button>
               </div>

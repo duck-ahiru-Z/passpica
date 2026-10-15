@@ -18,15 +18,158 @@ interface LearningContent {
 const CONTENTS: LearningContent[] = [
 
   {
+    slug: 'mathbc-mixed-drill', subject: 'math', subjectJp: '数学B・C', field: '数学B・C総合（解法選択）',
+    title: '数学B・C 総合・解法選択ランダムドリル',
+    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式を、分野固定または全体ランダムで練習。',
+    difficulty: '標準', type: '無限計算ドリル', link: '/learn/math/mathbc-mixed-drill'
+  },
+
+  {
+    slug: 'matha-mixed-drill', subject: 'math', subjectJp: '数学A', field: '数学A総合（解法選択）',
+    title: '数学A 総合・解法選択ランダムドリル',
+    description: '場合の数・確率・整数・図形の性質を、分野固定または数学A全体ランダムで練習。',
+    difficulty: '標準', type: '無限計算ドリル', link: '/learn/math/matha-mixed-drill'
+  },
+
+  {
+    slug: 'math2-mixed-drill', subject: 'math', subjectJp: '数学II', field: '数学II総合（解法選択）',
+    title: '数学II 総合・解法選択ランダムドリル',
+    description: '微分積分・三角関数・指数対数・図形と方程式を、単元固定または全体ランダムで練習。',
+    difficulty: '標準', type: '無限計算ドリル', link: '/learn/math/math2-mixed-drill'
+  },
+
+  {
+    slug: 'calculus3-integral-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '積分法（解法選択）',
+    title: '数学III 積分法・解法選択ドリル',
+    description: '置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-integral-drill'
+  },
+  {
+    slug: 'calculus3-differentiation-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分法（解法選択）',
+    title: '数学III 微分法・解法選択ドリル',
+    description: '合成関数・積・対数・媒介変数・陰関数の微分を、個別練習と全パターンランダムで反復します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-differentiation-drill'
+  },
+  {
+    slug: 'calculus3-limit-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '極限（解法選択）',
+    title: '数学III 極限・解法選択ドリル',
+    description: '因数分解・有理化・最高次比較・はさみうち・数列の極限を、個別練習と全パターンランダムで反復します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-limit-drill'
+  },
+  {
+    slug: 'calculus3-area-volume-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '積分法（面積・体積）',
+    title: '数学III 面積・体積・曲線の長さドリル',
+    description: '2曲線間の面積、x軸・y軸回転体、曲線の長さを個別練習と全パターンランダムで反復します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-area-volume-drill'
+  },
+  {
+    slug: 'calculus3-mixed-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '数学III総合（解法選択）',
+    title: '数学III 総合・解法選択ランダムドリル',
+    description: '極限・微分法・積分法・面積体積・微分方程式から、問題の形に合う最初の解法を判断する上位混合演習です。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-mixed-drill'
+  },
+  {
+    slug: 'calculus3-differential-equation-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分方程式（初歩）',
+    title: '数学III 微分方程式・初歩計算ドリル',
+    description: '変数分離・初期条件・指数成長・速度から位置を、個別練習と全パターンランダムで反復します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-differential-equation-drill'
+  },
+  {
+    slug: 'calculus3-curve-analysis-drill',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分法（曲線分析）',
+    title: '数学III 曲線分析・解法選択ドリル',
+    description: '増減・極大極小・凹凸・接線・速度加速度・法線を個別練習し、実戦では全パターンを混ぜます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/calculus3-curve-analysis-drill'
+  },
+  {
+    slug: 'mole-calculation-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質量・反応計算',
+    title: '化学 物質量・反応計算ドリル',
+    description: '物質量・モル濃度・希釈・気体・反応量比・pH・収率を個別練習と全パターンランダムで反復します。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
+    slug: 'motion-calculation-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学・計算',
+    title: '物理 力学・計算ドリル',
+    description: '平均速度・加速度・自由落下・仕事・運動量・運動エネルギー・ばねを個別練習と全パターンランダムで反復します。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'calculation-drill',
+    subject: 'information',
+    subjectJp: '情報I',
+    field: '計算・処理',
+    title: '情報I 計算・処理ドリル',
+    description: '2進数・データ量・通信時間・論理演算・標本化・圧縮率・補数表現を個別練習と全パターンランダムで反復します。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/information/calculation-drill'
+  },
+
+  {
     slug: 'cross-multiply-drill',
     subject: 'math',
     subjectJp: '数学I',
     field: '数と式（因数分解）',
     title: 'たすき掛け因数分解ドリル',
-    description: '係数が入り組んだ2次式を「たすき掛け」を使ってスピーディに因数分解する反復練習です。',
+    description: '全てプラス・マイナス混入・2変数・共通因数の4パターンを個別練習し、実戦では混合します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/cross-multiply-drill'
+  },
+  {
+    slug: 'math1-mixed-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数学I総合（解法選択）',
+    title: '数学I 総合・解法選択ランダムドリル',
+    description: '数と式・二次関数・三角比・確率から、問題の形に合う最初の解法を判断する上位混合演習です。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/math/math1-mixed-drill'
   },
   {
     slug: 'symmetric-polynomial-drill',
@@ -45,7 +188,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '数と式（実数）',
     title: '二重根号の外し方ドリル',
-    description: 'ルートの中のルート（二重根号）を外す計算を、基本から応用までパターン別に反復練習します。',
+    description: '基本の和・差・係数付き・割る√2の4パターンを個別練習し、実戦では全形式を混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/double-radical-drill'
@@ -56,7 +199,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '数と式（方程式）',
     title: '絶対値を含む方程式ドリル',
-    description: '絶対値記号の意味を方程式とグラフの交点として視覚的に捉え、素早く解を導く反復練習です。',
+    description: '基本・係数あり・場合分けと無縁根・絶対値2つを個別練習し、実戦では4パターンを混ぜます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/absolute-value-eq-drill'
@@ -67,7 +210,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '数と式（実数）',
     title: '有理化の計算ドリル',
-    description: '分母にルートの足し算・引き算が含まれる分数を、共役な無理数を掛けて有理化する反復練習です。',
+    description: '足し算型・引き算型を個別練習し、実戦では両方をランダムに混ぜて有理化の判断を反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/rationalization-drill'
@@ -100,7 +243,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学C',
     field: '複素数平面',
     title: '複素数平面・ド・モアブルの定理ドリル',
-    description: '極形式とド・モアブルの定理を用いて、複素数の累乗が実数となる最小の自然数を求める演習。',
+    description: '絶対値√2型・絶対値2型・単位円型を個別練習し、実戦では全形式をランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/complex-drill'
@@ -111,7 +254,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学B',
     field: '数列',
     title: '数列・隣接2項間の漸化式ドリル',
-    description: '特性方程式を用いて一般項を求める反復演習と、コブウェブプロットによる収束・発散の視覚化ツール。',
+    description: '公比が正・負の型を個別練習し、実戦では符号をランダムに混ぜて一般項を求めます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/sequence-drill'
@@ -145,7 +288,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '2次関数',
     title: '2次不等式の解ドリル',
-    description: '放物線とx軸の位置関係をイメージして、2次不等式を素早く正確に解く反復練習です。D=0の特殊解も網羅。',
+    description: '基本・マイナス係数・分数解・D=0を個別練習し、実戦では4パターンをランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/quadratic-inequality-drill'
@@ -178,7 +321,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '図形と計量（三角比）',
     title: '三角比の相互関係ドリル',
-    description: '単位円上の直角三角形をイメージして、三角比の相互関係を瞬時に導く反復練習です。',
+    description: '鋭角・鈍角・平方根を含む値・式の値を個別練習し、実戦では4パターンを混ぜます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/trig-identity-drill'
@@ -233,7 +376,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学A',
     field: '場合の数',
     title: 'P と C の単純計算',
-    description: '順列・組合せ・円順列などの値をスピーディに求める演習',
+    description: '順列・組合せ・対称性を使う組合せ・円順列を個別練習し、実戦では4パターンを混ぜます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/permutation-combination-drill'
@@ -244,7 +387,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学A',
     field: '確率',
     title: '反復試行の確率',
-    description: '公式や余事象を用いた確率計算の演習',
+    description: 'コイン・サイコロ・余事象・条件付きの4パターンを個別練習し、実戦では混合します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/binomial-probability-drill'
@@ -273,7 +416,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: 'n進法の変換',
-    description: '10進数との相互変換、小数の変換など、位取り記数法の仕組みを理解するドリル。',
+    description: '10進→n進、n進→10進、n進→m進、小数変換を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/base-n-conversion-drill',
     subject: 'math',
     subjectJp: '数学A',
@@ -328,7 +471,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '対数の底の変換公式と性質',
-    description: '底の変換公式や逆数の性質などを利用して対数計算を素早く行う演習。',
+    description: '底の累乗・対数の積・逆数関係・対数を指数に含む型を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/logarithm-drill',
     subject: 'math',
     subjectJp: '数学Ⅱ',
@@ -339,7 +482,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '等差・等比数列の和',
-    description: '数列の和の公式を正確に適用し、符号や分数の処理をミスなく行う反復演習。',
+    description: '等差の基本・末項指定・正の公比・負/分数公比を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/sequence-sum-drill',
     subject: 'math',
     subjectJp: '数学B',
@@ -350,7 +493,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: 'Σ（シグマ）の計算',
-    description: 'Σ記号の扱いに慣れ、公式の展開から具体的な数値の計算までをスムーズに行う演習。',
+    description: '1次式・2次式・望遠鏡和・等比数列のΣを個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/sigma-calculation-drill',
     subject: 'math',
     subjectJp: '数学B',
@@ -361,7 +504,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: 'ベクトルの内積・なす角',
-    description: '成分表示されたベクトルの内積計算、なす角、垂直条件、大きさの平方などの基本操作演習。',
+    description: '内積・なす角・垂直条件・大きさの平方を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/vector-dot-product-drill',
     subject: 'math',
     subjectJp: '数学C',
@@ -372,7 +515,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '複素数の極形式変換',
-    description: '複素数平面上での位置の把握、極形式への変換、積・商の計算を直感的にマスターする演習。',
+    description: '複素数の位置・極形式・積と商などを個別練習し、実戦では4パターンをランダムに混ぜます。',
     link: '/learn/math/complex-polar-drill',
     subject: 'math',
     subjectJp: '数学C',
@@ -383,7 +526,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '2次曲線の焦点と方程式（楕円）',
-    description: '楕円の標準形・一般形から焦点や中心を正確に求める演習。',
+    description: '横長・縦長の焦点、平方完成による中心、定義からの逆算を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/ellipse-drill',
     subject: 'math',
     subjectJp: '数学C',
@@ -394,7 +537,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '2次曲線の焦点と方程式（双曲線・放物線）',
-    description: '双曲線の漸近線と焦点、放物線の準線と焦点など、それぞれの曲線の特徴的な要素を計算する演習。',
+    description: '横開き・縦開き双曲線、放物線の基本形・平行移動を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/hyperbola-parabola-drill',
     subject: 'math',
     subjectJp: '数学C',
@@ -405,7 +548,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: 'データの分析（1変量）',
-    description: '平均・分散などの代表値の計算、分散の別公式の活用、変量の変換則を練習する演習。',
+    description: '代表値・分散の定義・分散の別公式・データ変換を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/data-analysis-1d-drill',
     subject: 'math',
     subjectJp: '数学Ⅰ',
@@ -416,7 +559,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: 'データの分析（2変量）',
-    description: '共分散と相関係数の計算、散布図からの相関係数の推定、クロス集計表の読み取り演習。',
+    description: '共分散・相関係数・散布図推定・クロス集計表を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/data-analysis-2d-drill',
     subject: 'math',
     subjectJp: '数学Ⅰ',
@@ -449,6 +592,12 @@ export default function DrillPortalPage() {
           綺麗な数値になるよう逆算で自動生成された無限計算ドリルで、圧倒的な計算力と解法パターンを身につけます。
         </p>
       </div>
+
+      <section className="retro-box bg-blue-50 border-blue-200 p-4 space-y-2" aria-label="演習の使い分け">
+        <h2 className="font-bold text-slate-900">■ 基礎練習と実戦練習を使い分ける</h2>
+        <p className="text-slate-700 leading-relaxed">まずは各ドリルの「基礎練習」で苦手な解法・出題パターンだけを反復し、慣れたら「実戦練習：全パターンランダム」で問題の形から解法を選ぶ練習へ進みます。</p>
+        <div className="flex flex-wrap gap-2 text-[11px] font-bold"><span className="px-2 py-1 bg-white border border-blue-300 text-blue-800">基礎練習：1パターン固定</span><span className="px-2 py-1 bg-white border border-emerald-300 text-emerald-800">実戦練習：全パターン混合</span><span className="px-2 py-1 bg-white border border-amber-300 text-amber-800">数学III：単元別＋総合ランダム</span></div>
+      </section>
 
       {/* 検索・フィルターエリア */}
       <div className="border border-gray-300 bg-gray-50 p-4 flex flex-col md:flex-row gap-6 text-xs">

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -11,6 +12,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface DBEntry {
   x: number[];
@@ -59,7 +61,7 @@ interface ProblemData {
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {
@@ -228,12 +230,9 @@ export default function DataAnalysis2DDrill() {
   const handleCheck = () => {
     if (!problem) return;
     let isOk = false;
-    
-    if (problem.pattern === 'pattern3') {
-      if (parseFloat(ans1.trim() || 'NaN') === parseFloat(problem.ans1!)) isOk = true;
-    } else {
-      if (ans1.trim() === problem.ans1) isOk = true;
-    }
+    const actual = Number(ans1.trim().replaceAll(',', ''));
+    const expected = Number(problem.ans1);
+    if (Number.isFinite(actual) && Number.isFinite(expected) && Math.abs(actual - expected) < 1e-9) isOk = true;
     
     setIsCorrect(isOk);
     setHasChecked(true);

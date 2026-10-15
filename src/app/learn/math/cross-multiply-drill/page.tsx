@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
+import { BalancedRandom } from '@/src/lib/balancedRandom';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -27,6 +28,7 @@ function gcd3(x: number, y: number, z: number): number {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface ProblemData {
   pattern: Pattern;
@@ -44,7 +46,7 @@ interface ProblemData {
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   const p_type = selectedPattern === 'mix' 
-    ? ['pattern1', 'pattern2', 'pattern3', 'pattern4'][Math.floor(Math.random() * 4)] as Pattern
+    ? mixedPatternPicker.next()
     : selectedPattern;
 
   while (true) {
@@ -149,15 +151,18 @@ export default function CrossMultiplyDrillPage() {
       return;
     }
     
-    // 代数的に一致するか確認
-    const matchA = uk * up * ur === problem.A;
-    const matchB = uk * (up * us + uq * ur) === problem.B;
-    const matchC = uk * uq * us === problem.C;
+    // (px+q)(rx+s) is unchanged when the two factors are exchanged.
+    // Accept both input orders so an equivalent factorization is not marked wrong.
+    const matchesOrder = (p: number, q: number, r: number, s: number) =>
+      uk * p * r === problem.A &&
+      uk * (p * s + q * r) === problem.B &&
+      uk * q * s === problem.C;
+    const matchesFactors = matchesOrder(up, uq, ur, us) || matchesOrder(ur, us, up, uq);
     
     // 完全に括り出されているか（カッコ内に共通因数がないか）確認
     const fullyFactored = gcd(up, uq) === 1 && gcd(ur, us) === 1;
     
-    if (matchA && matchB && matchC && fullyFactored) {
+    if (matchesFactors && fullyFactored) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
