@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -157,7 +157,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function QuadraticInequalityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData | null>(() => generateProblem('mix'));
   
   const [userAnsType, setUserAnsType] = useState<AnsType>(1);
   const [ans1Num, setAns1Num] = useState<string>('');
@@ -171,11 +171,7 @@ export default function QuadraticInequalityDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -241,24 +237,31 @@ export default function QuadraticInequalityDrillPage() {
     }
 
     if (hasChecked) {
-      // Fill Region
+      // Fill each continuous solution interval along the parabola and x-axis.
       ctx.fillStyle = problem.ineqSign === '<' || problem.ineqSign === '\\le' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-      ctx.beginPath();
+      const satisfiesInequality = (y: number) =>
+        problem.ineqSign === '<' || problem.ineqSign === '\\le' ? y <= 0 : y >= 0;
+      let region: Array<{ x: number; y: number }> = [];
+      const fillRegion = () => {
+        if (region.length === 0) return;
+        const first = region[0];
+        const last = region[region.length - 1];
+        ctx.beginPath();
+        ctx.moveTo(mapX(first.x), mapY(0));
+        region.forEach(point => ctx.lineTo(mapX(point.x), mapY(point.y)));
+        ctx.lineTo(mapX(last.x), mapY(0));
+        ctx.closePath();
+        ctx.fill();
+        region = [];
+      };
+
       for (let i = 0; i <= 200; i++) {
         const x = minX + (rangeX * i) / 200;
         const y = func(x);
-        let condition = false;
-        if (problem.ineqSign === '<' || problem.ineqSign === '\\le') condition = y <= 0;
-        else condition = y >= 0;
-        
-        if (condition) {
-          if (i === 0 || !((problem.ineqSign === '<' || problem.ineqSign === '\\le') ? func(minX + (rangeX * (i-1))/200) <= 0 : func(minX + (rangeX * (i-1))/200) >= 0)) {
-            ctx.moveTo(mapX(x), mapY(y));
-          }
-          ctx.lineTo(mapX(x), mapY(0));
-        }
+        if (satisfiesInequality(y)) region.push({ x, y });
+        else fillRegion();
       }
-      ctx.fill();
+      fillRegion();
 
       // Draw Roots Dots
       ctx.fillStyle = '#000';
@@ -297,14 +300,14 @@ export default function QuadraticInequalityDrillPage() {
     }
     ctx.stroke();
 
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setUserAnsType(1);
     setAns1Num(''); setAns1Den('');
     setAns2Num(''); setAns2Den('');
@@ -388,7 +391,11 @@ export default function QuadraticInequalityDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const pattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(pattern);
+                  handleNext(pattern);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -464,7 +471,7 @@ export default function QuadraticInequalityDrillPage() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔
