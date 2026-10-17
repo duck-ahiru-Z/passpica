@@ -13,6 +13,10 @@ for (const question of calculus3Questions) {
 }
 const separation = calculus3Questions.find(question => question.area === 'differential-equation' && question.prompt.includes('一般解'));
 if (!separation?.explanation.includes('y=0 も解')) throw new Error('the zero solution must be covered when separating variables');
+const parametric = calculus3Questions.find(question => question.area === 'differentiation' && question.prompt.includes('x = t²'));
+if (!parametric?.prompt.includes('t ≠ 0') || !parametric.explanation.includes('t≠0なので')) throw new Error('the parametric derivative question must exclude the zero denominator case');
+const shell = calculus3Questions.find(question => question.area === 'geometry' && question.answer.includes('円筒殻法'));
+if (!shell?.prompt.includes('xで積分') || !shell.explanation.includes('∫ₐᵇ 2πx f(x) dx')) throw new Error('the shell-method question must specify integration direction and formula');
 
 const picker = createCalculus3MixedQuestionPicker();
 for (let batch = 0; batch < 60; batch += 1) {
