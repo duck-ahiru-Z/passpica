@@ -25,6 +25,7 @@
     "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
     "test:factorization": "node --experimental-strip-types scripts/verify-factorization-questions.mjs",
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",
+    "test:complex-polar-exact": "node --experimental-strip-types scripts/verify-complex-polar-exact.mjs",
     "test:quadratic-inequality": "node --experimental-strip-types scripts/verify-quadratic-inequality.mjs",
     "test:matha-mixed": "node --experimental-strip-types scripts/verify-matha-mixed-questions.mjs",
     "test:physics-motion": "node --experimental-strip-types scripts/verify-physics-motion-calculation.mjs",

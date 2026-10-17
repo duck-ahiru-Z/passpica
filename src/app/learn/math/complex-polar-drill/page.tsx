@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { formatExactTrigComponent } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -58,22 +59,6 @@ function parseAngleStr(thVal: number): string {
   if (Math.abs(thVal - 11*pi/6) < eps) return "11pi/6";
   if (Math.abs(thVal - 2*pi) < eps) return "2pi";
   return "0";
-}
-
-function formatComplex(x: number, yStr: string): string {
-  let res = "";
-  if (x !== 0) res += x;
-  if (yStr === "0") return res === "" ? "0" : res;
-  
-  if (yStr.startsWith("-")) {
-    if (yStr === "-1") res += "-i";
-    else res += yStr + "i";
-  } else {
-    if (x !== 0) res += "+";
-    if (yStr === "1") res += "i";
-    else res += yStr + "i";
-  }
-  return res;
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
@@ -273,8 +258,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (ansB === "-1\\sqrt{2}") ansB = "-\\sqrt{2}";
       
       // if fractional like 1.5, write as 3/2 etc
-      if (ansA.includes(".")) ansA = `${rRes}/2`; // if rRes is odd
-      if (ansB.includes(".")) ansB = `${rRes}/2`;
+      if (ansA.includes(".") && !ansA.includes("\\sqrt")) ansA = `${rRes}/2`;
+      if (ansB.includes(".") && !ansB.includes("\\sqrt")) ansB = `${rRes}/2`;
+      ansA = formatExactTrigComponent(rRes, cosVal);
+      ansB = formatExactTrigComponent(rRes, sinVal);
       
       let finalThDisplay = thStr.replace("pi", "\\pi");
       if (finalThDisplay.startsWith("1\\pi")) finalThDisplay = finalThDisplay.replace("1\\pi", "\\pi");
@@ -288,8 +275,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         `\\text{極形式の${isProduct ? '積' : '商'}の性質を利用します。}`,
         `${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'} = ${isProduct ? `${r1} \\times ${r2}` : `\\frac{${r1}}{${r2}}`}\\left\\{ \\cos\\left(${a1.s} ${isProduct ? '+' : '-'} ${a2.s}\\right) + i\\sin\\left(${a1.s} ${isProduct ? '+' : '-'} ${a2.s}\\right) \\right\\}`,
         `= ${rRes}\\left(\\cos ${finalThDisplay} + i\\sin ${finalThDisplay}\\right)`,
-        `= ${rRes}\\left( ${ansA === '0' ? '0' : ansA} + ${ansB === '0' ? '0' : ansB}i \\right)`,
-        `= ${ansA === '0' ? '' : ansA} ${ansB === '0' ? '' : (ansB.startsWith('-') ? ansB : (ansA === '0' ? ansB : '+'+ansB)) + 'i'}`
+        `= ${ansA === '0' ? '0' : ansA} ${ansB === '0' ? '' : (ansB.startsWith('-') ? ansB : (ansA === '0' ? ansB : '+' + ansB)) + 'i'}`
       ];
       
       return { 
