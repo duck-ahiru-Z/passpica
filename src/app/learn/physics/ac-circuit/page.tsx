@@ -39,16 +39,14 @@ export default function ACCircuitPage() {
     const iPoints: string[] = [];
     
     const w = 400; // グラフ横幅
-    const h = 160; // グラフ縦幅
     const cy = 80;  // 基準線 Y
     
     // 表示範囲は 2周期分とする
     const tMax = 2 / f; // 2周期 (秒)
     
     // 描画倍率
-    const scaleT = (w - 40) / tMax;
     const scaleV = 55 / v0; // 電圧最大振幅が55pxになるよう調整
-    const scaleI = 55 / (v0 / r); // 電流も抵抗のみの時と同じスケール感になるよう調整 (I0_max = V0/R)
+    const scaleI = 55 / (v0 / r); // 抵抗のみのときの電流振幅 V0/R を55pxとして比較
 
     for (let px = 20; px <= w - 20; px++) {
       // 画面座標 px から 時間 t (s) を逆算
@@ -60,7 +58,7 @@ export default function ACCircuitPage() {
       const it = i0 * Math.sin(omega * t - phi);
 
       const pyV = cy - vt * scaleV;
-      const pyI = cy - it * scaleI * r * 0.8; // 視覚的に重ねやすくなるよう調整
+      const pyI = cy - it * scaleI;
 
       if (px === 20) {
         vPoints.push(`M ${px} ${pyV.toFixed(1)}`);
@@ -137,7 +135,7 @@ export default function ACCircuitPage() {
               <span className="font-bold text-slate-700">■ 電圧 v(t) と電流 i(t) の瞬時値波形（2周期分）</span>
               <div className="flex gap-4 text-[10px]">
                 <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-600 inline-block"></span> 電圧 v(t)</span>
-                <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-blue-600 inline-block"></span> 電流 i(t) (x80倍拡大表示)</span>
+                <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-blue-600 inline-block"></span> 電流 i(t) (V₀/Rを基準に表示)</span>
               </div>
             </div>
 
@@ -147,7 +145,7 @@ export default function ACCircuitPage() {
                 <line x1="15" y1="80" x2="385" y2="80" stroke="#94a3b8" strokeWidth="1" />
                 <line x1="20" y1="10" x2="20" y2="150" stroke="#94a3b8" strokeWidth="1" />
                 <text x="370" y="93" fill="#64748b" fontSize="8" fontWeight="bold">時間 t ➔</text>
-                <text x="25" y="15" fill="#64748b" fontSize="8" fontWeight="bold">振幅 ➔</text>
+                <text x="25" y="15" fill="#64748b" fontSize="8" fontWeight="bold">振幅（各波形を基準値で規格化）</text>
 
                 {/* 補助縦線（周期区切り） */}
                 <line x1="200" y1="15" x2="200" y2="145" stroke="#f1f5f9" strokeWidth="1" />
@@ -362,13 +360,13 @@ export default function ACCircuitPage() {
             <div className="border-t border-gray-200 pt-3 text-center">
               <button
                 onClick={() => {
-                  setF(50);
-                  setL(0.5);
-                  setC(20);
+                  setF(25);
+                  setL(0.45);
+                  setC(90);
                 }}
                 className="retro-btn-classic bg-emerald-50 border-emerald-400 text-emerald-800 font-bold hover:bg-emerald-100 py-1.5 px-3 text-[10px]"
               >
-                共振状態に設定 (50Hz, 0.5H, 20μF)
+                共振状態に設定 (25Hz, 0.45H, 90μF)
               </button>
             </div>
 
