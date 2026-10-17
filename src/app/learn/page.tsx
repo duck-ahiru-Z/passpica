@@ -13,6 +13,7 @@ interface LearningContent {
   difficulty: '基礎' | '標準' | '応用';
   type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル';
   link: string;
+  practiceLink?: string;
 }
 
 const CONTENTS: LearningContent[] = [
@@ -48,7 +49,8 @@ const CONTENTS: LearningContent[] = [
     description: '単位円上の複素数 z1, z2 を回してその積 z1*z2 をプロットし、複素数の掛け算が「回転と伸縮」を表す幾何学的イメージを定着させます。',
     difficulty: '応用',
     type: 'ビジュアル図解',
-    link: '/learn/math/unit-circle-complex'
+    link: '/learn/math/unit-circle-complex',
+    practiceLink: '/learn/math/complex-polar-drill'
   },
   {
     slug: 'derivative-graph',
@@ -59,7 +61,8 @@ const CONTENTS: LearningContent[] = [
     description: '点を動かしながら、関数の値・導関数・接線の傾きと増減の関係を同時に確認します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/math/derivative-graph'
+    link: '/learn/math/derivative-graph',
+    practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
 
   {
@@ -71,7 +74,8 @@ const CONTENTS: LearningContent[] = [
     description: 'xを0へ近づけたとき、sin x / x の値が1へ近づく様子をグラフとスライダーで観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-limit-visual'
+    link: '/learn/math/calculus3-limit-visual',
+    practiceLink: '/learn/math/calculus3-limit-drill'
   },
   {
     slug: 'calculus3-derivative-visual',
@@ -82,7 +86,8 @@ const CONTENTS: LearningContent[] = [
     description: '三次関数上の点を動かし、接線の傾き・導関数の符号・増減・極値候補の関係を同時に観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-derivative-visual'
+    link: '/learn/math/calculus3-derivative-visual',
+    practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
   {
     slug: 'calculus3-integral-visual',
@@ -93,7 +98,8 @@ const CONTENTS: LearningContent[] = [
     description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-integral-visual'
+    link: '/learn/math/calculus3-integral-visual',
+    practiceLink: '/learn/math/calculus3-integral-drill'
   },
   {
     slug: 'calculus3-curvature-visual',
@@ -104,7 +110,8 @@ const CONTENTS: LearningContent[] = [
     description: '四次関数上の移動点と接線を見ながら、極大・極小の位置、f′′の符号、変曲点での凹凸の切り替わりを確認します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-curvature-visual'
+    link: '/learn/math/calculus3-curvature-visual',
+    practiceLink: '/learn/math/calculus3-curve-analysis-drill'
   },
   {
     slug: 'calculus3-parametric-visual',
@@ -115,7 +122,8 @@ const CONTENTS: LearningContent[] = [
     description: '楕円上を動く点の座標と、dx/dt・dy/dtから求める接線の傾きをスライダーで観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-parametric-visual'
+    link: '/learn/math/calculus3-parametric-visual',
+    practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
   {
     slug: 'projectile-visual',
@@ -408,12 +416,10 @@ export default function LearnPortalPage() {
                   <div className="text-gray-500 text-[11px] leading-relaxed">{c.description}</div>
                 </td>
                 <td className="text-center">
-                  <Link 
-                    href={c.link}
-                    className="retro-btn-classic font-bold"
-                  >
-                    開く ➔
-                  </Link>
+                  <div className="flex flex-col items-center gap-1">
+                    <Link href={c.link} className="retro-btn-classic font-bold">開く ➔</Link>
+                    {c.practiceLink && <Link href={c.practiceLink} className="text-blue-700 underline underline-offset-2">関連演習</Link>}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -453,12 +459,10 @@ export default function LearnPortalPage() {
             </div>
 
             <div className="pt-2 border-t border-gray-100 flex justify-end">
-              <Link 
-                href={c.link}
-                className="retro-btn-classic font-bold text-xs px-4"
-              >
-                開く ➔
-              </Link>
+              <div className="flex items-center gap-3">
+                {c.practiceLink && <Link href={c.practiceLink} className="text-blue-700 underline underline-offset-2">関連演習</Link>}
+                <Link href={c.link} className="retro-btn-classic font-bold text-xs px-4">開く ➔</Link>
+              </div>
             </div>
           </div>
         ))}
