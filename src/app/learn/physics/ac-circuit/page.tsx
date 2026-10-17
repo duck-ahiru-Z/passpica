@@ -303,14 +303,14 @@ export default function ACCircuitPage() {
             <div className="space-y-1 border-t border-gray-200 pt-2.5">
               <div className="flex justify-between items-center text-slate-700 font-bold">
                 <span>L : 自己インダクタンス</span>
-                <span className="font-mono text-xs text-green-600">{l.toFixed(2)} H</span>
+                <span className="font-mono text-xs text-green-600">{l.toFixed(5)} H</span>
               </div>
               <input
                 type="range"
                 aria-label="自己インダクタンス L（ヘンリー）"
                 min="0.05"
                 max="2.0"
-                step="0.05"
+                step="0.00001"
                 value={l}
                 onChange={(e) => setL(parseFloat(e.target.value))}
                 className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
@@ -376,12 +376,12 @@ export default function ACCircuitPage() {
               <button
                 onClick={() => {
                   setF(25);
-                  setL(0.45);
+                  setL(0.45032);
                   setC(90);
                 }}
                 className="retro-btn-classic bg-emerald-50 border-emerald-400 text-emerald-800 font-bold hover:bg-emerald-100 py-1.5 px-3 text-[10px]"
               >
-                共振状態に設定 (25Hz, 0.45H, 90μF)
+                共振状態に設定 (25Hz, 0.45032H, 90μF)
               </button>
             </div>
 
