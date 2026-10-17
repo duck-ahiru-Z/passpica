@@ -20,6 +20,7 @@
     "test:calculus3-geometry": "node --experimental-strip-types scripts/verify-calculus3-geometry.mjs",
     "test:calculus3-volume-visual": "node --experimental-strip-types scripts/verify-calculus3-volume-visual.mjs",
     "test:calculus3-integral-visual": "node --experimental-strip-types scripts/verify-calculus3-integral-visual.mjs",
+    "test:calculus3-curvature-visual": "node --experimental-strip-types scripts/verify-calculus3-curvature-visual.mjs",
     "test:crystal-lattice-visual": "node scripts/verify-crystal-lattice-visual.mjs",
     "test:flame-reaction-visual": "node scripts/verify-flame-reaction-visual.mjs",
     "test:industrial-process-visual": "node scripts/verify-industrial-process-visual.mjs",
