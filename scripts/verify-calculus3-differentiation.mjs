@@ -12,6 +12,9 @@ if (!/const correct = strategy === problem\.pattern && isDifferentiationAnswerCo
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('differentiation feedback must announce the result and distinguish strategy from value errors');
 }
+if (!drillPage.includes('実戦練習：微分法 全パターンランダム') || !drillPage.includes('基礎練習：{differentiationLabels[p]}だけ')) {
+  throw new Error('the learner must be able to choose either mixed differentiation practice or one fixed pattern');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
@@ -75,4 +78,18 @@ for (let start = 0; start < mixed.length; start += differentiationPatterns.lengt
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed differentiation practice repeated adjacent patterns');
 
-console.log('Calculus III differentiation verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, answers, variants, balance, and adjacency checked.');
+for (let seed = 1; seed <= 20; seed += 1) {
+  let state = seed;
+  const seededRandom = () => {
+    state = (state * 48271) % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+  const sequence = Array.from({ length: 7_000 }, () => generateDifferentiationProblem('mix', seededRandom).pattern);
+  for (let start = 0; start < sequence.length; start += differentiationPatterns.length) {
+    const batch = sequence.slice(start, start + differentiationPatterns.length);
+    if (new Set(batch).size !== differentiationPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / differentiationPatterns.length}`);
+  }
+  if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
+}
+
+console.log('Calculus III differentiation verified: fixed-pattern options, formulas, answers, and variants; 140,000 seeded mixed questions plus 700 deterministic balance cases checked.');
