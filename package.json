@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:random": "node --experimental-strip-types scripts/verify-balanced-random.mjs",
+    "test:calculus3-curve": "node --experimental-strip-types scripts/verify-calculus3-curve-analysis.mjs",
     "test:math": "node --experimental-strip-types scripts/verify-discriminant-pattern.mjs",
     "test:coverage": "node scripts/verify-learning-coverage.mjs"
   },

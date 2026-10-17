@@ -59,13 +59,25 @@ function collectPages(directory) {
 }
 const pages = collectPages(learnRoot);
 const mathPages = pages.filter(file => file.includes(`${path.sep}math${path.sep}`));
+function includesBalancedRandom(source, file) {
+  if (source.includes('BalancedRandom')) return true;
+  const imports = [...source.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(match => match[1]);
+  return imports.some(specifier => {
+    if (!specifier.startsWith('@/') && !specifier.startsWith('.')) return false;
+    const base = specifier.startsWith('@/') ? path.join(root, specifier.slice(2)) : path.resolve(path.dirname(file), specifier);
+    return ['.ts', '.tsx', '.js', '.jsx'].some(extension => {
+      const dependency = `${base}${extension}`;
+      return fs.existsSync(dependency) && fs.readFileSync(dependency, 'utf8').includes('BalancedRandom');
+    });
+  });
+}
 const patternPages = pages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
   return /type\s+Pattern\s*=/.test(source);
 });
 const incompletePatternPages = patternPages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
-  return !source.includes('BalancedRandom')
+  return !includesBalancedRandom(source, file)
     || !/<select\b/.test(source)
     || !/value=['"]mix['"]/.test(source)
     || !/全パターンランダム|全パターンをランダム|ミックスモード/.test(source);
