@@ -5,8 +5,8 @@ import Link from 'next/link';
 
 const W = 640;
 const H = 360;
-const X_MIN = -3.5;
-const X_MAX = 3.5;
+const X_MIN = -2.4;
+const X_MAX = 2.4;
 const Y_MIN = -8;
 const Y_MAX = 8;
 
@@ -45,7 +45,7 @@ export default function DerivativeGraphPage() {
         <div className="overflow-x-auto bg-white border border-slate-300">
           <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="関数と導関数のグラフ" className="w-full min-w-[600px] h-auto">
             <rect width={W} height={H} fill="#fff" />
-            {[-3,-2,-1,0,1,2,3].map(v => <line key={`x${v}`} x1={sx(v)} y1={0} x2={sx(v)} y2={H} stroke="#e2e8f0" />)}
+            {[-2,-1,0,1,2].map(v => <line key={`x${v}`} x1={sx(v)} y1={0} x2={sx(v)} y2={H} stroke="#e2e8f0" />)}
             {[-6,-3,0,3,6].map(v => <line key={`y${v}`} x1={0} y1={sy(v)} x2={W} y2={sy(v)} stroke="#e2e8f0" />)}
             <line x1={0} y1={sy(0)} x2={W} y2={sy(0)} stroke="#64748b" />
             <line x1={sx(0)} y1={0} x2={sx(0)} y2={H} stroke="#64748b" />
