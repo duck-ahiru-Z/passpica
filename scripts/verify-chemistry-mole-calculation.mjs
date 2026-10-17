@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { formatMoleAnswer, generateMoleProblem, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
+import { formatMoleAnswer, generateMoleProblem, isMoleAnswerCorrect, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/mole-calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="mole-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
@@ -51,6 +51,14 @@ for (const pattern of molePatterns) {
 }
 
 if (formatMoleAnswer(0.30000000000000004) !== '0.3') throw new Error('answer feedback should show a readable rounded value');
+if (!isMoleAnswerCorrect('0.666667', 2 / 3)) throw new Error('answers rounded to the displayed six-decimal precision should be accepted');
+if (isMoleAnswerCorrect('0.666', 2 / 3)) throw new Error('answers rounded too coarsely should not be accepted');
+if (isMoleAnswerCorrect('', 1) || isMoleAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
+
+const learningPortal = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/page.tsx'), 'utf8');
+if (!/slug: 'concentration-visual'[\s\S]*?practiceLink: '\/learn\/chemistry\/mole-calculation-drill'/.test(learningPortal)) {
+  throw new Error('molar concentration visual should link to its related calculation drill');
+}
 
 const mixed = Array.from({ length: 700 }, () => generateMoleProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += molePatterns.length) {

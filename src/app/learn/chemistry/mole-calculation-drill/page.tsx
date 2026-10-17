@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
-import { formatMoleAnswer, generateMoleProblem, moleLabels, molePatterns, type MoleMode, type MolePattern } from '@/src/lib/chemistryMoleCalculation';
+import { formatMoleAnswer, generateMoleProblem, isMoleAnswerCorrect, moleLabels, molePatterns, type MoleMode, type MolePattern } from '@/src/lib/chemistryMoleCalculation';
 
 type Pattern = MolePattern;
 
@@ -15,8 +15,7 @@ export default function MoleCalculationDrillPage() {
   const [checked, setChecked] = useState(false);
   const next = (selectedMode = mode) => { setProblem(generateMoleProblem(selectedMode)); setMethod(''); setAnswer(''); setChecked(false); };
   if (!problem) return <main className="max-w-3xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const numericAnswer = Number(answer);
-  const correct = answer.trim() !== '' && Number.isFinite(numericAnswer) && method === problem.pattern && Math.abs(numericAnswer - problem.answer) < 1e-9;
+  const correct = method === problem.pattern && isMoleAnswerCorrect(answer, problem.answer);
 
   return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>

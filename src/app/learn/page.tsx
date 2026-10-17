@@ -168,7 +168,8 @@ const CONTENTS: LearningContent[] = [
     description: '体積スライダーで物質量を一定にした希釈を再現し、モル濃度 c=n/V の変化を観察します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/concentration-visual'
+    link: '/learn/chemistry/concentration-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
 
   // 化学基礎・化学（新設含む）

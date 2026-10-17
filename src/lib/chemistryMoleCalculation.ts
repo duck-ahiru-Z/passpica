@@ -44,6 +44,14 @@ const variants = {
 const displayNumber = (value: number) => Number(value.toFixed(6)).toString();
 export const formatMoleAnswer = displayNumber;
 
+export function isMoleAnswerCorrect(input: string, expected: number): boolean {
+  if (input.trim() === '') return false;
+  const value = Number(input);
+  if (!Number.isFinite(value)) return false;
+  // Accept the exact value or the six-decimal precision shown in feedback.
+  return Math.abs(value - expected) < 1e-9 || Math.abs(value - Number(displayNumber(expected))) < 1e-9;
+}
+
 export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleProblem {
   const pattern = mode === 'mix' ? picker.next(random) : mode;
   switch (pattern) {
