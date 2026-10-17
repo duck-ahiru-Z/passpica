@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { randomOrderedDistinctPair } from '@/src/lib/math/randomOrderedDistinctPair';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -90,9 +91,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   }
   
   if (p_type === 'pattern3') {
-    let r1 = Math.floor(Math.random() * 9) - 4;
-    let r2 = Math.floor(Math.random() * 9) - 4;
-    if (r1 >= r2) { r1--; r2++; }
+    const [r1, r2] = randomOrderedDistinctPair(-4, 4);
     const sum = r1 + r2;
     const mProd = - (r1 * r2);
     let cStr = '';
@@ -103,7 +102,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     if (cStr === '') cStr = '0';
     const hasParens = sum !== 0 && mProd !== 0;
-    const eq = `y = x^2 + 2kx + ${hasParens ? `(${cStr})` : cStr}`;
+    const constantExpression = cStr.startsWith('-')
+      ? `- ${cStr.slice(1).trimStart()}`
+      : `+ ${hasParens ? `(${cStr})` : cStr}`;
+    const eq = `y = x^2 + 2kx ${constantExpression}`;
     return { 
       pattern: p_type, eq, ansType: 'between', conditionText: "x軸と共有点をもたない",
       params: { sum, mProd, k_r1: r1, k_r2: r2, cStr }
@@ -458,8 +460,8 @@ export default function DiscriminantDrillPage() {
                     <>
                       <p className="text-emerald-700 font-bold mb-1">※ xの係数が2の倍数なので、<MathEq math="D/4" /> の公式を使うと計算量が減ります！</p>
                       <MathEq math={`D/4 = k^2 - 1 \\cdot (${problem.params.cStr}) < 0`} /><br/>
-                      <MathEq math={`k^2 ${problem.params.sum !== 0 ? problem.params.sum > 0 ? '-' : '+' : ''} ${Math.abs(problem.params.sum)===1?'':Math.abs(problem.params.sum)}k ${problem.params.mProd !== 0 ? problem.params.mProd > 0 ? '-' : '+' : ''} ${Math.abs(problem.params.mProd)} < 0`} /><br/>
-                      <MathEq math={`(k ${problem.params.k_r1 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r1)})(k ${problem.params.k_r2 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r2)}) < 0`} /><br/>
+                      <MathEq math={`k^2${problem.params.sum === 0 ? '' : ` ${problem.params.sum > 0 ? '-' : '+'} ${Math.abs(problem.params.sum) === 1 ? '' : Math.abs(problem.params.sum)}k`}${problem.params.mProd === 0 ? '' : ` ${problem.params.mProd > 0 ? '-' : '+'} ${Math.abs(problem.params.mProd)}`} < 0`} /><br/>
+                      <MathEq math={`${problem.params.k_r1 === 0 ? 'k' : `(k ${problem.params.k_r1 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r1)})`}${problem.params.k_r2 === 0 ? 'k' : `(k ${problem.params.k_r2 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r2)})`} < 0`} /><br/>
                       これを解いて、<MathEq math={`${problem.params.k_r1} < k < ${problem.params.k_r2}`} />。
                     </>
                   )}
