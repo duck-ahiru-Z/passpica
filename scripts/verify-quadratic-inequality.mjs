@@ -1,4 +1,16 @@
-import { getQuadraticInequalityAnswerType } from '../src/lib/quadraticInequality.ts';
+import { getQuadraticInequalityAnswerType, parseQuadraticInequalityFraction } from '../src/lib/quadraticInequality.ts';
+
+for (const invalid of [['1.5', ''], ['1abc', ''], ['1', '2.5'], ['1', '0'], ['', '1']]) {
+  if (parseQuadraticInequalityFraction(...invalid) !== null) {
+    throw new Error(`invalid fraction was accepted: ${invalid.join('/')}`);
+  }
+}
+for (const [input, expected] of [[['2', '4'], { num: 1, den: 2 }], [['-3', '-6'], { num: 1, den: 2 }], [['+5', ''], { num: 5, den: 1 }]]) {
+  const parsed = parseQuadraticInequalityFraction(...input);
+  if (!parsed || parsed.num !== expected.num || parsed.den !== expected.den) {
+    throw new Error(`valid fraction parsed incorrectly: ${input.join('/')} -> ${JSON.stringify(parsed)}`);
+  }
+}
 
 const signs = ['<', '>', '\\le', '\\ge'];
 const answerMatches = (type, x, first, second) => {

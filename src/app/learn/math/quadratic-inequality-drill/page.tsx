@@ -5,7 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
-import { getQuadraticInequalityAnswerType, type QuadraticInequalityAnswerType, type QuadraticInequalitySign } from '@/src/lib/quadraticInequality';
+import { getQuadraticInequalityAnswerType, parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType, type QuadraticInequalitySign } from '@/src/lib/quadraticInequality';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -307,24 +307,23 @@ export default function QuadraticInequalityDrillPage() {
       return;
     }
     
-    const parse = (nStr: string, dStr: string) => {
-      let num = parseInt(nStr);
-      let den = dStr.trim() === '' ? 1 : parseInt(dStr);
-      if (isNaN(num)) num = 0;
-      if (isNaN(den) || den === 0) den = 1;
-      return simplifyFraction(num, den);
-    };
-
-    const u1 = parse(ans1Num, ans1Den);
+    const u1 = parseQuadraticInequalityFraction(ans1Num, ans1Den);
+    const u2 = [1, 2, 3, 4].includes(problem.ansType)
+      ? parseQuadraticInequalityFraction(ans2Num, ans2Den)
+      : null;
+    if (!u1 || ([1, 2, 3, 4].includes(problem.ansType) && !u2)) {
+      setIsCorrect(false);
+      setHasChecked(true);
+      return;
+    }
     const r1 = problem.roots[0];
     
     if (problem.ansType === 5 || problem.ansType === 6) {
       if (u1.num === r1.num && u1.den === r1.den) setIsCorrect(true);
       else setIsCorrect(false);
     } else {
-      const u2 = parse(ans2Num, ans2Den);
       const r2 = problem.roots[1];
-      if (u1.num === r1.num && u1.den === r1.den && u2.num === r2.num && u2.den === r2.den) setIsCorrect(true);
+      if (u1.num === r1.num && u1.den === r1.den && u2?.num === r2.num && u2.den === r2.den) setIsCorrect(true);
       else setIsCorrect(false);
     }
     
