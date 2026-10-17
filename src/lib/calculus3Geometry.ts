@@ -35,10 +35,10 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
     },
     'y-axis-rotation': {
       pattern,
-      prompt: `曲線とx軸、x=${value}で囲まれた領域をy軸の周りに回転させた立体の体積を求める。`,
+      prompt: `曲線とx軸、x=0およびx=${value}で囲まれた領域をy軸の周りに回転させた立体の体積を求める。`,
       expression: `y=\\sqrt{x}\\quad(0\\le x\\le${value})`,
       answer: (4 * Math.PI * value ** 2.5) / 5,
-      explanation: `高さ y の断面は内半径 y²、外半径 ${value} の円環。V=π∫₀^√${value}(${value}²−y⁴)dy=4π${value}^(5/2)/5。`,
+      explanation: `高さ y の断面は内半径 y²、外半径 ${value} の円環。V=π∫₀^√${value}(${value}²−y⁴)dy=4π×${value}^(5/2)/5。`,
     },
     'curve-length': {
       pattern,

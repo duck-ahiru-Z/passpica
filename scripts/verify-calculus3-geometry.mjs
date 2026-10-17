@@ -9,6 +9,9 @@ if (!/aria-pressed=\{strategy === p\}/.test(drillPage) || !/disabled=\{!strategy
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
 }
+if (!drillPage.includes('<= 0.0005 + 1e-12') || !drillPage.includes('小数第3位まで入力')) {
+  throw new Error('geometry answer precision guidance and accepted rounding tolerance must match');
+}
 
 const stableRandom = () => 0.37;
 const checks = {
@@ -23,7 +26,9 @@ const checks = {
   },
   'y-axis-rotation': problem => {
     const [, radius] = problem.expression.match(/0\\le x\\le(\d+)/);
-    return Math.abs(problem.answer - (4 * Math.PI * Number(radius) ** 2.5) / 5) < 1e-10;
+    return Math.abs(problem.answer - (4 * Math.PI * Number(radius) ** 2.5) / 5) < 1e-10
+      && problem.prompt.includes(`x=0およびx=${radius}`)
+      && problem.explanation.includes(`4π×${radius}^(5/2)/5`);
   },
   'curve-length': problem => {
     const [, upper] = problem.expression.match(/0\\le x\\le(\d+)/);
