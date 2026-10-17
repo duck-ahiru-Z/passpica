@@ -11,7 +11,11 @@ const checks = {
   product: problem => {
     const [, power] = problem.expression.match(/y=x\^\{(\d+)\}\\sin/);
     const n = Number(power);
-    return close(problem.answer, n * (Math.PI / 2) ** (n - 1)) && problem.explanation.includes('積の微分');
+    return close(problem.answer, n * (Math.PI / 2) ** (n - 1))
+      && problem.explanation.includes('積の微分')
+      && problem.explanation.includes('sin(π/2)=1')
+      && problem.explanation.includes('cos(π/2)=0')
+      && problem.explanation.includes(problem.answer.toFixed(3));
   },
   logarithmic: problem => {
     const [, a] = problem.expression.match(/y=x\^\{(\d+)x\}/);

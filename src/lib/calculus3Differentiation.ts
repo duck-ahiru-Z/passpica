@@ -32,7 +32,12 @@ export function generateDifferentiationProblem(mode: DifferentiationMode, random
   const higherA = pattern === 'higher' ? variants.higher.next(random) : 1;
   const all: Record<DifferentiationPattern, DifferentiationProblem> = {
     chain: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{x=1},\\quad y=(${chain.a}x^2+1)^{${chain.n}}`, answer: 2 * chain.a * chain.n * (chain.a + 1) ** (chain.n - 1), explanation: `連鎖律より y′=2·${chain.a}·${chain.n}x(${chain.a}x²+1)^${chain.n - 1}。x=1で ${2 * chain.a * chain.n * (chain.a + 1) ** (chain.n - 1)}。` },
-    product: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{x=\\pi/2},\\quad y=x^{${productPower}}\\sin x`, answer: productPower * (Math.PI / 2) ** (productPower - 1), explanation: `積の微分を使い、x=π/2では y′=${productPower}(π/2)^${productPower - 1}。` },
+    product: {
+      pattern,
+      expression: `\\left.\\frac{dy}{dx}\\right|_{x=\\pi/2},\\quad y=x^{${productPower}}\\sin x`,
+      answer: productPower * (Math.PI / 2) ** (productPower - 1),
+      explanation: `積の微分で y′=${productPower}x^${productPower - 1} sin x+x^${productPower} cos x。x=π/2では sin(π/2)=1、cos(π/2)=0。よって y′=${productPower}(π/2)^${productPower - 1}=${(productPower * (Math.PI / 2) ** (productPower - 1)).toFixed(3)}。`,
+    },
     logarithmic: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{x=1},\\quad y=x^{${logPower}x}\\ (x>0)`, answer: logPower, explanation: `対数微分で y′=x^(${logPower}x)·${logPower}(ln x+1)。x=1で ${logPower}。` },
     parametric: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{t=1},\\quad x=t^2+1,\\ y=t^3-${parametricC}t`, answer: (3 - parametricC) / 2, explanation: `dy/dx=(3t²−${parametricC})/(2t)。t=1で ${(3 - parametricC) / 2}。` },
     implicit: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{(x,y)=(1,2)},\\quad x^2+${implicitA}xy+y^2=${5 + 2 * implicitA}`, answer: -(2 + 2 * implicitA) / (implicitA + 4), explanation: `陰関数微分で y′=−(2x+${implicitA}y)/(${implicitA}x+2y)。点(1,2)で ${-(2 + 2 * implicitA) / (implicitA + 4)}。` },
