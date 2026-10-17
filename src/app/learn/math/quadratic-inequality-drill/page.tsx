@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
 import { generateQuadraticInequalityProblem, type QuadraticInequalityPattern, type QuadraticInequalityProblem } from '@/src/lib/quadraticInequalityProblems';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -20,7 +21,7 @@ const generateProblem = generateQuadraticInequalityProblem;
 
 export default function QuadraticInequalityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [userAnsType, setUserAnsType] = useState<AnsType>(1);
   const [ans1Num, setAns1Num] = useState<string>('');
