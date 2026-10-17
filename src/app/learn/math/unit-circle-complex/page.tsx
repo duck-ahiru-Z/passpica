@@ -84,7 +84,7 @@ export default function UnitCircleComplexPage() {
       </div>
 
       {/* メイングリッド：複素数平面 ＋ コントロール */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 items-start gap-8">
         
         {/* 左側：複素数平面 (2/3) */}
         <div className="lg:col-span-2 border border-gray-300 bg-white p-6 flex flex-col items-center justify-between min-h-[400px]">
