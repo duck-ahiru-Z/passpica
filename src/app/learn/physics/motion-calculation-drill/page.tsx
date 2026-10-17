@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
-import { generateMotionProblem, motionLabels, motionPatterns, type MotionMode, type MotionPattern } from '@/src/lib/physicsMotionCalculation';
+import { formatMotionAnswer, generateMotionProblem, motionLabels, motionPatterns, type MotionMode, type MotionPattern } from '@/src/lib/physicsMotionCalculation';
 
 type Pattern = MotionPattern;
 
@@ -29,7 +29,7 @@ export default function MotionCalculationDrillPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{motionPatterns.map(pattern => <button key={pattern} type="button" onClick={() => setMethod(pattern)} className={`retro-btn-classic ${method === pattern ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>{motionLabels[pattern]}</button>)}</div>
       <div className="text-center"><input aria-label="計算結果" value={answer} onChange={event => setAnswer(event.target.value)} placeholder="数値" className="retro-input w-40 text-center" /><span className="ml-2 font-bold">{problem.unit}</span></div>
       <div className="flex justify-center gap-3"><button onClick={() => setChecked(true)} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold">解答する</button><button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button></div>
-      {checked && <div className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : `使う公式は「${motionLabels[problem.pattern]}」、正解は ${problem.answer} ${problem.unit} です。`}<div className="mt-2 font-normal text-slate-700">{problem.explanation}</div></div>}
+      {checked && <div className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : `使う公式は「${motionLabels[problem.pattern]}」、正解は ${formatMotionAnswer(problem.answer)} ${problem.unit} です。`}<div className="mt-2 font-normal text-slate-700">{problem.explanation}</div></div>}
     </section>
   </main>;
 }

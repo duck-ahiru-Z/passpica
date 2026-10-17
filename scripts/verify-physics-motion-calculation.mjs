@@ -1,4 +1,4 @@
-import { generateMotionProblem, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
+import { formatMotionAnswer, generateMotionProblem, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
 
 const stableRandom = () => 0.37;
 const checks = {
@@ -16,8 +16,9 @@ const checks = {
   },
   work: problem => {
     const [, force, angle, distance] = problem.question.match(/([\d.]+) N の力を、移動方向に対して (\d+)° の向きに加え、物体が ([\d.]+) m/);
-    const expected = Number(force) * Number(distance) * Math.cos((Number(angle) * Math.PI) / 180);
-    return Math.abs(problem.answer - expected) < 1e-9 && problem.unit === 'J';
+    const exactCosine = { 0: 1, 60: 0.5, 90: 0, 180: -1 }[Number(angle)];
+    const expected = Number(force) * Number(distance) * exactCosine;
+    return problem.answer === expected && problem.unit === 'J' && problem.explanation.includes(`${expected} J`);
   },
   momentum: problem => {
     const [, mass, velocity] = problem.question.match(/質量 ([\d.]+) kg .*? ([\d.]+) m\/s/);
@@ -32,6 +33,10 @@ const checks = {
     return Math.abs(problem.answer - Number(constant) * Number(extension)) < 1e-12 && problem.unit === 'N';
   },
 };
+
+if (formatMotionAnswer(30.000000000000007) !== '30' || formatMotionAnswer(2.4492935982947064e-15) !== '0') {
+  throw new Error('answer display should hide floating-point noise');
+}
 
 for (const pattern of motionPatterns) {
   const questions = new Set();

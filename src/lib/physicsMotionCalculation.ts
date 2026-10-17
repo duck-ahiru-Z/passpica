@@ -41,6 +41,15 @@ const variants = {
 };
 
 const displayNumber = (value: number) => Number(value.toFixed(6)).toString();
+export const formatMotionAnswer = displayNumber;
+
+function angleCosine(angle: number): number {
+  if (angle === 0) return 1;
+  if (angle === 60) return 0.5;
+  if (angle === 90) return 0;
+  if (angle === 180) return -1;
+  return Math.cos((angle * Math.PI) / 180);
+}
 
 export function generateMotionProblem(mode: MotionMode, random = Math.random): MotionProblem {
   const pattern = mode === 'mix' ? picker.next(random) : mode;
@@ -58,7 +67,7 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
       return { pattern, question: `空気抵抗を無視して静かに落とした物体の ${value.time} s 後の速さを求めよ。（g=${value.gravity} m/s²）`, answer, unit: 'm/s', explanation: `初速度0より v=gt=${value.gravity}×${value.time}=${displayNumber(answer)} m/s。` };
     }
     case 'work': {
-      const value = variants.work.next(random); const answer = value.force * value.distance * Math.cos((value.angle * Math.PI) / 180);
+      const value = variants.work.next(random); const answer = value.force * value.distance * angleCosine(value.angle);
       return { pattern, question: `${value.force} N の力を、移動方向に対して ${value.angle}° の向きに加え、物体が ${value.distance} m 移動した。力のした仕事は？`, answer, unit: 'J', explanation: `仕事 W=Fs cosθ=${value.force}×${value.distance}×cos${value.angle}°=${displayNumber(answer)} J。垂直なら0、反対向きなら負になる。` };
     }
     case 'momentum': {
