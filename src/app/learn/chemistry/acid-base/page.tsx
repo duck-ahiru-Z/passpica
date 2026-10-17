@@ -47,17 +47,12 @@ export default function AcidBasePage() {
             role="img"
             aria-label={`${display.indicatorName}を加えたpH${pH.toFixed(1)}の溶液。${display.colorName}。`}
           >
-            {/* 液体描画 */}
-            <div 
-              className="w-32 h-24 absolute bottom-1 border border-transparent transition-colors duration-300"
-              style={{
-                backgroundColor: display.backgroundColor,
-                borderRadius: '0 0 4px 4px'
-              }}
-            ></div>
-            
             {/* ビーカーの線画 */}
             <div className="w-36 h-28 border-x-2 border-b-2 border-slate-700 rounded-b relative z-20 flex items-end">
+              <div
+                className="absolute left-1 right-1 bottom-1 h-24 border border-transparent transition-colors duration-300"
+                style={{ backgroundColor: display.backgroundColor, borderRadius: '0 0 4px 4px' }}
+              />
               <div className="absolute left-1 top-4 w-3 h-0.5 bg-slate-400"></div>
               <div className="absolute left-1 top-10 w-1.5 h-0.5 bg-slate-400"></div>
               <div className="absolute left-1 top-16 w-3 h-0.5 bg-slate-400"></div>
@@ -79,6 +74,7 @@ export default function AcidBasePage() {
               min="1"
               max="14"
               step="0.1"
+              aria-valuetext={`pH ${pH.toFixed(1)}、${pH < 7 ? '酸性' : pH === 7 ? '中性' : '塩基性'}、${display.colorName}`}
               value={pH}
               onChange={(e) => setPH(parseFloat(e.target.value))}
               className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
@@ -101,7 +97,7 @@ export default function AcidBasePage() {
                 type="button"
                 aria-pressed={indicator === 'pp'}
                 onClick={() => setIndicator('pp')}
-                className={`border border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'pp' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
+                className={`border-2 p-2.5 text-left transition-all flex items-center justify-between ${indicator === 'pp' ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-300 font-bold' : 'bg-slate-50 border-gray-300 hover:bg-slate-100'}`}
               >
                 <div>
                   <div className="text-xs">フェノールフタレイン</div>
@@ -114,7 +110,7 @@ export default function AcidBasePage() {
                 type="button"
                 aria-pressed={indicator === 'litmus'}
                 onClick={() => setIndicator('litmus')}
-                className={`border border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'litmus' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
+                className={`border-2 p-2.5 text-left transition-all flex items-center justify-between ${indicator === 'litmus' ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-300 font-bold' : 'bg-slate-50 border-gray-300 hover:bg-slate-100'}`}
               >
                 <div>
                   <div className="text-xs">リトマス液</div>
@@ -127,7 +123,7 @@ export default function AcidBasePage() {
                 type="button"
                 aria-pressed={indicator === 'mo'}
                 onClick={() => setIndicator('mo')}
-                className={`border-2 border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'mo' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
+                className={`border-2 p-2.5 text-left transition-all flex items-center justify-between ${indicator === 'mo' ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-300 font-bold' : 'bg-slate-50 border-gray-300 hover:bg-slate-100'}`}
               >
                 <div>
                   <div className="text-xs">メチルオレンジ</div>
