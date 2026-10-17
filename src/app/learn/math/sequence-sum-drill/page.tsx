@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { generateSequenceSumProblem, type SequenceSumPattern, type SequenceSumProblem } from '@/src/lib/sequenceSumQuestions';
+import { generateSequenceSumProblem, type SequenceSumPattern } from '@/src/lib/sequenceSumQuestions';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
 
@@ -97,6 +97,7 @@ export default function SequenceSumDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="数列の和の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -119,6 +120,7 @@ export default function SequenceSumDrill() {
                   分数になる場合は 15/2 のようにスラッシュで入力
                 </div>
                 <input 
+                  aria-label="数列の和の答え"
                   type="text" 
                   className="w-40 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
@@ -144,7 +146,7 @@ export default function SequenceSumDrill() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！公式の適用と計算が完璧です。' : '不正解... 公式への代入や符号の処理を確認しましょう。'}
               </div>
             )}
