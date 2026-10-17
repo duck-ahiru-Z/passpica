@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateIntegralProblem, integralPatterns } from '../src/lib/calculus3Integrals.ts';
+import { generateIntegralProblem, integralPatterns, isIntegralAnswerCorrect } from '../src/lib/calculus3Integrals.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-integral-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="integral-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
   throw new Error('integral strategy must be a single-choice radio group');
 }
-if (!/const isCorrect = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer - problem\.answer\) < 0\.01/.test(drillPage)) {
+if (!/const isCorrect = strategy === problem\.pattern && isIntegralAnswerCorrect\(answer, problem\.answer\)/.test(drillPage)) {
   throw new Error('integral answers must require both the correct strategy and numeric value');
 }
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
@@ -55,6 +55,9 @@ const checks = {
 };
 
 const expectedVariants = { substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
+if (!isIntegralAnswerCorrect('1.718', Math.E - 1)) throw new Error('three-decimal displayed answers should be accepted');
+if (isIntegralAnswerCorrect('1.71', Math.E - 1)) throw new Error('answers rounded more coarsely than the display should not be accepted');
+if (isIntegralAnswerCorrect('', 1) || isIntegralAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
 for (const pattern of integralPatterns) {
   const seen = new Set();
   for (let index = 0; index < 500; index += 1) {

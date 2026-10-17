@@ -10,6 +10,15 @@ export const integralLabels: Record<IntegralPattern, string> = {
   trig: '三角関数の積分', radical: '三角置換（平方根）',
 };
 
+export function isIntegralAnswerCorrect(input: string, expected: number): boolean {
+  if (input.trim() === '') return false;
+  const value = Number(input);
+  if (!Number.isFinite(value)) return false;
+  // Match the three decimal places shown in the answer feedback, while also
+  // accepting the full-precision value when a learner enters it.
+  return Math.abs(value - expected) < 1e-10 || Math.abs(value - Number(expected.toFixed(3))) < 1e-10;
+}
+
 const picker = new BalancedRandom(integralPatterns);
 const variants = {
   substitution: new BalancedRandom([2, 3, 4, 5]),

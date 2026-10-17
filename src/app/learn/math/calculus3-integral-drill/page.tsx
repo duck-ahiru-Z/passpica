@@ -5,7 +5,7 @@ import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { generateIntegralProblem, integralLabels, integralPatterns, type IntegralMode, type IntegralPattern, type IntegralProblem } from '@/src/lib/calculus3Integrals';
+import { generateIntegralProblem, integralLabels, integralPatterns, isIntegralAnswerCorrect, type IntegralMode, type IntegralPattern, type IntegralProblem } from '@/src/lib/calculus3Integrals';
 
 type Pattern = IntegralPattern;
 type Mode = IntegralMode;
@@ -34,10 +34,9 @@ export default function Calculus3IntegralDrillPage() {
   const [checked, setChecked] = useState(false);
   const next = (selectedMode: Mode = mode) => { setProblem(generateIntegralProblem(selectedMode)); setStrategy(''); setAnswer(''); setChecked(false); };
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const numericAnswer = Number(answer);
-  const isCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && strategy === problem.pattern && Math.abs(numericAnswer - problem.answer) < 0.01;
+  const isCorrect = strategy === problem.pattern && isIntegralAnswerCorrect(answer, problem.answer);
   const strategyIsCorrect = strategy === problem.pattern;
-  const valueIsCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && Math.abs(numericAnswer - problem.answer) < 0.01;
+  const valueIsCorrect = isIntegralAnswerCorrect(answer, problem.answer);
 
   return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
