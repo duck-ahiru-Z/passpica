@@ -64,7 +64,7 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
     case 'sampling': {
       const value = variants.sampling.next(random);
       const bytes = (value.frequency * value.bits * value.channels) / 8;
-      return { pattern, question: `標本化周波数 ${value.frequency / 1000} kHz、量子化ビット数 ${value.bits} bit、${value.channels === 2 ? 'ステレオ2 ch' : 'モノラル1 ch'}で1秒の音声データ量は何 byte か。`, answer: String(bytes), explanation: `${value.frequency.toLocaleString('en-US')}×${value.bits}×${value.channels}÷8=${bytes.toLocaleString('en-US')} byte。`, unit: 'byte' };
+      return { pattern, question: `標本化周波数 ${value.frequency / 1000} kHz、量子化ビット数 ${value.bits} bit、${value.channels === 2 ? 'ステレオ2 ch' : 'モノラル1 ch'}の非圧縮PCM音声を1秒記録する。データ量は何 byte か。（1 byte=8 bit）`, answer: String(bytes), explanation: `${value.frequency.toLocaleString('en-US')}×${value.bits}×${value.channels}÷8=${bytes.toLocaleString('en-US')} byte。非圧縮PCMなので標本数×量子化ビット数×チャンネル数をそのまま数える。`, unit: 'byte' };
     }
     case 'compression': {
       const value = variants.compression.next(random);

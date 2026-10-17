@@ -27,7 +27,9 @@ const checks = {
   sampling: problem => {
     const [, khz, bits, channels] = problem.question.match(/(\d+(?:\.\d+)?) kHz、量子化ビット数 (\d+) bit、(ステレオ2 ch|モノラル1 ch)/);
     const channelCount = channels === 'ステレオ2 ch' ? 2 : 1;
-    return Number(problem.answer) === (Number(khz) * 1000 * Number(bits) * channelCount) / 8 && problem.unit === 'byte';
+    return Number(problem.answer) === (Number(khz) * 1000 * Number(bits) * channelCount) / 8 && problem.unit === 'byte'
+      && problem.question.includes('非圧縮PCM') && problem.question.includes('1 byte=8 bit')
+      && problem.explanation.includes('標本数×量子化ビット数×チャンネル数');
   },
   compression: problem => {
     const [, original, compressed] = problem.question.match(/元データ ([\d.]+) MB を ([\d.]+) MB/);
