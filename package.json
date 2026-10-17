@@ -21,6 +21,7 @@
     "test:calculus3-mixed": "node --experimental-strip-types scripts/verify-calculus3-mixed-questions.mjs",
     "test:chemistry-mole": "node --experimental-strip-types scripts/verify-chemistry-mole-calculation.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
+    "test:information-presets": "node --experimental-strip-types scripts/verify-information-presets.mjs",
     "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
     "test:factorization": "node --experimental-strip-types scripts/verify-factorization-questions.mjs",
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",

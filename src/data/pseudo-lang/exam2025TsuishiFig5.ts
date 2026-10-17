@@ -11,5 +11,6 @@ shuruisu = 7
 meishou = 【文字列を入力】
 jを1から shuruisu まで1ずつ増やしながら繰り返す:
 ｜  もし Namae[j] == meishou ならば:
-｜  ｜  Shurui[n] = j`
+｜  ｜  Shurui[n] = j
+表示する("分類番号：", Shurui[n])`
 };
