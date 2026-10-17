@@ -55,7 +55,8 @@ export default function Calculus3IntegralDrillPage() {
   const [checked, setChecked] = useState(false);
   const next = (selectedMode = mode) => { setProblem(generate(selectedMode)); setStrategy(''); setAnswer(''); setChecked(false); };
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const isCorrect = strategy === problem.pattern && Math.abs(Number(answer) - problem.answer) < 0.01;
+  const numericAnswer = Number(answer);
+  const isCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && strategy === problem.pattern && Math.abs(numericAnswer - problem.answer) < 0.01;
 
   return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
