@@ -47,7 +47,7 @@ const STEPS: Step[] = [
     precipitateColor: '黒色',
     precipitateColorHex: '#1e293b',
     reaction: 'Cu2+ + S2- ➔ CuS↓',
-    explain: '酸性条件下（H+濃度が高く、電離平衡により硫化物イオンS2-濃度が極めて低い状態）では、S2-と非常に強く結びつく溶解度積の極端に小さい金属（イオン化傾向の小さい銅Cu2+や鉛Pb2+）のみが硫化物沈殿(CuS)として沈殿します。イオン化傾向が比較的大きい鉄や亜鉛はここでは沈殿しません。'
+    explain: '先に希塩酸を加えてAg+とPb2+を塩化物として分離した後の濾液に、酸性条件で硫化水素を通します。酸性下ではS2-濃度が低く保たれるため、この対象イオンの中では溶解度積の小さいCuSだけが沈殿します。Fe3+やZn2+などはこの段階では溶液中に残ります。'
   },
   {
     id: 3,
@@ -69,7 +69,7 @@ const STEPS: Step[] = [
     precipitateColor: '白色',
     precipitateColorHex: '#f1f5f9',
     reaction: 'Zn2+ + S2- ➔ ZnS↓',
-    explain: 'アンモニアによって塩基性になった条件下では、S2-の電離度が大きくなりS2-濃度が十分に高くなります。これにより、酸性下では沈殿しなかったイオン化傾向中程度の金属（亜鉛Zn2+やマンガンMn2+）が硫化物(ZnS)として沈殿します。硫化亜鉛(ZnS)は、黒色が多い金属硫化物の中で珍しく「白色」を呈するため試験で非常によく問われます。'
+    explain: 'アンモニアによって塩基性になった条件下では、S2-の電離度が大きくなりS2-濃度が十分に高くなります。これにより、酸性下では沈殿しなかった亜鉛イオン(Zn2+)が硫化物(ZnS)として沈殿します。このモデルで対象にしているのはZn2+です。硫化亜鉛(ZnS)は白色を呈するため、色も重要な確認点です。'
   },
   {
     id: 5,
@@ -80,13 +80,13 @@ const STEPS: Step[] = [
     precipitateColor: '白色',
     precipitateColorHex: '#f8fafc',
     reaction: 'Ca2+ + CO3 2- ➔ CaCO3↓',
-    explain: '炭酸イオン(CO3 2-)を加えることで、アルカリ土類金属であるカルシウムイオン(Ca2+)やバリウムイオン(Ba2+)が、炭酸塩(CaCO3)の白色沈殿として分離されます。'
+    explain: 'この段階では、濾液に残っているカルシウムイオン(Ca2+)に炭酸イオン(CO3 2-)を加え、白色の炭酸カルシウム(CaCO3)として沈殿分離します。'
   },
   {
     id: 6,
     reagent: '⑥ 最後に残った濾液の炎色反応を確認する',
     reagentFormula: '炎色反応',
-    precipitates: ['Na+ (黄色)'],
+    precipitates: [],
     remains: [],
     precipitateColor: '黄色 (炎色反応)',
     precipitateColorHex: '#eab308',
@@ -172,7 +172,7 @@ export default function MetalIonPage() {
 
           {/* ビーカーと沈殿のフラットSVG */}
           <div className="flex items-center justify-center py-6 w-full relative">
-            <svg width="280" height="240" viewBox="0 0 160 140" className="overflow-visible font-sans">
+            <svg width="280" height="240" viewBox="0 0 160 140" className="overflow-visible font-sans" role="img" aria-label={`ステップ${currentStepIdx}。残っているイオン：${step.remains.join('、') || 'なし'}。${step.precipitates.length ? `今回の沈殿：${step.precipitates.join('、')}（${step.precipitateColor}）` : currentStepIdx === STEPS.length - 1 ? '沈殿はなく、ナトリウムの炎色反応を確認します。' : '今回の沈殿はありません。'}`}>
               
               {/* ビーカー */}
               <rect x="35" y="25" width="90" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
@@ -202,7 +202,7 @@ export default function MetalIonPage() {
                 )}
               </g>
 
-              {/* 下層：沈殿 (沈殿したイオン) */}
+              {/* 下層：この段階で生じた沈殿（炎色反応は沈殿として描かない） */}
               {step.precipitates.length > 0 && (
                 <g>
                   {/* 沈殿物の層 */}
@@ -255,13 +255,13 @@ export default function MetalIonPage() {
           {/* 反応式カード */}
           <div className="retro-box space-y-4">
             <h3 className="font-bold border-b border-gray-300 pb-1.5 text-slate-800">
-              ■ 沈殿生成反応式
+              ■ {currentStepIdx === STEPS.length - 1 ? '最終確認' : '沈殿生成反応式'}
             </h3>
 
             <table className="classic-table text-[10px]">
               <tbody>
                 <tr>
-                  <td className="bg-gray-50 font-bold w-24">加えた試薬</td>
+                  <td className="bg-gray-50 font-bold w-24">{currentStepIdx === STEPS.length - 1 ? '確認方法' : '加えた試薬'}</td>
                   <td className="font-bold text-slate-800 font-mono">{step.reagentFormula}</td>
                 </tr>
                 <tr>
@@ -271,11 +271,11 @@ export default function MetalIonPage() {
                   </td>
                 </tr>
                 <tr>
-                  <td className="bg-gray-50 font-bold">沈殿の色</td>
+                  <td className="bg-gray-50 font-bold">{currentStepIdx === STEPS.length - 1 ? '炎色反応' : '沈殿の色'}</td>
                   <td className="font-bold text-slate-800">{step.precipitateColor}</td>
                 </tr>
                 <tr>
-                  <td className="bg-gray-50 font-bold">イオン反応式</td>
+                  <td className="bg-gray-50 font-bold">{currentStepIdx === STEPS.length - 1 ? '観察内容' : 'イオン反応式'}</td>
                   <td className="font-mono text-slate-700 break-words">{step.reaction}</td>
                 </tr>
               </tbody>
@@ -291,7 +291,7 @@ export default function MetalIonPage() {
               {step.explain}
             </p>
             <p className="text-[10px] text-gray-500">
-              ※系統分離の順序（HCl ➔ H2S(酸性) ➔ 煮沸/HNO3/NH3(過剰) ➔ H2S(塩基性) ➔ CO3 2- ➔ 炎色反応）は、入試問題の基本構造としてそのまま出題されます。
+              ※この教材は、記載した金属イオンを対象にした系統分離の一例です。対象イオンや実験条件により、試薬・操作・分離順序は変わります。
             </p>
           </div>
 
