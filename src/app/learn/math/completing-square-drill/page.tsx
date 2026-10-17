@@ -294,11 +294,11 @@ export default function CompletingSquareDrillPage() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (基本・係数1)</option>
-                <option value="pattern2">パターン2 (係数あり)</option>
-                <option value="pattern3">パターン3 (頂点が分数)</option>
-                <option value="pattern4">パターン4 (係数あり＋分数)</option>
+                <option value="mix">実戦練習：平方完成 全パターンランダム</option>
+                <option value="pattern1">基礎練習：基本・係数1だけ</option>
+                <option value="pattern2">基礎練習：係数ありだけ</option>
+                <option value="pattern3">基礎練習：頂点が分数だけ</option>
+                <option value="pattern4">基礎練習：係数あり＋分数だけ</option>
               </select>
             </div>
 

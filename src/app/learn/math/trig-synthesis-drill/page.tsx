@@ -415,11 +415,11 @@ export default function TrigSynthesisDrill() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsROuter(''); setAnsRInner(''); setAnsAlpha(''); setAnsCos(''); setAnsSin(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (第一象限の有名角)</option>
-                <option value="pattern2">パターン2 (マイナスを含む有名角)</option>
-                <option value="pattern3">パターン3 (係数が大きい)</option>
-                <option value="pattern4">パターン4 (有名角にならない発展)</option>
+                <option value="mix">実戦練習：三角関数の合成 全パターンランダム</option>
+                <option value="pattern1">基礎練習：第一象限の有名角だけ</option>
+                <option value="pattern2">基礎練習：マイナスを含む有名角だけ</option>
+                <option value="pattern3">基礎練習：係数が大きい形だけ</option>
+                <option value="pattern4">基礎練習：有名角でない発展形だけ</option>
               </select>
             </div>
 

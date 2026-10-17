@@ -280,11 +280,11 @@ export default function QuadraticMaxMinDrillPage() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (軸が定義域の内側)</option>
-                <option value="pattern2">パターン2 (軸が外側・単調増減)</option>
-                <option value="pattern3">パターン3 (軸が中央・対称)</option>
-                <option value="pattern4">パターン4 (上に凸 a&lt;0)</option>
+                <option value="mix">実戦練習：最大・最小 全パターンランダム</option>
+                <option value="pattern1">基礎練習：軸が定義域の内側だけ</option>
+                <option value="pattern2">基礎練習：軸が外側・単調増減だけ</option>
+                <option value="pattern3">基礎練習：軸が中央・対称だけ</option>
+                <option value="pattern4">基礎練習：上に凸 a&lt;0 だけ</option>
               </select>
             </div>
 

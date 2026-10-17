@@ -69,7 +69,7 @@ export default function DoubleRadicalDrillPage() {
           二重根号の外し方ドリル
         </h1>
         <p className="text-gray-500">
-          ルートの中のルート（二重根号）を外す計算を、基本から応用までパターン別に反復練習します。
+          まず基礎練習で苦手な形を固定して反復し、慣れたら実戦練習で形を見て解法を選びます。
         </p>
       </div>
 
@@ -88,11 +88,11 @@ export default function DoubleRadicalDrillPage() {
                 onChange={e => { const pattern = e.target.value as DoubleRadicalMode; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (基本の和)</option>
-                <option value="pattern2">パターン2 (基本の差)</option>
-                <option value="pattern3">パターン3 (係数が2以外の偶数)</option>
-                <option value="pattern4">パターン4 (係数なし・割るルート2)</option>
+                <option value="mix">実戦練習：二重根号 全パターンランダム</option>
+                <option value="pattern1">基礎練習：基本の和だけ</option>
+                <option value="pattern2">基礎練習：基本の差だけ</option>
+                <option value="pattern3">基礎練習：係数付きだけ</option>
+                <option value="pattern4">基礎練習：係数なし・√2で割る形だけ</option>
               </select>
             </div>
 

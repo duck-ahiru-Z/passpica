@@ -330,11 +330,11 @@ export default function TrigIdentityDrillPage() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAns1(defaultFractionRoot); setAns2(defaultFractionRoot); setAns3(defaultFractionRoot); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (鋭角の基本)</option>
-                <option value="pattern2">パターン2 (鈍角の処理)</option>
-                <option value="pattern3">パターン3 (平方根を含む値)</option>
-                <option value="pattern4">パターン4 (式の値の計算)</option>
+                <option value="mix">実戦練習：三角比 全パターンランダム</option>
+                <option value="pattern1">基礎練習：鋭角の基本だけ</option>
+                <option value="pattern2">基礎練習：鈍角の処理だけ</option>
+                <option value="pattern3">基礎練習：平方根を含む値だけ</option>
+                <option value="pattern4">基礎練習：式の値の計算だけ</option>
               </select>
             </div>
 

@@ -324,11 +324,11 @@ export default function DiscriminantDrillPage() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (接する条件・2つ)</option>
-                <option value="pattern2">パターン2 (共有点の範囲)</option>
-                <option value="pattern3">パターン3 (D/4の利用)</option>
-                <option value="pattern4">パターン4 (2次の係数に文字)</option>
+                <option value="mix">実戦練習：判別式 全パターンランダム</option>
+                <option value="pattern1">基礎練習：接する条件・2つだけ</option>
+                <option value="pattern2">基礎練習：共有点の範囲だけ</option>
+                <option value="pattern3">基礎練習：D/4の利用だけ</option>
+                <option value="pattern4">基礎練習：2次の係数に文字だけ</option>
               </select>
             </div>
 

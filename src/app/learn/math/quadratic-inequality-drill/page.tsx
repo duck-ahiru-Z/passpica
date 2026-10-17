@@ -281,11 +281,11 @@ export default function QuadraticInequalityDrillPage() {
                 }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (基本・内側/外側)</option>
-                <option value="pattern2">パターン2 (マイナス係数)</option>
-                <option value="pattern3">パターン3 (解が分数)</option>
-                <option value="pattern4">パターン4 (D=0の特殊解)</option>
+                <option value="mix">実戦練習：二次不等式 全パターンランダム</option>
+                <option value="pattern1">基礎練習：基本・内側/外側だけ</option>
+                <option value="pattern2">基礎練習：マイナス係数だけ</option>
+                <option value="pattern3">基礎練習：解が分数だけ</option>
+                <option value="pattern4">基礎練習：D=0の特殊解だけ</option>
               </select>
             </div>
 
