@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { getEllipseParametricState } from '../../../../lib/calculus3ParametricVisual';
 
 const W = 640;
 const H = 320;
@@ -10,13 +11,7 @@ const sy = (y: number) => 160 - y * 100;
 
 export default function Calculus3ParametricVisualPage() {
   const [t, setT] = useState(Math.PI / 4);
-  const x = 2 * Math.cos(t);
-  const y = Math.sin(t);
-  const dxdt = -2 * Math.sin(t);
-  const dydt = Math.cos(t);
-  const rawSlope = Math.abs(dxdt) < 0.001 ? null : dydt / dxdt;
-  const slope = rawSlope !== null && Math.abs(rawSlope) < 0.0005 ? 0 : rawSlope;
-  const speed = Math.hypot(dxdt, dydt);
+  const { x, y, dxdt, dydt, slope, speed } = getEllipseParametricState(t);
   const tangentX = (dxdt / speed) * 0.65;
   const tangentY = (dydt / speed) * 0.65;
   const velocityStep = 0.45;
