@@ -11,6 +11,15 @@ for (const pattern of factorizationPatterns) {
     if (pattern === 'cross' && !/\(\d+x\+\d+\)\(\d+x\+\d+\)/.test(question.explanation)) throw new Error('tawagake must produce and explain two non-monic binomials');
     if (pattern === 'cross' && !question.explanation.includes('交差積')) throw new Error('tawagake must explain its cross products');
     if (pattern === 'substitution' && !/x\^4-/.test(question.expression)) throw new Error('substitution questions must require a difference of squares after substitution');
+    if (pattern === 'substitution') {
+      const [, middle, constant] = question.expression.match(/^x\^4-(\d+)x\^2\+(\d+)$/) ?? [];
+      const a = Number(question.explanation.match(/X−(\d+)/)?.[1]);
+      const b = Number(question.explanation.match(/\(X−\d+\)\(X−(\d+)\)/)?.[1]);
+      if (!middle || !constant || a === b || Number.isInteger(Math.sqrt(a)) || Number.isInteger(Math.sqrt(b))) {
+        throw new Error(`substitution question overlaps with a square identity: ${question.expression}`);
+      }
+      if (Number(middle) !== a + b || Number(constant) !== a * b) throw new Error(`substitution explanation does not match ${question.expression}`);
+    }
     if (pattern === 'higher' && !question.explanation.includes('(x−1)(x+1)')) throw new Error('higher-degree explanation must finish the factorization');
   }
 }

@@ -65,8 +65,14 @@ export function generateFactorizationQuestion(mode: FactorizationMode, random = 
       break;
     }
     case 'substitution': {
-      const a = integer(random, 2, 5);
-      const b = integer(random, 1, 5);
+      // Keep both constants non-squares and distinct so the quartic cannot
+      // collapse into a perfect-square identity or factor further over Z.
+      const values = [2, 3, 5, 6, 7, 8];
+      const aIndex = Math.floor(random() * values.length);
+      const bOffset = Math.floor(random() * (values.length - 1));
+      const bIndex = bOffset >= aIndex ? bOffset + 1 : bOffset;
+      const a = values[aIndex];
+      const b = values[bIndex];
       const middle = a + b;
       const constant = a * b;
       expression = `x^4-${middle}x^2+${constant}`;
