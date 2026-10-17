@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -36,7 +37,7 @@ function createSequenceProblem(nextMode: DrillMode): SequenceProblem {
 
 export default function SequenceDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<SequenceProblem>(() => createSequenceProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<SequenceProblem>(() => createSequenceProblem('mix'));
   
   // 入力状態
   const [inC, setInC] = useState('');

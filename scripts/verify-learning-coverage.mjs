@@ -60,6 +60,12 @@ function collectPages(directory) {
 }
 const pages = collectPages(learnRoot);
 const mathPages = pages.filter(file => file.includes(`${path.sep}math${path.sep}`));
+const randomStateInitializer = /\buseState(?:<[^;\n]*?>)?\s*\(\s*(?:\(\s*\)\s*=>\s*)?(?:generate[A-Z]\w*|create[A-Z]\w*|[\w$.]+\.(?:next|pick))\s*\(/;
+const unsafeRandomInitializers = pages.filter(file => randomStateInitializer.test(fs.readFileSync(file, 'utf8')));
+if (unsafeRandomInitializers.length > 0) {
+  throw new Error(`Random exercise state must be generated after hydration with useClientGeneratedState: ${unsafeRandomInitializers.join(', ')}`);
+}
+
 function importedSources(source, file) {
   const imports = [...source.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(match => match[1]);
   return imports.flatMap(specifier => {

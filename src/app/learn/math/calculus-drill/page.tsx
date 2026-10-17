@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 const formulaTypes = ['1/6_line', '1/6_para', '1/12', '1/20', '1/30'] as const;
 const mixedFormulaPicker = new BalancedRandom<string>(formulaTypes);
@@ -150,7 +151,7 @@ function createCalculusProblem(mode: string): ProblemData {
 
 export default function CalculusDrillPage() {
   const [selectedMode, setSelectedMode] = useState<string>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => createCalculusProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => createCalculusProblem('mix'));
   
   // 入力状態
   const [inputNum, setInputNum] = useState<string>('');
