@@ -105,7 +105,7 @@ export default function CrystalLatticePage() {
                       <circle key={idx} cx={x} cy={y} r="8" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
                     ))}
                     {/* 中心の原子 */}
-                    <circle cx="60" cy="60" r="14" fill="#f59e0b" stroke="#0f172a" strokeWidth="1.5" />
+                    <circle cx="60" cy="60" r="8" fill="#f59e0b" stroke="#0f172a" strokeWidth="1.5" />
                   </g>
                 )}
 
@@ -117,8 +117,8 @@ export default function CrystalLatticePage() {
                       <circle key={idx} cx={x} cy={y} r="8" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
                     ))}
                     {/* 各面の中央原子（6個） */}
-                    {[[50,30], [50,90], [50,60], [70,60], [30,60], [60,50]].map(([x,y], idx) => (
-                      <circle key={idx} cx={x} cy={y} r="11" fill="#3b82f6" stroke="#0f172a" strokeWidth="1.5" />
+                    {[[60,30], [60,90], [50,70], [90,60], [30,60], [70,50]].map(([x,y], idx) => (
+                      <circle key={idx} cx={x} cy={y} r="8" fill="#3b82f6" stroke="#0f172a" strokeWidth="1.5" />
                     ))}
                   </g>
                 )}
@@ -137,42 +137,36 @@ export default function CrystalLatticePage() {
             </span>
             
             <div className="py-6 flex items-center justify-center flex-grow">
-              <svg width="180" height="180" viewBox="0 0 120 120" className="overflow-visible">
-                {/* 外枠（対角断面長方形 または 面の正方形） */}
-                <rect x="20" y="20" width="80" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
-                
+              <svg width="180" height="180" viewBox={selectedType === 'bcc' ? '0 0 160 120' : '0 0 120 120'} className="overflow-visible">
                 {selectedType === 'bcc' ? (
                   <g>
-                    {/* 体心立方格子の対角断面: 縦a、横√2aの長方形 */}
-                    {/* 4角の原子(r) */}
-                    <path d="M 20 20 M 36 20 A 16 16 0 0 1 20 36 L 20 20 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    <path d="M 100 20 M 100 36 A 16 16 0 0 1 84 20 L 100 20 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    <path d="M 20 100 M 20 84 A 16 16 0 0 1 36 100 L 20 100 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    <path d="M 100 100 M 84 100 A 16 16 0 0 1 100 84 L 100 100 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    {/* 中央の原子(2r) */}
-                    <circle cx="60" cy="60" r="32" fill="#f59e0b" stroke="#0f172a" strokeWidth="1.5" />
-
-                    {/* 対角線矢印 */}
-                    <line x1="20" y1="20" x2="100" y2="100" stroke="#ef4444" strokeWidth="1" strokeDasharray="2,2" />
-                    {/* 軸のラベル */}
-                    <text x="5" y="62" fill="#475569" fontSize="9">縦 a</text>
-                    <text x="60" y="112" fill="#475569" fontSize="9" textAnchor="middle">横 √2 a</text>
+                    {/* The BCC body-diagonal section has sides a and √2a, so its diagonal is √3a. */}
+                    <defs><clipPath id="bcc-section"><rect x="20" y="20" width="113.14" height="80" /></clipPath></defs>
+                    <g clipPath="url(#bcc-section)">
+                      {[{ x: 20, y: 20 }, { x: 133.14, y: 20 }, { x: 20, y: 100 }, { x: 133.14, y: 100 }].map(({ x, y }, index) => (
+                        <circle key={index} cx={x} cy={y} r="34.64" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
+                      ))}
+                      <circle cx="76.57" cy="60" r="34.64" fill="#f59e0b" stroke="#0f172a" strokeWidth="1.5" />
+                    </g>
+                    <rect x="20" y="20" width="113.14" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
+                    <line x1="20" y1="20" x2="133.14" y2="100" stroke="#ef4444" strokeWidth="1" strokeDasharray="3,3" />
+                    <text x="4" y="62" fill="#475569" fontSize="9">a</text>
+                    <text x="76.57" y="113" fill="#475569" fontSize="9" textAnchor="middle">√2 a</text>
                   </g>
                 ) : (
                   <g>
-                    {/* 面心立方格子の面断面: 縦a、横aの正方形 */}
-                    {/* 4角の原子(r) */}
-                    <path d="M 20 20 M 34 20 A 14 14 0 0 1 20 34 L 20 20 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    <path d="M 100 20 M 100 34 A 14 14 0 0 1 86 20 L 100 20 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    <path d="M 20 100 M 20 86 A 14 14 0 0 1 34 100 L 20 100 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    <path d="M 100 100 M 86 100 A 14 14 0 0 1 100 86 L 100 100 Z" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
-                    {/* 中央の面心原子(2r) */}
-                    <circle cx="60" cy="60" r="28" fill="#3b82f6" stroke="#0f172a" strokeWidth="1.5" />
-
-                    {/* 対角線矢印 */}
-                    <line x1="20" y1="20" x2="100" y2="100" stroke="#ef4444" strokeWidth="1" strokeDasharray="2,2" />
-                    <text x="10" y="62" fill="#475569" fontSize="9">縦 a</text>
-                    <text x="60" y="112" fill="#475569" fontSize="9" textAnchor="middle">横 a</text>
+                    {/* An FCC face is a square of side a; its diagonal is √2a = 4r. */}
+                    <defs><clipPath id="fcc-section"><rect x="20" y="20" width="80" height="80" /></clipPath></defs>
+                    <g clipPath="url(#fcc-section)">
+                      {[{ x: 20, y: 20 }, { x: 100, y: 20 }, { x: 20, y: 100 }, { x: 100, y: 100 }].map(({ x, y }, index) => (
+                        <circle key={index} cx={x} cy={y} r="28.28" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
+                      ))}
+                      <circle cx="60" cy="60" r="28.28" fill="#3b82f6" stroke="#0f172a" strokeWidth="1.5" />
+                    </g>
+                    <rect x="20" y="20" width="80" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
+                    <line x1="20" y1="20" x2="100" y2="100" stroke="#ef4444" strokeWidth="1" strokeDasharray="3,3" />
+                    <text x="8" y="62" fill="#475569" fontSize="9">a</text>
+                    <text x="60" y="113" fill="#475569" fontSize="9" textAnchor="middle">a</text>
                   </g>
                 )}
               </svg>
