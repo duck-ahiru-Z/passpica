@@ -36,6 +36,19 @@ const checks = {
     const [, mass, velocity] = problem.question.match(/質量 ([\d.]+) kg .*? ([\d.]+) m\/s/);
     return Math.abs(problem.answer - 0.5 * Number(mass) * Number(velocity) ** 2) < 1e-12 && problem.unit === 'J';
   },
+  potentialEnergy: problem => {
+    const [, mass, height, gravity] = problem.question.match(/質量 ([\d.]+) kg .*? ([\d.]+) m 高い位置.*g=([\d.]+)/);
+    const expected = Number(mass) * Number(gravity) * Number(height);
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'J'
+      && problem.explanation.includes(`Eₚ=mgh=${mass}×${gravity}×${height}=${formatMotionAnswer(expected)} J`);
+  },
+  energyConservation: problem => {
+    const [, mass, height, gravity] = problem.question.match(/質量 ([\d.]+) kg .*?高さ ([\d.]+) m .*g=([\d.]+)/);
+    const expected = Math.sqrt(2 * Number(gravity) * Number(height));
+    return Number(mass) > 0 && Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'm/s'
+      && problem.explanation.includes('力学的エネルギー保存')
+      && problem.explanation.includes(`=${formatMotionAnswer(expected)} m/s`);
+  },
   spring: problem => {
     const [, constant, extension] = problem.question.match(/ばね定数 ([\d.]+) N\/m のばねを ([\d.]+) m/);
     return Math.abs(problem.answer - Number(constant) * Number(extension)) < 1e-12 && problem.unit === 'N';
@@ -44,6 +57,9 @@ const checks = {
 
 if (formatMotionAnswer(30.000000000000007) !== '30' || formatMotionAnswer(2.4492935982947064e-15) !== '0') {
   throw new Error('answer display should hide floating-point noise');
+}
+if (!drillPage.includes('Number(formatMotionAnswer(problem.answer))') || !drillPage.includes('小数第6位まで')) {
+  throw new Error('rounded displayed answers must be accepted at the stated input precision');
 }
 
 for (const pattern of motionPatterns) {
@@ -56,9 +72,9 @@ for (const pattern of motionPatterns) {
   if (questions.size !== 5) throw new Error(`${pattern} generated ${questions.size}/5 expected variants`);
 }
 
-const mixed = Array.from({ length: 700 }, () => generateMotionProblem('mix', stableRandom).pattern);
+const mixed = Array.from({ length: 900 }, () => generateMotionProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += motionPatterns.length) {
   if (new Set(mixed.slice(start, start + motionPatterns.length)).size !== motionPatterns.length) throw new Error(`mixed set omitted a mechanics pattern in batch ${start / motionPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mechanics practice repeated adjacent patterns');
-console.log('Physics mechanics verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, units, answer keys, variants, balance, and adjacency checked.');
+console.log('Physics mechanics verified: 4,500 fixed-pattern questions and 900 mixed questions; formulas, units, answer keys, variants, balance, adjacency, and displayed rounding checked.');

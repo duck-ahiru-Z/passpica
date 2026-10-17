@@ -145,7 +145,8 @@ const CONTENTS: LearningContent[] = [
     description: '落下位置を動かし、位置エネルギーと運動エネルギーの移り変わりと合計保存を図と数値で確認します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/physics/energy-visual'
+    link: '/learn/physics/energy-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
     slug: 'motion-visual',
