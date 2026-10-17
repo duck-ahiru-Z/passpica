@@ -224,6 +224,22 @@ export default function QuadraticInequalityDrillPage() {
 
   if (!problem) return null;
 
+  const formatRoot = ({ num, den }: ProblemData['roots'][number]) => den === 1 ? `${num}` : `${num}/${den}`;
+  const rootsLabel = problem.roots.map(formatRoot);
+  const solutionLabel = (() => {
+    switch (problem.ansType) {
+      case 1: return `${rootsLabel[0]} < x < ${rootsLabel[1]}`;
+      case 2: return `x < ${rootsLabel[0]} または ${rootsLabel[1]} < x`;
+      case 3: return `${rootsLabel[0]} ≤ x ≤ ${rootsLabel[1]}`;
+      case 4: return `x ≤ ${rootsLabel[0]} または ${rootsLabel[1]} ≤ x`;
+      case 5: return `x = ${rootsLabel[0]}`;
+      case 6: return `x = ${rootsLabel[0]} 以外のすべての実数`;
+      case 7: return 'すべての実数';
+      case 8: return '解なし';
+    }
+  })();
+  const graphDescription = `${problem.eq} のグラフ。${problem.a > 0 ? '下に凸' : '上に凸'}の放物線で、x軸との交点は ${rootsLabel.join(' と ')}。${hasChecked ? `色付き部分が不等式を満たす範囲で、解は ${solutionLabel}。` : '解答後に不等式を満たす範囲が色付きで表示されます。'}`;
+
   const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void) => (
     <div className="flex flex-col items-center justify-center inline-flex align-middle">
       <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => setNum(e.target.value)} />
@@ -374,6 +390,8 @@ export default function QuadraticInequalityDrillPage() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
+                role="img"
+                aria-label={graphDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
