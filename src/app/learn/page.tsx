@@ -305,7 +305,8 @@ export default function LearnPortalPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
   const filteredContents = CONTENTS.filter(c => {
-    const matchSubject = selectedSubject === 'all' || c.subject === selectedSubject;
+    const matchSubject = selectedSubject === 'all'
+      || (selectedSubject === 'math3' ? c.subjectJp === '数学III' : c.subject === selectedSubject);
     const matchDifficulty = selectedDifficulty === 'all' || c.difficulty === selectedDifficulty;
     return matchSubject && matchDifficulty;
   });
@@ -333,12 +334,15 @@ export default function LearnPortalPage() {
             {[
               { id: 'all', name: 'すべての科目' },
               { id: 'math', name: '数学' },
+              { id: 'math3', name: '数学III' },
               { id: 'chemistry', name: '化学' },
               { id: 'physics', name: '物理' },
               { id: 'information', name: '情報I' }
             ].map(sub => (
               <button
                 key={sub.id}
+                type="button"
+                aria-pressed={selectedSubject === sub.id}
                 onClick={() => setSelectedSubject(sub.id)}
                 className={`retro-btn-classic ${selectedSubject === sub.id ? 'bg-[#cbd5e1] font-bold' : ''}`}
               >
@@ -360,6 +364,8 @@ export default function LearnPortalPage() {
             ].map(diff => (
               <button
                 key={diff.id}
+                type="button"
+                aria-pressed={selectedDifficulty === diff.id}
                 onClick={() => setSelectedDifficulty(diff.id)}
                 className={`retro-btn-classic ${selectedDifficulty === diff.id ? 'bg-[#cbd5e1] font-bold' : ''}`}
               >
@@ -370,6 +376,8 @@ export default function LearnPortalPage() {
         </div>
 
       </div>
+
+      <p className="text-slate-500" aria-live="polite">表示中：{filteredContents.length}件</p>
 
       {/* 教材一覧 (デスクトップ版テーブル) */}
       <div className="hidden md:block border border-gray-300 overflow-x-auto">
