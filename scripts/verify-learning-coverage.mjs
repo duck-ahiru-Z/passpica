@@ -54,6 +54,17 @@ const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/ph
 if (!/role="img" aria-label=\{`\$\{info\.name\}の模式的な状態図/.test(phaseDiagram)) {
   throw new Error('Chemistry phase diagram must have an accessible, content-rich description');
 }
+const complexPlane = fs.readFileSync(path.join(root, 'src/app/learn/math/unit-circle-complex/page.tsx'), 'utf8');
+if (!/role="img"\s+aria-label=\{`複素数平面/.test(complexPlane) || !complexPlane.includes('偏角を足します')) {
+  throw new Error('Complex-plane visual must describe the values and meaning of its plotted product');
+}
+const trigonometry = fs.readFileSync(path.join(root, 'src/app/learn/math/trigonometry/page.tsx'), 'utf8');
+if (!/role="img" aria-label=\{`角度\$\{angle\}度の単位円/.test(trigonometry)) {
+  throw new Error('Trigonometry visual must describe its changing sine, cosine, and tangent values');
+}
+if (!trigonometry.includes('const tanUndefined = angle % 180 === 90') || !trigonometry.includes("tanは${tanUndefined ? '定義されない'")) {
+  throw new Error('Trigonometry visual must agree on tangent being undefined at vertical angles');
+}
 
 const learnRoot = path.join(root, 'src/app/learn');
 function collectPages(directory) {

@@ -103,6 +103,8 @@ export default function UnitCircleComplexPage() {
               height={height} 
               viewBox={`0 0 ${width} ${height}`} 
               className="overflow-visible font-mono"
+              role="img"
+              aria-label={`複素数平面。実軸と虚軸、単位円を表示。${showZ1 ? `z1は絶対値${r1.toFixed(2)}、偏角${theta1}度、座標(${z1_x.toFixed(2)}, ${z1_y.toFixed(2)})。` : 'z1は非表示。'}${showZ2 ? `z2は絶対値${r2.toFixed(2)}、偏角${theta2}度、座標(${z2_x.toFixed(2)}, ${z2_y.toFixed(2)})。` : 'z2は非表示。'}積z3=z1×z2は絶対値${r3.toFixed(2)}、偏角${theta3}度、座標(${z3_x.toFixed(2)}, ${z3_y.toFixed(2)})。複素数の積では絶対値を掛け、偏角を足します。`}
             >
               {/* グリッド補助円（r = 0.5, 1.0, 1.5） */}
               {showGrid && (
@@ -213,6 +215,7 @@ export default function UnitCircleComplexPage() {
                   step="0.05"
                   value={r1}
                   onChange={(e) => setR1(parseFloat(e.target.value))}
+                  aria-label="z1の絶対値"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -229,6 +232,7 @@ export default function UnitCircleComplexPage() {
                   step="5"
                   value={theta1}
                   onChange={(e) => setTheta1(parseInt(e.target.value))}
+                  aria-label="z1の偏角（度）"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -250,6 +254,7 @@ export default function UnitCircleComplexPage() {
                   step="0.05"
                   value={r2}
                   onChange={(e) => setR2(parseFloat(e.target.value))}
+                  aria-label="z2の絶対値"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -266,6 +271,7 @@ export default function UnitCircleComplexPage() {
                   step="5"
                   value={theta2}
                   onChange={(e) => setTheta2(parseInt(e.target.value))}
+                  aria-label="z2の偏角（度）"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
