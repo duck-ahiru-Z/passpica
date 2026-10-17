@@ -37,8 +37,8 @@ export default function Calculus3CurvatureVisual() {
       <div className="flex items-center justify-between gap-3"><div><div className="text-[11px] text-slate-500">数学III / 微分法</div><h1 className="text-xl md:text-2xl font-bold text-slate-900">凹凸・極値・変曲点ビジュアル装置</h1></div><Link href="/learn" className="retro-btn-classic">学習一覧へ</Link></div>
       <section className="retro-box bg-white p-4 space-y-4">
         <p className="text-slate-600 leading-relaxed">f(x)=x⁴−2x² のグラフ上を点が動きます。接線の傾き f′(x) と二階導関数 f′′(x) の符号を、極大・極小や凹凸の切り替わりと結び付けて観察できます。</p>
-        <div className="border border-slate-300 bg-slate-50 p-2 overflow-x-auto">
-          <svg viewBox={`0 0 ${W} ${H}`} className="w-full min-w-[440px]" role="img" aria-label={`f(x)=x⁴−2x²。x=${x.toFixed(2)}でf=${f(x).toFixed(3)}、傾き=${d1(x).toFixed(3)}、二階導関数=${d2(x).toFixed(3)}。${concavity}`}>
+        <div className="border border-slate-300 bg-slate-50 p-2">
+          <svg viewBox={`0 0 ${W} ${H}`} className="block w-full h-auto" role="img" aria-label={`f(x)=x⁴−2x²。x=${x.toFixed(2)}でf=${f(x).toFixed(3)}、傾き=${d1(x).toFixed(3)}、二階導関数=${d2(x).toFixed(3)}。${concavity}`}>
             <line x1={PLOT.left} y1={sy(0)} x2={PLOT.right} y2={sy(0)} stroke="#94a3b8" />
             <line x1={sx(0)} y1={PLOT.top} x2={sx(0)} y2={PLOT.bottom} stroke="#94a3b8" />
             <path d={curvePath} fill="none" stroke="#2563eb" strokeWidth="2.5" />
