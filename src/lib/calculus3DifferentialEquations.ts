@@ -9,6 +9,10 @@ export const differentialEquationLabels: Record<DifferentialEquationPattern, str
   separation: '変数分離', initial: '初期条件を使う積分', growth: '指数成長率', motion: '速度から位置',
 };
 
+export function normalizeDifferentialEquationAnswer(value: string): string {
+  return value.trim().replaceAll(/\s+/g, '').replaceAll('²', '^2').replaceAll('³', '^3').replaceAll('−', '-');
+}
+
 const picker = new BalancedRandom(differentialEquationPatterns);
 const variants = {
   separation: new BalancedRandom(Array.from({ length: 25 }, (_, index) => ({ rate: Math.floor(index / 5) + 1, initial: (index % 5) + 1 }))),

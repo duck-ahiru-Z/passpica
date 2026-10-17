@@ -1,4 +1,4 @@
-import { differentialEquationPatterns, generateDifferentialEquationProblem } from '../src/lib/calculus3DifferentialEquations.ts';
+import { differentialEquationPatterns, generateDifferentialEquationProblem, normalizeDifferentialEquationAnswer } from '../src/lib/calculus3DifferentialEquations.ts';
 
 const stableRandom = () => 0.37;
 const checks = {
@@ -26,6 +26,10 @@ const checks = {
   },
 };
 const expectedVariants = { separation: 25, initial: 25, growth: 8, motion: 25 };
+
+if (normalizeDifferentialEquationAnswer(' y = 2x³ + 4 ') !== normalizeDifferentialEquationAnswer('y=2x^3+4')) {
+  throw new Error('equivalent superscript and caret notation should be accepted');
+}
 
 for (const pattern of differentialEquationPatterns) {
   const seen = new Set();
