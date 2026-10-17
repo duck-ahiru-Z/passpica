@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -130,7 +131,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function CosineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal1, setAnsVal1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansVal2, setAnsVal2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -138,11 +139,10 @@ export default function CosineRuleDrillPage() {
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -223,11 +223,13 @@ export default function CosineRuleDrillPage() {
       ctx.fillStyle = '#f59e0b';
       ctx.fillText(`${problem.A}°`, ptA.x + 35, ptA.y - 10);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
+
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -245,7 +247,6 @@ export default function CosineRuleDrillPage() {
     if (problem.pattern === 'pattern3') {
       isOk = parseInt(ansDeg) === problem.ansAngle;
     } else {
-      const ok1 = false, ok2 = false;
       if (problem.ansTerms && problem.ansTerms.length === 1) {
         isOk = checkFractionRoot(ansVal1, 1, problem.ansTerms[0].num, problem.ansTerms[0].root, problem.ansTerms[0].den);
       } else if (problem.ansTerms && problem.ansTerms.length === 2) {
@@ -293,7 +294,7 @@ export default function CosineRuleDrillPage() {
                   setSelectedPattern(nextPattern);
                   setProblem(generateProblem(nextPattern));
                   setAnsVal1(defaultFractionRoot); setAnsVal2(defaultFractionRoot);
-                  setAnsDeg(''); setIsCorrect(false);
+                  setAnsDeg(''); setHasChecked(false); setIsCorrect(false);
                 }}
                 className="border p-1 text-xs"
               >
