@@ -1,18 +1,10 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
 import Header from "../components/layout/Header";
 import Footer from "../components/layout/Footer";
 import ServiceWorkerCleanser from "../components/utils/ServiceWorkerCleanser";
 import GoogleAnalytics from "../components/analytics/GoogleAnalytics";
-
-const notoSansJP = Noto_Sans_JP({
-  subsets: ["latin"],
-  weight: ["400", "700"],
-  display: "swap",
-  variable: "--font-noto-sans-jp",
-});
 
 export const metadata: Metadata = {
   title: "passpica | 大学受験の学習室ポータル",
@@ -25,7 +17,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ja" className={`${notoSansJP.variable}`}>
+    <html lang="ja">
       <body className="flex flex-col min-h-screen bg-white text-slate-800 antialiased">
         <Suspense fallback={null}>
           <GoogleAnalytics />

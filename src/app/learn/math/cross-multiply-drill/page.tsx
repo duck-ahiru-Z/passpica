@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -113,7 +113,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function CrossMultiplyDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   // ユーザー入力
   const [ansK, setAnsK] = useState<string>('');
@@ -126,12 +126,8 @@ export default function CrossMultiplyDrillPage() {
   const [isCorrect, setIsCorrect] = useState(false);
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setAnsK(''); setAnsP(''); setAnsQ(''); setAnsR(''); setAnsS('');
     setHasChecked(false);
     setIsCorrect(false);
@@ -199,7 +195,7 @@ export default function CrossMultiplyDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -247,7 +243,7 @@ export default function CrossMultiplyDrillPage() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -187,19 +187,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function SequenceSumDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setAnsVal('');
     setHasChecked(false);
     setIsCorrect(false);
@@ -278,7 +274,7 @@ export default function SequenceSumDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -316,7 +312,7 @@ export default function SequenceSumDrill() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔

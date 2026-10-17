@@ -107,7 +107,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function CompletingSquareDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   // User input states: y = [A] (x [pSign] [pNum]/[pDen])^2 [qSign] [qNum]/[qDen]
   const [ansA, setAnsA] = useState<string>('');
@@ -123,10 +123,6 @@ export default function CompletingSquareDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -228,8 +224,8 @@ export default function CompletingSquareDrillPage() {
     drawGraph();
   }, [problem, hasChecked]);
 
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setAnsA('');
     setAnsPSign('+'); setAnsPNum(''); setAnsPDen('');
     setAnsQSign('+'); setAnsQNum(''); setAnsQDen('');
@@ -294,7 +290,7 @@ export default function CompletingSquareDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -355,7 +351,7 @@ export default function CompletingSquareDrillPage() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔

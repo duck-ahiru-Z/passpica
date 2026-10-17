@@ -99,7 +99,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function QuadraticMaxMinDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansMaxV, setAnsMaxV] = useState('');
   const [ansMaxX1, setAnsMaxX1] = useState('');
@@ -114,10 +114,6 @@ export default function QuadraticMaxMinDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -221,8 +217,8 @@ export default function QuadraticMaxMinDrillPage() {
     drawGraph();
   }, [problem, hasChecked]);
 
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setAnsMaxV(''); setAnsMaxX1(''); setAnsMaxX2('');
     setAnsMinV(''); setAnsMinX1(''); setAnsMinX2('');
     setHasChecked(false);
@@ -280,7 +276,7 @@ export default function QuadraticMaxMinDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -342,7 +338,7 @@ export default function QuadraticMaxMinDrillPage() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔
