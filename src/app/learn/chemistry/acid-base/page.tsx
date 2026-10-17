@@ -71,7 +71,11 @@ export default function AcidBasePage() {
           </div>
 
           {/* フラットなビーカー */}
-          <div className="flex items-center justify-center py-6 w-full relative h-[180px]">
+          <div
+            className="flex items-center justify-center py-6 w-full relative h-[180px]"
+            role="img"
+            aria-label={`${indicator === 'pp' ? 'フェノールフタレイン' : indicator === 'litmus' ? 'リトマス液' : 'メチルオレンジ'}を加えたpH${pH.toFixed(1)}の溶液。${indicator === 'pp' ? pH >= 8.3 ? '赤紫色' : '無色' : indicator === 'litmus' ? pH <= 5 ? '赤色' : pH >= 8 ? '青色' : '紫色' : pH <= 3.1 ? '赤色' : pH < 4.4 ? '橙色' : '黄色'}。`}
+          >
             {/* 液体描画 */}
             <div 
               className="w-32 h-24 absolute bottom-1 border border-transparent transition-colors duration-300"

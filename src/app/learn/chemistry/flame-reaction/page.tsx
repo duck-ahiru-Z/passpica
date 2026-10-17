@@ -52,7 +52,14 @@ export default function FlameReactionPage() {
 
           {/* フラットな線画SVGガスバーナーと炎 */}
           <div className="flex items-center justify-center flex-grow py-6">
-            <svg width="180" height="240" viewBox="0 0 120 160" className="overflow-visible">
+            <svg
+              width="180"
+              height="240"
+              viewBox="0 0 120 160"
+              className="overflow-visible"
+              role="img"
+              aria-label={selectedMetal ? `${selectedMetal.jpName}の炎色反応。炎は${selectedMetal.colorName}。` : '青色のガスバーナーの炎。試薬を選ぶと炎色反応を観察できます。'}
+            >
               {/* 炎（選択されたイオンの発色） */}
               <path 
                 d="M 60 20 C 35 55 45 100 60 100 C 75 100 85 55 60 20 Z" 
@@ -75,7 +82,7 @@ export default function FlameReactionPage() {
           {/* 操作バー */}
           <div className="w-full border-t border-gray-200 pt-4 text-center">
             <span className="text-xs font-bold block mb-2 text-slate-700">
-              {selectedMetal ? `現在、${selectedMetal.jpName} (${selectedMetal.formula}) の炎色反応を観察中` : '下の試薬瓶をクリックすると炎に投入されます。'}
+              {selectedMetal ? `現在、${selectedMetal.jpName} (${selectedMetal.formula}) の${selectedMetal.colorName}の炎色反応を観察中` : '下の試薬瓶をクリックすると炎に投入されます。'}
             </span>
             {selectedMetal && (
               <button 
