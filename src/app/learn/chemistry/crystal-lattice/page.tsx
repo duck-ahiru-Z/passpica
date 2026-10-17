@@ -117,7 +117,8 @@ export default function CrystalLatticePage() {
                       <circle key={idx} cx={x} cy={y} r="8" fill="#e2e8f0" stroke="#475569" strokeWidth="1" />
                     ))}
                     {/* 各面の中央原子（6個） */}
-                    {[[60,30], [60,90], [50,70], [90,60], [30,60], [70,50]].map(([x,y], idx) => (
+                    {/* 上・下・前・右・左・奥の各面の中心（斜投影） */}
+                    {[[70,30], [50,90], [50,70], [90,70], [30,70], [70,50]].map(([x,y], idx) => (
                       <circle key={idx} cx={x} cy={y} r="8" fill="#3b82f6" stroke="#0f172a" strokeWidth="1.5" />
                     ))}
                   </g>
