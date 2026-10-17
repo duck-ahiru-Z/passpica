@@ -10,7 +10,13 @@ export const differentialEquationLabels: Record<DifferentialEquationPattern, str
 };
 
 export function normalizeDifferentialEquationAnswer(value: string): string {
-  return value.trim().replaceAll(/\s+/g, '').replaceAll('²', '^2').replaceAll('³', '^3').replaceAll('−', '-');
+  return value.trim()
+    .replaceAll(/\s+/g, '')
+    .replaceAll('²', '^2')
+    .replaceAll('³', '^3')
+    .replaceAll('−', '-')
+    .replaceAll(/e\^\((\d*x)\)/g, 'e^$1')
+    .replaceAll(/e\^1x/g, 'e^x');
 }
 
 const picker = new BalancedRandom(differentialEquationPatterns);
