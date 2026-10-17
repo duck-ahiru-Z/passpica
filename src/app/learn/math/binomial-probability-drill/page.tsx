@@ -100,7 +100,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function BinomialProbabilityDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<FractionRootValue>(defaultFractionRoot);
   
@@ -108,10 +108,6 @@ export default function BinomialProbabilityDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -230,8 +226,6 @@ export default function BinomialProbabilityDrill() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   const eventName = problem.pattern === 'pattern2' 
     ? (problem.p_num === 1 && problem.p_den === 6 ? '「1の目」' : problem.p_num === 1 && problem.p_den === 3 ? '「3の倍数の目」' : '「2以下の目」')
     : (problem.pattern === 'pattern3' ? '「アタリ」' : '「表」');
@@ -262,7 +256,14 @@ export default function BinomialProbabilityDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAnsVal(defaultFractionRoot);
+                  setHasChecked(false);
+                  setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

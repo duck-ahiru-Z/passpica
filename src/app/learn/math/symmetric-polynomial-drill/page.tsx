@@ -50,16 +50,12 @@ function generateProblem(mode: DrillMode = 'mix'): ProblemData {
 
 export default function SymmetricPolynomialDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   const [ansStr, setAnsStr] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
-
-  useEffect(() => {
-    handleNext('mix');
-  }, []);
 
   const handleNext = (nextMode: DrillMode = mode) => {
     setProblem(generateProblem(nextMode));
@@ -88,8 +84,6 @@ export default function SymmetricPolynomialDrillPage() {
     }
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   let questionMath = '';
   if (problem.type === 'x2+y2') questionMath = 'x^2 + y^2';

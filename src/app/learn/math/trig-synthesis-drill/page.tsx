@@ -196,7 +196,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function TrigSynthesisDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansROuter, setAnsROuter] = useState<string>('');
   const [ansRInner, setAnsRInner] = useState<string>('');
@@ -207,10 +207,6 @@ export default function TrigSynthesisDrill() {
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -339,8 +335,6 @@ export default function TrigSynthesisDrill() {
     drawGraph();
   }, [problem, hasChecked]);
 
-  if (!problem) return null;
-
   let rStr = "";
   if (problem.rInner === 1) rStr = `${problem.rOuter}`;
   else rStr = `${problem.rOuter === 1 ? '' : problem.rOuter}\\sqrt{${problem.rInner}}`;
@@ -415,7 +409,7 @@ export default function TrigSynthesisDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsROuter(''); setAnsRInner(''); setAnsAlpha(''); setAnsCos(''); setAnsSin(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

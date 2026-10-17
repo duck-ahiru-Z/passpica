@@ -90,7 +90,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function LinearDiophantineDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
@@ -99,10 +99,6 @@ export default function LinearDiophantineDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -226,8 +222,6 @@ export default function LinearDiophantineDrill() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   let eqStr = `${problem.A}x `;
   if (problem.B > 0) {
     eqStr += `+ ${problem.B}y`;
@@ -262,7 +256,7 @@ export default function LinearDiophantineDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

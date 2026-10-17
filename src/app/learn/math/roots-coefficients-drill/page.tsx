@@ -128,7 +128,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function RootsCoefficientsDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansSign, setAnsSign] = useState<'+' | '-'>('+');
   const [ansNumStr, setAnsNumStr] = useState<string>('');
@@ -136,10 +136,6 @@ export default function RootsCoefficientsDrill() {
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -165,8 +161,6 @@ export default function RootsCoefficientsDrill() {
     }
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   const eqStr = formatPoly(problem.a, problem.b, problem.c);
 
@@ -252,7 +246,7 @@ export default function RootsCoefficientsDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsSign('+'); setAnsNumStr(''); setAnsDenStr(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

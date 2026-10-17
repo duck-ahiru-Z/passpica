@@ -130,7 +130,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function CosineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal1, setAnsVal1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansVal2, setAnsVal2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -141,10 +141,6 @@ export default function CosineRuleDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -266,8 +262,6 @@ export default function CosineRuleDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -294,7 +288,13 @@ export default function CosineRuleDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAnsVal1(defaultFractionRoot); setAnsVal2(defaultFractionRoot);
+                  setAnsDeg(''); setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

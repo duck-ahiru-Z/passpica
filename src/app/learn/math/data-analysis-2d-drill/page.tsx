@@ -208,17 +208,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function DataAnalysis2DDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -293,8 +289,6 @@ export default function DataAnalysis2DDrill() {
     drawGraph();
   }, [problem, hasChecked]);
 
-  if (!problem) return null;
-
   let explanationEl = <></>;
   if (hasChecked) {
     explanationEl = (
@@ -339,7 +333,12 @@ export default function DataAnalysis2DDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAns1(''); setHasChecked(false); setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

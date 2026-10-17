@@ -136,7 +136,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function SineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansDeg, setAnsDeg] = useState<string>('');
@@ -146,10 +146,6 @@ export default function SineRuleDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -255,8 +251,6 @@ export default function SineRuleDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -283,7 +277,7 @@ export default function SineRuleDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal(defaultFractionRoot); setAnsDeg(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

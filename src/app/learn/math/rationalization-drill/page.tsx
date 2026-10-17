@@ -54,7 +54,7 @@ function generateProblem(mode: DrillMode = 'mix'): ProblemData {
 
 export default function RationalizationDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -68,10 +68,6 @@ export default function RationalizationDrillPage() {
   
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
-
-  useEffect(() => {
-    handleNext('mix');
-  }, []);
 
   const handleNext = (nextMode: DrillMode = mode) => {
     setProblem(generateProblem(nextMode));
@@ -110,8 +106,6 @@ export default function RationalizationDrillPage() {
     
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">

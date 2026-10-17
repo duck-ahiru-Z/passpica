@@ -87,7 +87,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function EuclideanAlgorithmDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -95,10 +95,6 @@ export default function EuclideanAlgorithmDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -200,8 +196,6 @@ export default function EuclideanAlgorithmDrill() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -228,7 +222,7 @@ export default function EuclideanAlgorithmDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

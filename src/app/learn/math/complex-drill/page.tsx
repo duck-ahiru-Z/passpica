@@ -46,7 +46,7 @@ const problemPickers: Record<DrillMode, BalancedRandom<typeof PROBLEMS[number]>>
 
 export default function ComplexDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<typeof PROBLEMS[0] | null>(null);
+  const [problem, setProblem] = useState<typeof PROBLEMS[0]>(() => problemPickers.mix.next());
   
   // 入力状態
   const [inN, setInN] = useState('');
@@ -75,10 +75,6 @@ export default function ComplexDrillPage() {
     setMode(nextMode);
     generateProblem(nextMode);
   };
-
-  useEffect(() => {
-    generateProblem();
-  }, []);
 
   // グラフ描画
   useEffect(() => {

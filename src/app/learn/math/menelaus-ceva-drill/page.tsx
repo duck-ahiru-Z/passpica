@@ -87,17 +87,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function MenelausCevaDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -122,8 +118,6 @@ export default function MenelausCevaDrill() {
     }
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   let questionEl = <></>;
   let formulaStr = "";
@@ -328,7 +322,7 @@ export default function MenelausCevaDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

@@ -303,7 +303,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function ComplexPolarDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansR, setAnsR] = useState<string>('');
   const [ansTheta, setAnsTheta] = useState<string>('');
@@ -313,10 +313,6 @@ export default function ComplexPolarDrill() {
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -444,8 +440,6 @@ export default function ComplexPolarDrill() {
     drawGraph();
   }, [problem, hasChecked]);
 
-  if (!problem) return null;
-
   let explanationEl = <></>;
   if (hasChecked) {
     explanationEl = (
@@ -490,7 +484,13 @@ export default function ComplexPolarDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAnsA(''); setAnsB(''); setAnsR(''); setAnsTheta('');
+                  setHasChecked(false); setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

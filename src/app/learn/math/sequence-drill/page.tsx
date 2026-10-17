@@ -23,9 +23,20 @@ interface SequenceProblem {
 type DrillMode = 'mix' | 'positive' | 'negative';
 const signPicker = new BalancedRandom<'positive' | 'negative'>(['positive', 'negative']);
 
+function createSequenceProblem(nextMode: DrillMode): SequenceProblem {
+  const alpha = Math.floor(Math.random() * 11) - 5;
+  const mixedSign = signPicker.next();
+  const pChoices = nextMode === 'positive' ? [2, 3, 4, 5] : nextMode === 'negative' ? [-3, -2] : mixedSign === 'positive' ? [2, 3, 4, 5] : [-3, -2];
+  const p = pChoices[Math.floor(Math.random() * pChoices.length)];
+  const q = alpha * (1 - p);
+  let a1 = alpha;
+  while (a1 === alpha) a1 = Math.floor(Math.random() * 11) - 5;
+  return { a1, p, q, alpha, C: a1 - alpha };
+}
+
 export default function SequenceDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<SequenceProblem | null>(null);
+  const [problem, setProblem] = useState<SequenceProblem>(() => createSequenceProblem('mix'));
   
   // 入力状態
   const [inC, setInC] = useState('');
@@ -41,22 +52,7 @@ export default function SequenceDrillPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const generateProblem = (nextMode: DrillMode = mode) => {
-    const alpha = Math.floor(Math.random() * 11) - 5; // -5 to 5
-    
-    const mixedSign = signPicker.next();
-    const pChoices = nextMode === 'positive' ? [2, 3, 4, 5] : nextMode === 'negative' ? [-3, -2] : mixedSign === 'positive' ? [2, 3, 4, 5] : [-3, -2];
-    const p = pChoices[Math.floor(Math.random() * pChoices.length)];
-    
-    const q = alpha * (1 - p);
-    
-    let a1 = alpha;
-    while (a1 === alpha) {
-      a1 = Math.floor(Math.random() * 11) - 5;
-    }
-    
-    const C = a1 - alpha;
-
-    setProblem({ a1, p, q, alpha, C });
+    setProblem(createSequenceProblem(nextMode));
     setInC('');
     setInP('');
     setInAlpha('');
@@ -70,10 +66,6 @@ export default function SequenceDrillPage() {
     setMode(nextMode);
     generateProblem(nextMode);
   };
-
-  useEffect(() => {
-    generateProblem();
-  }, []);
 
   // グラフ描画 (コブウェブプロット)
   useEffect(() => {

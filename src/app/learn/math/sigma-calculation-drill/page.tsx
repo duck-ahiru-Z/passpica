@@ -152,16 +152,12 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function SigmaCalculationDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -191,8 +187,6 @@ export default function SigmaCalculationDrill() {
     }
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   let explanationEl = <></>;
   if (hasChecked) {
@@ -243,7 +237,7 @@ export default function SigmaCalculationDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>

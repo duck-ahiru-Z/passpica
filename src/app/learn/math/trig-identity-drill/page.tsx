@@ -162,7 +162,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function TrigIdentityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ans2, setAns2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -173,10 +173,6 @@ export default function TrigIdentityDrillPage() {
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const drawGraph = () => {
     if (!problem || !canvasRef.current) return;
@@ -304,8 +300,6 @@ export default function TrigIdentityDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   const target1 = problem.givenType === 'sin' ? 'cos' : 'sin';
   const target2 = problem.givenType === 'tan' ? 'cos' : 'tan';
 
@@ -335,7 +329,7 @@ export default function TrigIdentityDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAns1(defaultFractionRoot); setAns2(defaultFractionRoot); setAns3(defaultFractionRoot); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
