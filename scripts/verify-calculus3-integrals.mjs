@@ -24,7 +24,10 @@ const checks = {
   parts: problem => {
     const [, rate] = problem.expression.match(/e\^\{(\d+)x\}/);
     const n = Number(rate);
-    return close(problem.answer, (Math.exp(n) * (n - 1) + 1) / n ** 2) && problem.explanation.includes(`/${n}²`);
+    const expected = (Math.exp(n) * (n - 1) + 1) / n ** 2;
+    return close(problem.answer, expected)
+      && problem.explanation.includes(`xe^(${n}x)/${n}−e^(${n}x)/${n}²]₀¹`)
+      && problem.explanation.includes(`≈ ${expected.toFixed(3)}`);
   },
   rational: problem => {
     const [, xCoefficient, constant] = problem.expression.match(/\\frac\{(\d+)x\+(\d+)\}/);
@@ -45,7 +48,7 @@ const checks = {
     const expectedUpper = r % 2 === 0 ? String(r / 2) : `\\frac{${r}}{2}`;
     const expected = r ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8);
     return upper === expectedUpper && close(problem.answer, expected)
-      && problem.hint.includes('三角置換') && problem.explanation.includes('θ=0からπ/6')
+      && problem.hint.includes('上端が R/2') && problem.explanation.includes('sin θ=1/2 より θ=π/6')
       && !problem.explanation.includes('\\frac')
       && problem.explanation.includes(expected.toFixed(3));
   },
