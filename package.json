@@ -9,6 +9,8 @@
     "lint": "eslint",
     "test:random": "node --experimental-strip-types scripts/verify-balanced-random.mjs",
     "test:rational-input": "node --experimental-strip-types scripts/verify-rational-input.mjs",
+    "test:fraction-root-input": "node --experimental-strip-types scripts/verify-fraction-root-input.mjs",
+    "test:trig-identity-parameters": "node --experimental-strip-types scripts/verify-trig-identity-parameters.mjs",
     "test:sequence-sum-prompt": "node --experimental-strip-types scripts/verify-sequence-sum-prompt.mjs",
     "test:sequence-sum-questions": "node --experimental-strip-types scripts/verify-sequence-sum-questions.mjs",
     "test:sequence-recurrence": "node --experimental-strip-types scripts/verify-sequence-recurrence.mjs",

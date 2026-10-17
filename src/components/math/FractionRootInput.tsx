@@ -1,6 +1,7 @@
 "use client";
 
 import React from 'react';
+import { checkFractionRoot as validateFractionRoot } from '@/src/lib/fractionRoot';
 
 export interface FractionRootValue {
   sign: '+' | '-';
@@ -20,9 +21,10 @@ interface Props {
   value: FractionRootValue;
   onChange: (val: FractionRootValue) => void;
   hideSign?: boolean;
+  label?: string;
 }
 
-export default function FractionRootInput({ value, onChange, hideSign = false }: Props) {
+export default function FractionRootInput({ value, onChange, hideSign = false, label = '答え' }: Props) {
   const update = (key: keyof FractionRootValue, v: string) => {
     onChange({ ...value, [key]: v });
   };
@@ -31,6 +33,7 @@ export default function FractionRootInput({ value, onChange, hideSign = false }:
     <div className="flex items-center gap-1 inline-flex align-middle">
       {!hideSign && (
         <select 
+          aria-label={`${label}の符号`}
           className="border border-gray-400 py-1 px-0.5 bg-white text-sm font-bold text-center appearance-none"
           value={value.sign}
           onChange={(e) => update('sign', e.target.value)}
@@ -42,6 +45,7 @@ export default function FractionRootInput({ value, onChange, hideSign = false }:
       <div className="flex flex-col items-center">
         <div className="flex items-center gap-0.5">
           <input 
+            aria-label={`${label}の分子の係数`}
             type="text" 
             className="w-8 border border-gray-400 p-1 text-center font-bold text-sm" 
             value={value.numCoeff} 
@@ -49,6 +53,7 @@ export default function FractionRootInput({ value, onChange, hideSign = false }:
           />
           <span className="text-gray-500 font-serif italic font-bold">√</span>
           <input 
+            aria-label={`${label}の根号の中の数`}
             type="text" 
             className="w-8 border border-gray-400 p-1 text-center font-bold text-sm" 
             value={value.numRoot} 
@@ -57,6 +62,7 @@ export default function FractionRootInput({ value, onChange, hideSign = false }:
         </div>
         <div className="w-full border-b-[1.5px] border-slate-800 my-0.5"></div>
         <input 
+          aria-label={`${label}の分母`}
           type="text" 
           className="w-12 border border-gray-400 p-1 text-center font-bold text-sm bg-gray-50" 
           value={value.den} 
@@ -70,21 +76,5 @@ export default function FractionRootInput({ value, onChange, hideSign = false }:
 
 // Utility to parse and compare FractionRootValue to actual mathematically expected values
 export function checkFractionRoot(val: FractionRootValue, expectedSign: 1 | -1, expectedNumCoeff: number, expectedNumRoot: number, expectedDen: number): boolean {
-  let vSign = val.sign === '+' ? 1 : -1;
-  let vNumCoeff = val.numCoeff.trim() === '' || val.numCoeff.trim() === '1' ? 1 : parseInt(val.numCoeff);
-  if (val.numCoeff.trim() === '0') vNumCoeff = 0;
-  if (val.numCoeff.trim() === '-1') { vSign *= -1; vNumCoeff = 1; }
-  
-  let vNumRoot = val.numRoot.trim() === '' || val.numRoot.trim() === '1' ? 1 : parseInt(val.numRoot);
-  if (val.numRoot.trim() === '0') { vNumCoeff = 0; vNumRoot = 1; }
-  
-  let vDen = val.den.trim() === '' ? 1 : parseInt(val.den);
-  if (vDen < 0) { vSign *= -1; vDen *= -1; }
-  
-  if (vNumCoeff === 0) {
-    return expectedNumCoeff === 0;
-  }
-  
-  // They must match perfectly in simplified radical form since it's a drill
-  return vSign === expectedSign && vNumCoeff === expectedNumCoeff && vNumRoot === expectedNumRoot && vDen === expectedDen;
+  return validateFractionRoot(val, expectedSign, expectedNumCoeff, expectedNumRoot, expectedDen);
 }

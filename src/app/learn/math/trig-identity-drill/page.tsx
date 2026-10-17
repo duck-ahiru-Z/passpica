@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { generateTrigSumParameters } from '@/src/lib/trigIdentityParameters';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -87,10 +88,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p_type === 'pattern4') {
-    const q = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
-    const maxP = Math.floor(q * 1.414); // sqrt(2)
-    let p = Math.floor(Math.random() * (maxP * 2 + 1)) - maxP;
-    if (p === q || p === -q || p === 0) p = 1; // avoid 0, 1, -1 for non-trivial
+    const { p, q } = generateTrigSumParameters();
     
     // sum = p/q. (sin+cos)^2 = p^2/q^2 => 1 + 2sin cos = p^2/q^2 => sin cos = (p^2 - q^2)/(2q^2)
     // We can just use getVal to simplify (p^2 - q^2) / (2q^2) 
@@ -325,7 +323,9 @@ export default function TrigIdentityDrillPage() {
               <h2 className="text-sm font-bold">
                 ■ 問題
               </h2>
-              <select 
+              <label htmlFor="trig-identity-mode" className="sr-only">三角比の演習パターン</label>
+              <select
+                id="trig-identity-mode"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAns1(defaultFractionRoot); setAns2(defaultFractionRoot); setAns3(defaultFractionRoot); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
@@ -357,17 +357,17 @@ export default function TrigIdentityDrillPage() {
                 {problem.pattern === 'pattern4' ? (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math="\sin\theta \cos\theta =" />
-                    <FractionRootInput value={ans3} onChange={setAns3} />
+                    <FractionRootInput value={ans3} onChange={setAns3} label="sin θ cos θ" />
                   </div>
                 ) : (
                   <>
                     <div className="flex items-center gap-4 bg-gray-50 p-2 border rounded">
                       <div className="w-16 text-right"><MathEq math={`\\${target1}\\theta =`} /></div>
-                      <FractionRootInput value={ans1} onChange={setAns1} />
+                      <FractionRootInput value={ans1} onChange={setAns1} label={`${target1} θ`} />
                     </div>
                     <div className="flex items-center gap-4 bg-gray-50 p-2 border rounded">
                       <div className="w-16 text-right"><MathEq math={`\\${target2}\\theta =`} /></div>
-                      <FractionRootInput value={ans2} onChange={setAns2} />
+                      <FractionRootInput value={ans2} onChange={setAns2} label={`${target2} θ`} />
                     </div>
                   </>
                 )}
@@ -382,12 +382,14 @@ export default function TrigIdentityDrillPage() {
 
             <div className="mt-8 flex gap-4 justify-center">
               <button 
+                type="button"
                 onClick={handleCheck}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
               </button>
               <button 
+                type="button"
                 onClick={handleNext}
                 className="retro-btn-classic"
               >
@@ -396,7 +398,7 @@ export default function TrigIdentityDrillPage() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！図との対応も確認しましょう。' : '不正解... 解説を見てみよう。'}
               </div>
             )}
