@@ -18,7 +18,7 @@ const METALS: MetalSalt[] = [
   { formula: 'NaCl', name: 'Sodium', jpName: 'ナトリウム', colorName: '黄色', colorHex: '#eab308', mnemonic: '無き（Na:黄）', explain: '炎色反応は黄色。食塩（塩化ナトリウム）や、かつてトンネル照明に使用されたナトリウムランプでおなじみです。' },
   { formula: 'KCl', name: 'Potassium', jpName: 'カリウム', colorName: '赤紫色', colorHex: '#c084fc', mnemonic: 'Kの村（K:紫）', explain: '炎色反応は赤紫色。植物の生長を支える「肥料の三要素」の主成分であり、細胞液の浸透圧調節に重要です。' },
   { formula: 'CuCl2', name: 'Copper', jpName: '銅', colorName: '青緑色', colorHex: '#0d9488', mnemonic: '動力（Cu:緑）', explain: '炎色反応は青緑色。花火の着色剤として配合されます。電気の良導体であり、電線や配線に大量に使用されます。' },
-  { formula: 'CaCl2', name: 'Calcium', jpName: 'カルシウム', colorName: '橙赤色', colorHex: '#f97316', mnemonic: '借りるとう（Ca:橙）', explain: '炎色反応は橙赤色。融雪剤（塩化カルシウム）として道路に散布されるほか、骨や歯を構成する必須元素です。' },
+  { formula: 'CaCl2', name: 'Calcium', jpName: 'カルシウム', colorName: '橙赤色', colorHex: '#ff4500', mnemonic: '借りるとう（Ca:橙）', explain: '炎色反応は橙赤色。融雪剤（塩化カルシウム）として道路に散布されるほか、骨や歯を構成する必須元素です。' },
   { formula: 'BaCl2', name: 'Barium', jpName: 'バリウム', colorName: '黄緑色', colorHex: '#84cc16', mnemonic: '馬力（Ba:緑）', explain: '炎色反応は黄緑色。消化管（胃）のレントゲン検査で用いられる造影剤（硫酸バリウム）として有名です。' }
 ];
 
