@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 type Area = 'limit' | 'differentiation' | 'integral' | 'geometry' | 'differential-equation';
 type Question = { area: Area; areaLabel: string; prompt: string; options: string[]; answer: string; explanation: string };
@@ -26,7 +27,7 @@ const areaPickers = new Map(areaOrder.map(area => [area, new BalancedRandom(ques
 
 export default function Calculus3MixedDrillPage() {
   const [mode, setMode] = useState<'all' | Area>('all');
-  const [question, setQuestion] = useState<Question>(questions[0]);
+  const [question, setQuestion] = useClientGeneratedState(() => picker.next());
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
 
@@ -42,9 +43,8 @@ export default function Calculus3MixedDrillPage() {
     next(value);
   };
 
+  if (!question) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const correct = answer === question.answer;
-
-  useEffect(() => { next('all'); }, []);
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">

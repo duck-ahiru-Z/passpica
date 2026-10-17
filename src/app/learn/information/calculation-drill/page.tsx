@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 
@@ -19,8 +20,9 @@ const problems: Record<Pattern, Problem> = {
 };
 const picker = new BalancedRandom(patterns);
 export default function InformationCalculationDrillPage() {
-  const [mode, setMode] = useState<Pattern | 'mix'>('mix'); const [problem, setProblem] = useState<Problem>(() => problems[picker.next()]); const [answer, setAnswer] = useState(''); const [checked, setChecked] = useState(false);
+  const [mode, setMode] = useState<Pattern | 'mix'>('mix'); const [problem, setProblem] = useClientGeneratedState(() => problems[picker.next()]); const [answer, setAnswer] = useState(''); const [checked, setChecked] = useState(false);
   const load = (selected: Pattern | 'mix') => { const p = selected === 'mix' ? picker.next() : selected; setProblem(problems[p]); setAnswer(''); setChecked(false); };
+  if (!problem) return <main className="max-w-3xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const normalizeAnswer = (value: string) => value.trim().replaceAll(',', '').replaceAll(' ', '').toLowerCase();
   const numericPatterns = new Set<Pattern>(['data', 'transfer', 'sampling', 'compression']);
   const normalizedAnswer = normalizeAnswer(answer);

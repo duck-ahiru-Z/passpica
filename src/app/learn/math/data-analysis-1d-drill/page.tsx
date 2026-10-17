@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -180,7 +181,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function DataAnalysis1DDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<string>('');
   const [ans2, setAns2] = useState<string>('');
@@ -190,12 +191,8 @@ export default function DataAnalysis1DDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setAns1('');
     setAns2('');
     setAns3('');
@@ -296,7 +293,7 @@ export default function DataAnalysis1DDrill() {
     drawGraph();
   }, [problem, hasChecked]);
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let explanationEl = <></>;
   if (hasChecked) {
@@ -342,7 +339,7 @@ export default function DataAnalysis1DDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -438,7 +435,7 @@ export default function DataAnalysis1DDrill() {
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔

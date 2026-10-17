@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -153,7 +154,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function AbsoluteValueEqDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
   
   // ユーザー入力 (分数対応のため分子・分母で管理)
   const [ans1Num, setAns1Num] = useState<string>('');
@@ -367,7 +368,7 @@ export default function AbsoluteValueEqDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">

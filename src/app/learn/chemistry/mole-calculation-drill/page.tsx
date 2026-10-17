@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 
@@ -21,10 +22,11 @@ const mixedPatternPicker = new BalancedRandom<Pattern>(patterns);
 
 export default function MoleCalculationDrillPage() {
   const [pattern, setPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<Problem>(() => problems[mixedPatternPicker.next()]);
+  const [problem, setProblem] = useClientGeneratedState(() => problems[mixedPatternPicker.next()]);
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
   const load = (selected: Pattern | 'mix') => { const p = selected === 'mix' ? mixedPatternPicker.next() : selected; setProblem(problems[p]); setAnswer(''); setChecked(false); };
+  if (!problem) return <main className="max-w-3xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const correct = answer.trim() !== '' && Number.isFinite(Number(answer)) && Math.abs(Number(answer) - Number(problem.answer)) < 1e-9;
   return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs"><Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link><h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">化学 物質量・反応計算ドリル</h1><p className="text-gray-500 mb-6">物質量・濃度・希釈・気体・反応量比・pH・収率を個別に練習し、実戦では計算方法を判断しながら混合演習します。</p><section className="retro-box space-y-5"><div className="flex flex-wrap items-center gap-2"><span className="font-bold">演習モード</span><select value={pattern} onChange={e => { const p = e.target.value as Pattern | 'mix'; setPattern(p); load(p); }} className="border p-1"><option value="mix">実戦練習：化学計算 全パターンランダム</option>{patterns.map(p => <option key={p} value={p}>基礎練習：{labels[p]}だけ</option>)}</select></div><div className="bg-white border p-8 text-center text-lg font-bold">{problem.question}</div><p className="text-center font-bold">答えを入力し、最初に使う計算を確認しなさい。</p><input value={answer} onChange={e => setAnswer(e.target.value)} placeholder="数値" className="retro-input block mx-auto w-40 text-center" /><div className="flex justify-center gap-3"><button onClick={() => setChecked(true)} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold">解答する</button><button onClick={() => load(pattern)} className="retro-btn-classic">次の問題へ ➔</button></div>{checked && <div className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : `不正解。正解は ${problem.answer} です。`}<div className="mt-2 font-normal text-slate-700">{problem.explanation}</div></div>}</section></main>;
 }

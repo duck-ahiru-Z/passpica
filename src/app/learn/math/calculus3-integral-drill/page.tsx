@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from 'react';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -35,11 +36,12 @@ function generate(mode: Mode): Problem {
 
 export default function Calculus3IntegralDrillPage() {
   const [mode, setMode] = useState<Mode>('mix');
-  const [problem, setProblem] = useState<Problem>(() => generate('mix'));
+  const [problem, setProblem] = useClientGeneratedState(() => generate('mix'));
   const [strategy, setStrategy] = useState<Pattern | ''>('');
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
   const next = (selectedMode = mode) => { setProblem(generate(selectedMode)); setStrategy(''); setAnswer(''); setChecked(false); };
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const isCorrect = strategy === problem.pattern && Math.abs(Number(answer) - problem.answer) < 0.01;
 
   return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
