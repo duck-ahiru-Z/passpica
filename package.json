@@ -14,6 +14,7 @@
     "test:calculus3-differentiation": "node --experimental-strip-types scripts/verify-calculus3-differentiation.mjs",
     "test:calculus3-limits": "node --experimental-strip-types scripts/verify-calculus3-limits.mjs",
     "test:calculus3-differential-equations": "node --experimental-strip-types scripts/verify-calculus3-differential-equations.mjs",
+    "test:calculus3-mixed": "node --experimental-strip-types scripts/verify-calculus3-mixed-questions.mjs",
     "test:chemistry-mole": "node --experimental-strip-types scripts/verify-chemistry-mole-calculation.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
     "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
