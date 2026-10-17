@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -223,12 +224,12 @@ export default function TrigSynthesisDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const rOut = parseInt(ansROuter) || 1;
-    const rIn = parseInt(ansRInner) || 1;
+    const rOut = parseStrictPositiveInteger(ansROuter);
+    const rIn = parseStrictPositiveInteger(ansRInner, true);
     
     let isOk = false;
     // check r
-    if (rOut === problem.rOuter && rIn === problem.rInner) {
+    if (rOut !== null && rIn !== null && rOut === problem.rOuter && rIn === problem.rInner) {
       // check alpha
       const uAlp = ansAlpha.trim().replace(/\s+/g, '').toLowerCase();
       // allow 11pi/6 or -pi/6
@@ -410,7 +411,9 @@ export default function TrigSynthesisDrill() {
               <h2 className="text-sm font-bold">
                 ■ 問題
               </h2>
-              <select 
+              <label htmlFor="trig-synthesis-mode" className="sr-only">三角関数の合成の演習パターン</label>
+              <select
+                id="trig-synthesis-mode"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsROuter(''); setAnsRInner(''); setAnsAlpha(''); setAnsCos(''); setAnsSin(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
@@ -433,6 +436,7 @@ export default function TrigSynthesisDrill() {
                 <span className="text-sm font-bold text-gray-500">振幅 <MathEq math="r" /></span>
                 <div className="flex items-center gap-1">
                   <input 
+                    aria-label="振幅の平方根の外側の係数"
                     type="number" 
                     className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                     value={ansROuter} 
@@ -441,6 +445,7 @@ export default function TrigSynthesisDrill() {
                   />
                   <span className="text-xl font-bold">√</span>
                   <input 
+                    aria-label="振幅の平方根の内側の数"
                     type="number" 
                     className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                     value={ansRInner} 
@@ -454,6 +459,7 @@ export default function TrigSynthesisDrill() {
               <div className="flex flex-col items-center gap-1 w-full border-t pt-4">
                 <span className="text-sm font-bold text-gray-500">偏角 <MathEq math="\alpha" /></span>
                 <input 
+                  aria-label="偏角 alpha"
                   type="text" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                   value={ansAlpha} 
@@ -469,6 +475,7 @@ export default function TrigSynthesisDrill() {
                   <div className="flex items-center gap-2">
                     <span><MathEq math="\cos\alpha=" /></span>
                     <input 
+                      aria-label="cos alpha の値"
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-base text-slate-800 focus:border-blue-500" 
                       value={ansCos} 
@@ -479,6 +486,7 @@ export default function TrigSynthesisDrill() {
                   <div className="flex items-center gap-2">
                     <span><MathEq math="\sin\alpha=" /></span>
                     <input 
+                      aria-label="sin alpha の値"
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-base text-slate-800 focus:border-blue-500" 
                       value={ansSin} 

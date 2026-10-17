@@ -27,6 +27,7 @@
     "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
     "test:factorization": "node --experimental-strip-types scripts/verify-factorization-questions.mjs",
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",
+    "test:trig-synthesis-inputs": "node --experimental-strip-types scripts/verify-trig-synthesis-inputs.mjs",
     "test:complex-polar-exact": "node --experimental-strip-types scripts/verify-complex-polar-exact.mjs",
     "test:quadratic-inequality": "node --experimental-strip-types scripts/verify-quadratic-inequality.mjs",
     "test:absolute-value-equations": "node --experimental-strip-types scripts/verify-absolute-value-equation-answers.mjs",
