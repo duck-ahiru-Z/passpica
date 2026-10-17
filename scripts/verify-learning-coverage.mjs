@@ -73,7 +73,7 @@ function includesBalancedRandom(source, file) {
 }
 const patternPages = pages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
-  return /type\s+Pattern\s*=/.test(source);
+  return /type\s+\w*Pattern\s*=/.test(source);
 });
 const incompletePatternPages = patternPages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
@@ -89,7 +89,7 @@ if (incompletePatternPages.length > 0) {
 for (const slug of requiredDrills) {
   const entry = drillEntries.find(candidate => candidate.slug === slug);
   const source = fs.readFileSync(routeFile(entry.link), 'utf8');
-  if (!source.includes('BalancedRandom') || !/<select\b/.test(source) || !/全体ランダム|全パターンランダム|全分野ランダム|value=['"]all['"]/.test(source)) {
+  if (!includesBalancedRandom(source, routeFile(entry.link)) || !/<select\b/.test(source) || !/全体ランダム|全パターンランダム|全分野ランダム|value=['"]all['"]/.test(source)) {
     throw new Error(`Aggregate drill must provide balanced topic selection and a mixed mode: ${slug}`);
   }
 }
