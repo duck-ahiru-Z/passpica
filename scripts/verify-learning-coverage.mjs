@@ -59,21 +59,25 @@ function collectPages(directory) {
 }
 const pages = collectPages(learnRoot);
 const mathPages = pages.filter(file => file.includes(`${path.sep}math${path.sep}`));
-function includesBalancedRandom(source, file) {
-  if (source.includes('BalancedRandom')) return true;
+function importedSources(source, file) {
   const imports = [...source.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(match => match[1]);
-  return imports.some(specifier => {
-    if (!specifier.startsWith('@/') && !specifier.startsWith('.')) return false;
+  return imports.flatMap(specifier => {
+    if (!specifier.startsWith('@/') && !specifier.startsWith('.')) return [];
     const base = specifier.startsWith('@/') ? path.join(root, specifier.slice(2)) : path.resolve(path.dirname(file), specifier);
-    return ['.ts', '.tsx', '.js', '.jsx'].some(extension => {
+    const dependency = ['.ts', '.tsx', '.js', '.jsx'].map(extension => {
       const dependency = `${base}${extension}`;
-      return fs.existsSync(dependency) && fs.readFileSync(dependency, 'utf8').includes('BalancedRandom');
-    });
+      return fs.existsSync(dependency) ? fs.readFileSync(dependency, 'utf8') : null;
+    }).find(Boolean);
+    return dependency ? [dependency] : [];
   });
+}
+function includesBalancedRandom(source, file) {
+  return source.includes('BalancedRandom') || importedSources(source, file).some(dependency => dependency.includes('BalancedRandom'));
 }
 const patternPages = pages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
-  return /type\s+\w*Pattern\s*=/.test(source);
+  return /type\s+\w*Pattern\s*=/.test(source)
+    || importedSources(source, file).some(dependency => /export\s+const\s+\w*Patterns\b/.test(dependency));
 });
 const incompletePatternPages = patternPages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');

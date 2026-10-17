@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateDoubleRadicalProblem, type DoubleRadicalMode } from '@/src/lib/doubleRadicalProblems';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
@@ -13,77 +13,9 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function getSquareFactors(n: number): number[] {
-  const factors = [];
-  for (let k = 2; k * k <= n; k++) {
-    if (n % (k * k) === 0) factors.push(k);
-  }
-  return factors;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  a: number;
-  b: number;
-  eq: string;
-  sign: '+' | '-';
-  sum: number;
-  prod: number;
-  k?: number; // for pattern3
-  inner?: number; // for pattern3
-  X?: number; // for pattern4
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    const a = Math.floor(Math.random() * 8) + 2; // 2 to 9
-    const b = Math.floor(Math.random() * 8) + 2; // 2 to 9
-    if (a <= b) continue; // 必ず a > b
-    
-    const sum = a + b;
-    const prod = a * b;
-    
-    if (p === 'pattern1' || p === 'pattern2') {
-      // ユーザー要望: 答えが整数になる場合はそのまま √の中身として扱っても良いが、
-      // 逆算ロジックとしては単に a+b, ab を使えばOK
-      const sign: '+' | '-' = p === 'pattern1' ? '+' : '-';
-      const eq = `\\sqrt{${sum} ${sign} 2\\sqrt{${prod}}}`;
-      return { pattern: p, a, b, eq, sign, sum, prod };
-    }
-    
-    if (p === 'pattern3') {
-      const kFactors = getSquareFactors(prod);
-      if (kFactors.length === 0) continue; // 係数として外に出せる数がない場合はやり直し
-      const k = kFactors[kFactors.length - 1]; // 最大の平方因数のルート
-      const inner = prod / (k * k);
-      const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      const coef = 2 * k; // 2以外の偶数係数 (4, 6, 8...)
-      const eq = `\\sqrt{${sum} ${sign} ${coef}\\sqrt{${inner}}}`;
-      return { pattern: p, a, b, eq, sign, sum, prod, k, inner };
-    }
-    
-    if (p === 'pattern4') {
-      if (a % 2 === 0 || b % 2 === 0) continue; // a, b は奇数（和が偶数になるように）
-      const X = sum / 2;
-      // prodが4で割り切れると係数が出てしまうので除外
-      if (prod % 4 === 0) continue;
-      const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      const eq = `\\sqrt{${X} ${sign} \\sqrt{${prod}}}`;
-      return { pattern: p, a, b, eq, sign, sum, prod, X };
-    }
-  }
-}
-
 export default function DoubleRadicalDrillPage() {
-  const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [selectedPattern, setSelectedPattern] = useState<DoubleRadicalMode>('mix');
+  const [problem, setProblem] = useClientGeneratedState(() => generateDoubleRadicalProblem('mix'));
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -92,13 +24,11 @@ export default function DoubleRadicalDrillPage() {
   // 判定状態
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showGraph, setShowGraph] = useState(false); // 二重根号はグラフ不要ですが、要件統一のためUIは用意するか？(後述)
-  
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
-  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
-    setProblem(generateProblem(pattern));
+  const handleNext = (pattern: DoubleRadicalMode = selectedPattern) => {
+    setProblem(generateDoubleRadicalProblem(pattern));
     setAnsA('');
     setAnsB('');
     setHasChecked(false);
@@ -154,7 +84,7 @@ export default function DoubleRadicalDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
+                onChange={e => { const pattern = e.target.value as DoubleRadicalMode; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
