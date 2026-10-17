@@ -21,7 +21,7 @@ const STEPS: SeparationStep[] = [
     etherLayer: ['アニリン (塩基性)', '安息香酸 (カルボン酸・フェノールより強い酸)', 'フェノール (弱酸性)', 'ニトロベンゼン (中性)'],
     waterLayer: [],
     reaction: '-',
-    explain: 'アニリン、安息香酸、フェノール、ニトロベンゼンの4つの有機化合物がエーテル（有機溶媒層）に均一に溶けている初期状態です。水とエーテルを混ぜると、互いに混ざり合わず、密度の小さいエーテルが「上層（エーテル層）」、水が「下層（水層）」に分離します。'
+    explain: 'アニリン、安息香酸、フェノール、ニトロベンゼンの4つがエーテルに溶けた、水溶液を加える前の初期状態です。水溶液を加えると水とエーテルは混ざり合わず、密度の小さいエーテルが上層、水が下層になります。'
   },
   {
     id: 1,
@@ -129,7 +129,7 @@ export default function OrganicSeparationPage() {
 
           {/* 分液漏斗のフラットSVG */}
           <div className="flex items-center justify-center py-6 w-full relative">
-            <svg width="240" height="240" viewBox="0 0 160 160" className="overflow-visible font-sans">
+            <svg width="240" height="240" viewBox="0 0 160 160" className="overflow-visible font-sans" role="img" aria-label={`分液漏斗の層の図。上層エーテルには${step.etherLayer.join('、') || '物質なし'}。${step.waterLayer.length ? `下層水溶液には${step.waterLayer.join('、')}。` : 'まだ水溶液を加えていません。'}`}>
               
               {/* 分液漏斗のアウトライン（涙のしずく型） */}
               <path 
@@ -150,20 +150,7 @@ export default function OrganicSeparationPage() {
                 fill="#fef08a" 
                 opacity="0.3" 
               />
-              <text x="80" y="50" fill="#a16207" fontSize="8" fontWeight="bold" textAnchor="middle">
-                [上層] エーテル層（有機溶媒）
-              </text>
-              {/* エーテル層の溶質 */}
-              <g>
-                {step.etherLayer.map((item, idx) => {
-                  const yPos = 58 + idx * 5;
-                  return (
-                    <text key={item} x="80" y={yPos} fill="#854d0e" fontSize="7" fontWeight="bold" textAnchor="middle">
-                      {item}
-                    </text>
-                  );
-                })}
-              </g>
+              <text x="80" y="62" fill="#854d0e" fontSize="7" fontWeight="bold" textAnchor="middle">エーテル層</text>
 
               {/* 下層：水層（境界線 y=75 〜 y=110） */}
               {step.waterLayer.length > 0 && (
@@ -173,29 +160,27 @@ export default function OrganicSeparationPage() {
                     fill="#93c5fd" 
                     opacity="0.3" 
                   />
-                  <text x="80" y="86" fill="#1d4ed8" fontSize="8" fontWeight="bold" textAnchor="middle">
-                    [下層] 水層（水溶液）
-                  </text>
-                  {/* 水層の溶質 */}
-                  <g>
-                    {step.waterLayer.map((item, idx) => {
-                      const yPos = 94 + idx * 6;
-                      return (
-                        <text key={item} x="80" y={yPos} fill="#1e40af" fontSize="7" fontWeight="bold" textAnchor="middle">
-                          {item}
-                        </text>
-                      );
-                    })}
-                  </g>
+                  <text x="80" y="90" fill="#1d4ed8" fontSize="8" fontWeight="bold" textAnchor="middle">水層</text>
                 </g>
               )}
 
             </svg>
           </div>
 
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-2xl mx-auto text-[10px]">
+            <div className="border border-amber-200 bg-amber-50/60 p-2 rounded min-w-0">
+              <h3 className="font-bold text-amber-900 mb-1">上層：エーテル層</h3>
+              <ul className="list-disc pl-4 space-y-0.5 break-words">{step.etherLayer.map(item => <li key={item}>{item}</li>)}</ul>
+            </div>
+            <div className="border border-blue-200 bg-blue-50/60 p-2 rounded min-w-0">
+              <h3 className="font-bold text-blue-900 mb-1">下層：水層</h3>
+              {step.waterLayer.length ? <ul className="list-disc pl-4 space-y-0.5 break-words">{step.waterLayer.map(item => <li key={item}>{item}</li>)}</ul> : <p className="text-slate-600">まだ水溶液を加えていません。</p>}
+            </div>
+          </div>
+
           <div className="w-full border-t border-gray-200 pt-4 text-center">
             <span className="text-[10px] text-gray-500 font-mono">
-              ※エーテルと水は混ざり合わず、水の方が密度が大きいため必ず水が下層にきます。
+              ※水溶液を加えた後は、密度の小さいエーテルが上層、水が下層になります。初期状態はエーテル溶液のみです。
             </span>
           </div>
 
