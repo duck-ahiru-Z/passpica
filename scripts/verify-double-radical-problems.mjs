@@ -1,4 +1,14 @@
 import { doubleRadicalPatterns, generateDoubleRadicalProblem, parseRadicandAnswer } from '../src/lib/doubleRadicalProblems.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/double-radical-drill/page.tsx'), 'utf8');
+if (!drillPage.includes('role="status" aria-live="polite"')
+  || !drillPage.includes("aria-pressed={detailLevel === 'brief'}")
+  || !drillPage.includes("aria-pressed={detailLevel === 'normal'}")
+  || !drillPage.includes("aria-pressed={detailLevel === 'detailed'}")) {
+  throw new Error('double-radical feedback and explanation-level choices must be exposed accessibly');
+}
 
 function seeded(seed) {
   let state = seed >>> 0;
