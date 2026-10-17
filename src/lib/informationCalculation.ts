@@ -7,6 +7,15 @@ export type InformationProblem = { pattern: InformationPattern; question: string
 export const informationPatterns: readonly InformationPattern[] = ['binary', 'data', 'transfer', 'logic', 'sampling', 'compression', 'complement'];
 export const informationLabels: Record<InformationPattern, string> = { binary: '2進数変換', data: 'データ量', transfer: '通信時間', logic: '論理演算', sampling: '標本化', compression: '圧縮率', complement: '補数表現' };
 
+function binaryAddends(value: number): string {
+  const addends: number[] = [];
+  for (let power = Math.floor(Math.log2(value)); power >= 0; power -= 1) {
+    const placeValue = 2 ** power;
+    if (value & placeValue) addends.push(placeValue);
+  }
+  return addends.join('+');
+}
+
 const picker = new BalancedRandom(informationPatterns);
 const variants = {
   binary: new BalancedRandom([13, 19, 23, 42, 58]),
@@ -41,7 +50,7 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
     case 'binary': {
       const decimal = variants.binary.next(random);
       const answer = decimal.toString(2);
-      return { pattern, question: `10進数の ${decimal} を2進数で表せ。`, answer, explanation: `${decimal} を2のべき乗の和に分解すると ${answer}₂。`, unit: '2進数' };
+      return { pattern, question: `10進数の ${decimal} を2進数で表せ。`, answer, explanation: `${decimal}=${binaryAddends(decimal)} と2のべき乗の和に分解する。各位に対応するビットを並べると ${answer}₂。`, unit: '2進数' };
     }
     case 'data': {
       const value = variants.data.next(random);
@@ -76,8 +85,8 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
       const unsigned = Number.parseInt(bits, 2);
       const answer = bits[0] === '1' ? unsigned - 256 : unsigned;
       const explanation = answer < 0
-        ? `${bits[0]} が1なので負の数。符号なしの値 ${unsigned} から 2⁸=256 を引き、${unsigned}−256=${answer}。`
-        : `最上位ビットが0なので正の数。2進数 ${bits} は10進数で ${answer}。`;
+        ? `${bits[0]} が1なので負の数。まず符号なしで読むと ${bits}₂=${unsigned}。8 bitの2の補数なので 2⁸=256 を引き、${unsigned}−256=${answer}。`
+        : `最上位ビットが0なので正の数。各位の重みを足すと ${bits}₂=${binaryAddends(unsigned)}=${answer}。`;
       return { pattern, question: `8 bitの2の補数表現で、${bits}₂が表す整数は？`, answer: String(answer), explanation, unit: '' };
     }
   }

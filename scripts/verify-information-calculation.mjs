@@ -4,7 +4,8 @@ const stableRandom = () => 0.37;
 const checks = {
   binary: problem => {
     const [, decimal] = problem.question.match(/10進数の (\d+)/);
-    return problem.answer === Number(decimal).toString(2) && problem.unit === '2進数';
+    return problem.answer === Number(decimal).toString(2) && problem.unit === '2進数'
+      && problem.explanation.includes(`${decimal}=`) && problem.explanation.includes(`${problem.answer}₂`);
   },
   data: problem => {
     const [, width, height, bits] = problem.question.match(/(\d+)×(\d+)画素、(\d+) bit/);
@@ -39,7 +40,10 @@ const checks = {
     const [, bits] = problem.question.match(/で、([01]{8})₂/);
     const unsigned = Number.parseInt(bits, 2);
     const expected = bits[0] === '1' ? unsigned - 256 : unsigned;
-    return Number(problem.answer) === expected && problem.unit === '';
+    return Number(problem.answer) === expected && problem.unit === ''
+      && (expected < 0
+        ? problem.explanation.includes(`${bits}₂=${unsigned}`) && problem.explanation.includes(`${unsigned}−256=${expected}`)
+        : problem.explanation.includes(`${bits}₂=`) && problem.explanation.includes(`=${expected}。`));
   },
 };
 
