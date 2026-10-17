@@ -2,7 +2,7 @@ import { BalancedRandom } from './balancedRandom.ts';
 
 export type MolePattern = 'mass' | 'concentration' | 'dilution' | 'gas' | 'stoichiometry' | 'ph' | 'yield';
 export type MoleMode = MolePattern | 'mix';
-export type MoleProblem = { pattern: MolePattern; question: string; answer: number; explanation: string };
+export type MoleProblem = { pattern: MolePattern; question: string; answer: number; unit: string; explanation: string };
 
 export const molePatterns: readonly MolePattern[] = ['mass', 'concentration', 'dilution', 'gas', 'stoichiometry', 'ph', 'yield'];
 export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', concentration: 'モル濃度', dilution: '希釈', gas: '気体の物質量', stoichiometry: '反応量比', ph: 'pH計算', yield: '収率' };
@@ -42,6 +42,7 @@ const variants = {
 };
 
 const displayNumber = (value: number) => Number(value.toFixed(6)).toString();
+export const formatMoleAnswer = displayNumber;
 
 export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleProblem {
   const pattern = mode === 'mix' ? picker.next(random) : mode;
@@ -49,36 +50,36 @@ export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleP
     case 'mass': {
       const value = variants.mass.next(random);
       const answer = value.mass / value.molarMass;
-      return { pattern, question: `${value.substance} ${value.mass} g は何 mol か。（モル質量 ${value.molarMass} g/mol）`, answer, explanation: `n=m/M=${value.mass}/${value.molarMass}=${displayNumber(answer)} mol。` };
+      return { pattern, question: `${value.substance} ${value.mass} g は何 mol か。（モル質量 ${value.molarMass} g/mol）`, answer, unit: 'mol', explanation: `n=m/M=${value.mass}/${value.molarMass}=${displayNumber(answer)} mol。` };
     }
     case 'concentration': {
       const value = variants.concentration.next(random);
       const answer = value.amount / value.volume;
-      return { pattern, question: `溶質 ${value.amount} mol を水に溶かして ${value.volume} L とした。モル濃度は？`, answer, explanation: `c=n/V=${value.amount}/${value.volume}=${displayNumber(answer)} mol/L。` };
+      return { pattern, question: `溶質 ${value.amount} mol を水に溶かして ${value.volume} L とした。モル濃度は？`, answer, unit: 'mol/L', explanation: `c=n/V=${value.amount}/${value.volume}=${displayNumber(answer)} mol/L。` };
     }
     case 'dilution': {
       const value = variants.dilution.next(random);
       const answer = (value.initial * value.initialVolume) / value.target;
-      return { pattern, question: `${value.initial} mol/L の溶液 ${value.initialVolume} mL を ${value.target} mol/L に薄める。全体を何 mL にするか。`, answer, explanation: `溶質の物質量一定より c₁V₁=c₂V₂。V₂=${value.initial}×${value.initialVolume}/${value.target}=${displayNumber(answer)} mL。` };
+      return { pattern, question: `${value.initial} mol/L の溶液 ${value.initialVolume} mL を ${value.target} mol/L に薄める。全体を何 mL にするか。`, answer, unit: 'mL', explanation: `溶質の物質量一定より c₁V₁=c₂V₂。V₂=${value.initial}×${value.initialVolume}/${value.target}=${displayNumber(answer)} mL。` };
     }
     case 'gas': {
       const value = variants.gas.next(random);
       const answer = value.volume / 22.4;
-      return { pattern, question: `0℃、1.013×10⁵ Pa の標準状態で ${value.gas} ${value.volume} L は何 mol か。（モル体積 22.4 L/mol）`, answer, explanation: `この標準状態ではモル体積が22.4 L/molなので、n=V/22.4=${value.volume}/22.4=${displayNumber(answer)} mol。` };
+      return { pattern, question: `0℃、1.013×10⁵ Pa の標準状態で ${value.gas} ${value.volume} L は何 mol か。（モル体積 22.4 L/mol）`, answer, unit: 'mol', explanation: `この標準状態ではモル体積が22.4 L/molなので、n=V/22.4=${value.volume}/22.4=${displayNumber(answer)} mol。` };
     }
     case 'stoichiometry': {
       const value = variants.stoichiometry.next(random);
       const answer = (value.amount * value.targetCoefficient) / value.sourceCoefficient;
-      return { pattern, question: `${value.equation}。${value.source} ${value.amount} mol と完全反応する ${value.target} は何 mol か。`, answer, explanation: `反応式の係数比 ${value.source}:${value.target}=${value.sourceCoefficient}:${value.targetCoefficient} より、${value.amount}×${value.targetCoefficient}/${value.sourceCoefficient}=${displayNumber(answer)} mol。` };
+      return { pattern, question: `${value.equation}。${value.source} ${value.amount} mol と完全反応する ${value.target} は何 mol か。`, answer, unit: 'mol', explanation: `反応式の係数比 ${value.source}:${value.target}=${value.sourceCoefficient}:${value.targetCoefficient} より、${value.amount}×${value.targetCoefficient}/${value.sourceCoefficient}=${displayNumber(answer)} mol。` };
     }
     case 'ph': {
       const value = variants.ph.next(random);
-      return { pattern, question: `水素イオン濃度が 10⁻${value} mol/L の強酸水溶液の pH は？`, answer: value, explanation: `[H⁺]=10⁻${value} mol/L なので pH=−log₁₀[H⁺]=${value}。` };
+      return { pattern, question: `水素イオン濃度が 10⁻${value} mol/L の強酸水溶液の pH は？`, answer: value, unit: '', explanation: `[H⁺]=10⁻${value} mol/L なので pH=−log₁₀[H⁺]=${value}。` };
     }
     case 'yield': {
       const value = variants.yield.next(random);
       const answer = (value.actual / value.theoretical) * 100;
-      return { pattern, question: `理論上 ${value.theoretical} g 得られる反応で、実際に ${value.actual} g 得た。収率は？`, answer, explanation: `収率=実際量/理論量×100=${value.actual}/${value.theoretical}×100=${displayNumber(answer)}%。` };
+      return { pattern, question: `理論上 ${value.theoretical} g 得られる反応で、実際に ${value.actual} g 得た。収率は？`, answer, unit: '%', explanation: `収率=実際量/理論量×100=${displayNumber(answer)}%。` };
     }
   }
 }

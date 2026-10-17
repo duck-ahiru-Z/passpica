@@ -1,6 +1,7 @@
-import { generateMoleProblem, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
+import { formatMoleAnswer, generateMoleProblem, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
 
 const stableRandom = () => 0.37;
+const expectedUnits = { mass: 'mol', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', ph: '', yield: '%' };
 const checks = {
   mass: problem => {
     const [, mass, molarMass] = problem.question.match(/([\d.]+) g.*?([\d.]+) g\/mol/);
@@ -36,15 +37,17 @@ for (const pattern of molePatterns) {
   const variants = new Set();
   for (let index = 0; index < 500; index += 1) {
     const problem = generateMoleProblem(pattern, stableRandom);
-    if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
+    if (problem.pattern !== pattern || problem.unit !== expectedUnits[pattern] || !checks[pattern](problem)) throw new Error(`formula, unit, or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     variants.add(problem.question);
   }
   if (variants.size !== 5) throw new Error(`${pattern} generated ${variants.size}/5 expected variants`);
 }
+
+if (formatMoleAnswer(0.30000000000000004) !== '0.3') throw new Error('answer feedback should show a readable rounded value');
 
 const mixed = Array.from({ length: 700 }, () => generateMoleProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += molePatterns.length) {
   if (new Set(mixed.slice(start, start + molePatterns.length)).size !== molePatterns.length) throw new Error(`mixed set omitted a chemistry pattern in batch ${start / molePatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed chemistry practice repeated adjacent patterns');
-console.log('Chemistry mole calculations verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, answer keys, variant coverage, balance, and adjacency checked.');
+console.log('Chemistry mole calculations verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, units, answer keys, variant coverage, balance, and adjacency checked.');
