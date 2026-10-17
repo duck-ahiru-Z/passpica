@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -303,7 +304,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function ComplexPolarDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansR, setAnsR] = useState<string>('');
   const [ansTheta, setAnsTheta] = useState<string>('');
@@ -351,7 +352,7 @@ export default function ComplexPolarDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -434,11 +435,13 @@ export default function ComplexPolarDrill() {
         ctx.fillText('r', cx + (problem.zX*scale)/2 - 10, cy - (problem.zY*scale)/2 - 10);
       }
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
+
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   let explanationEl = <></>;
   if (hasChecked) {
