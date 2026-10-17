@@ -38,8 +38,20 @@ const checks = {
     const [, a, c] = problem.expression.match(/\\frac\{(\d+)n\+1\}\{(\d+)n\+2\}/);
     return close(Number(problem.answer), Number(a) / Number(c)) && problem.explanation.includes(`${a}/${c}`);
   },
+  trigonometric: problem => {
+    const [, coefficient] = problem.expression.match(/\\sin\((?:(\d+)x|x)\)/);
+    const n = Number(coefficient ?? 1);
+    return Number(problem.answer) === n && problem.expression.includes('ラジアン')
+      && problem.explanation.includes('sin u/u=1') && problem.explanation.includes(`極限値は ${n}`);
+  },
+  continuity: problem => {
+    const [, squared, denominatorPoint, point] = problem.expression.match(/x\^2-(\d+)\}\{x-(\d+)\} & \(x\\ne (\d+)\)/);
+    const n = Number(point);
+    return Number(squared) === n ** 2 && Number(denominatorPoint) === n && Number(problem.answer) === 2 * n
+      && problem.expression.includes(`x=${n}`) && problem.explanation.includes(`極限値=f(${n})=k`);
+  },
 };
-const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 9 };
+const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 9, trigonometric: 5, continuity: 5 };
 
 for (const pattern of limitPatterns) {
   const seen = new Set();
@@ -51,10 +63,10 @@ for (const pattern of limitPatterns) {
   if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
 }
 
-const mixed = Array.from({ length: 600 }, () => generateLimitProblem('mix', stableRandom).pattern);
+const mixed = Array.from({ length: 700 }, () => generateLimitProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += limitPatterns.length) {
   if (new Set(mixed.slice(start, start + limitPatterns.length)).size !== limitPatterns.length) throw new Error(`mixed set omitted a limit pattern in batch ${start / limitPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed limit practice repeated adjacent patterns');
 
-console.log('Calculus III limits verified: 2,500 fixed-pattern questions and 600 mixed questions; formulas, answers, all variants, balance, and adjacency checked.');
+console.log('Calculus III limits verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, answers, all variants, balance, and adjacency checked.');
