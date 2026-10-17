@@ -237,6 +237,9 @@ export default function DiscriminantDrillPage() {
 
   const handleCheck = () => {
     if (!problem) return;
+
+    const requiredInputs = problem.ansType === 'values' || problem.ansType === 'between' ? [ans1Num, ans2Num] : [ans1Num];
+    if (requiredInputs.some(value => !value.trim())) return;
     
     const parse = (nStr: string, dStr: string) => {
       const num = parseInt(nStr);
@@ -362,6 +365,7 @@ export default function DiscriminantDrillPage() {
             <div className="mt-8 flex gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={(problem.ansType !== 'value' && !ans1Num.trim()) || ((problem.ansType === 'values' || problem.ansType === 'between') && !ans2Num.trim())}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -439,6 +443,7 @@ export default function DiscriminantDrillPage() {
                   <p>となります。</p>
                 </div>
 
+                {detailLevel === 'normal' && (
                 <div className="bg-gray-50 p-2 border">
                   <p className="font-bold border-b pb-1 mb-1">計算の実行</p>
                   {problem.pattern === 'pattern1' && (
@@ -474,6 +479,7 @@ export default function DiscriminantDrillPage() {
                     </>
                   )}
                 </div>
+                )}
 
               </div>
             )}
