@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseRationalRoot } from '@/src/lib/absoluteValueEquationAnswer';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -333,15 +334,7 @@ export default function AbsoluteValueEqDrillPage() {
     if (!problem) return;
     
     // 入力をパース
-    const parseInput = (nStr: string, dStr: string) => {
-      if (!nStr) return null;
-      const num = parseInt(nStr);
-      const den = dStr ? parseInt(dStr) : 1;
-      if (isNaN(num) || isNaN(den) || den === 0) return null;
-      return simplifyFraction(num, den);
-    };
-
-    const userRoots = [parseInput(ans1Num, ans1Den), parseInput(ans2Num, ans2Den)].filter(r => r !== null) as Root[];
+    const userRoots = [parseRationalRoot(ans1Num, ans1Den), parseRationalRoot(ans2Num, ans2Den)].filter(r => r !== null) as Root[];
     
     if (userRoots.length !== problem.roots.length) {
       setIsCorrect(false);
@@ -395,6 +388,7 @@ export default function AbsoluteValueEqDrillPage() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="絶対値方程式の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -420,9 +414,9 @@ export default function AbsoluteValueEqDrillPage() {
                 <div className="flex items-center gap-2">
                   <div className="font-bold text-lg">x = </div>
                   <div className="flex flex-col items-center">
-                    <input type="text" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Num} onChange={e => setAns1Num(e.target.value)} placeholder="分子" />
+                    <input type="text" aria-label="1つ目の解の分子" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Num} onChange={e => setAns1Num(e.target.value)} placeholder="分子" />
                     <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                    <input type="text" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Den} onChange={e => setAns1Den(e.target.value)} placeholder="分母" />
+                    <input type="text" aria-label="1つ目の解の分母（整数なら空欄可）" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Den} onChange={e => setAns1Den(e.target.value)} placeholder="分母" />
                   </div>
                 </div>
 
@@ -430,9 +424,9 @@ export default function AbsoluteValueEqDrillPage() {
 
                 <div className="flex items-center gap-2">
                   <div className="flex flex-col items-center">
-                    <input type="text" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Num} onChange={e => setAns2Num(e.target.value)} placeholder="分子" />
+                    <input type="text" aria-label="2つ目の解の分子" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Num} onChange={e => setAns2Num(e.target.value)} placeholder="分子" />
                     <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                    <input type="text" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Den} onChange={e => setAns2Den(e.target.value)} placeholder="分母" />
+                    <input type="text" aria-label="2つ目の解の分母（整数なら空欄可）" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Den} onChange={e => setAns2Den(e.target.value)} placeholder="分母" />
                   </div>
                 </div>
 
@@ -460,7 +454,7 @@ export default function AbsoluteValueEqDrillPage() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！素晴らしい！' : '不正解... 解説を見てみよう。'}
               </div>
             )}
@@ -481,8 +475,8 @@ export default function AbsoluteValueEqDrillPage() {
                 </label>
                 {hasChecked && (
                   <div className="flex gap-1 text-[10px]">
-                    <button type="button" onClick={() => setDetailLevel('brief')} className={`px-2 py-1 border ${detailLevel === 'brief' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>略解</button>
-                    <button type="button" onClick={() => setDetailLevel('normal')} className={`px-2 py-1 border ${detailLevel === 'normal' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>標準</button>
+                    <button type="button" aria-pressed={detailLevel === 'brief'} onClick={() => setDetailLevel('brief')} className={`px-2 py-1 border ${detailLevel === 'brief' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>略解</button>
+                    <button type="button" aria-pressed={detailLevel === 'normal'} onClick={() => setDetailLevel('normal')} className={`px-2 py-1 border ${detailLevel === 'normal' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>標準</button>
                   </div>
                 )}
               </div>
@@ -532,7 +526,7 @@ export default function AbsoluteValueEqDrillPage() {
                   <div>
                     {problem.pattern === 'pattern3' && problem.invalidRoot ? (
                       <div className="space-y-2">
-                        <p className="font-bold text-red-600">※ この問題は右辺に $x$ があるため、必ず場合分けをして「解が条件を満たすか」を確認する必要があります。</p>
+                        <p className="font-bold text-red-600">※ この問題は右辺に <MathEq math="x" /> があるため、必ず場合分けをして「解が条件を満たすか」を確認する必要があります。</p>
                         <div className="bg-gray-50 p-2 border">
                           <p className="font-bold border-b pb-1 mb-1">【場合分け1】 <MathEq math={`${problem.a}x ${problem.b < 0 ? '+' : '-'} ${Math.abs(problem.b)} \\ge 0`} /> のとき</p>
                           <p>そのまま絶対値を外します。<br/>

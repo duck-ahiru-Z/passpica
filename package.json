@@ -29,6 +29,7 @@
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",
     "test:complex-polar-exact": "node --experimental-strip-types scripts/verify-complex-polar-exact.mjs",
     "test:quadratic-inequality": "node --experimental-strip-types scripts/verify-quadratic-inequality.mjs",
+    "test:absolute-value-equations": "node --experimental-strip-types scripts/verify-absolute-value-equation-answers.mjs",
     "test:matha-mixed": "node --experimental-strip-types scripts/verify-matha-mixed-questions.mjs",
     "test:physics-motion": "node --experimental-strip-types scripts/verify-physics-motion-calculation.mjs",
     "test:projectile-visual": "node --experimental-strip-types scripts/verify-projectile-motion.mjs",
