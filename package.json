@@ -12,6 +12,7 @@
     "test:calculus3-geometry": "node --experimental-strip-types scripts/verify-calculus3-geometry.mjs",
     "test:chemistry-mole": "node --experimental-strip-types scripts/verify-chemistry-mole-calculation.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
+    "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
     "test:math": "node --experimental-strip-types scripts/verify-discriminant-pattern.mjs",
     "test:coverage": "node scripts/verify-learning-coverage.mjs"
   },
