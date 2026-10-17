@@ -10,6 +10,7 @@
     "test:random": "node --experimental-strip-types scripts/verify-balanced-random.mjs",
     "test:rational-input": "node --experimental-strip-types scripts/verify-rational-input.mjs",
     "test:sequence-sum-prompt": "node --experimental-strip-types scripts/verify-sequence-sum-prompt.mjs",
+    "test:sequence-recurrence": "node --experimental-strip-types scripts/verify-sequence-recurrence.mjs",
     "test:calculus3-curve": "node --experimental-strip-types scripts/verify-calculus3-curve-analysis.mjs",
     "test:calculus3-geometry": "node --experimental-strip-types scripts/verify-calculus3-geometry.mjs",
     "test:calculus3-integrals": "node --experimental-strip-types scripts/verify-calculus3-integrals.mjs",
