@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -54,7 +55,7 @@ function generateProblem(mode: DrillMode = 'mix'): ProblemData {
 
 export default function RationalizationDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -106,6 +107,8 @@ export default function RationalizationDrillPage() {
     
     setHasChecked(true);
   };
+
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
