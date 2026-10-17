@@ -411,7 +411,7 @@ export default function QuadraticInequalityDrillPage() {
                       {problem.ansType === 5 && <li>接点のみが条件を満たすため、答えは <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> となります。</li>}
                       {problem.ansType === 6 && <li>接点以外はすべて条件を満たすため、答えは <MathEq math={`x \\neq ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> のすべての実数です。</li>}
                       {problem.ansType === 7 && <li>すべての点で条件を満たすため、答えは「すべての実数」です。</li>}
-                      {problem.ansType === 8 && <li>二次式は実数範囲で常に{problem.a > 0 ? '正' : '負'}です。したがって、この不等号を満たす値はなく、答えは「解なし」です。</li>}
+                      {problem.ansType === 8 && <li>二次式は実数範囲で常に{problem.a > 0 ? '0以上' : '0以下'}です。したがって、この不等号を満たす値はなく、答えは「解なし」です。</li>}
                     </ul>
                   </div>
                 )}
