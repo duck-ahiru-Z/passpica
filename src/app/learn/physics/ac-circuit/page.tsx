@@ -115,12 +115,22 @@ export default function ACCircuitPage() {
         </p>
       </div>
 
-      {/* RLC直列回路の概略図 (Geocities風アスキー/SVGモデル) */}
+      {/* RLC直列回路の概略図 */}
       <div className="border border-gray-300 bg-gray-50 p-4 text-center">
-        <span className="font-bold text-[10px] text-gray-500 block mb-2 select-none">【RLC 直列交流回路モデル】</span>
-        <div className="flex justify-center items-center gap-2 font-mono text-slate-600 text-sm">
-          <span>~ (AC電源) ─── [ R: 抵抗 ] ─── [ L: コイル ] ─── [ C: コンデンサ ] ─── (閉回路)</span>
-        </div>
+        <span className="font-bold text-[10px] text-gray-500 block mb-2">【RLC 直列交流回路モデル】</span>
+        <svg viewBox="0 0 500 130" className="w-full max-w-2xl mx-auto" role="img" aria-label="交流電源、抵抗、コイル、コンデンサが一つの閉回路に直列接続された模式図">
+          <path d="M60 25 V45 M60 85 V105 H450 V25 H410 M130 25 H150 M220 25 H250 M330 25 H370 M390 25 H410" fill="none" stroke="#475569" strokeWidth="2" />
+          <circle cx="60" cy="65" r="20" fill="white" stroke="#475569" strokeWidth="2" />
+          <path d="M48 65 C52 55 56 75 60 65 C64 55 68 75 72 65" fill="none" stroke="#2563eb" strokeWidth="1.5" />
+          <path d="M150 25 L158 15 L168 35 L178 15 L188 35 L198 15 L208 35 L220 25" fill="none" stroke="#dc2626" strokeWidth="2" />
+          <path d="M250 25 C250 5 270 5 270 25 C270 5 290 5 290 25 C290 5 310 5 310 25 C310 5 330 5 330 25" fill="none" stroke="#16a34a" strokeWidth="2" />
+          <line x1="370" y1="12" x2="370" y2="38" stroke="#ea580c" strokeWidth="3" />
+          <line x1="390" y1="12" x2="390" y2="38" stroke="#ea580c" strokeWidth="3" />
+          <text x="60" y="125" textAnchor="middle" fill="#475569" fontSize="10">交流電源</text>
+          <text x="185" y="55" textAnchor="middle" fill="#b91c1c" fontSize="10">R</text>
+          <text x="290" y="55" textAnchor="middle" fill="#15803d" fontSize="10">L</text>
+          <text x="380" y="55" textAnchor="middle" fill="#c2410c" fontSize="10">C</text>
+        </svg>
       </div>
 
       {/* メイングリッド：左グラフィック、右コントロール */}
@@ -134,13 +144,13 @@ export default function ACCircuitPage() {
             <div className="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
               <span className="font-bold text-slate-700">■ 電圧 v(t) と電流 i(t) の瞬時値波形（2周期分）</span>
               <div className="flex gap-4 text-[10px]">
-                <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-600 inline-block"></span> 電圧 v(t)</span>
-                <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-blue-600 inline-block"></span> 電流 i(t) (V₀/Rを基準に表示)</span>
+                <span className="flex items-center gap-1"><span className="w-4 border-t-2 border-solid border-red-600 inline-block"></span> 電圧 v(t)（赤実線）</span>
+                <span className="flex items-center gap-1"><span className="w-4 border-t-2 border-dashed border-blue-600 inline-block"></span> 電流 i(t)（青破線・V₀/R基準）</span>
               </div>
             </div>
 
             <div className="w-full aspect-[5/2] max-h-[240px]">
-              <svg viewBox="0 0 400 160" className="w-full h-full overflow-visible font-mono">
+              <svg viewBox="0 0 400 160" className="w-full h-full overflow-visible font-mono" role="img" aria-label={`電圧は赤い実線、電流は青い破線。2周期分を表示し、位相差は${phiDeg.toFixed(2)}度です。`}>
                 {/* 軸 */}
                 <line x1="15" y1="80" x2="385" y2="80" stroke="#94a3b8" strokeWidth="1" />
                 <line x1="20" y1="10" x2="20" y2="150" stroke="#94a3b8" strokeWidth="1" />
@@ -157,7 +167,7 @@ export default function ACCircuitPage() {
                 <path d={vPath} fill="none" stroke="#dc2626" strokeWidth="2" />
 
                 {/* 2. 電流波形（青線） */}
-                <path d={iPath} fill="none" stroke="#2563eb" strokeWidth="2.5" />
+                <path d={iPath} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeDasharray="6 3" />
               </svg>
             </div>
             
@@ -185,7 +195,7 @@ export default function ACCircuitPage() {
               
               <div className="flex flex-col items-center justify-center">
                 <span className="font-bold text-slate-700 text-[10px] mb-3 select-none">■ 各素子の電圧フェーザ（電流基準）</span>
-                <svg viewBox="0 0 200 200" className="w-48 h-48 overflow-visible border border-gray-100 bg-gray-50/50">
+                <svg viewBox="0 0 200 200" className="w-48 h-48 overflow-visible border border-gray-100 bg-gray-50/50" role="img" aria-label={`電流を基準にしたフェーザ図。位相差${phiDeg.toFixed(2)}度。抵抗電圧は同相、コイル電圧は90度進み、コンデンサ電圧は90度遅れます。`}>
                   {/* 軸 */}
                   <line x1="10" y1="100" x2="190" y2="100" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2,2" />
                   <line x1="100" y1="10" x2="100" y2="190" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2,2" />
@@ -279,6 +289,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="抵抗 R（オーム）"
                 min="10"
                 max="200"
                 step="5"
@@ -296,6 +307,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="自己インダクタンス L（ヘンリー）"
                 min="0.05"
                 max="2.0"
                 step="0.05"
@@ -313,6 +325,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="電気容量 C（マイクロファラド）"
                 min="5"
                 max="200"
                 step="5"
@@ -330,6 +343,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="電源周波数 f（ヘルツ）"
                 min="10"
                 max="120"
                 step="5"
@@ -347,6 +361,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="電源電圧の最大値 V0（ボルト）"
                 min="10"
                 max="100"
                 step="5"
