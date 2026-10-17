@@ -36,6 +36,17 @@ interface ProblemData {
   questionText: string;
 }
 
+function formatSignedProduct(coefficient: number, value: number, first = false) {
+  const product = coefficient * value;
+  const sign = product < 0 ? '−' : '+';
+  const term = `${Math.abs(coefficient)} \\cdot ${Math.abs(value)}`;
+  return first ? `${product < 0 ? '−' : ''}${term}` : ` ${sign} ${term}`;
+}
+
+function formatSignedConstant(value: number) {
+  return ` ${value < 0 ? '−' : '+'} ${Math.abs(value)}`;
+}
+
 const triples = [
   { a: 3, b: 4 }, { a: 4, b: 3 },
   { a: 5, b: 12 }, { a: 12, b: 5 },
@@ -295,7 +306,7 @@ export default function PointLineDistanceDrill() {
     const baseVal = problem.a * problem.px + problem.b * problem.py;
     const numPart = problem.pattern === 'pattern4'
       ? `|${baseVal} + k|`
-      : `|${problem.a} \\cdot (${problem.px}) + ${problem.b} \\cdot (${problem.py}) + ${problem.c}|`;
+      : `|${formatSignedProduct(problem.a, problem.px, true)}${formatSignedProduct(problem.b, problem.py)}${formatSignedConstant(problem.c)}|`;
     const distInt = Math.sqrt(problem.a*problem.a + problem.b*problem.b);
 
     if (problem.pattern === 'pattern4') {
