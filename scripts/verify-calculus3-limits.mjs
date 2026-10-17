@@ -12,6 +12,9 @@ if (!/const correct = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer 
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('limit feedback must announce the result and distinguish strategy from value errors');
 }
+if (!drillPage.includes('実戦練習：極限 全パターンランダム') || !drillPage.includes('基礎練習：{limitLabels[p]}だけ')) {
+  throw new Error('the learner must be able to choose either mixed limit practice or one fixed pattern');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-12;
@@ -69,4 +72,18 @@ for (let start = 0; start < mixed.length; start += limitPatterns.length) {
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed limit practice repeated adjacent patterns');
 
-console.log('Calculus III limits verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, answers, all variants, balance, and adjacency checked.');
+for (let seed = 1; seed <= 20; seed += 1) {
+  let state = seed;
+  const seededRandom = () => {
+    state = (state * 48271) % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+  const sequence = Array.from({ length: 7_000 }, () => generateLimitProblem('mix', seededRandom).pattern);
+  for (let start = 0; start < sequence.length; start += limitPatterns.length) {
+    const batch = sequence.slice(start, start + limitPatterns.length);
+    if (new Set(batch).size !== limitPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / limitPatterns.length}`);
+  }
+  if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
+}
+
+console.log('Calculus III limits verified: fixed-pattern options, formulas, answers, and variants; 140,000 seeded mixed questions plus 700 deterministic balance cases checked.');
