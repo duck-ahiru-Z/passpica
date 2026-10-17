@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { generateLimitProblem, limitPatterns } from '../src/lib/calculus3Limits.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-limit-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="limit-strategy"/.test(drillPage) || drillPage.includes('onClick={() => setStrategy(p)}')) {
+  throw new Error('limit strategy must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-12;
