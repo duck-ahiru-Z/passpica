@@ -27,9 +27,14 @@ const checks = {
     return close(problem.answer, expected) && problem.hint.includes('置換');
   },
   radical: problem => {
-    const [, upper] = problem.expression.match(/\\int_0\^\{(\d+)\}/);
-    const n = Number(upper);
-    return close(problem.answer, (2 / 3) * ((n + 1) ** 1.5 - 1)) && problem.explanation.includes(`1から${n + 1}`);
+    const [, upper, radius] = problem.expression.match(/\\int_0\^\{(.*?)\} \\sqrt\{(\d+)\^2-x\^2\}/);
+    const r = Number(radius);
+    const expectedUpper = r % 2 === 0 ? String(r / 2) : `\\frac{${r}}{2}`;
+    const expected = r ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8);
+    return upper === expectedUpper && close(problem.answer, expected)
+      && problem.hint.includes('三角置換') && problem.explanation.includes('θ=0からπ/6')
+      && !problem.explanation.includes('\\frac')
+      && problem.explanation.includes(expected.toFixed(3));
   },
 };
 
