@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 
@@ -19,8 +19,7 @@ const problems: Record<Pattern, Problem> = {
 };
 const picker = new BalancedRandom(patterns);
 export default function InformationCalculationDrillPage() {
-  const [mode, setMode] = useState<Pattern | 'mix'>('mix'); const [problem, setProblem] = useState<Problem>(problems.binary); const [answer, setAnswer] = useState(''); const [checked, setChecked] = useState(false);
-  useEffect(() => { load('mix'); }, []);
+  const [mode, setMode] = useState<Pattern | 'mix'>('mix'); const [problem, setProblem] = useState<Problem>(() => problems[picker.next()]); const [answer, setAnswer] = useState(''); const [checked, setChecked] = useState(false);
   const load = (selected: Pattern | 'mix') => { const p = selected === 'mix' ? picker.next() : selected; setProblem(problems[p]); setAnswer(''); setChecked(false); };
   const normalizeAnswer = (value: string) => value.trim().replaceAll(',', '').replaceAll(' ', '').toLowerCase();
   const numericPatterns = new Set<Pattern>(['data', 'transfer', 'sampling', 'compression']);
