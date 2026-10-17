@@ -10,6 +10,14 @@ export const differentiationLabels: Record<DifferentiationPattern, string> = {
   implicit: '陰関数の微分', inverse: '逆関数の微分', higher: '高次導関数',
 };
 
+export function isDifferentiationAnswerCorrect(input: string, expected: number): boolean {
+  if (input.trim() === '') return false;
+  const value = Number(input);
+  if (!Number.isFinite(value)) return false;
+  // Accept the exact value or the three-decimal approximation shown in feedback.
+  return Math.abs(value - expected) < 1e-10 || Math.abs(value - Number(expected.toFixed(3))) < 1e-10;
+}
+
 const picker = new BalancedRandom(differentiationPatterns);
 const variants = {
   chain: new BalancedRandom(Array.from({ length: 9 }, (_, index) => ({ a: Math.floor(index / 3) + 1, n: (index % 3) + 2 }))),

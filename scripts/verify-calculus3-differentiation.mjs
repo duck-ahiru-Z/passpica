@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { differentiationPatterns, generateDifferentiationProblem } from '../src/lib/calculus3Differentiation.ts';
+import { differentiationPatterns, generateDifferentiationProblem, isDifferentiationAnswerCorrect } from '../src/lib/calculus3Differentiation.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-differentiation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="differentiation-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
   throw new Error('differentiation strategy must be a single-choice radio group');
 }
-if (!/const correct = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer - problem\.answer\) < 0\.01/.test(drillPage)) {
+if (!/const correct = strategy === problem\.pattern && isDifferentiationAnswerCorrect\(answer, problem\.answer\)/.test(drillPage)) {
   throw new Error('differentiation answers must require both the correct strategy and numeric value');
 }
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
@@ -53,6 +53,9 @@ const checks = {
   },
 };
 const expectedVariants = { chain: 9, product: 4, logarithmic: 5, parametric: 4, implicit: 5, inverse: 5, higher: 5 };
+if (!isDifferentiationAnswerCorrect('0.250', 1 / 4)) throw new Error('three-decimal displayed answers should be accepted');
+if (isDifferentiationAnswerCorrect('0.24', 1 / 4)) throw new Error('answers rounded more coarsely than the display should not be accepted');
+if (isDifferentiationAnswerCorrect('', 1) || isDifferentiationAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
 
 for (const pattern of differentiationPatterns) {
   const seen = new Set();
