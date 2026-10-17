@@ -14,7 +14,8 @@ export default function Calculus3ParametricVisualPage() {
   const y = Math.sin(t);
   const dxdt = -2 * Math.sin(t);
   const dydt = Math.cos(t);
-  const slope = Math.abs(dxdt) < 0.001 ? null : dydt / dxdt;
+  const rawSlope = Math.abs(dxdt) < 0.001 ? null : dydt / dxdt;
+  const slope = rawSlope !== null && Math.abs(rawSlope) < 0.0005 ? 0 : rawSlope;
   const speed = Math.hypot(dxdt, dydt);
   const tangentX = (dxdt / speed) * 0.65;
   const tangentY = (dydt / speed) * 0.65;
