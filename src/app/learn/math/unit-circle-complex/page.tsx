@@ -21,21 +21,22 @@ export default function UnitCircleComplexPage() {
   // --- 数学計算 ---
   const rad1 = (theta1 * Math.PI) / 180;
   const rad2 = (theta2 * Math.PI) / 180;
+  const cleanCoordinate = (value: number) => (Math.abs(value) < 1e-12 ? 0 : value);
 
   // デカルト座標表示
-  const z1_x = r1 * Math.cos(rad1);
-  const z1_y = r1 * Math.sin(rad1);
+  const z1_x = cleanCoordinate(r1 * Math.cos(rad1));
+  const z1_y = cleanCoordinate(r1 * Math.sin(rad1));
 
-  const z2_x = r2 * Math.cos(rad2);
-  const z2_y = r2 * Math.sin(rad2);
+  const z2_x = cleanCoordinate(r2 * Math.cos(rad2));
+  const z2_y = cleanCoordinate(r2 * Math.sin(rad2));
 
   // 積 z3 = z1 * z2
   const r3 = r1 * r2;
   const theta3 = (theta1 + theta2) % 360;
   const rad3 = (theta3 * Math.PI) / 180;
   
-  const z3_x = r3 * Math.cos(rad3);
-  const z3_y = r3 * Math.sin(rad3);
+  const z3_x = cleanCoordinate(r3 * Math.cos(rad3));
+  const z3_y = cleanCoordinate(r3 * Math.sin(rad3));
 
   // --- SVGプロット定数 ---
   const width = 320;
@@ -341,7 +342,7 @@ export default function UnitCircleComplexPage() {
                 </li>
                 <li>
                   <strong className="text-slate-800">偏角 (角度) の和</strong>:<br />
-                  arg(z₃) = arg(z₁) + arg(z₂) (角度は足し算になります。{theta1}° + {theta2}° = {theta3}°)。
+                  arg(z₃) ≡ arg(z₁) + arg(z₂) (mod 360°)。{theta1}° + {theta2}° = {theta1 + theta2}° ≡ {theta3}° (mod 360°)。
                 </li>
               </ul>
               <p className="border-t border-gray-200 pt-2 text-[9px] text-gray-500">
