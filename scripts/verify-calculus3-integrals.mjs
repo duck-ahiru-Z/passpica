@@ -12,6 +12,9 @@ if (!/const isCorrect = strategy === problem\.pattern && isIntegralAnswerCorrect
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('integral feedback must announce the result and distinguish strategy from value errors');
 }
+if (!drillPage.includes('実戦練習：積分法 全パターンランダム') || !drillPage.includes('基礎練習：{integralLabels[p]}だけ')) {
+  throw new Error('the learner must be able to choose either mixed strategy practice or one fixed integration pattern');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
@@ -77,4 +80,18 @@ for (let start = 0; start < mixed.length; start += integralPatterns.length) {
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed integral practice repeated adjacent patterns');
 
-console.log('Calculus III integration verified: 2,500 fixed-pattern questions and 600 mixed questions; answers, formulas, all variants, balance, and adjacency checked.');
+for (let seed = 1; seed <= 20; seed += 1) {
+  let state = seed;
+  const seededRandom = () => {
+    state = (state * 48271) % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+  const sequence = Array.from({ length: 5_000 }, () => generateIntegralProblem('mix', seededRandom).pattern);
+  for (let start = 0; start < sequence.length; start += integralPatterns.length) {
+    const batch = sequence.slice(start, start + integralPatterns.length);
+    if (new Set(batch).size !== integralPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / integralPatterns.length}`);
+  }
+  if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
+}
+
+console.log('Calculus III integration verified: fixed-pattern options, formulas, answers, and variants; 100,000 seeded mixed questions plus 600 deterministic balance cases checked.');
