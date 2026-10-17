@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { getQuadraticInequalityAnswerType, type QuadraticInequalityAnswerType, type QuadraticInequalitySign } from '@/src/lib/quadraticInequality';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -39,8 +40,8 @@ function simplifyFraction(n: number, d: number): Root {
   return { num, den };
 }
 
-type InequalityType = '<' | '>' | '\\le' | '\\ge';
-type AnsType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
+type InequalityType = QuadraticInequalitySign;
+type AnsType = QuadraticInequalityAnswerType;
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
@@ -51,35 +52,6 @@ interface ProblemData {
   roots: Root[]; // 2 roots (sorted) or 1 root (D=0)
   ansType: AnsType;
   eq: string;
-}
-
-function getAnsType(a: number, D: number, sign: InequalityType): AnsType {
-  if (D > 0) {
-    if (a > 0) {
-      if (sign === '<') return 1;
-      if (sign === '\\le') return 3;
-      if (sign === '>') return 2;
-      if (sign === '\\ge') return 4;
-    } else {
-      if (sign === '<') return 2;
-      if (sign === '\\le') return 4;
-      if (sign === '>') return 1;
-      if (sign === '\\ge') return 3;
-    }
-  } else if (D === 0) {
-    if (a > 0) {
-      if (sign === '<') return 8; // 解なし
-      if (sign === '\\le') return 5; // x = p
-      if (sign === '>') return 6; // x != p
-      if (sign === '\\ge') return 7; // すべての実数
-    } else {
-      if (sign === '<') return 6; // x != p
-      if (sign === '\\le') return 7; // すべての実数
-      if (sign === '>') return 8; // 解なし
-      if (sign === '\\ge') return 5; // x = p
-    }
-  }
-  return 8;
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
@@ -136,7 +108,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     if (a === 0) continue;
 
     const D = b * b - 4 * a * c;
-    const ansType = getAnsType(a, D, sign);
+    const ansType = getQuadraticInequalityAnswerType(a, D, sign);
 
     let eq = '';
     if (a === 1) eq += 'x^2';
@@ -536,7 +508,7 @@ export default function QuadraticInequalityDrillPage() {
 
                 {problem.roots.length === 1 && (
                   <div className="bg-gray-50 p-2 border">
-                    <p>左辺は完全平方式 <MathEq math={`(${problem.a > 0 ? '' : '-'}(x - ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`})^2`} /> になります。</p>
+                    <p>左辺は完全平方式 <MathEq math={`${problem.a < 0 ? '-' : ''}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
                     <p>判別式 <MathEq math="D=0" /> であり、放物線は x軸と <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> で接します。</p>
                     <p className="mt-2">グラフから、{problem.ineqSign === '<' || problem.ineqSign === '\\le' ? '0より小さい（0以下）' : '0より大きい（0以上）'} 条件を満たす $x$ を探します。</p>
                     <ul className="list-disc pl-4 mt-1">
