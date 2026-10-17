@@ -2,7 +2,7 @@ import { BalancedRandom } from './balancedRandom.ts';
 
 export type InformationPattern = 'binary' | 'data' | 'transfer' | 'logic' | 'sampling' | 'compression' | 'complement';
 export type InformationMode = InformationPattern | 'mix';
-export type InformationProblem = { pattern: InformationPattern; question: string; answer: string; explanation: string };
+export type InformationProblem = { pattern: InformationPattern; question: string; answer: string; explanation: string; unit: string };
 
 export const informationPatterns: readonly InformationPattern[] = ['binary', 'data', 'transfer', 'logic', 'sampling', 'compression', 'complement'];
 export const informationLabels: Record<InformationPattern, string> = { binary: '2進数変換', data: 'データ量', transfer: '通信時間', logic: '論理演算', sampling: '標本化', compression: '圧縮率', complement: '補数表現' };
@@ -41,34 +41,35 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
     case 'binary': {
       const decimal = variants.binary.next(random);
       const answer = decimal.toString(2);
-      return { pattern, question: `10進数の ${decimal} を2進数で表せ。`, answer, explanation: `${decimal} を2のべき乗の和に分解すると ${answer}₂。` };
+      return { pattern, question: `10進数の ${decimal} を2進数で表せ。`, answer, explanation: `${decimal} を2のべき乗の和に分解すると ${answer}₂。`, unit: '2進数' };
     }
     case 'data': {
       const value = variants.data.next(random);
       const bytes = (value.width * value.height * value.bits) / 8;
-      return { pattern, question: `${value.width}×${value.height}画素、${value.bits} bit/画素の画像データ量は何 byte か。（圧縮なし）`, answer: String(bytes), explanation: `${value.width}×${value.height}×${value.bits}÷8=${bytes.toLocaleString('en-US')} byte。` };
+      return { pattern, question: `${value.width}×${value.height}画素、${value.bits} bit/画素の画像データ量は何 byte か。（圧縮なし）`, answer: String(bytes), explanation: `${value.width}×${value.height}×${value.bits}÷8=${bytes.toLocaleString('en-US')} byte。`, unit: 'byte' };
     }
     case 'transfer': {
       const value = variants.transfer.next(random);
       const seconds = (value.size * 8) / value.rate;
-      return { pattern, question: `${value.size} MB のファイルを ${value.rate} Mbps で送る。何秒か。（1 MB=10⁶ byte）`, answer: String(seconds), explanation: `${value.size} MB を bit に直して ${value.size}×8 Mbps。${value.size}×8÷${value.rate}=${seconds} s。` };
+      const megabits = value.size * 8;
+      return { pattern, question: `${value.size} MB のファイルを ${value.rate} Mbps で送る。何秒か。（1 MB=10⁶ byte、1 Mbps=10⁶ bit/s）`, answer: String(seconds), explanation: `${value.size} MB×8=${megabits} Mbit。${megabits} Mbit÷${value.rate} Mbps=${seconds} s。`, unit: '秒' };
     }
     case 'logic': {
       const value = variants.logic.next(random);
       const explanation = value.operation === 'A XOR B'
         ? `A と B はどちらも${value.a}なので、XOR（排他的論理和）は ${value.result}。`
         : `NOT B=${1 - value.b}。${value.operation} を順に計算すると ${value.result}。`;
-      return { pattern, question: `A=${value.a}、B=${value.b} のとき、${value.operation} の値は？`, answer: String(value.result), explanation };
+      return { pattern, question: `A=${value.a}、B=${value.b} のとき、${value.operation} の値は？`, answer: String(value.result), explanation, unit: '' };
     }
     case 'sampling': {
       const value = variants.sampling.next(random);
       const bytes = (value.frequency * value.bits * value.channels) / 8;
-      return { pattern, question: `標本化周波数 ${value.frequency / 1000} kHz、量子化ビット数 ${value.bits} bit、${value.channels === 2 ? 'ステレオ2 ch' : 'モノラル1 ch'}で1秒の音声データ量は何 byte か。`, answer: String(bytes), explanation: `${value.frequency.toLocaleString('en-US')}×${value.bits}×${value.channels}÷8=${bytes.toLocaleString('en-US')} byte。` };
+      return { pattern, question: `標本化周波数 ${value.frequency / 1000} kHz、量子化ビット数 ${value.bits} bit、${value.channels === 2 ? 'ステレオ2 ch' : 'モノラル1 ch'}で1秒の音声データ量は何 byte か。`, answer: String(bytes), explanation: `${value.frequency.toLocaleString('en-US')}×${value.bits}×${value.channels}÷8=${bytes.toLocaleString('en-US')} byte。`, unit: 'byte' };
     }
     case 'compression': {
       const value = variants.compression.next(random);
       const ratio = (value.compressed / value.original) * 100;
-      return { pattern, question: `元データ ${value.original} MB を ${value.compressed} MB にした。圧縮率は何 % か。（圧縮後/圧縮前×100）`, answer: String(ratio), explanation: `圧縮率=${value.compressed}/${value.original}×100=${ratio}%。` };
+      return { pattern, question: `元データ ${value.original} MB を ${value.compressed} MB にした。圧縮率は何 % か。（圧縮後/圧縮前×100）`, answer: String(ratio), explanation: `圧縮率=${value.compressed}/${value.original}×100=${ratio}%。`, unit: '%' };
     }
     case 'complement': {
       const bits = variants.complement.next(random);
@@ -77,7 +78,7 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
       const explanation = answer < 0
         ? `${bits[0]} が1なので負の数。符号なしの値 ${unsigned} から 2⁸=256 を引き、${unsigned}−256=${answer}。`
         : `最上位ビットが0なので正の数。2進数 ${bits} は10進数で ${answer}。`;
-      return { pattern, question: `8 bitの2の補数表現で、${bits}₂が表す整数は？`, answer: String(answer), explanation };
+      return { pattern, question: `8 bitの2の補数表現で、${bits}₂が表す整数は？`, answer: String(answer), explanation, unit: '' };
     }
   }
 }

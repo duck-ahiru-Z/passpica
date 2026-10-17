@@ -4,15 +4,17 @@ const stableRandom = () => 0.37;
 const checks = {
   binary: problem => {
     const [, decimal] = problem.question.match(/10進数の (\d+)/);
-    return problem.answer === Number(decimal).toString(2);
+    return problem.answer === Number(decimal).toString(2) && problem.unit === '2進数';
   },
   data: problem => {
     const [, width, height, bits] = problem.question.match(/(\d+)×(\d+)画素、(\d+) bit/);
-    return Number(problem.answer) === (Number(width) * Number(height) * Number(bits)) / 8;
+    return Number(problem.answer) === (Number(width) * Number(height) * Number(bits)) / 8 && problem.unit === 'byte';
   },
   transfer: problem => {
     const [, size, rate] = problem.question.match(/([\d.]+) MB .*? ([\d.]+) Mbps/);
-    return Number(problem.answer) === (Number(size) * 8) / Number(rate);
+    const seconds = (Number(size) * 8) / Number(rate);
+    return Number(problem.answer) === seconds && problem.unit === '秒' && problem.question.includes('1 Mbps=10⁶ bit/s')
+      && problem.explanation.includes(`${Number(size) * 8} Mbit`) && problem.explanation.includes(`${Number(rate)} Mbps=${seconds} s`);
   },
   logic: problem => {
     const [, a, b, operation] = problem.question.match(/A=(\d)、B=(\d) のとき、(.+) の値/);
@@ -20,22 +22,22 @@ const checks = {
     const expected = operation === 'A AND (NOT B)' ? Number(Boolean(left && !right))
       : operation === 'A OR (NOT B)' ? Number(Boolean(left || !right))
         : Number(Boolean(left !== right));
-    return Number(problem.answer) === expected;
+    return Number(problem.answer) === expected && problem.unit === '';
   },
   sampling: problem => {
     const [, khz, bits, channels] = problem.question.match(/(\d+(?:\.\d+)?) kHz、量子化ビット数 (\d+) bit、(ステレオ2 ch|モノラル1 ch)/);
     const channelCount = channels === 'ステレオ2 ch' ? 2 : 1;
-    return Number(problem.answer) === (Number(khz) * 1000 * Number(bits) * channelCount) / 8;
+    return Number(problem.answer) === (Number(khz) * 1000 * Number(bits) * channelCount) / 8 && problem.unit === 'byte';
   },
   compression: problem => {
     const [, original, compressed] = problem.question.match(/元データ ([\d.]+) MB を ([\d.]+) MB/);
-    return Number(problem.answer) === (Number(compressed) / Number(original)) * 100;
+    return Number(problem.answer) === (Number(compressed) / Number(original)) * 100 && problem.unit === '%';
   },
   complement: problem => {
     const [, bits] = problem.question.match(/で、([01]{8})₂/);
     const unsigned = Number.parseInt(bits, 2);
     const expected = bits[0] === '1' ? unsigned - 256 : unsigned;
-    return Number(problem.answer) === expected;
+    return Number(problem.answer) === expected && problem.unit === '';
   },
 };
 
