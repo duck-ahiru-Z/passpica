@@ -289,6 +289,10 @@ export default function QuadraticInequalityDrillPage() {
 
   const handleCheck = () => {
     if (!problem) return;
+
+    const firstRequired = [1, 2, 3, 4, 5, 6].includes(userAnsType);
+    const secondRequired = [1, 2, 3, 4].includes(userAnsType);
+    if ((firstRequired && !ans1Num.trim()) || (secondRequired && !ans2Num.trim())) return;
     
     if (userAnsType !== problem.ansType) {
       setIsCorrect(false);
@@ -438,6 +442,7 @@ export default function QuadraticInequalityDrillPage() {
             <div className="mt-8 flex gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={([1, 2, 3, 4, 5, 6].includes(userAnsType) && !ans1Num.trim()) || ([1, 2, 3, 4].includes(userAnsType) && !ans2Num.trim())}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -515,7 +520,7 @@ export default function QuadraticInequalityDrillPage() {
                       {problem.ansType === 5 && <li>接点のみが条件を満たすため、答えは <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> となります。</li>}
                       {problem.ansType === 6 && <li>接点以外はすべて条件を満たすため、答えは <MathEq math={`x \\neq ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> のすべての実数です。</li>}
                       {problem.ansType === 7 && <li>すべての点で条件を満たすため、答えは「すべての実数」です。</li>}
-                      {problem.ansType === 8 && <li>条件を満たす点はひとつもないため、答えは「解なし」です。</li>}
+                      {problem.ansType === 8 && <li>二次式は実数範囲で常に{problem.a > 0 ? '正' : '負'}です。したがって、この不等号を満たす値はなく、答えは「解なし」です。</li>}
                     </ul>
                   </div>
                 )}

@@ -36,6 +36,14 @@ for (const a of [-7, -3, -1, 1, 2, 5, 9]) {
         }
       }
     }
+    for (const aValue of [-a, a]) {
+      const type = getQuadraticInequalityAnswerType(aValue, -1, sign);
+      for (const x of [-20, -3, 0, 4, 20]) {
+        const actual = satisfies(aValue * (x * x + 1), sign);
+        if (answerMatches(type, x, 0, 0) !== actual) throw new Error(`D<0 mismatch: a=${aValue}, sign=${sign}, x=${x}, type=${type}`);
+        cases += 1;
+      }
+    }
   }
 }
 

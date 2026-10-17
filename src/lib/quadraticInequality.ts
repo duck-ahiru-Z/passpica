@@ -26,5 +26,7 @@ export function getQuadraticInequalityAnswerType(a: number, discriminant: number
     if (sign === '>') return 8;
     return 5;
   }
-  return 8;
+  // With no real roots, the quadratic keeps the sign of its leading term.
+  if (a > 0) return sign === '>' || sign === '\\ge' ? 7 : 8;
+  return sign === '<' || sign === '\\le' ? 7 : 8;
 }
