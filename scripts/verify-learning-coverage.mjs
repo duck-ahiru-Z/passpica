@@ -50,6 +50,11 @@ for (const entry of learnEntries) {
   if (!file || !fs.existsSync(file)) throw new Error(`Missing learning page for ${entry.slug}: ${entry.link}`);
 }
 
+const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');
+if (!/role="img" aria-label=\{`\$\{info\.name\}の模式的な状態図/.test(phaseDiagram)) {
+  throw new Error('Chemistry phase diagram must have an accessible, content-rich description');
+}
+
 const learnRoot = path.join(root, 'src/app/learn');
 function collectPages(directory) {
   return fs.readdirSync(directory, { withFileTypes: true }).flatMap(entry => {

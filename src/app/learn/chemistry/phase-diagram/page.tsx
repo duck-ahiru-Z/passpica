@@ -84,7 +84,7 @@ export default function PhaseDiagramPage() {
 
           {/* SVGによる状態図のフラット線画 */}
           <div className="flex items-center justify-center flex-grow py-4 w-full">
-            <svg width="280" height="220" viewBox="0 0 200 160" className="overflow-visible font-mono text-[8px]">
+            <svg width="280" height="220" viewBox="0 0 200 160" className="overflow-visible font-mono text-[8px]" role="img" aria-label={`${info.name}の模式的な状態図。横軸は温度、縦軸は圧力です。固体・液体・気体の領域、昇華曲線、蒸気圧曲線、${info.meltingCurveSlope}の融解曲線、1気圧の位置、超臨界流体の領域を示します。三重点は${info.triplePoint}、臨界点は${info.criticalPoint}です。圧力と温度は比例目盛ではありません。`}>
               
               {/* x軸（温度 T）とy軸（圧力 P） */}
               <line x1="25" y1="130" x2="185" y2="130" stroke="#475569" strokeWidth="1.5" />
