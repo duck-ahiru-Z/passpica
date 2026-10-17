@@ -172,7 +172,7 @@ export default function MetalIonPage() {
 
           {/* ビーカーと沈殿のフラットSVG */}
           <div className="flex items-center justify-center py-6 w-full relative">
-            <svg width="280" height="240" viewBox="0 0 160 140" className="overflow-visible font-sans" role="img" aria-label={`ステップ${currentStepIdx}。残っているイオン：${step.remains.join('、') || 'なし'}。${step.precipitates.length ? `今回の沈殿：${step.precipitates.join('、')}（${step.precipitateColor}）` : currentStepIdx === STEPS.length - 1 ? '沈殿はなく、ナトリウムの炎色反応を確認します。' : '今回の沈殿はありません。'}`}>
+            <svg width="280" height="240" viewBox="0 0 160 140" className="overflow-visible font-sans" role="img" aria-label={`ステップ${currentStepIdx}。残っているイオン：${step.remains.join('、') || 'なし'}。${step.precipitates.length ? `今回の沈殿：${step.precipitates.join('、')}（${step.precipitateColor}）` : currentStepIdx === STEPS.length - 1 ? '沈殿はなく、ナトリウムの黄色い炎色反応を図示します。' : '今回の沈殿はありません。'}`}>
               
               {/* ビーカー */}
               <rect x="35" y="25" width="90" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
@@ -195,11 +195,17 @@ export default function MetalIonPage() {
                     </text>
                   );
                 })}
-                {step.remains.length === 0 && (
+                {currentStepIdx === STEPS.length - 1 ? (
+                  <g aria-hidden="true">
+                    <path d="M80 48 C72 60 65 67 68 78 C70 87 76 91 80 92 C88 88 94 82 92 73 C91 66 85 59 80 48Z" fill="#facc15" stroke="#ca8a04" strokeWidth="1.5" />
+                    <path d="M80 65 C76 72 74 76 76 82 C77 85 79 87 81 88 C86 83 86 77 80 65Z" fill="#fb923c" />
+                    <text x="80" y="101" fill="#854d0e" fontSize="8" fontWeight="bold" textAnchor="middle">Na の黄色い炎色反応</text>
+                  </g>
+                ) : step.remains.length === 0 ? (
                   <text x="80" y="70" fill="#94a3b8" fontSize="10" fontStyle="italic" textAnchor="middle">
                     （イオンなし）
                   </text>
-                )}
+                ) : null}
               </g>
 
               {/* 下層：この段階で生じた沈殿（炎色反応は沈殿として描かない） */}

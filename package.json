@@ -26,6 +26,7 @@
     "test:flame-reaction-visual": "node scripts/verify-flame-reaction-visual.mjs",
     "test:industrial-process-visual": "node scripts/verify-industrial-process-visual.mjs",
     "test:phase-diagram-visual": "node scripts/verify-phase-diagram-visual.mjs",
+    "test:metal-ion-flow-visual": "node scripts/verify-metal-ion-flow-visual.mjs",
     "test:calculus3-integrals": "node --experimental-strip-types scripts/verify-calculus3-integrals.mjs",
     "test:calculus3-differentiation": "node --experimental-strip-types scripts/verify-calculus3-differentiation.mjs",
     "test:calculus3-limits": "node --experimental-strip-types scripts/verify-calculus3-limits.mjs",
