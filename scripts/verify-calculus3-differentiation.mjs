@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { differentiationPatterns, generateDifferentiationProblem } from '../src/lib/calculus3Differentiation.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-differentiation-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="differentiation-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
+  throw new Error('differentiation strategy must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
