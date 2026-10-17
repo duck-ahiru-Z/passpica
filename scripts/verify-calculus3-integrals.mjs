@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { generateIntegralProblem, integralPatterns } from '../src/lib/calculus3Integrals.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-integral-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="integral-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
+  throw new Error('integral strategy must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
