@@ -13,6 +13,7 @@
     "test:sequence-sum-questions": "node --experimental-strip-types scripts/verify-sequence-sum-questions.mjs",
     "test:sequence-recurrence": "node --experimental-strip-types scripts/verify-sequence-recurrence.mjs",
     "test:calculus3-curve": "node --experimental-strip-types scripts/verify-calculus3-curve-analysis.mjs",
+    "test:calculus3-derivative-visual": "node scripts/verify-calculus3-derivative-visual.mjs",
     "test:calculus3-geometry": "node --experimental-strip-types scripts/verify-calculus3-geometry.mjs",
     "test:calculus3-integrals": "node --experimental-strip-types scripts/verify-calculus3-integrals.mjs",
     "test:calculus3-differentiation": "node --experimental-strip-types scripts/verify-calculus3-differentiation.mjs",
