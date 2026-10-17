@@ -1,4 +1,11 @@
 import { factorizationPatterns, generateFactorizationQuestion } from '../src/lib/factorizationQuestions.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/factorization-strategy-drill/page.tsx'), 'utf8');
+if (!drillPage.includes('aria-pressed={choice === option}') || !drillPage.includes('role="status" aria-live="polite"')) {
+  throw new Error('factorization choice and answer feedback must be exposed accessibly');
+}
 
 const fixedRandom = () => 0.42;
 for (const pattern of factorizationPatterns) {
