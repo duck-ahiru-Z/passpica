@@ -2,10 +2,16 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { createCalculus3MixedQuestionPicker, type Calculus3MixedMode, type Calculus3Question } from '@/src/lib/calculus3MixedQuestions';
 
 const picker = createCalculus3MixedQuestionPicker();
+
+function MathEq({ math }: { math: string }) {
+  return <span dangerouslySetInnerHTML={{ __html: katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'error' }) }} />;
+}
 
 export default function Calculus3MixedDrillPage() {
   const [mode, setMode] = useState<Calculus3MixedMode>('all');
@@ -36,8 +42,8 @@ export default function Calculus3MixedDrillPage() {
         <p className="text-gray-500 mt-1">単元名を見て解くのではなく、問題の形から最初の方針を選ぶ実戦練習です。</p>
       </div>
       <section className="retro-box bg-gray-50 p-4 space-y-3">
-        <label className="font-bold block">■ 出題範囲</label>
-        <select value={mode} onChange={e => chooseMode(e.target.value as Calculus3MixedMode)} className="border p-2 bg-white">
+        <label htmlFor="calculus3-mixed-mode" className="font-bold block">■ 出題範囲</label>
+        <select id="calculus3-mixed-mode" aria-label="数学IIIの出題範囲" value={mode} onChange={e => chooseMode(e.target.value as Calculus3MixedMode)} className="border p-2 bg-white">
           <option value="all">実戦練習：数学III 全体ランダム</option>
           <option value="limit">極限だけ</option>
           <option value="differentiation">微分法だけ</option>
@@ -48,10 +54,10 @@ export default function Calculus3MixedDrillPage() {
       </section>
       <section className="retro-box bg-white p-5 space-y-5">
         <div className="flex items-center justify-between gap-2"><span className="font-bold text-blue-700">{mode === 'all' ? '数学III・実戦問題' : `出題分野：${question.areaLabel}`}</span><span className="text-gray-500">方針を選択</span></div>
-        <div className="border border-slate-300 bg-slate-50 p-6 text-center text-base md:text-lg font-bold leading-relaxed">{question.prompt}</div>
-        <div className="grid sm:grid-cols-2 gap-2">{question.options.map(option => <button key={option} onClick={() => setAnswer(option)} className={`retro-btn-classic ${answer === option ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>{option}</button>)}</div>
-        <div className="flex justify-center gap-2"><button onClick={() => setChecked(true)} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold">解答する</button><button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button></div>
-        {checked && <div className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : `正解は「${question.answer}」です。`}<div className="mt-2 font-normal text-slate-700">{question.explanation}</div></div>}
+        <div className="border border-slate-300 bg-slate-50 p-6 text-center text-base md:text-lg font-bold leading-relaxed space-y-3"><p>{question.prompt}</p>{question.expressionFormat === 'math' ? <MathEq math={question.expression} /> : <p className="font-mono">{question.expression}</p>}</div>
+        <fieldset className="space-y-2"><legend className="font-bold">最初に使う方法を一つ選んでください。</legend><div className="grid sm:grid-cols-2 gap-2">{question.options.map(option => <label key={`${question.pattern}-${option}`} className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${answer === option ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}><input type="radio" name="calculus3-mixed-answer" value={option} checked={answer === option} onChange={() => { setAnswer(option); setChecked(false); }} className="accent-blue-600" />{option}</label>)}</div></fieldset>
+        <div className="flex justify-center gap-2"><button onClick={() => setChecked(true)} disabled={!answer} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed">解答する</button><button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button></div>
+        {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : `正解は「${question.answer}」です。`}<div className="mt-2 font-normal text-slate-700">{question.explanation}</div></div>}
       </section>
     </main>
   );
