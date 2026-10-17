@@ -81,7 +81,7 @@ const GASES: GasInfo[] = [
     colorOdor: '無色・無臭',
     dryAgent: '濃硫酸、塩化カルシウムなど（H₂と反応しないもの）',
     reaction: 'Zn + H2SO4 ➔ ZnSO4 + H2',
-    explain: 'すべての気体の中で最も軽く、水に難溶なため「水上置換法」で集めます（非常に軽いため、水上置換の方が漏れを最小限に抑えられます）。可燃性があり、空気との混合気体に点火すると「ポッ」と音を立てて爆発的に燃焼し、水（H2O）を生じます。'
+    explain: 'すべての気体の中で最も軽く、水にほとんど溶けないため水上置換法で集められます。水上置換を選ぶ直接の理由は水への溶けにくさで、空気との相対密度だけでは捕集法は決まりません。水素は可燃性があり、空気との混合気体は引火・爆発する危険があるため、火気を近づけず、学校の実験手順に従って扱います。'
   },
   {
     formula: 'CO2',
@@ -113,7 +113,7 @@ export default function GasCollectionPage() {
           気体の発生装置と捕集法
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          気体の性質（水への溶解性、空気に対する密度）に応じて、最適な捕集法（水上・上方・下方置換）が決定されます。
+          まず水に溶けにくく反応しない気体は水上置換を選びます。それ以外は、空気との密度差に応じて上方・下方置換を選びます。
         </p>
       </div>
 
@@ -128,7 +128,7 @@ export default function GasCollectionPage() {
 
           {/* SVGによる捕集装置線画 */}
           <div className="flex items-center justify-center flex-grow py-6">
-            <svg width="240" height="240" viewBox="0 0 160 160" className="overflow-visible">
+            <svg width="240" height="240" viewBox="0 0 160 160" className="overflow-visible" role="img" aria-label={`${selectedGas.name}を${selectedGas.methodJp}で捕集する装置。${selectedGas.method === 'water' ? '水に溶けにくい気体を水上で集めます。' : selectedGas.method === 'upward' ? '軽い気体が逆さの集気びんに上がり、空気を下へ押し出します。' : '重い気体が集気びんの底に入り、空気を上へ押し出します。'}`}>
               <defs>
                 <marker id="gas-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
                   <path d="M 0 0 L 6 3 L 0 6 Z" fill="#64748b" />
@@ -220,13 +220,13 @@ export default function GasCollectionPage() {
             </span>
             <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto text-[10px]">
               <div className="border border-blue-200 bg-blue-50/50 p-1.5 rounded">
-                <strong>水に難溶</strong><br/>➔ 水上置換
+                <strong>水に難溶・反応しない</strong><br/>➔ 水上置換
               </div>
               <div className="border border-red-200 bg-red-50/50 p-1.5 rounded">
-                <strong>水溶・空気より軽い</strong><br/>➔ 上方置換
+                <strong>水に溶けやすい・空気より軽い</strong><br/>➔ 上方置換
               </div>
               <div className="border border-amber-200 bg-amber-50/50 p-1.5 rounded">
-                <strong>水溶・空気より重い</strong><br/>➔ 下方置換
+                <strong>水に溶けやすい・空気より重い</strong><br/>➔ 下方置換
               </div>
             </div>
           </div>
@@ -247,6 +247,7 @@ export default function GasCollectionPage() {
                 <button
                   key={g.formula}
                   onClick={() => setSelectedGas(g)}
+                  aria-pressed={selectedGas.formula === g.formula}
                   className={`border border-gray-400 py-2 text-center rounded text-xs font-bold transition-all bg-slate-50 hover:bg-slate-100 ${selectedGas.formula === g.formula ? 'bg-amber-100 border-amber-600' : ''}`}
                 >
                   <div className="font-mono">{g.formula}</div>
