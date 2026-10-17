@@ -13,6 +13,7 @@
     "test:chemistry-mole": "node --experimental-strip-types scripts/verify-chemistry-mole-calculation.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
     "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
+    "test:matha-mixed": "node --experimental-strip-types scripts/verify-matha-mixed-questions.mjs",
     "test:physics-motion": "node --experimental-strip-types scripts/verify-physics-motion-calculation.mjs",
     "test:math2-bc-mixed": "node --experimental-strip-types scripts/verify-math2-bc-mixed-questions.mjs",
     "test:math": "node --experimental-strip-types scripts/verify-discriminant-pattern.mjs",
