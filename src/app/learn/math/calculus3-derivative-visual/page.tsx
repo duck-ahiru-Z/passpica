@@ -20,7 +20,15 @@ export default function Calculus3DerivativeVisualPage() {
     const value = -2.7 + index * 0.05;
     return `${index === 0 ? 'M' : 'L'} ${sx(value).toFixed(1)} ${sy(f(value)).toFixed(1)}`;
   }).join(' '), []);
-  const tangentPath = `M ${sx(x - 1.05).toFixed(1)} ${sy(y - slope * 1.05).toFixed(1)} L ${sx(x + 1.05).toFixed(1)} ${sy(y + slope * 1.05).toFixed(1)}`;
+  const tangentHalfWidth = Math.min(1.05, 4.5 / Math.max(Math.abs(slope), 1));
+  const tangentValueAt = (value: number) => y + slope * (value - x);
+  const tangentDomainMin = Math.max(-2.7, x - tangentHalfWidth);
+  const tangentDomainMax = Math.min(2.7, x + tangentHalfWidth);
+  const tangentClipX1 = x + (-5 - y) / slope;
+  const tangentClipX2 = x + (5 - y) / slope;
+  const tangentStartX = slope === 0 ? tangentDomainMin : Math.max(tangentDomainMin, Math.min(tangentClipX1, tangentClipX2));
+  const tangentEndX = slope === 0 ? tangentDomainMax : Math.min(tangentDomainMax, Math.max(tangentClipX1, tangentClipX2));
+  const tangentPath = `M ${sx(tangentStartX).toFixed(1)} ${sy(tangentValueAt(tangentStartX)).toFixed(1)} L ${sx(tangentEndX).toFixed(1)} ${sy(tangentValueAt(tangentEndX)).toFixed(1)}`;
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
