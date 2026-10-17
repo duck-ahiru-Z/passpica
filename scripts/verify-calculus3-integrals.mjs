@@ -6,6 +6,12 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/c
 if (!/type="radio"\s+name="integral-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
   throw new Error('integral strategy must be a single-choice radio group');
 }
+if (!/const isCorrect = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer - problem\.answer\) < 0\.01/.test(drillPage)) {
+  throw new Error('integral answers must require both the correct strategy and numeric value');
+}
+if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
+  throw new Error('integral feedback must announce the result and distinguish strategy from value errors');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;

@@ -1,4 +1,14 @@
 import { generateGeometryProblem, geometryPatterns } from '../src/lib/calculus3Geometry.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-area-volume-drill/page.tsx'), 'utf8');
+if (!/aria-pressed=\{strategy === p\}/.test(drillPage) || !/disabled=\{!strategy \|\| answer\.trim\(\) === ''\}/.test(drillPage)) {
+  throw new Error('geometry drill must expose the selected strategy and require strategy plus answer before checking');
+}
+if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
+  throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
+}
 
 const stableRandom = () => 0.37;
 const checks = {

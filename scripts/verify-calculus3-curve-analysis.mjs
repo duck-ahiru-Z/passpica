@@ -6,6 +6,12 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/c
 if (!/type="radio"\s+name="curve-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === pattern}')) {
   throw new Error('curve-analysis strategy must be a single-choice radio group');
 }
+if (!/const correct = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer - problem\.answer\) <= 0\.001/.test(drillPage)) {
+  throw new Error('curve-analysis answers must require both the correct strategy and numeric value');
+}
+if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
+  throw new Error('curve-analysis feedback must announce the result and distinguish strategy from value errors');
+}
 
 const stableRandom = () => 0.37;
 const checks = {

@@ -25,6 +25,8 @@ export default function Calculus3IntegralDrillPage() {
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const numericAnswer = Number(answer);
   const isCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && strategy === problem.pattern && Math.abs(numericAnswer - problem.answer) < 0.01;
+  const strategyIsCorrect = strategy === problem.pattern;
+  const valueIsCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && Math.abs(numericAnswer - problem.answer) < 0.01;
 
   return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
@@ -44,7 +46,7 @@ export default function Calculus3IntegralDrillPage() {
       </fieldset>
       <input aria-label="積分値" value={answer} onChange={e => setAnswer(e.target.value)} placeholder="積分値" className="retro-input mx-auto block w-40 text-center" />
       <div className="flex justify-center gap-3"><button onClick={() => setChecked(true)} disabled={!strategy || answer.trim() === ''} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed">解答する</button><button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button></div>
-      {checked && <div className={`p-3 border text-center font-bold ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{isCorrect ? '正解！' : `解法は「${integralLabels[problem.pattern]}」、積分値は約 ${problem.answer.toFixed(3)} です。`}<div className="mt-2 font-normal text-slate-700"><span className="font-semibold">{problem.hint}</span>：{problem.explanation}</div></div>}
+      {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{isCorrect ? '正解！' : <>不正解。{!strategyIsCorrect && <>解法は「{integralLabels[problem.pattern]}」です。 </>}{!valueIsCorrect && <>積分値は約 {problem.answer.toFixed(3)} です。</>}</>}<div className="mt-2 font-normal text-slate-700"><span className="font-semibold">{problem.hint}</span>：{problem.explanation}</div></div>}
     </section>
   </main>;
 }

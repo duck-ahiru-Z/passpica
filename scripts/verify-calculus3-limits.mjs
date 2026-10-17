@@ -6,6 +6,12 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/c
 if (!/type="radio"\s+name="limit-strategy"/.test(drillPage) || drillPage.includes('onClick={() => setStrategy(p)}')) {
   throw new Error('limit strategy must be a single-choice radio group');
 }
+if (!/const correct = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer - Number\(problem\.answer\)\) <= 0\.0005/.test(drillPage)) {
+  throw new Error('limit answers must require the correct strategy and the rounded numeric value');
+}
+if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
+  throw new Error('limit feedback must announce the result and distinguish strategy from value errors');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-12;
