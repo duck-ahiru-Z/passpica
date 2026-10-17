@@ -63,12 +63,16 @@ export default function CrystalLatticePage() {
       {/* タブ切り替え */}
       <div className="flex gap-2">
         <button
+          type="button"
+          aria-pressed={selectedType === 'bcc'}
           onClick={() => setSelectedType('bcc')}
           className={`retro-btn-classic font-bold py-1.5 px-4 ${selectedType === 'bcc' ? 'bg-[#cbd5e1]' : ''}`}
         >
           体心立方格子 (BCC)
         </button>
         <button
+          type="button"
+          aria-pressed={selectedType === 'fcc'}
           onClick={() => setSelectedType('fcc')}
           className={`retro-btn-classic font-bold py-1.5 px-4 ${selectedType === 'fcc' ? 'bg-[#cbd5e1]' : ''}`}
         >
@@ -88,7 +92,7 @@ export default function CrystalLatticePage() {
             </span>
             
             <div className="py-6 flex items-center justify-center flex-grow">
-              <svg width="180" height="180" viewBox="0 0 120 120" className="overflow-visible">
+              <svg width="180" height="180" viewBox="0 0 120 120" className="overflow-visible" role="img" aria-label={selectedType === 'bcc' ? '体心立方格子の配置図。立方体の8つの頂点と立方体の中心に原子があります。' : '面心立方格子の配置図。立方体の8つの頂点と6つの面の中心に原子があります。'}>
                 {/* 立方体ワイヤーフレーム */}
                 <path d="M 20 40 L 80 40 L 100 20 L 40 20 Z" fill="none" stroke="#94a3b8" strokeWidth="1" />
                 <path d="M 20 100 L 80 100 L 100 80 L 40 80 Z" fill="none" stroke="#94a3b8" strokeWidth="1" />
@@ -138,7 +142,7 @@ export default function CrystalLatticePage() {
             </span>
             
             <div className="py-6 flex items-center justify-center flex-grow">
-              <svg width="180" height="180" viewBox={selectedType === 'bcc' ? '0 0 160 120' : '0 0 120 120'} className="overflow-visible">
+              <svg width="180" height="180" viewBox={selectedType === 'bcc' ? '0 0 160 120' : '0 0 120 120'} className="overflow-visible" role="img" aria-label={selectedType === 'bcc' ? '体心立方格子の体対角線を含む断面。角の原子、中心原子、角の原子が接し、対角線は√3 a、原子半径は合計4rです。' : '面心立方格子の面を通る断面。四隅の原子と面中心の原子が対角線上で接し、対角線は√2 a、原子半径は合計4rです。'}>
                 {selectedType === 'bcc' ? (
                   <g>
                     {/* The BCC body-diagonal section has sides a and √2a, so its diagonal is √3a. */}
