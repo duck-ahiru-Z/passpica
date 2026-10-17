@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { generateInformationProblem, informationPatterns } from '../src/lib/informationCalculation.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/information/calculation-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="information-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
+  throw new Error('information method selection must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const checks = {

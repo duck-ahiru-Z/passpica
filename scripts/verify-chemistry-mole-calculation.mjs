@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { formatMoleAnswer, generateMoleProblem, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/mole-calculation-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="mole-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
+  throw new Error('chemistry method selection must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const expectedUnits = { mass: 'mol', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', ph: '', yield: '%' };
