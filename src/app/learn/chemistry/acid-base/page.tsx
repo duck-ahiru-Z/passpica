@@ -12,22 +12,23 @@ export default function AcidBasePage() {
     if (indicator === 'pp') {
       // フェノールフタレイン: 酸性・中性は無色、塩基性で赤ピンク
       if (pH >= 8.3) {
-        const opacity = Math.min((pH - 8.3) / (14 - 8.3) + 0.3, 0.95);
+        const opacity = 0.15 + 0.8 * Math.min((pH - 8.3) / (10 - 8.3), 1);
         return `rgba(244, 114, 182, ${opacity})`;
       }
-      return 'rgba(255, 255, 255, 0.2)';
+      // Clear solutions still need a subtle fill so the liquid level is visible against the white page.
+      return 'rgba(219, 234, 254, 0.72)';
     } else if (indicator === 'litmus') {
       // リトマス液: 酸性で赤、中性で紫、塩基性で青
-      if (pH < 5.0) {
+      if (pH <= 5.0) {
         return 'rgba(239, 68, 68, 0.7)'; // 赤
-      } else if (pH > 8.0) {
+      } else if (pH >= 8.0) {
         return 'rgba(59, 130, 246, 0.7)'; // 青
       } else {
         return 'rgba(139, 92, 246, 0.6)'; // 紫
       }
     } else {
       // メチルオレンジ: 強酸性で赤、pH 4.4以上で黄色
-      if (pH < 3.1) {
+      if (pH <= 3.1) {
         return 'rgba(239, 68, 68, 0.8)'; // 赤
       } else if (pH < 4.4) {
         return 'rgba(249, 115, 22, 0.8)'; // オレンジ
@@ -94,15 +95,17 @@ export default function AcidBasePage() {
             <div className="flex justify-between items-center mb-1 text-xs font-bold text-slate-700">
               <span>溶液のpH調整スライダー：</span>
               <span className="bg-gray-100 border border-gray-400 px-3 py-1 font-mono text-slate-800 font-bold">
-                pH = {pH} ({pH < 7 ? '酸性' : pH === 7 ? '中性' : '塩基性'})
+                pH = {pH.toFixed(1)} ({pH < 7 ? '酸性' : pH === 7 ? '中性' : '塩基性'})
               </span>
             </div>
             <input
               type="range"
+              aria-label="溶液のpH"
               min="1"
               max="14"
+              step="0.1"
               value={pH}
-              onChange={(e) => setPH(parseInt(e.target.value))}
+              onChange={(e) => setPH(parseFloat(e.target.value))}
               className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
             />
           </div>
