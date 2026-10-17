@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useState } from 'react';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { factorizationLabels, factorizationPatterns, generateFactorizationQuestion, type FactorizationMode, type FactorizationPattern } from '@/src/lib/factorizationQuestions';
 
 const mixedQuestions = new BalancedRandom(factorizationPatterns);
@@ -11,7 +12,7 @@ const initialMode: FactorizationMode = 'mix';
 
 export default function FactorizationStrategyDrillPage() {
   const [mode, setMode] = useState<FactorizationMode>(initialMode);
-  const [question, setQuestion] = useState(() => generateFactorizationQuestion(mixedQuestions.next()));
+  const [question, setQuestion] = useClientGeneratedState(() => generateFactorizationQuestion(mixedQuestions.next()));
   const [choice, setChoice] = useState('');
   const [checked, setChecked] = useState(false);
 
@@ -21,6 +22,8 @@ export default function FactorizationStrategyDrillPage() {
     setChoice('');
     setChecked(false);
   };
+
+  if (!question) return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   return <main className="max-w-3xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-700 hover:underline">← 無限演習ポータルへ戻る</Link>

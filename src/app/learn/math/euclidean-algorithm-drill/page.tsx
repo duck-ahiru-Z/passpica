@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -87,7 +88,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function EuclideanAlgorithmDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -96,7 +97,7 @@ export default function EuclideanAlgorithmDrill() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -172,11 +173,11 @@ export default function EuclideanAlgorithmDrill() {
     };
     
     drawEuclid(offsetX, offsetY, drawW, drawH, A, B, true, 0);
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -195,6 +196,10 @@ export default function EuclideanAlgorithmDrill() {
     }
     setHasChecked(true);
   };
+
+  if (!problem) {
+    return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
+  }
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
