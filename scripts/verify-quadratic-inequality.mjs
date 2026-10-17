@@ -1,4 +1,5 @@
 import { getQuadraticInequalityAnswerType, parseQuadraticInequalityFraction } from '../src/lib/quadraticInequality.ts';
+import { generateQuadraticInequalityProblem } from '../src/lib/quadraticInequalityProblems.ts';
 
 for (const invalid of [['1.5', ''], ['1abc', ''], ['1', '2.5'], ['1', '0'], ['', '1']]) {
   if (parseQuadraticInequalityFraction(...invalid) !== null) {
@@ -13,6 +14,7 @@ for (const [input, expected] of [[['2', '4'], { num: 1, den: 2 }], [['-3', '-6']
 }
 
 const signs = ['<', '>', '\\le', '\\ge'];
+const patterns = ['pattern1', 'pattern2', 'pattern3', 'pattern4'];
 const answerMatches = (type, x, first, second) => {
   switch (type) {
     case 1: return first < x && x < second;
@@ -26,6 +28,70 @@ const answerMatches = (type, x, first, second) => {
   }
 };
 const satisfies = (value, sign) => sign === '<' ? value < 0 : sign === '>' ? value > 0 : sign === '\\le' ? value <= 0 : value >= 0;
+
+let randomState = 0x65c12026;
+const seededRandom = () => {
+  randomState = (Math.imul(randomState, 1664525) + 1013904223) >>> 0;
+  return randomState / 0x100000000;
+};
+
+function verifyGeneratedProblem(problem, expectedPattern) {
+  if (problem.pattern !== expectedPattern || !problem.eq.endsWith(`${problem.ineqSign} 0`) || problem.a === 0) {
+    throw new Error(`invalid generated problem metadata: ${JSON.stringify(problem)}`);
+  }
+  const discriminant = problem.b ** 2 - 4 * problem.a * problem.c;
+  if (problem.ansType !== getQuadraticInequalityAnswerType(problem.a, discriminant, problem.ineqSign)) {
+    throw new Error(`generated answer classification mismatch: ${JSON.stringify(problem)}`);
+  }
+  if (problem.pattern === 'pattern1' && problem.a !== 1) throw new Error('pattern1 must be monic');
+  if (problem.pattern === 'pattern2' && problem.a !== -1) throw new Error('pattern2 must have a negative leading coefficient');
+  if (problem.pattern === 'pattern3' && problem.a <= 1) throw new Error('pattern3 must use a non-unit positive leading coefficient');
+  if (problem.pattern === 'pattern4' && (discriminant !== 0 || problem.b === 0 || problem.c === 0)) throw new Error('pattern4 must be a full repeated-root quadratic');
+
+  const rootValues = problem.roots.map(root => root.num / root.den);
+  if (problem.pattern === 'pattern4') {
+    if (rootValues.length !== 1) throw new Error('pattern4 must expose one repeated root');
+  } else if (rootValues.length !== 2 || !(rootValues[0] < rootValues[1]) || discriminant <= 0) {
+    throw new Error(`two-root pattern has invalid roots: ${JSON.stringify(problem)}`);
+  }
+  for (const root of rootValues) {
+    const value = problem.a * root ** 2 + problem.b * root + problem.c;
+    if (Math.abs(value) > 1e-9) throw new Error(`listed root does not solve polynomial: ${JSON.stringify(problem)}`);
+  }
+
+  const probes = rootValues.length === 1
+    ? [rootValues[0] - 1, rootValues[0], rootValues[0] + 1]
+    : [rootValues[0] - 1, rootValues[0], (rootValues[0] + rootValues[1]) / 2, rootValues[1], rootValues[1] + 1];
+  for (const x of probes) {
+    const polynomial = problem.a * x ** 2 + problem.b * x + problem.c;
+    const actual = Math.abs(polynomial) < 1e-9
+      ? problem.ineqSign === '\\le' || problem.ineqSign === '\\ge'
+      : satisfies(polynomial, problem.ineqSign);
+    if (answerMatches(problem.ansType, x, rootValues[0], rootValues.at(-1)) !== actual) {
+      throw new Error(`generated answer does not solve polynomial at x=${x}: ${JSON.stringify(problem)}`);
+    }
+  }
+}
+
+for (const pattern of patterns) {
+  const observedSigns = new Set();
+  for (let index = 0; index < 2500; index += 1) {
+    const problem = generateQuadraticInequalityProblem(pattern, seededRandom);
+    verifyGeneratedProblem(problem, pattern);
+    observedSigns.add(problem.ineqSign);
+  }
+  if (observedSigns.size !== signs.length) throw new Error(`${pattern} did not produce every inequality sign`);
+}
+
+const mixedProblems = Array.from({ length: 20000 }, () => generateQuadraticInequalityProblem('mix', seededRandom));
+const mixedPatterns = mixedProblems.map(problem => problem.pattern);
+for (const problem of mixedProblems) verifyGeneratedProblem(problem, problem.pattern);
+for (let index = 0; index < mixedPatterns.length; index += patterns.length) {
+  if (new Set(mixedPatterns.slice(index, index + patterns.length)).size !== patterns.length) {
+    throw new Error(`mixed generator omitted a pattern in batch ${index / patterns.length}`);
+  }
+}
+if (mixedPatterns.some((pattern, index) => index > 0 && pattern === mixedPatterns[index - 1])) throw new Error('mixed generator repeated adjacent patterns');
 
 let cases = 0;
 for (const a of [-7, -3, -1, 1, 2, 5, 9]) {
@@ -59,4 +125,4 @@ for (const a of [-7, -3, -1, 1, 2, 5, 9]) {
   }
 }
 
-console.log(`Quadratic-inequality answer regions verified against the polynomial: ${cases.toLocaleString()} boundary, interval, and exterior probes.`);
+console.log(`Quadratic-inequality generation verified: 10,000 fixed-pattern and 20,000 mixed problems, plus ${cases.toLocaleString()} answer-region probes.`);

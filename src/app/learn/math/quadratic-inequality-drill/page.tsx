@@ -4,128 +4,19 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
-import { getQuadraticInequalityAnswerType, parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType, type QuadraticInequalitySign } from '@/src/lib/quadraticInequality';
+import { parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
+import { generateQuadraticInequalityProblem, type QuadraticInequalityPattern, type QuadraticInequalityProblem } from '@/src/lib/quadraticInequalityProblems';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-interface Root {
-  num: number;
-  den: number;
-}
-
-function simplifyFraction(n: number, d: number): Root {
-  if (d === 0) return { num: 0, den: 1 };
-  const g = gcd(n, d);
-  let num = n / g;
-  let den = d / g;
-  if (den < 0) {
-    num *= -1;
-    den *= -1;
-  }
-  return { num, den };
-}
-
-type InequalityType = QuadraticInequalitySign;
 type AnsType = QuadraticInequalityAnswerType;
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+type Pattern = QuadraticInequalityPattern;
+type ProblemData = QuadraticInequalityProblem;
 
-interface ProblemData {
-  pattern: Pattern;
-  a: number; b: number; c: number;
-  ineqSign: InequalityType;
-  roots: Root[]; // 2 roots (sorted) or 1 root (D=0)
-  ansType: AnsType;
-  eq: string;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p_type = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  const signs: InequalityType[] = ['<', '>', '\\le', '\\ge'];
-
-  while (true) {
-    const sign = signs[Math.floor(Math.random() * signs.length)];
-    let p, q, r, s, a, b, c;
-    let roots: Root[] = [];
-
-    if (p_type === 'pattern4') {
-      const root_val = Math.floor(Math.random() * 19) - 9;
-      const sign_a = Math.random() < 0.5 ? 1 : -1;
-      a = sign_a;
-      b = -2 * sign_a * root_val;
-      c = sign_a * root_val * root_val;
-      roots = [simplifyFraction(root_val, 1)];
-      if (a === 0 || b === 0 || c === 0) continue; // to make it look like a full polynomial
-    } else {
-      if (p_type === 'pattern1') {
-        p = 1; r = 1;
-        q = Math.floor(Math.random() * 11) - 5;
-        s = Math.floor(Math.random() * 11) - 5;
-      } else if (p_type === 'pattern2') {
-        p = -1; r = 1;
-        q = Math.floor(Math.random() * 11) - 5;
-        s = Math.floor(Math.random() * 11) - 5;
-      } else {
-        // pattern3
-        p = Math.floor(Math.random() * 5) + 1;
-        r = Math.floor(Math.random() * 5) + 1;
-        if (p === 1 && r === 1) r = 2;
-        q = Math.floor(Math.random() * 11) - 5;
-        s = Math.floor(Math.random() * 11) - 5;
-      }
-      if (q === 0 || s === 0) continue;
-      
-      const root1 = simplifyFraction(-q, p);
-      const root2 = simplifyFraction(-s, r);
-      const v1 = root1.num / root1.den;
-      const v2 = root2.num / root2.den;
-      if (v1 === v2) continue; // D>0 needs distinct roots
-      
-      roots = v1 < v2 ? [root1, root2] : [root2, root1];
-      a = p * r;
-      b = p * s + q * r;
-      c = q * s;
-    }
-
-    if (a === 0) continue;
-
-    const D = b * b - 4 * a * c;
-    const ansType = getQuadraticInequalityAnswerType(a, D, sign);
-
-    let eq = '';
-    if (a === 1) eq += 'x^2';
-    else if (a === -1) eq += '-x^2';
-    else eq += `${a}x^2`;
-    
-    if (b > 0) eq += ` + ${b === 1 ? '' : b}x`;
-    else if (b < 0) eq += ` - ${Math.abs(b) === 1 ? '' : Math.abs(b)}x`;
-    
-    if (c > 0) eq += ` + ${c}`;
-    else if (c < 0) eq += ` - ${Math.abs(c)}`;
-
-    eq += ` ${sign} 0`;
-    
-    return { pattern: p_type, a, b, c, ineqSign: sign, roots, ansType, eq };
-  }
-}
+const generateProblem = generateQuadraticInequalityProblem;
 
 export default function QuadraticInequalityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
