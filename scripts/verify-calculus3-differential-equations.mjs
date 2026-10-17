@@ -1,4 +1,11 @@
 import { differentialEquationPatterns, generateDifferentialEquationProblem, normalizeDifferentialEquationAnswer } from '../src/lib/calculus3DifferentialEquations.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-differential-equation-drill/page.tsx'), 'utf8');
+for (const requirement of ['aria-pressed={strategy === pattern}', 'disabled={!strategy || answer.trim() === \'\'}', 'role="status" aria-live="polite"', '入力例：y=2e^(3x)']) {
+  if (!drillPage.includes(requirement)) throw new Error(`differential-equation drill is missing accessible input behavior: ${requirement}`);
+}
 
 const stableRandom = () => 0.37;
 const checks = {
