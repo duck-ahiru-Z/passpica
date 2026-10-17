@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -87,7 +88,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function MenelausCevaDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
@@ -118,6 +119,8 @@ export default function MenelausCevaDrill() {
     }
     setHasChecked(true);
   };
+
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let questionEl = <></>;
   let formulaStr = "";

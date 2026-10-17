@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -57,8 +58,8 @@ function createCircleProblem(): CircleProblem {
 
 export default function CircleTangentDrillPage() {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
-  const [strategy, setStrategy] = useState<'contact' | 'distance'>(() => strategyPicker.next());
-  const [problem, setProblem] = useState<CircleProblem>(() => createCircleProblem());
+  const [strategy, setStrategy] = useClientGeneratedState<'contact' | 'distance'>(() => strategyPicker.next());
+  const [problem, setProblem] = useClientGeneratedState<CircleProblem>(() => createCircleProblem());
   
   // 入力状態
   const [L1_A, setL1_A] = useState('');
@@ -225,7 +226,7 @@ export default function CircleTangentDrillPage() {
     return `${res} = ${c}`;
   };
 
-  if (!problem) return <div className="p-8 text-center">生成中...</div>;
+  if (!problem || !strategy) return <div className="p-8 text-center">生成中...</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">

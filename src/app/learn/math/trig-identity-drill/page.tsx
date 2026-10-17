@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -92,10 +93,6 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     if (p === q || p === -q || p === 0) p = 1; // avoid 0, 1, -1 for non-trivial
     
     // sum = p/q. (sin+cos)^2 = p^2/q^2 => 1 + 2sin cos = p^2/q^2 => sin cos = (p^2 - q^2)/(2q^2)
-    const sqNum = Math.abs(p * p - q * q);
-    const signProd = p * p - q * q >= 0 ? 1 : -1;
-    const sqDen = 2 * q * q;
-    
     // We can just use getVal to simplify (p^2 - q^2) / (2q^2) 
     // wait, getVal takes squared values. The actual value is (p^2-q^2)/(2q^2), not its sqrt.
     // So we need a standard fraction simplifier.
@@ -162,7 +159,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function TrigIdentityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ans2, setAns2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -170,11 +167,10 @@ export default function TrigIdentityDrillPage() {
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -259,11 +255,11 @@ export default function TrigIdentityDrillPage() {
       ctx.fillText("y", px + 8, cy + (py-cy)/2);
       ctx.fillText("x", cx + (px-cx)/2, cy + 15);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -299,6 +295,8 @@ export default function TrigIdentityDrillPage() {
     setIsCorrect(isOk);
     setHasChecked(true);
   };
+
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   const target1 = problem.givenType === 'sin' ? 'cos' : 'sin';
   const target2 = problem.givenType === 'tan' ? 'cos' : 'tan';

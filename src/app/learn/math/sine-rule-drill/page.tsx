@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -136,18 +137,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function SineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansDeg, setAnsDeg] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -175,7 +175,6 @@ export default function SineRuleDrillPage() {
     ctx.fill();
 
     // Angles
-    const A_rad = problem.A * Math.PI / 180;
     const B_rad = problem.B * Math.PI / 180;
     const C_rad = problem.C * Math.PI / 180;
 
@@ -221,11 +220,11 @@ export default function SineRuleDrillPage() {
       ctx.font = '12px sans-serif';
       ctx.fillText(`R = ${problem.R}`, cx + 20, cy - 20);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -250,6 +249,8 @@ export default function SineRuleDrillPage() {
     setIsCorrect(isOk);
     setHasChecked(true);
   };
+
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
