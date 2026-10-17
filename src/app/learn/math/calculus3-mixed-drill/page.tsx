@@ -65,7 +65,7 @@ export default function Calculus3MixedDrillPage() {
         </select>
       </section>
       <section className="retro-box bg-white p-5 space-y-5">
-        <div className="flex items-center justify-between gap-2"><span className="font-bold text-blue-700">出題分野：{question.areaLabel}</span><span className="text-gray-500">方針を選択</span></div>
+        <div className="flex items-center justify-between gap-2"><span className="font-bold text-blue-700">{mode === 'all' ? '数学III・実戦問題' : `出題分野：${question.areaLabel}`}</span><span className="text-gray-500">方針を選択</span></div>
         <div className="border border-slate-300 bg-slate-50 p-6 text-center text-base md:text-lg font-bold leading-relaxed">{question.prompt}</div>
         <div className="grid sm:grid-cols-2 gap-2">{question.options.map(option => <button key={option} onClick={() => setAnswer(option)} className={`retro-btn-classic ${answer === option ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>{option}</button>)}</div>
         <div className="flex justify-center gap-2"><button onClick={() => setChecked(true)} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold">解答する</button><button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button></div>
