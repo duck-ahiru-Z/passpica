@@ -101,8 +101,10 @@ export default function IndustrialProcessPage() {
           </div>
 
           {/* SVGによるプロセスパイプライン */}
-          <div className="flex items-center justify-center flex-grow py-6 w-full">
-            <svg width="510" height="300" viewBox="0 0 340 200" className="w-full max-w-[510px] h-auto overflow-visible font-sans" role="img" aria-label={`${proc.name}。実質反応式：${proc.overallReaction}。${proc.stages.map(stage => `${stage.name}、${stage.reaction}`).join('。')}`}>
+          <div className="flex-grow py-6 w-full min-w-0">
+            <p className="md:hidden text-[10px] text-slate-500 mb-1">図は左右にスクロールできます。</p>
+            <div className="flex items-center justify-start md:justify-center w-full min-w-0 overflow-x-auto">
+            <svg width="510" height="300" viewBox="0 0 340 200" className="w-[510px] min-w-[510px] max-w-none h-auto overflow-visible font-sans" role="img" aria-label={`${proc.name}。実質反応式：${proc.overallReaction}。${proc.stages.map(stage => `${stage.name}、${stage.reaction}`).join('。')}`}>
               
               {/* 接触法・オストワルト法（直列フロー） */}
               {(selectedProcess === 'contact' || selectedProcess === 'ostwald') && (
@@ -222,6 +224,7 @@ export default function IndustrialProcessPage() {
               )}
 
             </svg>
+            </div>
           </div>
 
           <div className="w-full border-t border-gray-200 pt-4 text-center">
