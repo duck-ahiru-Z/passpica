@@ -137,6 +137,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/physics/projectile-visual'
   },
   {
+    slug: 'energy-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（力学的エネルギー）',
+    title: '力学的エネルギーの変換ビジュアル',
+    description: '落下位置を動かし、位置エネルギーと運動エネルギーの移り変わりと合計保存を図と数値で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/energy-visual'
+  },
+  {
     slug: 'motion-visual',
     subject: 'physics',
     subjectJp: '物理',

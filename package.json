@@ -28,6 +28,7 @@
     "test:matha-mixed": "node --experimental-strip-types scripts/verify-matha-mixed-questions.mjs",
     "test:physics-motion": "node --experimental-strip-types scripts/verify-physics-motion-calculation.mjs",
     "test:projectile-visual": "node --experimental-strip-types scripts/verify-projectile-motion.mjs",
+    "test:mechanical-energy": "node --experimental-strip-types scripts/verify-mechanical-energy.mjs",
     "test:math2-bc-mixed": "node --experimental-strip-types scripts/verify-math2-bc-mixed-questions.mjs",
     "test:math": "node --experimental-strip-types scripts/verify-discriminant-pattern.mjs",
     "test:coverage": "node scripts/verify-learning-coverage.mjs"

@@ -26,7 +26,7 @@ const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'projectile-visual', 'motion-visual',
+  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual',
   'concentration-visual',
 ];
 
