@@ -161,6 +161,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/math/cross-multiply-drill'
   },
   {
+    slug: 'factorization-strategy-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（因数分解）',
+    title: '因数分解・解法選択ドリル',
+    description: '共通因数・展開公式・たすき掛け・置き換え・高次式を個別練習し、実戦では全パターンをバランスよく混ぜます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/factorization-strategy-drill'
+  },
+  {
     slug: 'math1-mixed-drill',
     subject: 'math',
     subjectJp: '数学I',
