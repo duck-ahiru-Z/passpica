@@ -109,6 +109,8 @@ export default function FlameReactionPage() {
               {METALS.map((m) => (
                 <button
                   key={m.formula}
+                  type="button"
+                  aria-pressed={selectedMetal?.formula === m.formula}
                   onClick={() => setSelectedMetal(m)}
                   className={`border border-gray-400 p-2 text-center text-xs font-bold transition-all bg-slate-50 hover:bg-slate-100 ${selectedMetal?.formula === m.formula ? 'bg-amber-100 border-amber-600' : ''}`}
                 >

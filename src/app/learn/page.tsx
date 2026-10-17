@@ -224,7 +224,7 @@ const CONTENTS: LearningContent[] = [
     subject: 'chemistry',
     subjectJp: '化学基礎',
     field: '酸と塩基（中和反応）',
-    title: '指示薬・pH中和滴定シミュレーター',
+    title: '酸塩基指示薬・pH色変化シミュレーター',
     description: 'pHスライダーを動かし、フェノールフタレインなどの指示薬の色の変化と、中和点の特性を理解します。',
     difficulty: '基礎',
     type: '実験シミュレータ',

@@ -47,7 +47,7 @@ export default function AcidBasePage() {
           <Link href="/">トップ</Link> &gt; <Link href="/learn">学習室</Link> &gt; 化学・酸と塩基
         </nav>
         <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-          指示薬・pH中和滴定シミュレーター
+          酸塩基指示薬・pH色変化シミュレーター
         </h1>
         <p className="text-xs text-gray-500 mt-1">
           pH値の増減による、フェノールフタレイン等の主要指示薬の色調変化をシミュレートします。
@@ -127,6 +127,8 @@ export default function AcidBasePage() {
 
             <div className="flex flex-col gap-2">
               <button
+                type="button"
+                aria-pressed={indicator === 'pp'}
                 onClick={() => setIndicator('pp')}
                 className={`border border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'pp' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
               >
@@ -138,6 +140,8 @@ export default function AcidBasePage() {
               </button>
 
               <button
+                type="button"
+                aria-pressed={indicator === 'litmus'}
                 onClick={() => setIndicator('litmus')}
                 className={`border border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'litmus' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
               >
@@ -149,6 +153,8 @@ export default function AcidBasePage() {
               </button>
 
               <button
+                type="button"
+                aria-pressed={indicator === 'mo'}
                 onClick={() => setIndicator('mo')}
                 className={`border-2 border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'mo' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
               >
