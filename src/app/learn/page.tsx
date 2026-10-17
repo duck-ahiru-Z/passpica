@@ -102,6 +102,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/math/calculus3-integral-drill'
   },
   {
+    slug: 'calculus3-volume-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '積分法（回転体の体積）',
+    title: '回転体の体積・断面円板ビジュアル',
+    description: 'y=x²の領域をx軸回転し、断面円板の半径・面積と右端円板和、正確な体積の差をスライダーで比較します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-volume-visual',
+    practiceLink: '/learn/math/calculus3-area-volume-drill'
+  },
+  {
     slug: 'calculus3-curvature-visual',
     subject: 'math',
     subjectJp: '数学III',

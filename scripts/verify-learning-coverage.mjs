@@ -25,7 +25,7 @@ const requiredDrills = [
 const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
-  'calculus3-integral-visual', 'calculus3-curvature-visual',
+  'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual',
   'concentration-visual',
 ];
@@ -48,6 +48,13 @@ for (const slug of requiredVisuals) {
 for (const entry of learnEntries) {
   const file = routeFile(entry.link);
   if (!file || !fs.existsSync(file)) throw new Error(`Missing learning page for ${entry.slug}: ${entry.link}`);
+}
+const volumeVisual = fs.readFileSync(path.join(root, 'src/app/learn/math/calculus3-volume-visual/page.tsx'), 'utf8');
+if (!volumeVisual.includes('πx⁴') || !volumeVisual.includes('πb⁵/5') || !volumeVisual.includes('aria-label={`y=x²をx軸の周りに回転')) {
+  throw new Error('Calculus III volume visual must connect the disk cross-section to the rotation volume and expose an accessible summary');
+}
+if (!learn.includes("practiceLink: '/learn/math/calculus3-area-volume-drill'")) {
+  throw new Error('Calculus III volume visual must link to its related area and volume practice');
 }
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');

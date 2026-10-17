@@ -18,6 +18,7 @@
     "test:calculus3-derivative-visual": "node scripts/verify-calculus3-derivative-visual.mjs",
     "test:derivative-graph-visual": "node scripts/verify-derivative-graph-visual.mjs",
     "test:calculus3-geometry": "node --experimental-strip-types scripts/verify-calculus3-geometry.mjs",
+    "test:calculus3-volume-visual": "node --experimental-strip-types scripts/verify-calculus3-volume-visual.mjs",
     "test:calculus3-integrals": "node --experimental-strip-types scripts/verify-calculus3-integrals.mjs",
     "test:calculus3-differentiation": "node --experimental-strip-types scripts/verify-calculus3-differentiation.mjs",
     "test:calculus3-limits": "node --experimental-strip-types scripts/verify-calculus3-limits.mjs",

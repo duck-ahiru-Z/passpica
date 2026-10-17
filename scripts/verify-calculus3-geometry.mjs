@@ -30,6 +30,13 @@ const checks = {
       && problem.prompt.includes(`x=0およびx=${radius}`)
       && problem.explanation.includes(`4π×${radius}^(5/2)/5`);
   },
+  'shell-method': problem => {
+    const [, upper] = problem.expression.match(/0\\le x\\le(\d+)/);
+    const value = Number(upper);
+    return Math.abs(problem.answer - (2 * Math.PI * value ** 3) / 3) < 1e-10
+      && problem.prompt.includes(`x=${value}`)
+      && problem.explanation.includes(`V=2π∫₀^${value} x·x dx`);
+  },
   'curve-length': problem => {
     const [, upper] = problem.expression.match(/0\\le x\\le(\d+)/);
     return Math.abs(problem.answer - (2 / 3) * ((Number(upper) + 1) ** 1.5 - 1)) < 1e-12;
@@ -46,9 +53,9 @@ for (const pattern of geometryPatterns) {
   if (variants.size !== 5) throw new Error(`${pattern} generated ${variants.size}/5 expected coefficient or interval variants`);
 }
 
-const mixed = Array.from({ length: 400 }, () => generateGeometryProblem('mix', stableRandom).pattern);
+const mixed = Array.from({ length: 500 }, () => generateGeometryProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += geometryPatterns.length) {
   if (new Set(mixed.slice(start, start + geometryPatterns.length)).size !== geometryPatterns.length) throw new Error(`mixed set omitted a geometry pattern in batch ${start / geometryPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed geometry practice repeated adjacent patterns');
-console.log('Calculus III geometry verified: 2,000 fixed-pattern questions and 400 mixed questions; formulas, answers, variants, balance, and adjacency checked.');
+console.log('Calculus III geometry verified: 2,500 fixed-pattern questions and 500 mixed questions; formulas, answers, variants, balance, and adjacency checked.');
