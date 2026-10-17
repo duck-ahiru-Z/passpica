@@ -24,8 +24,9 @@ export default function Calculus3CurvatureVisual() {
     const value = X_MIN + ((X_MAX - X_MIN) * index) / 144;
     return `${index === 0 ? 'M' : 'L'} ${sx(value).toFixed(1)} ${sy(f(value)).toFixed(1)}`;
   }).join(' ');
-  const tangentStartX = Math.max(X_MIN, x - 0.45);
-  const tangentEndX = Math.min(X_MAX, x + 0.45);
+  const tangentHalfWidth = Math.min(0.45, 4.5 / Math.max(Math.abs(d1(x)), 1));
+  const tangentStartX = Math.max(X_MIN, x - tangentHalfWidth);
+  const tangentEndX = Math.min(X_MAX, x + tangentHalfWidth);
   const tangentPath = `M ${sx(tangentStartX).toFixed(1)} ${sy(f(x) + d1(x) * (tangentStartX - x)).toFixed(1)} L ${sx(tangentEndX).toFixed(1)} ${sy(f(x) + d1(x) * (tangentEndX - x)).toFixed(1)}`;
   const concavity = d2(x) > 0 ? '下に凸（f′′(x) > 0）' : d2(x) < 0 ? '上に凸（f′′(x) < 0）' : '変曲点（f′′(x) = 0）';
   const nearInflection = Math.min(Math.abs(x - inflectionX), Math.abs(x + inflectionX)) < 0.05;
