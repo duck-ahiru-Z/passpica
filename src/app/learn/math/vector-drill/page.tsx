@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { parseRationalParts, rationalEquals } from '@/src/lib/rationalInput';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -44,6 +45,7 @@ const strategyPicker = new BalancedRandom<'menelaus' | 'coefficient'>(['menelaus
 export default function VectorDrillPage() {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
   const [strategy, setStrategy] = useState<'menelaus' | 'coefficient'>('menelaus');
+  const [selectedStrategy, setSelectedStrategy] = useState<'menelaus' | 'coefficient' | ''>('');
   const [problem, setProblem] = useState<VectorProblem | null>(null);
   
   // 入力状態
@@ -81,6 +83,7 @@ export default function VectorDrillPage() {
       yNum: numY / gY, yDen: den / gY
     });
 
+    setSelectedStrategy('');
     setInXNum(''); setInXDen('');
     setInYNum(''); setInYDen('');
     setFeedbackMsg('');
@@ -167,22 +170,25 @@ export default function VectorDrillPage() {
     e.preventDefault();
     if (!problem) return;
 
-    const parseInput = (numStr: string, denStr: string) => {
-      const n = parseInt(numStr) || 0;
-      const d = denStr.trim() === '' ? 1 : parseInt(denStr) || 1;
-      const g = gcd(n, d);
-      return { num: (n / g) * Math.sign(n * d), den: Math.abs(d / g) };
-    };
+    const userX = parseRationalParts(inXNum, inXDen);
+    const userY = parseRationalParts(inYNum, inYDen);
+    if (strategyMode === 'mix' && selectedStrategy === '') {
+      setIsCorrect(false);
+      setFeedbackMsg('計算を始める前に、使う解法を選んでください。');
+      return;
+    }
 
-    const userX = parseInput(inXNum, inXDen);
-    const userY = parseInput(inYNum, inYDen);
+    const answerIsCorrect =
+      rationalEquals(userX, { numerator: problem.xNum, denominator: problem.xDen }) &&
+      rationalEquals(userY, { numerator: problem.yNum, denominator: problem.yDen });
+    const strategyIsCorrect = strategyMode !== 'mix' || selectedStrategy === strategy;
 
-    if (
-      userX.num === problem.xNum && userX.den === problem.xDen &&
-      userY.num === problem.yNum && userY.den === problem.yDen
-    ) {
+    if (answerIsCorrect && strategyIsCorrect) {
       setIsCorrect(true);
       setFeedbackMsg('大正解！完璧です。');
+    } else if (answerIsCorrect) {
+      setIsCorrect(false);
+      setFeedbackMsg(`答えは合っていますが、今回の方針は「${strategy === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}」です。`);
     } else {
       setIsCorrect(false);
       setFeedbackMsg('不正解です。式を見直して再挑戦するか、「正解と解説を見る」を押してください。');
@@ -214,7 +220,7 @@ export default function VectorDrillPage() {
           <option value="menelaus">基礎練習：メネラウスの定理だけ</option>
           <option value="coefficient">基礎練習：係数比較と連立方程式だけ</option>
         </select>
-        <p className="text-gray-600">今回の最初の方針：<span className="font-bold text-blue-700">{strategy === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}</span></p>
+        <p className="text-gray-600">{strategyMode === 'mix' ? '問題の形から解法を選び、選んだ方針で解きましょう。' : <>指定された方針：<span className="font-bold text-blue-700">{strategyMode === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}</span></>}</p>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -238,6 +244,15 @@ export default function VectorDrillPage() {
               ■ 解答を入力
             </h2>
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
+              {strategyMode === 'mix' && (
+                <fieldset className="w-full space-y-2">
+                  <legend className="font-bold text-center">最初に使う解法を選択</legend>
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button type="button" aria-pressed={selectedStrategy === 'menelaus'} onClick={() => setSelectedStrategy('menelaus')} className={`retro-btn-classic ${selectedStrategy === 'menelaus' ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>メネラウスの定理</button>
+                    <button type="button" aria-pressed={selectedStrategy === 'coefficient'} onClick={() => setSelectedStrategy('coefficient')} className={`retro-btn-classic ${selectedStrategy === 'coefficient' ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>係数比較と連立方程式</button>
+                  </div>
+                </fieldset>
+              )}
               <div className="flex items-center gap-2 text-lg font-bold flex-wrap justify-center">
                 <MathEq math="\vec{\text{OP}} =" />
                 <div className="flex flex-col items-center gap-1 mx-2">

@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -130,7 +131,6 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       const qStr = `初項 ${a} 、公比 $${rStr}$ の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
       
-      const rPowN = 0;
       let rNum = 0, rDen = 1;
       let powNum = 0, powDen = 1;
 
@@ -205,18 +205,10 @@ export default function SequenceSumDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let uNum = 0, uDen = 1;
-    const uStr = ansVal.trim().replace(/\s+/g, '');
-    if (uStr.includes('/')) {
-      const parts = uStr.split('/');
-      uNum = parseInt(parts[0]);
-      uDen = parseInt(parts[1]);
-    } else {
-      uNum = parseInt(uStr);
-      uDen = 1;
-    }
-    
-    if (!isNaN(uNum) && !isNaN(uDen) && uNum * problem.ansDen === problem.ansNum * uDen) {
+    const userAnswer = parseRationalAnswer(ansVal);
+    const expectedAnswer = { numerator: problem.ansNum, denominator: problem.ansDen };
+
+    if (rationalEquals(userAnswer, expectedAnswer)) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
