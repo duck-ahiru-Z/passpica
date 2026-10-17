@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { rightRectangleApproximation, squareAreaBetweenZeroAnd } from '@/src/lib/calculus3IntegralVisual';
 
 const W = 640;
 const H = 330;
@@ -10,7 +11,7 @@ const f = (x: number) => x * x;
 export default function Calculus3IntegralVisualPage() {
   const [upper, setUpper] = useState(2);
   const [rectangleCount, setRectangleCount] = useState(8);
-  const area = upper ** 3 / 3;
+  const area = squareAreaBetweenZeroAnd(upper);
   const xMin = -Math.min(0.5, upper * 0.2);
   const xMax = upper + 0.2;
   const yMax = xMax ** 2 * 1.15;
@@ -26,7 +27,7 @@ export default function Calculus3IntegralVisualPage() {
     const right = upper * (index + 1) / rectangleCount;
     return { left, right, width: upper / rectangleCount };
   });
-  const rectangleArea = rectangleSlices.reduce((sum, slice) => sum + f(slice.right) * slice.width, 0);
+  const rectangleArea = rightRectangleApproximation(upper, rectangleCount);
   const rectangles = rectangleSlices.map(({ left, right }, index) => <rect key={index} x={sx(left)} y={sy(f(right))} width={sx(right) - sx(left)} height={sy(0) - sy(f(right))} fill="rgba(37,99,235,0.18)" stroke="#93c5fd" />);
 
   return (
