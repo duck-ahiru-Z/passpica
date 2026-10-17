@@ -2,41 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { getIndicatorDisplay, type IndicatorKey } from '@/src/lib/chemistryIndicator';
 
 export default function AcidBasePage() {
-  const [indicator, setIndicator] = useState<'pp' | 'litmus' | 'mo'>('pp');
+  const [indicator, setIndicator] = useState<IndicatorKey>('pp');
   const [pH, setPH] = useState<number>(7);
-
-  // 指示薬の色計算
-  const getLiquidColor = () => {
-    if (indicator === 'pp') {
-      // フェノールフタレイン: 酸性・中性は無色、塩基性で赤ピンク
-      if (pH >= 8.3) {
-        const opacity = 0.15 + 0.8 * Math.min((pH - 8.3) / (10 - 8.3), 1);
-        return `rgba(244, 114, 182, ${opacity})`;
-      }
-      // Clear solutions still need a subtle fill so the liquid level is visible against the white page.
-      return 'rgba(219, 234, 254, 0.72)';
-    } else if (indicator === 'litmus') {
-      // リトマス液: 酸性で赤、中性で紫、塩基性で青
-      if (pH <= 5.0) {
-        return 'rgba(239, 68, 68, 0.7)'; // 赤
-      } else if (pH >= 8.0) {
-        return 'rgba(59, 130, 246, 0.7)'; // 青
-      } else {
-        return 'rgba(139, 92, 246, 0.6)'; // 紫
-      }
-    } else {
-      // メチルオレンジ: 強酸性で赤、pH 4.4以上で黄色
-      if (pH <= 3.1) {
-        return 'rgba(239, 68, 68, 0.8)'; // 赤
-      } else if (pH < 4.4) {
-        return 'rgba(249, 115, 22, 0.8)'; // オレンジ
-      } else {
-        return 'rgba(234, 179, 8, 0.7)'; // 黄色
-      }
-    }
-  };
+  const display = getIndicatorDisplay(indicator, pH);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
@@ -74,13 +45,13 @@ export default function AcidBasePage() {
           <div
             className="flex items-center justify-center py-6 w-full relative h-[180px]"
             role="img"
-            aria-label={`${indicator === 'pp' ? 'フェノールフタレイン' : indicator === 'litmus' ? 'リトマス液' : 'メチルオレンジ'}を加えたpH${pH.toFixed(1)}の溶液。${indicator === 'pp' ? pH >= 8.3 ? '赤紫色' : '無色' : indicator === 'litmus' ? pH <= 5 ? '赤色' : pH >= 8 ? '青色' : '紫色' : pH <= 3.1 ? '赤色' : pH < 4.4 ? '橙色' : '黄色'}。`}
+            aria-label={`${display.indicatorName}を加えたpH${pH.toFixed(1)}の溶液。${display.colorName}。`}
           >
             {/* 液体描画 */}
             <div 
               className="w-32 h-24 absolute bottom-1 border border-transparent transition-colors duration-300"
               style={{
-                backgroundColor: getLiquidColor(),
+                backgroundColor: display.backgroundColor,
                 borderRadius: '0 0 4px 4px'
               }}
             ></div>
