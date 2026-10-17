@@ -3,11 +3,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-area-volume-drill/page.tsx'), 'utf8');
-if (!/aria-pressed=\{strategy === p\}/.test(drillPage) || !/disabled=\{!strategy \|\| answer\.trim\(\) === ''\}/.test(drillPage)) {
-  throw new Error('geometry drill must expose the selected strategy and require strategy plus answer before checking');
+if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}') || !/disabled=\{!strategy \|\| answer\.trim\(\) === ''\}/.test(drillPage)) {
+  throw new Error('geometry drill must expose a single-choice strategy group and require strategy plus answer before checking');
 }
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
+}
+if (!drillPage.includes('実戦練習：面積・体積 全パターンランダム') || !drillPage.includes('基礎練習：{geometryLabels[p]}だけ')) {
+  throw new Error('the learner must be able to choose mixed practice or one fixed geometry pattern');
 }
 if (!drillPage.includes('<= 0.0005 + 1e-12') || !drillPage.includes('小数第3位まで入力')) {
   throw new Error('geometry answer precision guidance and accepted rounding tolerance must match');
@@ -58,4 +61,18 @@ for (let start = 0; start < mixed.length; start += geometryPatterns.length) {
   if (new Set(mixed.slice(start, start + geometryPatterns.length)).size !== geometryPatterns.length) throw new Error(`mixed set omitted a geometry pattern in batch ${start / geometryPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed geometry practice repeated adjacent patterns');
-console.log('Calculus III geometry verified: 2,500 fixed-pattern questions and 500 mixed questions; formulas, answers, variants, balance, and adjacency checked.');
+
+for (let seed = 1; seed <= 20; seed += 1) {
+  let state = seed;
+  const seededRandom = () => {
+    state = (state * 48271) % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+  const sequence = Array.from({ length: 5_000 }, () => generateGeometryProblem('mix', seededRandom).pattern);
+  for (let start = 0; start < sequence.length; start += geometryPatterns.length) {
+    const batch = sequence.slice(start, start + geometryPatterns.length);
+    if (new Set(batch).size !== geometryPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / geometryPatterns.length}`);
+  }
+  if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
+}
+console.log('Calculus III geometry verified: fixed-pattern options, formulas and answers; 100,000 seeded mixed questions plus 500 deterministic balance cases checked.');
