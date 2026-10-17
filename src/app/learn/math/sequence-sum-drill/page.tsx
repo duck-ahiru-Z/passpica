@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
+import { formatGeometricSequenceSumPrompt } from '@/src/lib/sequenceSumPrompt';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -129,7 +130,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         rStr = "-\\frac{1}{2}";
       }
       
-      const qStr = `初項 ${a} 、公比 $${rStr}$ の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
+      const qStr = formatGeometricSequenceSumPrompt(a, rStr, n);
       
       let rNum = 0, rDen = 1;
       let powNum = 0, powDen = 1;
