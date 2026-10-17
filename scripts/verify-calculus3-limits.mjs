@@ -1,0 +1,47 @@
+import { generateLimitProblem, limitPatterns } from '../src/lib/calculus3Limits.ts';
+
+const stableRandom = () => 0.37;
+const close = (actual, expected) => Math.abs(actual - expected) < 1e-12;
+const checks = {
+  factor: problem => {
+    const [, point] = problem.expression.match(/\\lim_\{x\\to (\d+)\}/);
+    const n = Number(point);
+    return Number(problem.answer) === 2 * n && problem.explanation.includes(`(x−${n})(x+${n})`);
+  },
+  rationalize: problem => {
+    const [, coefficient] = problem.expression.match(/\\sqrt\{1\+(\d+)x\}/);
+    const n = Number(coefficient);
+    return Number(problem.answer) === n / 2 && problem.explanation.includes(`${n}/(√(1+${n}x)+1)`);
+  },
+  dominant: problem => {
+    const [, a, c] = problem.expression.match(/\\frac\{(\d+)x\^2-x\+1\}\{(\d+)x\^2\+4\}/);
+    return close(Number(problem.answer), Number(a) / Number(c)) && problem.explanation.includes(`${a}/${c}`);
+  },
+  squeeze: problem => {
+    const [, coefficient] = problem.expression.match(/\\sin\\frac\{(\d+)\}\{x\}/);
+    return Number(problem.answer) === 0 && problem.explanation.includes(`sin(${coefficient}/x)`);
+  },
+  sequence: problem => {
+    const [, a, c] = problem.expression.match(/\\frac\{(\d+)n\+1\}\{(\d+)n\+2\}/);
+    return close(Number(problem.answer), Number(a) / Number(c)) && problem.explanation.includes(`${a}/${c}`);
+  },
+};
+const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 9 };
+
+for (const pattern of limitPatterns) {
+  const seen = new Set();
+  for (let index = 0; index < 500; index += 1) {
+    const problem = generateLimitProblem(pattern, stableRandom);
+    if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
+    seen.add(problem.expression);
+  }
+  if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
+}
+
+const mixed = Array.from({ length: 600 }, () => generateLimitProblem('mix', stableRandom).pattern);
+for (let start = 0; start < mixed.length; start += limitPatterns.length) {
+  if (new Set(mixed.slice(start, start + limitPatterns.length)).size !== limitPatterns.length) throw new Error(`mixed set omitted a limit pattern in batch ${start / limitPatterns.length}`);
+}
+if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed limit practice repeated adjacent patterns');
+
+console.log('Calculus III limits verified: 2,500 fixed-pattern questions and 600 mixed questions; formulas, answers, all variants, balance, and adjacency checked.');
