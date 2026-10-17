@@ -102,11 +102,15 @@ export default function SequenceSumDrill() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (等差数列の和・基本)</option>
-                <option value="pattern2">パターン2 (等差数列の和・末項指定)</option>
-                <option value="pattern3">パターン3 (等比数列の和・正の公比)</option>
-                <option value="pattern4">パターン4 (等比数列の和・負/分数公比)</option>
+                <optgroup label="実戦練習">
+                  <option value="mix">数列の和 全パターンランダム</option>
+                </optgroup>
+                <optgroup label="基礎練習">
+                  <option value="pattern1">等差数列の和（初項・公差）</option>
+                  <option value="pattern2">等差数列の和（末項指定）</option>
+                  <option value="pattern3">等比数列の和（正の公比）</option>
+                  <option value="pattern4">等比数列の和（負・分数公比）</option>
+                </optgroup>
               </select>
             </div>
 
@@ -132,12 +136,15 @@ export default function SequenceSumDrill() {
 
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
               <button 
+                type="button"
                 onClick={handleCheck}
-                className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
+                disabled={!ansVal.trim()}
+                className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 解答する
               </button>
               <button 
+                type="button"
                 onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
