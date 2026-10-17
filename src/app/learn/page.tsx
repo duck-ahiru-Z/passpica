@@ -121,9 +121,9 @@ const CONTENTS: LearningContent[] = [
     slug: 'projectile-visual',
     subject: 'physics',
     subjectJp: '物理',
-    field: '力学（水平投射）',
-    title: '水平投射と放物運動ビジュアル装置',
-    description: '時間スライダーで水平位置・高さ・鉛直速度を追跡し、水平運動と自由落下の分解を視覚的に理解します。',
+    field: '力学（水平投射・斜方投射）',
+    title: '水平投射・斜方投射ビジュアル装置',
+    description: '射出角と時刻を変え、水平・鉛直の速度成分、軌道、高さ、到達距離の関係を視覚的に理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/physics/projectile-visual'
