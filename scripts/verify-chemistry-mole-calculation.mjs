@@ -52,6 +52,8 @@ for (const pattern of molePatterns) {
 
 if (formatMoleAnswer(0.30000000000000004) !== '0.3') throw new Error('answer feedback should show a readable rounded value');
 if (!isMoleAnswerCorrect('0.666667', 2 / 3)) throw new Error('answers rounded to the displayed six-decimal precision should be accepted');
+if (!isMoleAnswerCorrect(String(2 / 3), 2 / 3)) throw new Error('full-precision mole answers should be accepted');
+if (!isMoleAnswerCorrect('0.6666666667', 2 / 3)) throw new Error('more precise mole answers should be accepted');
 if (isMoleAnswerCorrect('0.666', 2 / 3)) throw new Error('answers rounded too coarsely should not be accepted');
 if (isMoleAnswerCorrect('', 1) || isMoleAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
 

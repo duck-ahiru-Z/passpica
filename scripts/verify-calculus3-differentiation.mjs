@@ -54,6 +54,8 @@ const checks = {
 };
 const expectedVariants = { chain: 9, product: 4, logarithmic: 5, parametric: 4, implicit: 5, inverse: 5, higher: 5 };
 if (!isDifferentiationAnswerCorrect('0.250', 1 / 4)) throw new Error('three-decimal displayed answers should be accepted');
+if (!isDifferentiationAnswerCorrect(String(1 / 3), 1 / 3)) throw new Error('full-precision differentiation answers should be accepted');
+if (!isDifferentiationAnswerCorrect('0.333333', 1 / 3)) throw new Error('more precise differentiation answers should be accepted');
 if (isDifferentiationAnswerCorrect('0.24', 1 / 4)) throw new Error('answers rounded more coarsely than the display should not be accepted');
 if (isDifferentiationAnswerCorrect('', 1) || isDifferentiationAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
 

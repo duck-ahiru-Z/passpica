@@ -1,4 +1,5 @@
 import { BalancedRandom } from './balancedRandom.ts';
+import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
 export type IntegralPattern = 'substitution' | 'parts' | 'rational' | 'trig' | 'radical';
 export type IntegralMode = IntegralPattern | 'mix';
@@ -11,12 +12,7 @@ export const integralLabels: Record<IntegralPattern, string> = {
 };
 
 export function isIntegralAnswerCorrect(input: string, expected: number): boolean {
-  if (input.trim() === '') return false;
-  const value = Number(input);
-  if (!Number.isFinite(value)) return false;
-  // Match the three decimal places shown in the answer feedback, while also
-  // accepting the full-precision value when a learner enters it.
-  return Math.abs(value - expected) < 1e-10 || Math.abs(value - Number(expected.toFixed(3))) < 1e-10;
+  return isNumericAnswerCorrect(input, expected, 3);
 }
 
 const picker = new BalancedRandom(integralPatterns);

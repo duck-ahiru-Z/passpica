@@ -1,4 +1,5 @@
 import { BalancedRandom } from './balancedRandom.ts';
+import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
 export type CurvePattern = 'increase' | 'extrema' | 'concavity' | 'tangent' | 'normal' | 'motion';
 export type CurveMode = CurvePattern | 'mix';
@@ -8,11 +9,7 @@ export const curvePatterns: readonly CurvePattern[] = ['increase', 'extrema', 'c
 export const curveLabels: Record<CurvePattern, string> = { increase: '増減', extrema: '極大・極小', concavity: '凹凸・変曲点', tangent: '接線', normal: '法線', motion: '速度・加速度' };
 
 export function isCurveAnswerCorrect(input: string, expected: number): boolean {
-  if (input.trim() === '') return false;
-  const value = Number(input);
-  if (!Number.isFinite(value)) return false;
-  // Accept an exact numeric entry or the three-decimal approximation in feedback.
-  return Math.abs(value - expected) < 1e-10 || Math.abs(value - Number(expected.toFixed(3))) < 1e-10;
+  return isNumericAnswerCorrect(input, expected, 3);
 }
 
 const picker = new BalancedRandom(curvePatterns);

@@ -1,4 +1,5 @@
 import { BalancedRandom } from './balancedRandom.ts';
+import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
 export type DifferentiationPattern = 'chain' | 'product' | 'logarithmic' | 'parametric' | 'implicit' | 'inverse' | 'higher';
 export type DifferentiationMode = DifferentiationPattern | 'mix';
@@ -11,11 +12,7 @@ export const differentiationLabels: Record<DifferentiationPattern, string> = {
 };
 
 export function isDifferentiationAnswerCorrect(input: string, expected: number): boolean {
-  if (input.trim() === '') return false;
-  const value = Number(input);
-  if (!Number.isFinite(value)) return false;
-  // Accept the exact value or the three-decimal approximation shown in feedback.
-  return Math.abs(value - expected) < 1e-10 || Math.abs(value - Number(expected.toFixed(3))) < 1e-10;
+  return isNumericAnswerCorrect(input, expected, 3);
 }
 
 const picker = new BalancedRandom(differentiationPatterns);
