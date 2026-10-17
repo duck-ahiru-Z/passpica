@@ -42,7 +42,9 @@ export default function UnitCircleComplexPage() {
   const height = 320;
   const cx = 160;
   const cy = 160;
-  const radius = 80; // 絶対値 = 1.0 が 80px に対応
+  // Keep the product vector inside the plot even when both factors are at max magnitude.
+  const plotScale = 130 / Math.max(1.5, r1, r2, r3);
+  const radius = plotScale; // absolute value = 1.0 maps to plotScale pixels
 
   // ベクトル座標マッピング
   const getVecCoords = (x: number, y: number) => {
@@ -329,7 +331,7 @@ export default function UnitCircleComplexPage() {
               <ul className="list-disc pl-4 space-y-1.5">
                 <li>
                   <strong className="text-slate-800">絶対値 (長さ) の積</strong>:<br />
-                  |z₃| = |z₁|・|z₂| (長さは掛け算になります。1.0 × 1.2 = {r3.toFixed(2)})。
+                  |z₃| = |z₁|・|z₂| (長さは掛け算になります。{r1.toFixed(1)} × {r2.toFixed(1)} = {r3.toFixed(2)})。
                 </li>
                 <li>
                   <strong className="text-slate-800">偏角 (角度) の和</strong>:<br />
