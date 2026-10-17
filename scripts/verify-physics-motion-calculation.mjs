@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { formatMotionAnswer, generateMotionProblem, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes('onClick={() => setMethod(pattern)}')) {
+  throw new Error('mechanics method selection must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const checks = {
