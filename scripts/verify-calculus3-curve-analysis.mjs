@@ -1,4 +1,11 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { curvePatterns, generateCurveProblem } from '../src/lib/calculus3CurveAnalysis.ts';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-curve-analysis-drill/page.tsx'), 'utf8');
+if (!/type="radio"\s+name="curve-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === pattern}')) {
+  throw new Error('curve-analysis strategy must be a single-choice radio group');
+}
 
 const stableRandom = () => 0.37;
 const checks = {
