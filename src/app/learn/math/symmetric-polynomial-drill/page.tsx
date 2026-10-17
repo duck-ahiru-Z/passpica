@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -50,7 +51,7 @@ function generateProblem(mode: DrillMode = 'mix'): ProblemData {
 
 export default function SymmetricPolynomialDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   const [ansStr, setAnsStr] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
@@ -84,6 +85,8 @@ export default function SymmetricPolynomialDrillPage() {
     }
     setHasChecked(true);
   };
+
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let questionMath = '';
   if (problem.type === 'x2+y2') questionMath = 'x^2 + y^2';
