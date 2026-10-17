@@ -5,7 +5,7 @@ export type MotionMode = MotionPattern | 'mix';
 export type MotionProblem = { pattern: MotionPattern; question: string; answer: number; unit: string; explanation: string };
 
 export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'kineticEnergy', 'spring'];
-export const motionLabels: Record<MotionPattern, string> = { speed: '平均速度', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', kineticEnergy: '運動エネルギー', spring: 'ばねの力' };
+export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', kineticEnergy: '運動エネルギー', spring: 'ばねの力' };
 
 const picker = new BalancedRandom(motionPatterns);
 const variants = {
@@ -56,7 +56,7 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
   switch (pattern) {
     case 'speed': {
       const value = variants.speed.next(random); const answer = value.distance / value.time;
-      return { pattern, question: `物体が ${value.distance} m を ${value.time} s で進んだ。平均速度は？`, answer, unit: 'm/s', explanation: `平均速度 v=移動距離/時間=${value.distance}/${value.time}=${displayNumber(answer)} m/s。` };
+      return { pattern, question: `物体が ${value.distance} m を ${value.time} s で進んだ。平均の速さは？`, answer, unit: 'm/s', explanation: `平均の速さ=移動距離/時間=${value.distance}/${value.time}=${displayNumber(answer)} m/s。` };
     }
     case 'acceleration': {
       const value = variants.acceleration.next(random); const answer = (value.final - value.initial) / value.time;

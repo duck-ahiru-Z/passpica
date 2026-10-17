@@ -132,7 +132,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '力学・計算',
     title: '物理 力学・計算ドリル',
-    description: '平均速度・加速度・自由落下・仕事・運動量・運動エネルギー・ばねを個別練習と全パターンランダムで反復します。',
+    description: '平均の速さ・加速度・自由落下・仕事・運動量・運動エネルギー・ばねを個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/physics/motion-calculation-drill'

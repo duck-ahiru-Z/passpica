@@ -4,7 +4,8 @@ const stableRandom = () => 0.37;
 const checks = {
   speed: problem => {
     const [, distance, time] = problem.question.match(/([\d.]+) m を ([\d.]+) s/);
-    return Math.abs(problem.answer - Number(distance) / Number(time)) < 1e-12 && problem.unit === 'm/s';
+    return Math.abs(problem.answer - Number(distance) / Number(time)) < 1e-12 && problem.unit === 'm/s'
+      && problem.question.includes('平均の速さ') && problem.explanation.startsWith('平均の速さ=');
   },
   acceleration: problem => {
     const [, initial, final, time] = problem.question.match(/([\d.]+) m\/s から ([\d.]+) m\/s に ([\d.]+) s/);
