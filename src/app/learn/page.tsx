@@ -99,9 +99,9 @@ const CONTENTS: LearningContent[] = [
     slug: 'calculus3-curvature-visual',
     subject: 'math',
     subjectJp: '数学III',
-    field: '微分法（凹凸・変曲点）',
-    title: '凹凸と変曲点ビジュアル装置',
-    description: '四次関数上の点を動かし、接線の傾き・二階導関数の符号・凹凸の切り替わりを観察します。',
+    field: '微分法（極値・凹凸・変曲点）',
+    title: '凹凸・極値・変曲点ビジュアル装置',
+    description: '四次関数上の移動点と接線を見ながら、極大・極小の位置、f′′の符号、変曲点での凹凸の切り替わりを確認します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
     link: '/learn/math/calculus3-curvature-visual'
