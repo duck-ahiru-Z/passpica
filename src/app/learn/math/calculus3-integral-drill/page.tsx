@@ -12,18 +12,7 @@ type Mode = IntegralMode;
 type Problem = IntegralProblem;
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
-  const accessibleMath = math
-    .replaceAll('\\int', '積分')
-    .replaceAll('\\pi', 'パイ')
-    .replaceAll('\\sin', 'サイン')
-    .replaceAll('\\sqrt', '平方根')
-    .replaceAll('\\frac', '分数')
-    .replaceAll('\\,', ' ')
-    .replaceAll('\\', ' ')
-    .replace(/[{}_^]/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim();
-  return <span role="img" aria-label={`積分問題: ${accessibleMath}`} dangerouslySetInnerHTML={{ __html: katex.renderToString(math, { displayMode: block, throwOnError: false }) }} />;
+  return <span dangerouslySetInnerHTML={{ __html: katex.renderToString(math, { displayMode: block, throwOnError: false }) }} />;
 }
 
 export default function Calculus3IntegralDrillPage() {
