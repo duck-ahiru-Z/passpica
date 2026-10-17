@@ -23,9 +23,9 @@ const PROCESSES: Record<string, ProcessInfo> = {
     stages: [
       { name: '1. 硫黄の燃焼', reaction: 'S + O2 ➔ SO2' },
       { name: '2. 二酸化硫黄の酸化 (触媒: V2O5)', reaction: '2SO2 + O2 ⇄ 2SO3' },
-      { name: '3. 三酸化硫黄を濃硫酸に吸収させ、希硫酸で希釈', reaction: 'SO3 + H2O ➔ H2SO4' }
+      { name: '3. SO3を濃硫酸に吸収して発煙硫酸（oleum）を作り、水で希釈', reaction: 'SO3 + H2SO4 ➔ H2S2O7; H2S2O7 + H2O ➔ 2H2SO4' }
     ],
-    explain: '接触法の最大の鍵は「二酸化硫黄(SO2)の酸化」の可逆反応段階です。ここで触媒として「酸化バナジウム(V) V2O5」を用いて効率よく三酸化硫黄(SO3)を得ます。生成したSO3を直接水に加えると多量の熱が発生して酸霧（細かい霧状）になり吸収しにくいため、一旦「濃硫酸」に吸収させて「発煙硫酸」とし、それを希硫酸で薄めることで安全かつ効率的に高濃度硫酸を製造します。'
+    explain: '接触法の最大の鍵は「二酸化硫黄(SO2)の酸化」の可逆反応段階です。ここで触媒として「酸化バナジウム(V) V2O5」を用いて効率よく三酸化硫黄(SO3)を得ます。生成したSO3を直接水に加えると多量の熱が発生して酸霧（細かい霧状）になり吸収しにくいため、一旦「濃硫酸」に吸収させて「発煙硫酸」とし、それを水で希釈して高濃度硫酸を製造します。'
   },
   ostwald: {
     id: 'ostwald',
@@ -36,7 +36,7 @@ const PROCESSES: Record<string, ProcessInfo> = {
     stages: [
       { name: '1. アンモニアの酸化 (触媒: Pt, 800℃)', reaction: '4NH3 + 5O2 ➔ 4NO + 6H2O' },
       { name: '2. 一酸化窒素の酸化（常温で速やかに進行）', reaction: '2NO + O2 ➔ 2NO2' },
-      { name: '3. 二酸化窒素を温水に吸収させる', reaction: '3NO2 + H2O ➔ 2HNO3 + NO' }
+      { name: '3. 二酸化窒素を水に吸収（副生NOを循環）', reaction: '3NO2 + H2O ➔ 2HNO3 + NO' }
     ],
     explain: 'アンモニア(NH3)を出発原料として硝酸を作ります。第1段階のアンモニア酸化反応では「白金 Pt」触媒が高温(約800℃)で必要になります。第3段階の水への吸収反応で副生する一酸化窒素(NO)は、第2段階に戻して循環利用されるため、効率よく原料を硝酸へと変換できます。'
   },
@@ -44,7 +44,7 @@ const PROCESSES: Record<string, ProcessInfo> = {
     id: 'solvay',
     name: 'アンモニアソーダ法／ソルベー法（炭酸ナトリウム Na2CO3 の製造）',
     overallReaction: '2NaCl + CaCO3 ➔ Na2CO3 + CaCl2',
-    catalyst: 'なし（副生成物アンモニア・CO2は100%循環回収）',
+    catalyst: 'なし（NH3・CO2を工程内で循環利用）',
     rawMaterials: '塩化ナトリウム NaCl , 石灰石 CaCO3',
     stages: [
       { name: '1. 食塩水にNH3を飽和させ、CO2を通す', reaction: 'NaCl + H2O + NH3 + CO2 ➔ NaHCO3↓ + NH4Cl' },
@@ -53,7 +53,7 @@ const PROCESSES: Record<string, ProcessInfo> = {
       { name: '4. 生石灰に水を加え消石灰に', reaction: 'CaO + H2O ➔ Ca(OH)2' },
       { name: '5. 塩化アンモニウムと消石灰からNH3を回収', reaction: '2NH4Cl + Ca(OH)2 ➔ CaCl2 + 2H2O + 2NH3' }
     ],
-    explain: '安価な食塩(NaCl)と石灰石(CaCO3)から、工業的に重要な炭酸ナトリウム(Na2CO3)を製造します。この製法の特徴は、炭酸水素ナトリウム(NaHCO3)の沈殿を作るために一時的にアンモニア(NH3)を介在させますが、最終段階の水酸化カルシウム(消石灰)との反応により、そのアンモニアを全て排気せずに100%回収して循環再利用する点にあります。全体での実質的な反応は「食塩＋石灰石 ➔ 炭酸ナトリウム＋塩化カルシウム」になります。'
+    explain: '安価な食塩(NaCl)と石灰石(CaCO3)から、工業的に重要な炭酸ナトリウム(Na2CO3)を製造します。炭酸水素ナトリウム(NaHCO3)を沈殿させるためにアンモニア(NH3)を使い、最終段階で塩化アンモニウムと消石灰を反応させてNH3を回収し、工程内で循環利用します。CO2も工程内で再利用されます。全体での実質的な反応は「食塩＋石灰石 ➔ 炭酸ナトリウム＋塩化カルシウム」です。'
   }
 };
 
@@ -96,12 +96,12 @@ export default function IndustrialProcessPage() {
         <div className="lg:col-span-2 border border-gray-300 bg-white p-6 flex flex-col items-center justify-between min-h-[420px]">
           
           <div className="text-center w-full border-b border-gray-200 pb-2 mb-4 font-bold text-slate-700 text-sm">
-            製造ライン流程図：{proc.name}
+            製造プロセス図：{proc.name}
           </div>
 
           {/* SVGによるプロセスパイプライン */}
           <div className="flex items-center justify-center flex-grow py-6 w-full">
-            <svg width="340" height="200" viewBox="0 0 340 200" className="overflow-visible font-sans">
+            <svg width="510" height="300" viewBox="0 0 340 200" className="w-full max-w-[510px] h-auto overflow-visible font-sans">
               
               {/* 接触法・オストワルト法（直列フロー） */}
               {(selectedProcess === 'contact' || selectedProcess === 'ostwald') && (
@@ -150,7 +150,7 @@ export default function IndustrialProcessPage() {
                     {selectedProcess === 'contact' ? '製品: 硫酸 H2SO4' : '製品: 硝酸 HNO3'}
                   </text>
                   <text x="277.5" y="93" fill="#15803d" fontSize="7" textAnchor="middle">
-                    {selectedProcess === 'contact' ? 'SO3 + H2O ➔ H2SO4' : '3NO2 + H2O ➔ 2HNO3'}
+                    {selectedProcess === 'contact' ? 'SO3→H2S2O7→H2SO4' : '3NO2+H2O→2HNO3+NO'}
                   </text>
 
                   {/* オストワルト法のNOリサイクル矢印 */}
@@ -181,6 +181,11 @@ export default function IndustrialProcessPage() {
                   <text x="177.5" y="42" fill="#166534" fontSize="7.5" fontWeight="bold" textAnchor="middle">② Na2CO3 (炭酸ナトリウム)</text>
                   <text x="177.5" y="52" fill="#15803d" fontSize="6.5" textAnchor="middle">※副生CO2は①へリサイクル</text>
 
+                  {/* ①で生じるNH4Clを⑤へ送る */}
+                  <path d="M 60 60 L 60 72 L 200 72" fill="none" stroke="#2563eb" strokeWidth="1" strokeDasharray="3,3" />
+                  <polygon points="200,72 194,69 194,75" fill="#2563eb" />
+                  <text x="130" y="68" fill="#2563eb" fontSize="7" textAnchor="middle">副生NH4Clを⑤へ</text>
+
                   {/* 原料発生経路 */}
                   <rect x="15" y="105" width="90" height="35" fill="#f8fafc" stroke="#334155" strokeWidth="1.5" />
                   <text x="60" y="122" fill="#0f172a" fontSize="7.5" fontWeight="bold" textAnchor="middle">③ CaCO3 (石灰石) 熱分解</text>
@@ -205,7 +210,7 @@ export default function IndustrialProcessPage() {
 
                   {/* アンモニア循環リサイクル */}
                   <path d="M 245 55 L 245 10 L 60 10 L 60 25" fill="none" stroke="#2563eb" strokeWidth="1" strokeDasharray="3,3" />
-                  <text x="152.5" y="6" fill="#2563eb" fontSize="7" textAnchor="middle">アンモニア NH3 を100%回収・循環利用</text>
+              <text x="152.5" y="6" fill="#2563eb" fontSize="7" textAnchor="middle">アンモニア NH3 を回収・循環利用</text>
                 </g>
               )}
 
