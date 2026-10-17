@@ -1,4 +1,4 @@
-import { doubleRadicalPatterns, generateDoubleRadicalProblem } from '../src/lib/doubleRadicalProblems.ts';
+import { doubleRadicalPatterns, generateDoubleRadicalProblem, parseRadicandAnswer } from '../src/lib/doubleRadicalProblems.ts';
 
 function seeded(seed) {
   let state = seed >>> 0;
@@ -23,6 +23,10 @@ function verify(problem) {
   }
   if (problem.pattern === 'pattern3' && 2 * problem.k === 2) throw new Error('pattern3 did not produce a non-basic coefficient');
   if (problem.pattern === 'pattern4' && (problem.a % 2 === 0 || problem.b % 2 === 0)) throw new Error('pattern4 requires odd a and b');
+}
+
+for (const [input, expected] of [['3', 3], [' 12 ', 12], ['3.8', null], ['', null], ['3abc', null], ['1e2', null], ['9007199254740992', null], ['0', null], ['-2', null]]) {
+  if (parseRadicandAnswer(input) !== expected) throw new Error(`answer parser failed for ${JSON.stringify(input)}`);
 }
 
 for (let patternIndex = 0; patternIndex < doubleRadicalPatterns.length; patternIndex += 1) {

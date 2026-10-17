@@ -4,6 +4,14 @@ export const doubleRadicalPatterns = ['pattern1', 'pattern2', 'pattern3', 'patte
 export type DoubleRadicalPattern = (typeof doubleRadicalPatterns)[number];
 export type DoubleRadicalMode = DoubleRadicalPattern | 'mix';
 
+/** Parse a positive integer radicand without silently truncating decimals or trailing text. */
+export function parseRadicandAnswer(value: string): number | null {
+  const normalized = value.trim();
+  if (!/^\d+$/.test(normalized)) return null;
+  const parsed = Number(normalized);
+  return Number.isSafeInteger(parsed) && parsed > 0 ? parsed : null;
+}
+
 export interface DoubleRadicalProblem {
   pattern: DoubleRadicalPattern;
   a: number;
