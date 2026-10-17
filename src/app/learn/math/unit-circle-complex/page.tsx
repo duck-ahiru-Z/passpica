@@ -345,7 +345,7 @@ export default function UnitCircleComplexPage() {
                 </li>
               </ul>
               <p className="border-t border-gray-200 pt-2 text-[9px] text-gray-500">
-                これにより、絶対値が1の複素数（単位円上の点）を掛けることは、平面上の点（またはベクトル）を**「長さは変えずに、角度だけ回転させる」**ことと同等になります。
+                これにより、絶対値が1の複素数（単位円上の点）を掛けることは、平面上の点（またはベクトル）を<strong>「長さは変えずに、角度だけ回転させる」</strong>ことと同等になります。
               </p>
             </div>
           </div>

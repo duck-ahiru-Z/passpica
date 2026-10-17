@@ -58,6 +58,9 @@ const complexPlane = fs.readFileSync(path.join(root, 'src/app/learn/math/unit-ci
 if (!/role="img"\s+aria-label=\{`複素数平面/.test(complexPlane) || !complexPlane.includes('偏角を足します')) {
   throw new Error('Complex-plane visual must describe the values and meaning of its plotted product');
 }
+if (complexPlane.includes('**「長さは変えずに') || !complexPlane.includes('<strong>「長さは変えずに、角度だけ回転させる」</strong>')) {
+  throw new Error('Complex-plane lesson emphasis must render as HTML instead of literal Markdown markers');
+}
 const trigonometry = fs.readFileSync(path.join(root, 'src/app/learn/math/trigonometry/page.tsx'), 'utf8');
 if (!/role="img" aria-label=\{`角度\$\{angle\}度の単位円/.test(trigonometry)) {
   throw new Error('Trigonometry visual must describe its changing sine, cosine, and tangent values');
