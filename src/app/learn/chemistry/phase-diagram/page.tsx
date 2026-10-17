@@ -21,9 +21,9 @@ const PHASES: Record<string, PhaseInfo> = {
     triplePoint: '0.01 ℃ , 6.11 × 10^2 Pa (約 0.006 気圧)',
     criticalPoint: '374 ℃ , 2.21 × 10^7 Pa (約 218 気圧)',
     meltingCurveSlope: '負の傾き (左下がり／左傾斜)',
-    meltingCurveExplain: '融解曲線（固・液の境界線）が左に傾いています。これは「固体（氷）の体積が液体（水）より大きい（氷の方が密度が小さい）」という、水に特異的な異常性質を示しています。氷に高い圧力をかけると融点が下がり、氷が溶けて液体になります（スケート靴の刃にかかる圧力で氷表面が溶ける原理です）。',
+    meltingCurveExplain: '融解曲線（固体と液体の境界線）は、温度を横軸・圧力を縦軸にすると左下がりです。氷 Ih は開いた結晶構造をとり、同じ質量なら液体の水より体積が大きく密度が小さいため、圧力を上げると融点はわずかに下がります。',
     sublimationExplain: '1気圧で氷を加熱する平衡経路は、まず融解曲線を横切って水になり、その後に蒸発曲線を横切って水蒸気になります。この経路では液体を経ずに昇華する境界を通りません（低圧では氷が直接昇華する場合もあります）。',
-    explain: '水分子は固体の「氷」になると、水素結合によって隙間の多い正六角柱型の結晶構造（籠のような構造）を作るため、液体である「水」よりも体積が増加し、密度が減少します。そのため状態図の融解曲線が負の傾きを持ちます。'
+    explain: '氷 Ih では水素結合が比較的開いた結晶構造を作ります。融解すると分子の配置が組み替わり、同じ質量あたりの体積は氷より液体の水の方が小さくなります。この体積差が水の融解曲線の負の傾きに対応します。'
   },
   co2: {
     id: 'co2',
@@ -31,9 +31,9 @@ const PHASES: Record<string, PhaseInfo> = {
     triplePoint: '-56.6 ℃ , 5.18 × 10^5 Pa (約 5.1 気圧)',
     criticalPoint: '31.1 ℃ , 7.38 × 10^6 Pa (約 73 気圧)',
     meltingCurveSlope: '正の傾き (右上がり／右傾斜)',
-    meltingCurveExplain: '融解曲線が右に傾いています。これは「固体（ドライアイス）の体積が液体よりも小さい（固体の方が密度が大きい）」という、大半の通常の物質に共通する標準的な物理特性を示しています。圧力をかけても融点は上がります。',
+    meltingCurveExplain: '融解曲線（固体と液体の境界線）は右上がりです。三重点付近では固体 CO₂ のモル体積は液体より小さいため、圧力を上げると融点も上がります。',
     sublimationExplain: '三重点の圧力が約5.1気圧と非常に高いため、我々の日常生活の「1気圧」のラインは三重点より下に位置します。そのため、常温常圧下では液体になれず、固体（ドライアイス）から直接気体に「昇華」します。',
-    explain: '二酸化炭素は無極性分子であり、固体になると分子間力（ファンデルワールス力）で密に詰まった結晶を作るため、固体の方が体積が小さく（密度が大きく）なります。そのため、融解曲線は正の傾きになります。常圧で液体が存在しないのは、三重点圧力が大気圧を上回っているからです。'
+    explain: '三重点付近では固体 CO₂ のモル体積が液体 CO₂ より小さく、圧力を上げると融解温度も上がります。常圧で液体が存在しないのは、三重点圧力が大気圧を上回っているためです。'
   }
 };
 
@@ -89,8 +89,8 @@ export default function PhaseDiagramPage() {
               {/* x軸（温度 T）とy軸（圧力 P） */}
               <line x1="25" y1="130" x2="185" y2="130" stroke="#475569" strokeWidth="1.5" />
               <line x1="25" y1="15" x2="25" y2="130" stroke="#475569" strokeWidth="1.5" />
-              <text x="180" y="140" fill="#475569" fontSize="8" fontWeight="bold">温度 T</text>
-              <text x="5" y="12" fill="#475569" fontSize="8" fontWeight="bold">圧力 P</text>
+              <text x="180" y="140" fill="#475569" fontSize="8" fontWeight="bold">温度 T（℃）</text>
+              <text x="5" y="12" fill="#475569" fontSize="8" fontWeight="bold">圧力 P（相対値）</text>
 
               {/* 三重点・臨界点のプロット座標 */}
               {/* 三重点:(90, 85), 臨界点:(150, 40) とする */}
@@ -145,7 +145,7 @@ export default function PhaseDiagramPage() {
 
           <div className="w-full border-t border-gray-200 pt-4 text-center">
             <span className="text-[10px] text-gray-500 font-mono">
-              ※この図は模式図で、曲線上の座標は比例目盛ではありません。数値は右の表を参照してください。{selectedPhase === 'h2o' ? ' 赤い融解曲線は水に特徴的な負の傾きを示します。' : ' 二酸化炭素の融解曲線は正の傾きを示します。'}
+              ※模式図（圧力・温度とも比例目盛ではありません）。曲線の交点・傾きと相の位置関係を示します。正確な代表値は右の表を参照してください。{selectedPhase === 'h2o' ? ' 赤い融解曲線は水に特徴的な負の傾きを示します。' : ' 黒い融解曲線は二酸化炭素の正の傾きを示します。'}
             </span>
           </div>
 
@@ -186,6 +186,7 @@ export default function PhaseDiagramPage() {
             <div>
               <span className="font-bold text-slate-800 block text-[11px]">【融解曲線の傾き】</span>
               <p className="text-gray-600 text-[11px] leading-relaxed mt-0.5">{info.meltingCurveExplain}</p>
+              <p className="text-gray-500 text-[10px] leading-relaxed mt-1">融解曲線の傾きは固体と液体のモル体積差に関係します。図の横軸は温度、縦軸は圧力です。</p>
             </div>
             <div>
               <span className="font-bold text-slate-700 block text-[11px]">【1気圧での挙動と昇華】</span>
