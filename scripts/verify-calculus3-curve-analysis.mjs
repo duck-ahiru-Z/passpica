@@ -35,7 +35,10 @@ const checks = {
   },
   normal: problem => {
     const [, n] = problem.expression.match(/x\^2\+(\d+)x/);
-    return Math.abs(problem.answer + 1 / (2 + Number(n))) < 1e-12;
+    const tangentSlope = 2 + Number(n);
+    return Math.abs(problem.answer + 1 / tangentSlope) < 1e-12
+      && problem.explanation.includes(`m×${tangentSlope}=−1`)
+      && problem.explanation.includes(`≈${problem.answer.toFixed(3)}`);
   },
   motion: problem => {
     const [, coefficient] = problem.expression.match(/t\^3-(\d+)t/);

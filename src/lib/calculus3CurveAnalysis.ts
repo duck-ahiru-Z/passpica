@@ -25,7 +25,7 @@ export function generateCurveProblem(mode: CurveMode, random = Math.random): Cur
     extrema: { pattern, expression: `f(x)=x^3-${3 * n ** 2}x`, prompt: 'この関数の極大値と極小値の差（極大値−極小値）を求めなさい。', answer: 4 * n ** 3, explanation: `f′(x)=3(x²−${n ** 2}) より臨界点は ±${n}。f(−${n})=${2 * n ** 3}、f(${n})=−${2 * n ** 3}。差は ${4 * n ** 3}。` },
     concavity: { pattern, expression: `f(x)=x^3-${3 * n}x^2`, prompt: '変曲点の x 座標を求めなさい。', answer: n, explanation: `f′′(x)=6x−${6 * n} は x=${n} の前後で符号が変わるため、変曲点の x 座標は ${n}。` },
     tangent: { pattern, expression: `y=x^2+${n}x,\\; x=1`, prompt: '指定された点での接線の傾きを求めなさい。', answer: 2 + n, explanation: `y′=2x+${n}。x=1 での傾きは ${2 + n}。` },
-    normal: { pattern, expression: `y=x^2+${n}x,\\; x=1`, prompt: '指定された点での法線の傾きを求めなさい。', answer: -1 / (2 + n), explanation: `接線の傾きは y′(1)=${2 + n}。法線の傾きはその負の逆数 −1/${2 + n}。` },
+    normal: { pattern, expression: `y=x^2+${n}x,\\; x=1`, prompt: '指定された点での法線の傾きを求めなさい。', answer: -1 / (2 + n), explanation: `接線の傾きは y′(1)=${2 + n}。接線に垂直な法線の傾き m は m×${2 + n}=−1 を満たすので、m=−1/${2 + n}≈${(-1 / (2 + n)).toFixed(3)}。` },
     motion: {
       pattern,
       expression: `x(t)=t^3-${3 * n}t,\\; t=1`,
