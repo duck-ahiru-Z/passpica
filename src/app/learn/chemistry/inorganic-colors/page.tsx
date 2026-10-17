@@ -13,7 +13,7 @@ interface MetalIon {
 }
 
 const METAL_IONS: MetalIon[] = [
-  { id: 'Cu2+', name: '銅(II)イオン', symbol: 'Cu²', initialColor: 'rgba(56, 189, 248, 0.4)', initialBgClass: 'bg-sky-100', desc: '水溶液中では水和して青色（[Cu(H₂O)₄]²⁺）を示します。' },
+  { id: 'Cu2+', name: '銅(II)イオン', symbol: 'Cu²⁺', initialColor: 'rgba(56, 189, 248, 0.4)', initialBgClass: 'bg-sky-100', desc: '水溶液中では水和して青色（[Cu(H₂O)₄]²⁺）を示します。' },
   { id: 'Fe3+', name: '鉄(III)イオン', symbol: 'Fe³⁺', initialColor: 'rgba(234, 179, 8, 0.35)', initialBgClass: 'bg-yellow-100', desc: '水溶液中では黄褐色を示します。加水分解しやすく酸性です。' },
   { id: 'Fe2+', name: '鉄(II)イオン', symbol: 'Fe²⁺', initialColor: 'rgba(187, 247, 208, 0.3)', initialBgClass: 'bg-green-100', desc: '淡緑色を示しますが、空気中で徐々に酸化されて鉄(III)に変化します。' },
   { id: 'Al3+', name: 'アルミニウムイオン', symbol: 'Al³⁺', initialColor: 'rgba(255, 255, 255, 0.1)', initialBgClass: 'bg-slate-50', desc: '無色透明です。典型元素であり、両性金属の性質を持ちます。' },
@@ -96,12 +96,20 @@ export default function InorganicColorsPage() {
           description: '硫化水素を通じると、液性に関係なく極めて難溶な硫化銅(II)の黒色沈殿が生成します（酸性・塩基性どちらでも沈殿）。'
         };
       }
-      if (selectedReagent === 'HCl' || selectedReagent === 'KI') {
+      if (selectedReagent === 'KI') {
+        return {
+          liquidColor: 'rgba(146, 64, 14, 0.55)',
+          precipitateColor: 'rgba(248, 250, 252, 0.96)',
+          formula: '2Cu²⁺ + 4I⁻ → 2CuI↓ + I₂ (白色沈殿・褐色溶液)',
+          description: 'ヨウ化物イオンが銅(II)イオンを銅(I)イオンへ還元し、自身はヨウ素に酸化されます。白色のヨウ化銅(I)沈殿と褐色のヨウ素が生じます。ヨウ化物イオンが過剰なら、ヨウ素は三ヨウ化物イオンとして溶液中にも存在します。'
+        };
+      }
+      if (selectedReagent === 'HCl') {
         return {
           liquidColor: currentIon.initialColor,
           precipitateColor: '',
           formula: '変化なし',
-          description: '銅(II)イオンは塩化物イオンやヨウ化物イオンの希薄溶液とは沈殿を形成しないため、変化はありません（※高濃度KIの場合は酸化還元反応を起こしますが、高校範囲では変化なしと扱います）。'
+          description: '銅(II)イオンと希薄な塩化物イオンでは、この条件で目に見える沈殿は生じません。'
         };
       }
     }
@@ -135,11 +143,19 @@ export default function InorganicColorsPage() {
           };
         }
       }
+      if (selectedReagent === 'KI') {
+        return {
+          liquidColor: 'rgba(146, 64, 14, 0.5)',
+          precipitateColor: '',
+          formula: '2Fe³⁺ + 2I⁻ → 2Fe²⁺ + I₂ (褐色溶液)',
+          description: '鉄(III)イオンがヨウ化物イオンを酸化してヨウ素を生じ、自身は鉄(II)イオンに還元されます。ヨウ素が溶液を褐色にします。沈殿は生じません。'
+        };
+      }
       return {
         liquidColor: currentIon.initialColor,
         precipitateColor: '',
         formula: '変化なし',
-        description: '希塩酸やヨウ化カリウム溶液を加えても、顕著な沈殿は生成しません。'
+        description: '希塩酸を加えても、この条件では顕著な変化はありません。'
       };
     }
 
