@@ -4,10 +4,13 @@ import path from 'node:path';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/double-radical-drill/page.tsx'), 'utf8');
 if (!drillPage.includes('role="status" aria-live="polite"')
+  || !drillPage.includes('role="alert"')
+  || drillPage.includes("alert('枠に整数を入力してください。')")
+  || !drillPage.includes('aria-invalid={Boolean(validationError)}')
   || !drillPage.includes("aria-pressed={detailLevel === 'brief'}")
   || !drillPage.includes("aria-pressed={detailLevel === 'normal'}")
   || !drillPage.includes("aria-pressed={detailLevel === 'detailed'}")) {
-  throw new Error('double-radical feedback and explanation-level choices must be exposed accessibly');
+  throw new Error('double-radical validation, feedback, and explanation-level choices must be exposed accessibly');
 }
 
 function seeded(seed) {

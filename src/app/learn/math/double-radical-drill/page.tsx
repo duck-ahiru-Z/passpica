@@ -24,6 +24,7 @@ export default function DoubleRadicalDrillPage() {
   // 判定状態
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [validationError, setValidationError] = useState('');
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
@@ -33,6 +34,7 @@ export default function DoubleRadicalDrillPage() {
     setAnsB('');
     setHasChecked(false);
     setIsCorrect(false);
+    setValidationError('');
   };
 
   const handleCheck = () => {
@@ -42,9 +44,11 @@ export default function DoubleRadicalDrillPage() {
     const ub = parseRadicandAnswer(ansB);
     
     if (ua === null || ub === null) {
-      alert('枠に整数を入力してください。');
+      setValidationError('2つの枠に正の整数を入力してください。小数や空欄は使えません。');
       return;
     }
+
+    setValidationError('');
     
     if (ua === problem.a && ub === problem.b) {
       setIsCorrect(true);
@@ -113,7 +117,7 @@ export default function DoubleRadicalDrillPage() {
                       <div className="flex items-stretch">
                         <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                         <div className="border-t-2 border-slate-700 pt-1">
-                          <input aria-label="大きい数の根号内" type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
+                          <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); }} placeholder="大" />
                         </div>
                       </div>
                       
@@ -123,7 +127,7 @@ export default function DoubleRadicalDrillPage() {
                       <div className="flex items-stretch">
                         <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                         <div className="border-t-2 border-slate-700 pt-1">
-                          <input aria-label="小さい数の根号内" type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
+                          <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); }} placeholder="小" />
                         </div>
                       </div>
                     </div>
@@ -138,7 +142,7 @@ export default function DoubleRadicalDrillPage() {
                     <div className="flex items-stretch">
                       <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                       <div className="border-t-[3px] border-slate-700 pt-1">
-                        <input aria-label="大きい数の根号内" type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
+                        <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); }} placeholder="大" />
                       </div>
                     </div>
                     
@@ -148,12 +152,13 @@ export default function DoubleRadicalDrillPage() {
                     <div className="flex items-stretch">
                       <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                       <div className="border-t-[3px] border-slate-700 pt-1">
-                        <input aria-label="小さい数の根号内" type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
+                        <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); }} placeholder="小" />
                       </div>
                     </div>
                   </div>
                 )}
               </div>
+              {validationError && <p id="radical-answer-error" role="alert" className="text-center text-red-700 font-semibold">{validationError}</p>}
               <div className="text-[10px] text-gray-500 text-center">
                 ※ 引き算の場合、必ず大きい数字を左側（大）に入力してください。<br/>
                 ※ 答えが整数になる場合もルートのまま（例：\(\sqrt{4}\)）入力してください。<br/>
