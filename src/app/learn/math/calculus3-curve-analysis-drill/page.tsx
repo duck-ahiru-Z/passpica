@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { curveLabels, curvePatterns, generateCurveProblem, type CurveMode, type CurvePattern } from '@/src/lib/calculus3CurveAnalysis';
+import { curveLabels, curvePatterns, generateCurveProblem, isCurveAnswerCorrect, type CurveMode, type CurvePattern } from '@/src/lib/calculus3CurveAnalysis';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 type Pattern = CurvePattern;
@@ -22,10 +22,9 @@ export default function Calculus3CurveAnalysisDrill() {
   const [checked, setChecked] = useState(false);
   const next = (selectedMode = mode) => { setProblem(generateCurveProblem(selectedMode)); setStrategy(''); setAnswer(''); setChecked(false); };
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const numericAnswer = Number(answer);
-  const correct = answer.trim() !== '' && Number.isFinite(numericAnswer) && strategy === problem.pattern && Math.abs(numericAnswer - problem.answer) <= 0.001;
+  const correct = strategy === problem.pattern && isCurveAnswerCorrect(answer, problem.answer);
   const strategyIsCorrect = strategy === problem.pattern;
-  const valueIsCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && Math.abs(numericAnswer - problem.answer) <= 0.001;
+  const valueIsCorrect = isCurveAnswerCorrect(answer, problem.answer);
 
   return <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>

@@ -1,12 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { curvePatterns, generateCurveProblem } from '../src/lib/calculus3CurveAnalysis.ts';
+import { curvePatterns, generateCurveProblem, isCurveAnswerCorrect } from '../src/lib/calculus3CurveAnalysis.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-curve-analysis-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="curve-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === pattern}')) {
   throw new Error('curve-analysis strategy must be a single-choice radio group');
 }
-if (!/const correct = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer - problem\.answer\) <= 0\.001/.test(drillPage)) {
+if (!/const correct = strategy === problem\.pattern && isCurveAnswerCorrect\(answer, problem\.answer\)/.test(drillPage)) {
   throw new Error('curve-analysis answers must require both the correct strategy and numeric value');
 }
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
@@ -14,6 +14,9 @@ if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includ
 }
 
 const stableRandom = () => 0.37;
+if (!isCurveAnswerCorrect('-0.333', -1 / 3)) throw new Error('three-decimal displayed answers should be accepted');
+if (isCurveAnswerCorrect('-0.334', -1 / 3)) throw new Error('values outside the displayed three-decimal answer should be rejected');
+if (isCurveAnswerCorrect('', 1) || isCurveAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
 const checks = {
   increase: problem => {
     const [, coefficient] = problem.expression.match(/x\^3-(\d+)x/);
@@ -30,13 +33,16 @@ const checks = {
     return problem.answer === Number(n) / 3 && problem.explanation.includes(`x=${Number(n) / 3}`);
   },
   tangent: problem => {
-    const [, n] = problem.expression.match(/x\^2\+(\d+)x/);
-    return problem.answer === 2 + Number(n);
+    const [, coefficient] = problem.expression.match(/x\^2\+(?:(\d+)x|x)/);
+    const n = Number(coefficient ?? 1);
+    return problem.answer === 2 + n && !problem.expression.includes('+1x');
   },
   normal: problem => {
-    const [, n] = problem.expression.match(/x\^2\+(\d+)x/);
-    const tangentSlope = 2 + Number(n);
+    const [, coefficient] = problem.expression.match(/x\^2\+(?:(\d+)x|x)/);
+    const n = Number(coefficient ?? 1);
+    const tangentSlope = 2 + n;
     return Math.abs(problem.answer + 1 / tangentSlope) < 1e-12
+      && !problem.expression.includes('+1x')
       && problem.explanation.includes(`m×${tangentSlope}=−1`)
       && problem.explanation.includes(`≈${problem.answer.toFixed(3)}`);
   },
