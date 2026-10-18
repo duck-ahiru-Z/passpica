@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { isQuadraticExtremumAnswerCorrect } from '@/src/lib/quadraticMaxMin';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -229,21 +230,8 @@ export default function QuadraticMaxMinDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const checkVals = (uV: string, ux1: string, ux2: string, pV: number, pX: number[]) => {
-      if (parseInt(uV) !== pV) return false;
-      const uX = [];
-      if (ux1.trim() !== '') uX.push(parseInt(ux1));
-      if (ux2.trim() !== '') uX.push(parseInt(ux2));
-      uX.sort((a,b)=>a-b);
-      if (uX.length !== pX.length) return false;
-      for (let i=0; i<uX.length; i++) {
-        if (uX[i] !== pX[i]) return false;
-      }
-      return true;
-    };
-
-    const maxOk = checkVals(ansMaxV, ansMaxX1, ansMaxX2, problem.maxV, problem.maxX);
-    const minOk = checkVals(ansMinV, ansMinX1, ansMinX2, problem.minV, problem.minX);
+    const maxOk = isQuadraticExtremumAnswerCorrect(ansMaxV, ansMaxX1, ansMaxX2, problem.maxV, problem.maxX);
+    const minOk = isQuadraticExtremumAnswerCorrect(ansMinV, ansMinX1, ansMinX2, problem.minV, problem.minX);
 
     setIsCorrect(maxOk && minOk);
     setHasChecked(true);

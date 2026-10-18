@@ -11,6 +11,9 @@ if (!drillPage.includes('onChange={() => { setMethod(pattern); setChecked(false)
   || !drillPage.includes('role="status" aria-live="polite"')) {
   throw new Error('changing an information answer must clear stale feedback and announce new feedback');
 }
+if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{informationLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed information practice must lock its method while mixed practice asks learners to identify it');
+}
 
 const stableRandom = () => 0.37;
 const checks = {

@@ -9,11 +9,14 @@ if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includ
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
 }
-if (!drillPage.includes('setStrategy(p); setChecked(false);') || !drillPage.includes('setAnswer(e.target.value); setChecked(false);')) {
+if (!drillPage.includes('setStrategy(pattern); setChecked(false);') || !drillPage.includes('setAnswer(e.target.value); setChecked(false);')) {
   throw new Error('changing a geometry strategy or answer must clear stale feedback');
 }
-if (!drillPage.includes('実戦練習：面積・体積 全パターンランダム') || !drillPage.includes('基礎練習：{geometryLabels[p]}だけ')) {
+if (!drillPage.includes('実戦練習：面積・体積 全パターンランダム') || !drillPage.includes('基礎練習：{geometryLabels[pattern]}だけ')) {
   throw new Error('the learner must be able to choose mixed practice or one fixed geometry pattern');
+}
+if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("{mode === 'mix' ? (") || !drillPage.includes('基礎練習：{geometryLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed geometry practice must lock its pattern while mixed practice asks learners to identify it');
 }
 if (!drillPage.includes('<= 0.0005 + 1e-12') || !drillPage.includes('小数第3位まで入力')) {
   throw new Error('geometry answer precision guidance and accepted rounding tolerance must match');

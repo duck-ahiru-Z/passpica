@@ -15,6 +15,9 @@ if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includ
 if (!drillPage.includes('setStrategy(pattern); setChecked(false);') || !drillPage.includes('setAnswer(e.target.value); setChecked(false);')) {
   throw new Error('changing a curve-analysis strategy or answer must clear stale feedback');
 }
+if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{curveLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed curve-analysis practice must lock its pattern while mixed practice asks learners to identify it');
+}
 
 const stableRandom = () => 0.37;
 if (!isCurveAnswerCorrect('-0.333', -1 / 3)) throw new Error('three-decimal displayed answers should be accepted');

@@ -15,6 +15,9 @@ if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includ
 if (!drillPage.includes('実戦練習：微分法 全パターンランダム') || !drillPage.includes('基礎練習：{differentiationLabels[p]}だけ')) {
   throw new Error('the learner must be able to choose either mixed differentiation practice or one fixed pattern');
 }
+if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{differentiationLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed differentiation practice must lock its pattern while mixed practice asks learners to identify it');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;

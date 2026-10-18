@@ -9,6 +9,9 @@ if (!/type="radio"\s+name="mole-method"/.test(drillPage) || drillPage.includes('
 if (!drillPage.includes('setMethod(pattern); setChecked(false);') || !drillPage.includes('setAnswer(event.target.value); setChecked(false);')) {
   throw new Error('changing a chemistry method or answer must clear old feedback');
 }
+if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{moleLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed chemistry practice must lock its method while mixed practice asks learners to identify it');
+}
 
 const stableRandom = () => 0.37;
 const expectedUnits = { mass: 'mol', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', ph: '', yield: '%' };

@@ -12,8 +12,11 @@ if (!/const correct = .*strategy === problem\.pattern.*Math\.abs\(numericAnswer 
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('limit feedback must announce the result and distinguish strategy from value errors');
 }
-if (!drillPage.includes('実戦練習：極限 全パターンランダム') || !drillPage.includes('基礎練習：{limitLabels[p]}だけ')) {
+if (!drillPage.includes('実戦練習：極限 全パターンランダム') || !drillPage.includes('基礎練習：{limitLabels[pattern]}だけ')) {
   throw new Error('the learner must be able to choose either mixed limit practice or one fixed pattern');
+}
+if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("{mode === 'mix' ? (") || !drillPage.includes('基礎練習：{limitLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed limit practice must lock its pattern while mixed practice asks learners to identify it');
 }
 
 const stableRandom = () => 0.37;

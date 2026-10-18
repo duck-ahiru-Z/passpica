@@ -146,7 +146,8 @@ const CONTENTS: LearningContent[] = [
     description: '射出角と時刻を変え、水平・鉛直の速度成分、軌道、高さ、到達距離の関係を視覚的に理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/physics/projectile-visual'
+    link: '/learn/physics/projectile-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
     slug: 'energy-visual',
@@ -169,7 +170,8 @@ const CONTENTS: LearningContent[] = [
     description: '時刻スライダーで位置・速度・加速度の変化を同時に観察し、運動方程式の関係を直感的に理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/physics/motion-visual'
+    link: '/learn/physics/motion-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
     slug: 'concentration-visual',

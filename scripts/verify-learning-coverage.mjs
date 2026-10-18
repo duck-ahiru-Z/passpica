@@ -62,6 +62,12 @@ if (!volumeVisual.includes('πx⁴') || !volumeVisual.includes('πb⁵/5') || !v
 if (!learn.includes("practiceLink: '/learn/math/calculus3-area-volume-drill'")) {
   throw new Error('Calculus III volume visual must link to its related area and volume practice');
 }
+for (const slug of ['projectile-visual', 'motion-visual']) {
+  const entry = learnEntries.find(candidate => candidate.slug === slug);
+  if (!entry || !new RegExp(`slug: '${slug}'[\\s\\S]*?practiceLink: '/learn/physics/motion-calculation-drill'`).test(learn)) {
+    throw new Error(`Physics visual ${slug} must link to its related mechanics practice`);
+  }
+}
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');
 if (!/role="img" aria-label=\{`\$\{info\.name\}の模式的な状態図/.test(phaseDiagram)) {

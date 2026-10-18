@@ -1,6 +1,15 @@
 export type QuadraticInequalitySign = '<' | '>' | '\\le' | '\\ge';
 export type QuadraticInequalityAnswerType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
+export function reverseQuadraticInequalitySign(sign: QuadraticInequalitySign): QuadraticInequalitySign {
+  switch (sign) {
+    case '<': return '>';
+    case '>': return '<';
+    case '\\le': return '\\ge';
+    case '\\ge': return '\\le';
+  }
+}
+
 export function getQuadraticInequalityRegion(sign: QuadraticInequalitySign): { boundary: string; side: '下' | '上' } {
   switch (sign) {
     case '<': return { boundary: '0未満', side: '下' };

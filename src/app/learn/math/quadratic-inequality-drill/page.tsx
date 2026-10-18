@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { getQuadraticInequalityRegion, parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
+import { getQuadraticInequalityRegion, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
 import { generateQuadraticInequalityProblem, type QuadraticInequalityPattern, type QuadraticInequalityProblem } from '@/src/lib/quadraticInequalityProblems';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
@@ -226,7 +226,8 @@ export default function QuadraticInequalityDrillPage() {
 
   const formatRoot = ({ num, den }: ProblemData['roots'][number]) => den === 1 ? `${num}` : `${num}/${den}`;
   const rootsLabel = problem.roots.map(formatRoot);
-  const inequalityRegion = getQuadraticInequalityRegion(problem.ineqSign);
+  const normalizedSign = problem.a < 0 ? reverseQuadraticInequalitySign(problem.ineqSign) : problem.ineqSign;
+  const inequalityRegion = getQuadraticInequalityRegion(normalizedSign);
   const solutionLabel = (() => {
     switch (problem.ansType) {
       case 1: return `${rootsLabel[0]} < x < ${rootsLabel[1]}`;
@@ -408,14 +409,14 @@ export default function QuadraticInequalityDrillPage() {
                   <div className="bg-red-50 p-2 border border-red-200">
                     <p className="font-bold text-red-600 mb-1">【重要】最初に x² の係数をプラスにする！</p>
                     <p>両辺に <MathEq math="-1" /> を掛けます。<strong className="text-red-600 underline">このとき不等号の向きが逆になることに注意！</strong></p>
-                    <MathEq math={`${-problem.a === 1 ? '' : -problem.a}x^2 ${-problem.b > 0 ? '+' : ''} ${-problem.b === 1 ? '' : -problem.b === -1 ? '-' : -problem.b}x ${-problem.c > 0 ? '+' : ''} ${-problem.c === 0 ? '' : -problem.c} ${problem.ineqSign === '<' ? '>' : problem.ineqSign === '>' ? '<' : problem.ineqSign === '\\le' ? '\\ge' : '\\le'} 0`} block />
+                    <MathEq math={`${-problem.a === 1 ? '' : -problem.a}x^2 ${-problem.b > 0 ? '+' : ''} ${-problem.b === 1 ? '' : -problem.b === -1 ? '-' : -problem.b}x ${-problem.c > 0 ? '+' : ''} ${-problem.c === 0 ? '' : -problem.c} ${normalizedSign} 0`} block />
                   </div>
                 )}
 
                 {problem.roots.length === 2 && (
                   <div className="bg-gray-50 p-2 border">
                     <p>因数分解すると、左辺は <MathEq math={`= 0`} /> のとき、<MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}, \\quad ${problem.roots[1].den === 1 ? problem.roots[1].num : `\\frac{${problem.roots[1].num}}{${problem.roots[1].den}}`}`} /> となります。</p>
-                    <p>グラフを描くと、{problem.a > 0 ? '下に凸' : '上に凸'}の放物線になります。</p>
+                    <p>{problem.a < 0 ? '変形後の式' : '左辺'}のグラフは、下に凸の放物線になります。</p>
                     <p className="mt-2">今回は <MathEq math={inequalityRegion.boundary} /> 条件なので、x軸より「{inequalityRegion.side}」の部分を探します。</p>
                     <p>グラフの色付き部分に対応する $x$ の範囲が答えです。</p>
                   </div>
@@ -423,9 +424,9 @@ export default function QuadraticInequalityDrillPage() {
 
                 {problem.roots.length === 1 && (
                   <div className="bg-gray-50 p-2 border">
-                    <p>左辺は完全平方式 <MathEq math={`${Math.abs(problem.a) === 1 ? '' : Math.abs(problem.a)}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
+                    <p>{problem.a < 0 ? '変形後の左辺' : '左辺'}は完全平方式 <MathEq math={`${Math.abs(problem.a) === 1 ? '' : Math.abs(problem.a)}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
                     <p>判別式 <MathEq math="D=0" /> であり、放物線は x軸と <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> で接します。</p>
-                    <p className="mt-2">グラフから、<MathEq math={inequalityRegion.boundary} /> 条件を満たす $x$ を探します。</p>
+                    <p className="mt-2">{problem.a < 0 ? '変形後のグラフから' : 'グラフから'}、<MathEq math={inequalityRegion.boundary} /> 条件を満たす $x$ を探します。</p>
                     <ul className="list-disc pl-4 mt-1">
                       {problem.ansType === 5 && <li>接点のみが条件を満たすため、答えは <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> となります。</li>}
                       {problem.ansType === 6 && <li>接点以外はすべて条件を満たすため、答えは <MathEq math={`x \\neq ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> のすべての実数です。</li>}

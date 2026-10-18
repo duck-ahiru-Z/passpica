@@ -1,4 +1,4 @@
-import { factorizationPatterns, generateFactorizationQuestion } from '../src/lib/factorizationQuestions.ts';
+import { factorizationPatterns, generateFactorizationQuestion, normalizeFactorizationAnswer } from '../src/lib/factorizationQuestions.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -9,12 +9,17 @@ if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage
 if (!drillPage.includes('setChoice(option); setChecked(false);')) {
   throw new Error('changing a factorization strategy must clear the previous feedback');
 }
+for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', 'normalizeFactorizationAnswer(question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
+  if (!drillPage.includes(requirement)) throw new Error(`factorization practice is missing fixed-answer behavior: ${requirement}`);
+}
 
 const fixedRandom = () => 0.42;
+if (normalizeFactorizationAnswer(' (x−3) (x+3) ') !== normalizeFactorizationAnswer('(x-3)(x+3)')) throw new Error('full-width minus and spacing should be accepted in factorization answers');
+if (normalizeFactorizationAnswer('(x+4)²') !== normalizeFactorizationAnswer('(x+4)^2')) throw new Error('superscript powers should be accepted in factorization answers');
 for (const pattern of factorizationPatterns) {
   for (let index = 0; index < 500; index += 1) {
     const question = generateFactorizationQuestion(pattern, fixedRandom);
-    if (question.pattern !== pattern || !question.expression || !question.explanation) throw new Error(`incomplete ${pattern} question`);
+    if (question.pattern !== pattern || !question.expression || !question.factorization || !question.explanation) throw new Error(`incomplete ${pattern} question`);
     if (!question.options.includes(question.answer) || question.options.length !== factorizationPatterns.length) throw new Error(`invalid choices for ${pattern}`);
     if (pattern === 'common' && !question.explanation.includes('判別式')) throw new Error('common-factor questions must explain whether further factorization is possible');
     if (pattern === 'common' && !question.explanation.includes('< 0')) throw new Error('common-factor remainder must be irreducible over the reals');
@@ -31,6 +36,15 @@ for (const pattern of factorizationPatterns) {
       if (Number(middle) !== a + b || Number(constant) !== a * b) throw new Error(`substitution explanation does not match ${question.expression}`);
     }
     if (pattern === 'higher' && !question.explanation.includes('(x−1)(x+1)')) throw new Error('higher-degree explanation must finish the factorization');
+    if (pattern === 'common') {
+      const [, a, b, c] = question.expression.match(/^(\d+)x\^2 \+ (\d+)x \+ (\d+)$/);
+      const [, factor, qa, qb, qc] = question.factorization.match(/^(\d+)\((\d+)x\^2\+(\d+)x\+(\d+)\)$/);
+      if (Number(a) !== Number(factor) * Number(qa) || Number(b) !== Number(factor) * Number(qb) || Number(c) !== Number(factor) * Number(qc)) throw new Error('common-factor result does not expand to the question');
+    }
+    if (pattern === 'identity' && !question.explanation.includes(question.factorization.replaceAll('^2', '²').replaceAll('-', '−'))) throw new Error('identity result must agree with its explanation');
+    if (pattern === 'cross' && !question.explanation.includes(`したがって ${question.factorization}`)) throw new Error('tawagake result must agree with its explanation');
+    if (pattern === 'substitution' && !question.explanation.includes(`${question.factorization.replaceAll('^2', '²').replaceAll('-', '−')} とします。`)) throw new Error('substitution result must agree with its explanation');
+    if (pattern === 'higher' && !question.explanation.includes(`${question.factorization.replaceAll('-', '−')} とします。`)) throw new Error('higher-degree result must agree with its explanation');
   }
 }
 

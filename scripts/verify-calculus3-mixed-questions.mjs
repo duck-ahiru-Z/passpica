@@ -3,9 +3,9 @@ import katex from 'katex';
 import fs from 'node:fs';
 import path from 'node:path';
 
-const areas = ['limit', 'differentiation', 'integral', 'geometry', 'differential-equation'];
-const patternCounts = { limit: 7, differentiation: 7, integral: 5, geometry: 5, 'differential-equation': 4 };
-const areaLabels = { limit: '極限', differentiation: '微分法', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式' };
+const areas = ['limit', 'differentiation', 'curve-analysis', 'integral', 'geometry', 'differential-equation'];
+const patternCounts = { limit: 7, differentiation: 7, 'curve-analysis': 6, integral: 5, geometry: 5, 'differential-equation': 4 };
+const areaLabels = { limit: '極限', differentiation: '微分法', 'curve-analysis': '曲線分析', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式' };
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-mixed-drill/page.tsx'), 'utf8');
 for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}']) {
   if (!drillPage.includes(requirement)) throw new Error(`Math III mixed drill is missing expected UI behavior: ${requirement}`);
@@ -27,13 +27,13 @@ const validateQuestion = question => {
 };
 
 const allPicker = createCalculus3MixedQuestionPicker();
-const allQuestions = Array.from({ length: 1_000 }, () => allPicker.next('all'));
+const allQuestions = Array.from({ length: 1_002 }, () => allPicker.next('all'));
 for (const question of allQuestions) validateQuestion(question);
 const allPatterns = new Map(areas.map(area => [area, new Set()]));
 for (const question of allQuestions) allPatterns.get(question.area).add(question.pattern);
 for (let index = 0; index < allQuestions.length; index += areas.length) {
   const batch = allQuestions.slice(index, index + areas.length);
-  if (new Set(batch.map(question => question.area)).size !== areas.length) throw new Error(`all-range batch ${index / areas.length} did not evenly mix all five areas`);
+  if (new Set(batch.map(question => question.area)).size !== areas.length) throw new Error(`all-range batch ${index / areas.length} did not evenly mix all six areas`);
 }
 for (const area of areas) {
   if (allPatterns.get(area).size !== patternCounts[area]) throw new Error(`${area} exposes ${allPatterns.get(area).size}/${patternCounts[area]} lower-level patterns in the full-range picker`);
@@ -63,13 +63,13 @@ for (let seed = 1; seed <= 20; seed += 1) {
     return (state - 1) / 2147483646;
   };
   const picker = createCalculus3MixedQuestionPicker();
-  const questions = Array.from({ length: 500 }, () => picker.next('all', random));
+  const questions = Array.from({ length: 504 }, () => picker.next('all', random));
   for (const question of questions) validateQuestion(question);
   for (let index = 0; index < questions.length; index += areas.length) {
     if (new Set(questions.slice(index, index + areas.length).map(question => question.area)).size !== areas.length) {
-      throw new Error(`seed ${seed} failed to include every area in a five-question batch`);
+      throw new Error(`seed ${seed} failed to include every area in a six-question batch`);
     }
   }
 }
 
-console.log('Calculus III mixed practice verified: all 28 lower-level strategy patterns, varied generated questions, five-area balance across 10,000 seeded questions, KaTeX rendering, single-choice UI, and balanced answer positions.');
+console.log('Calculus III mixed practice verified: all 34 lower-level strategy patterns, varied generated questions, six-area balance across 10,000 seeded questions, KaTeX rendering, single-choice UI, and balanced answer positions.');

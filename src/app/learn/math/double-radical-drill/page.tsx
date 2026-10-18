@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { generateDoubleRadicalProblem, parseRadicandAnswer, type DoubleRadicalMode } from '@/src/lib/doubleRadicalProblems';
+import { doubleRadicalPatterns, generateDoubleRadicalProblem, parseRadicandAnswer, type DoubleRadicalMode, type DoubleRadicalPattern } from '@/src/lib/doubleRadicalProblems';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
@@ -13,9 +13,17 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+const patternLabels: Record<DoubleRadicalPattern, string> = {
+  pattern1: '基本の和',
+  pattern2: '基本の差',
+  pattern3: '係数付き',
+  pattern4: '係数なし・√2で割る形',
+};
+
 export default function DoubleRadicalDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<DoubleRadicalMode>('mix');
   const [problem, setProblem] = useClientGeneratedState(() => generateDoubleRadicalProblem('mix'));
+  const [strategy, setStrategy] = useState<DoubleRadicalPattern | ''>('');
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -30,6 +38,7 @@ export default function DoubleRadicalDrillPage() {
 
   const handleNext = (pattern: DoubleRadicalMode = selectedPattern) => {
     setProblem(generateDoubleRadicalProblem(pattern));
+    setStrategy(pattern === 'mix' ? '' : pattern);
     setAnsA('');
     setAnsB('');
     setHasChecked(false);
@@ -50,7 +59,7 @@ export default function DoubleRadicalDrillPage() {
 
     setValidationError('');
     
-    if (ua === problem.a && ub === problem.b) {
+    if (strategy === problem.pattern && ua === problem.a && ub === problem.b) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -105,9 +114,17 @@ export default function DoubleRadicalDrillPage() {
             </div>
             
             <div className="space-y-4">
-              <div className="text-center font-bold text-gray-700">
-                二重根号を外しなさい。
-              </div>
+              <div className="text-center font-bold text-gray-700">二重根号を外しなさい。</div>
+              {selectedPattern === 'mix' ? (
+                <fieldset className="space-y-2">
+                  <legend className="w-full text-center font-bold">実戦練習：式の形から解法パターンを選んでください。</legend>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {doubleRadicalPatterns.map(pattern => <label key={pattern} className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${strategy === pattern ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}><input type="radio" name="double-radical-strategy" value={pattern} checked={strategy === pattern} onChange={() => { setStrategy(pattern); setHasChecked(false); setIsCorrect(false); }} className="accent-blue-600" />{patternLabels[pattern]}</label>)}
+                  </div>
+                </fieldset>
+              ) : (
+                <p role="status" aria-live="polite" className="text-center font-bold text-blue-800">基礎練習：{patternLabels[selectedPattern]}に固定して繰り返します。</p>
+              )}
               <div className="flex items-center justify-center gap-2 text-xl">
                 <MathEq math="=" />
                 {problem.pattern === 'pattern4' ? (
@@ -182,7 +199,7 @@ export default function DoubleRadicalDrillPage() {
 
             {hasChecked && (
               <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！素晴らしい！' : '不正解... 解説を見てみよう。'}
+                {isCorrect ? '正解！素晴らしい！' : `不正解... 解法パターンは「${patternLabels[problem.pattern]}」です。解説を見てみよう。`}
               </div>
             )}
           </div>

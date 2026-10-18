@@ -9,6 +9,9 @@ if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes
 if (!drillPage.includes('setMethod(pattern); setChecked(false);') || !drillPage.includes('setAnswer(event.target.value); setChecked(false);')) {
   throw new Error('changing a mechanics method or answer must clear old feedback');
 }
+if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{motionLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed mechanics practice must lock its formula while mixed practice asks learners to identify it');
+}
 
 const stableRandom = () => 0.37;
 const checks = {

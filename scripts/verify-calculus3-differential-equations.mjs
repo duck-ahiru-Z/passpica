@@ -6,6 +6,9 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/c
 for (const requirement of ['type="radio" name="differential-equation-strategy"', 'disabled={!strategy || answer.trim() === \'\'}', 'role="status" aria-live="polite"', 'setStrategy(pattern); setChecked(false);', 'setAnswer(event.target.value); setChecked(false);', '入力例：y=2e^(3x)', '実戦練習：微分方程式 全パターンランダム', '基礎練習：{differentialEquationLabels[pattern]}だけ']) {
   if (!drillPage.includes(requirement)) throw new Error(`differential-equation drill is missing accessible input behavior: ${requirement}`);
 }
+if (!drillPage.includes("setStrategy(selected === 'mix' ? '' : selected)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{differentialEquationLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed differential-equation practice must lock its pattern while mixed practice asks learners to identify it');
+}
 if (drillPage.includes('aria-pressed={strategy === pattern}')) throw new Error('single-choice solution selection must not be exposed as a toggle-button group');
 
 const stableRandom = () => 0.37;

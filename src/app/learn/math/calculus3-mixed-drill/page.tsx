@@ -47,6 +47,7 @@ export default function Calculus3MixedDrillPage() {
           <option value="all">実戦練習：数学III 全体ランダム</option>
           <option value="limit">極限だけ</option>
           <option value="differentiation">微分法だけ</option>
+          <option value="curve-analysis">曲線分析だけ</option>
           <option value="integral">積分法だけ</option>
           <option value="geometry">面積・体積だけ</option>
           <option value="differential-equation">微分方程式だけ</option>

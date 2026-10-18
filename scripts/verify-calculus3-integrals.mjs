@@ -15,6 +15,9 @@ if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includ
 if (!drillPage.includes('実戦練習：積分法 全パターンランダム') || !drillPage.includes('基礎練習：{integralLabels[p]}だけ')) {
   throw new Error('the learner must be able to choose either mixed strategy practice or one fixed integration pattern');
 }
+if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? (") || !drillPage.includes('基礎練習：{integralLabels[mode]}に固定して繰り返します。')) {
+  throw new Error('fixed-pattern practice must lock the target method while mixed practice asks the learner to choose it');
+}
 if (drillPage.includes('role="img" aria-label={`積分問題: ${accessibleMath}`}') || drillPage.includes('.replace(/[{}_^]/g')) {
   throw new Error('KaTeX MathML should remain available instead of flattening equations into ambiguous spoken text');
 }

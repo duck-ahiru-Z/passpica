@@ -13,6 +13,12 @@ if (!drillPage.includes('role="status" aria-live="polite"')
   || (drillPage.match(/setValidationError\(''\); setHasChecked\(false\); setIsCorrect\(false\);/g) ?? []).length !== 4) {
   throw new Error('double-radical validation, feedback, and explanation-level choices must be exposed accessibly');
 }
+if (!drillPage.includes('type="radio" name="double-radical-strategy"')
+  || !drillPage.includes("selectedPattern === 'mix' ? (")
+  || !drillPage.includes("setStrategy(pattern === 'mix' ? '' : pattern)")
+  || !drillPage.includes('strategy === problem.pattern && ua === problem.a && ub === problem.b')) {
+  throw new Error('mixed double-radical practice must require the learner to identify the pattern; fixed practice must preselect it');
+}
 
 function seeded(seed) {
   let state = seed >>> 0;

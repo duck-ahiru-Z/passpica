@@ -4,8 +4,9 @@ import { generateDifferentiationProblem, differentiationLabels } from './calculu
 import { generateIntegralProblem, integralLabels } from './calculus3Integrals.ts';
 import { generateGeometryProblem, geometryLabels } from './calculus3Geometry.ts';
 import { generateDifferentialEquationProblem, differentialEquationLabels } from './calculus3DifferentialEquations.ts';
+import { generateCurveProblem, curveLabels } from './calculus3CurveAnalysis.ts';
 
-export type Calculus3Area = 'limit' | 'differentiation' | 'integral' | 'geometry' | 'differential-equation';
+export type Calculus3Area = 'limit' | 'differentiation' | 'curve-analysis' | 'integral' | 'geometry' | 'differential-equation';
 export type Calculus3Question = {
   area: Calculus3Area;
   areaLabel: string;
@@ -19,13 +20,14 @@ export type Calculus3Question = {
 };
 export type Calculus3MixedMode = 'all' | Calculus3Area;
 
-const areas: readonly Calculus3Area[] = ['limit', 'differentiation', 'integral', 'geometry', 'differential-equation'];
+const areas: readonly Calculus3Area[] = ['limit', 'differentiation', 'curve-analysis', 'integral', 'geometry', 'differential-equation'];
 const areaLabels: Record<Calculus3Area, string> = {
-  limit: '極限', differentiation: '微分法', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式',
+  limit: '極限', differentiation: '微分法', 'curve-analysis': '曲線分析', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式',
 };
 const areaOptions: Record<Calculus3Area, readonly string[]> = {
   limit: [...new Set(Object.values(limitLabels))],
   differentiation: [...new Set(Object.values(differentiationLabels))],
+  'curve-analysis': [...new Set(Object.values(curveLabels))],
   integral: [...new Set(Object.values(integralLabels))],
   geometry: [...new Set(Object.values(geometryLabels))],
   'differential-equation': [...new Set(Object.values(differentialEquationLabels))],
@@ -70,6 +72,14 @@ function createQuestion(area: Calculus3Area, random: () => number): Calculus3Que
         area, areaLabel: areaLabels[area], pattern: `${area}:${problem.pattern}`,
         prompt: '次の積分を計算するとき、最初に使う方法は？', expression: problem.expression,
         expressionFormat: 'math', options: [...areaOptions[area]], answer: integralLabels[problem.pattern], explanation: `${problem.hint}。${problem.explanation}`,
+      };
+    }
+    case 'curve-analysis': {
+      const problem = generateCurveProblem('mix', random);
+      return {
+        area, areaLabel: areaLabels[area], pattern: `${area}:${problem.pattern}`,
+        prompt: problem.prompt, expression: problem.expression,
+        expressionFormat: 'math', options: [...areaOptions[area]], answer: curveLabels[problem.pattern], explanation: problem.explanation,
       };
     }
     case 'geometry': {

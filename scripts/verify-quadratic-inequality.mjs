@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getQuadraticInequalityAnswerType, getQuadraticInequalityRegion, parseQuadraticInequalityFraction } from '../src/lib/quadraticInequality.ts';
+import { getQuadraticInequalityAnswerType, getQuadraticInequalityRegion, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign } from '../src/lib/quadraticInequality.ts';
 import { generateQuadraticInequalityProblem } from '../src/lib/quadraticInequalityProblems.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/quadratic-inequality-drill/page.tsx'), 'utf8');
@@ -10,9 +10,15 @@ if (!/role="img"\s+aria-label=\{graphDescription\}/.test(drillPage)) {
 if (!drillPage.includes('Math.abs(problem.a) === 1 ?')) {
   throw new Error('repeated-root explanation must show the positive square after normalizing a negative leading coefficient');
 }
+if (!drillPage.includes('const normalizedSign = problem.a < 0 ? reverseQuadraticInequalitySign(problem.ineqSign) : problem.ineqSign;') || !drillPage.includes("problem.a < 0 ? '変形後の式' : '左辺'")) {
+  throw new Error('negative-leading-coefficient explanations must consistently describe the normalized quadratic and inequality');
+}
 for (const [sign, boundary, side] of [['<', '0未満', '下'], ['\\le', '0以下', '下'], ['>', '0より大きい（0超）', '上'], ['\\ge', '0以上', '上']]) {
   const region = getQuadraticInequalityRegion(sign);
   if (region.boundary !== boundary || region.side !== side) throw new Error(`incorrect strict/non-strict region wording for ${sign}`);
+}
+for (const [sign, reversed] of [['<', '>'], ['>', '<'], ['\\le', '\\ge'], ['\\ge', '\\le']]) {
+  if (reverseQuadraticInequalitySign(sign) !== reversed) throw new Error(`inequality direction was not reversed correctly for ${sign}`);
 }
 
 for (const invalid of [['1.5', ''], ['1abc', ''], ['1', '2.5'], ['1', '0'], ['', '1']]) {

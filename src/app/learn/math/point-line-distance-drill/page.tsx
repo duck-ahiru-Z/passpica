@@ -39,9 +39,11 @@ interface ProblemData {
 
 function formatSignedProduct(coefficient: number, value: number, first = false) {
   const product = coefficient * value;
-  const sign = product < 0 ? '−' : '+';
+  // A zero coordinate hides the coefficient's sign in the product; keep it visible
+  // so the worked substitution still matches the signed line equation.
+  const sign = product < 0 || (product === 0 && coefficient < 0) ? '−' : '+';
   const term = `${Math.abs(coefficient)} \\cdot ${Math.abs(value)}`;
-  return first ? `${product < 0 ? '−' : ''}${term}` : ` ${sign} ${term}`;
+  return first ? `${sign === '−' ? '−' : ''}${term}` : ` ${sign} ${term}`;
 }
 
 function formatSignedConstant(value: number) {
