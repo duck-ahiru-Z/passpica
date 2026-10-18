@@ -114,13 +114,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       // (y-cy)^2 = 4p(x-cx) -> y^2 - 2cy y + cy^2 = 4p x - 4p cx -> y^2 - 2cy y - 4p x + (cy^2 + 4p cx) = 0
-      const isH = true; // keep it simple, horizontal only for completing square
       let p_val = Math.floor(Math.random() * 5) - 2; // -2..2
       if (p_val === 0) p_val = 1;
       const cx = Math.floor(Math.random() * 7) - 3; // -3..3
       const cy = Math.floor(Math.random() * 7) - 3;
       
-      const A = 1; // y^2
       const B = -2 * cy; // y
       const C = -4 * p_val; // x
       const D = cy*cy + 4*p_val*cx; // const

@@ -47,7 +47,6 @@ export default function HomePage() {
         { id: '2', text: '化学・炎色反応の語呂合わせを確認する', completed: false },
         { id: '3', text: '数学・三角比の座標変化を復習する', completed: false }
       ];
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setTodos(defaultTodos);
       localStorage.setItem('passpica_dashboard_todos', JSON.stringify(defaultTodos));
     }

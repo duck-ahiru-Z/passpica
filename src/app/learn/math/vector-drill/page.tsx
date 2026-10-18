@@ -95,6 +95,7 @@ export default function VectorDrillPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     generateProblem();
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- Initial question generation runs once after hydration; subsequent generation is user-triggered.
   }, []);
 
   // グラフ描画
