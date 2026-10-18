@@ -28,19 +28,24 @@ const checks = {
     return close(problem.answer, (2 ** (p + 1) - 1) / (p + 1)) && problem.explanation.includes(`2^${p + 1}`);
   },
   parts: problem => {
-    const [, rate] = problem.expression.match(/e\^\{(\d+)x\}/);
-    const n = Number(rate);
+    const [, exponent] = problem.expression.match(/e\^\{(x|\d+x)\}/);
+    const n = exponent === 'x' ? 1 : Number(exponent.slice(0, -1));
     const expected = (Math.exp(n) * (n - 1) + 1) / n ** 2;
     return close(problem.answer, expected)
-      && problem.explanation.includes(`xe^(${n}x)/${n}−e^(${n}x)/${n}²]₀¹`)
+      && (n === 1
+        ? problem.expression.includes('e^{x}') && problem.explanation.includes('[xeˣ−eˣ]₀¹ = e−(e−1)=1') && !problem.explanation.includes('1x')
+        : problem.explanation.includes(`xe^(${n}x)/${n}−e^(${n}x)/${n}²]₀¹`))
       && problem.explanation.includes(`≈ ${expected.toFixed(3)}`);
   },
   rational: problem => {
     const [, xCoefficient, constant] = problem.expression.match(/\\frac\{(\d+)x\+(\d+)\}/);
     const a = Number(constant) - Number(xCoefficient);
     const b = 2 * Number(xCoefficient) - Number(constant);
+    const logTerm = (coefficient, argument) => `${coefficient === 1 ? '' : `${coefficient} `}ln ${argument}`;
     return close(problem.answer, a * Math.log(2) + b * Math.log(1.5))
       && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`)
+      && problem.explanation.includes(`${logTerm(a, '2')} + ${logTerm(b, '(3/2)')}`)
+      && !problem.explanation.includes('1 ln')
       && (a + b) === Number(xCoefficient)
       && (2 * a + b) === Number(constant);
   },
