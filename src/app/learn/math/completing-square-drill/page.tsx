@@ -4,8 +4,8 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { generateCompletingSquareProblem, isCompletingSquareAnswerCorrect, type CompletingSquareAnswer, type CompletingSquareMode } from '@/src/lib/completingSquare';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -13,102 +13,9 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-interface Root {
-  num: number;
-  den: number;
-}
-
-function simplifyFraction(n: number, d: number): Root {
-  if (d === 0) return { num: 0, den: 1 };
-  const g = gcd(n, d);
-  let num = n / g;
-  let den = d / g;
-  if (den < 0) {
-    num *= -1;
-    den *= -1;
-  }
-  return { num, den };
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  a: number;
-  b: number;
-  c: number;
-  P: Root;
-  Q: Root;
-  eq: string;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p_type = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    let a = 1, b = 0, c = 0;
-    
-    if (p_type === 'pattern1') {
-      a = 1;
-      b = (Math.floor(Math.random() * 9) + 1) * 2; // 2 to 18 (even)
-      if (Math.random() < 0.5) b = -b;
-      c = Math.floor(Math.random() * 19) - 9;
-    } else if (p_type === 'pattern2') {
-      a = Math.floor(Math.random() * 9) - 4; // -4 to 4
-      if (a === 0 || a === 1) continue;
-      const p_int = Math.floor(Math.random() * 9) - 4;
-      if (p_int === 0) continue;
-      b = -2 * a * p_int;
-      c = Math.floor(Math.random() * 19) - 9;
-    } else if (p_type === 'pattern3') {
-      a = 1;
-      b = Math.floor(Math.random() * 9) * 2 + 1; // 1 to 17 (odd)
-      if (Math.random() < 0.5) b = -b;
-      c = Math.floor(Math.random() * 19) - 9;
-    } else if (p_type === 'pattern4') {
-      a = Math.floor(Math.random() * 9) - 4;
-      if (a === 0 || a === 1) continue;
-      b = Math.floor(Math.random() * 19) - 9;
-      if (b === 0) continue;
-      if (b % (2 * a) === 0) continue; // Must result in a fraction
-      c = Math.floor(Math.random() * 19) - 9;
-    }
-
-    const P = simplifyFraction(b, 2 * a);
-    const Q = simplifyFraction(4 * a * c - b * b, 4 * a);
-    
-    let eq = 'y = ';
-    if (a === 1) eq += 'x^2';
-    else if (a === -1) eq += '-x^2';
-    else eq += `${a}x^2`;
-    
-    if (b > 0) eq += ` + ${b === 1 ? '' : b}x`;
-    else if (b < 0) eq += ` - ${Math.abs(b) === 1 ? '' : Math.abs(b)}x`;
-    
-    if (c > 0) eq += ` + ${c}`;
-    else if (c < 0) eq += ` - ${Math.abs(c)}`;
-    
-    return { pattern: p_type, a, b, c, P, Q, eq };
-  }
-}
-
 export default function CompletingSquareDrillPage() {
-  const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [selectedPattern, setSelectedPattern] = useState<CompletingSquareMode>('mix');
+  const [problem, setProblem] = useClientGeneratedState(() => generateCompletingSquareProblem('mix'));
   
   // User input states: y = [A] (x [pSign] [pNum]/[pDen])^2 [qSign] [qNum]/[qDen]
   const [ansA, setAnsA] = useState<string>('');
@@ -225,8 +132,8 @@ export default function CompletingSquareDrillPage() {
     drawGraph();
   }, [drawGraph]);
 
-  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
-    setProblem(generateProblem(pattern));
+  const handleNext = (pattern: CompletingSquareMode = selectedPattern) => {
+    setProblem(generateCompletingSquareProblem(pattern));
     setAnsA('');
     setAnsPSign('+'); setAnsPNum(''); setAnsPDen('');
     setAnsQSign('+'); setAnsQNum(''); setAnsQDen('');
@@ -237,29 +144,11 @@ export default function CompletingSquareDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const aVal = ansA.trim() === '' ? 1 : ansA.trim() === '-' ? -1 : parseInt(ansA);
-    
-    let pNum = parseInt(ansPNum);
-    const pDen = ansPDen.trim() === '' ? 1 : parseInt(ansPDen);
-    if (isNaN(pNum)) pNum = 0; // if empty, treat as 0
-    const userP = simplifyFraction((ansPSign === '+' ? 1 : -1) * pNum, pDen);
-    
-    let qNum = parseInt(ansQNum);
-    const qDen = ansQDen.trim() === '' ? 1 : parseInt(ansQDen);
-    if (isNaN(qNum)) qNum = 0;
-    const userQ = simplifyFraction((ansQSign === '+' ? 1 : -1) * qNum, qDen);
-    
-    if (isNaN(aVal) || isNaN(userP.num) || isNaN(userQ.num)) {
-      alert('正しく数値を入力してください。');
-      return;
-    }
-    
-    if (aVal === problem.a && userP.num === problem.P.num && userP.den === problem.P.den && userQ.num === problem.Q.num && userQ.den === problem.Q.den) {
-      setIsCorrect(true);
-    } else {
-      setIsCorrect(false);
-    }
-    
+    const answer: CompletingSquareAnswer = {
+      a: ansA, pSign: ansPSign, pNum: ansPNum, pDen: ansPDen,
+      qSign: ansQSign, qNum: ansQNum, qDen: ansQDen,
+    };
+    setIsCorrect(isCompletingSquareAnswerCorrect(problem, answer));
     setHasChecked(true);
   };
 
@@ -291,7 +180,8 @@ export default function CompletingSquareDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
+                onChange={e => { const pattern = e.target.value as CompletingSquareMode; setSelectedPattern(pattern); handleNext(pattern); }}
+                aria-label="平方完成の演習パターン"
                 className="border p-1 text-xs"
               >
                 <option value="mix">実戦練習：平方完成 全パターンランダム</option>
@@ -313,7 +203,7 @@ export default function CompletingSquareDrillPage() {
               
               <div className="flex items-center justify-center gap-1 text-base md:text-xl font-bold mt-4">
                 <span className="mr-2">y =</span>
-                <input type="text" className="w-10 border p-1 text-center bg-yellow-50" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
+                <input type="text" aria-label="二次項の係数 a" className="w-10 border p-1 text-center bg-yellow-50" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
                 <span className="mx-1">(</span>
                 <span>x</span>
                 <select value={ansPSign} onChange={e => { setAnsPSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
@@ -321,9 +211,9 @@ export default function CompletingSquareDrillPage() {
                   <option value="-">-</option>
                 </select>
                 <div className="flex flex-col items-center justify-center">
-                  <input type="number" className="w-10 border p-1 text-center" value={ansPNum} onChange={e => { setAnsPNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+                  <input type="number" aria-label="平方内の分数の分子" className="w-10 border p-1 text-center" value={ansPNum} onChange={e => { setAnsPNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                  <input type="number" className="w-10 border p-1 text-center bg-gray-50" value={ansPDen} onChange={e => { setAnsPDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
+                  <input type="number" aria-label="平方内の分数の分母" className="w-10 border p-1 text-center bg-gray-50" value={ansPDen} onChange={e => { setAnsPDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
                 </div>
                 <span className="mx-1">)<sup>2</sup></span>
                 <select value={ansQSign} onChange={e => { setAnsQSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
@@ -331,9 +221,9 @@ export default function CompletingSquareDrillPage() {
                   <option value="-">-</option>
                 </select>
                 <div className="flex flex-col items-center justify-center">
-                  <input type="number" className="w-10 border p-1 text-center" value={ansQNum} onChange={e => { setAnsQNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+                  <input type="number" aria-label="定数項の分子" className="w-10 border p-1 text-center" value={ansQNum} onChange={e => { setAnsQNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                  <input type="number" className="w-10 border p-1 text-center bg-gray-50" value={ansQDen} onChange={e => { setAnsQDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
+                  <input type="number" aria-label="定数項の分母" className="w-10 border p-1 text-center bg-gray-50" value={ansQDen} onChange={e => { setAnsQDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
                 </div>
               </div>
 
@@ -360,7 +250,7 @@ export default function CompletingSquareDrillPage() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！グラフで頂点を確認しよう。' : '不正解... 解説を見てみよう。'}
               </div>
             )}

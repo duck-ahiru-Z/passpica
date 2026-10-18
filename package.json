@@ -9,6 +9,7 @@
     "lint": "eslint",
     "test:random": "node --experimental-strip-types scripts/verify-balanced-random.mjs",
     "test:symmetric-polynomial": "node --experimental-strip-types scripts/verify-symmetric-polynomial.mjs",
+    "test:completing-square": "node --experimental-strip-types scripts/verify-completing-square.mjs",
     "test:rational-input": "node --experimental-strip-types scripts/verify-rational-input.mjs",
     "test:rationalization": "node --experimental-strip-types scripts/verify-rationalization-problems.mjs",
     "test:fraction-root-input": "node --experimental-strip-types scripts/verify-fraction-root-input.mjs",
