@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
+import { getQuadraticInequalityRegion, parseQuadraticInequalityFraction, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
 import { generateQuadraticInequalityProblem, type QuadraticInequalityPattern, type QuadraticInequalityProblem } from '@/src/lib/quadraticInequalityProblems';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
@@ -226,6 +226,7 @@ export default function QuadraticInequalityDrillPage() {
 
   const formatRoot = ({ num, den }: ProblemData['roots'][number]) => den === 1 ? `${num}` : `${num}/${den}`;
   const rootsLabel = problem.roots.map(formatRoot);
+  const inequalityRegion = getQuadraticInequalityRegion(problem.ineqSign);
   const solutionLabel = (() => {
     switch (problem.ansType) {
       case 1: return `${rootsLabel[0]} < x < ${rootsLabel[1]}`;
@@ -415,16 +416,16 @@ export default function QuadraticInequalityDrillPage() {
                   <div className="bg-gray-50 p-2 border">
                     <p>因数分解すると、左辺は <MathEq math={`= 0`} /> のとき、<MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}, \\quad ${problem.roots[1].den === 1 ? problem.roots[1].num : `\\frac{${problem.roots[1].num}}{${problem.roots[1].den}}`}`} /> となります。</p>
                     <p>グラフを描くと、{problem.a > 0 ? '下に凸' : '上に凸'}の放物線になります。</p>
-                    <p className="mt-2">今回は {problem.ineqSign === '<' || problem.ineqSign === '\\le' ? '0より小さい（0以下）なので、x軸より「下」' : '0より大きい（0以上）なので、x軸より「上」'} の部分を探します。</p>
+                    <p className="mt-2">今回は <MathEq math={inequalityRegion.boundary} /> 条件なので、x軸より「{inequalityRegion.side}」の部分を探します。</p>
                     <p>グラフの色付き部分に対応する $x$ の範囲が答えです。</p>
                   </div>
                 )}
 
                 {problem.roots.length === 1 && (
                   <div className="bg-gray-50 p-2 border">
-                    <p>左辺は完全平方式 <MathEq math={`${problem.a < 0 ? '-' : ''}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
+                    <p>左辺は完全平方式 <MathEq math={`${Math.abs(problem.a) === 1 ? '' : Math.abs(problem.a)}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
                     <p>判別式 <MathEq math="D=0" /> であり、放物線は x軸と <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> で接します。</p>
-                    <p className="mt-2">グラフから、{problem.ineqSign === '<' || problem.ineqSign === '\\le' ? '0より小さい（0以下）' : '0より大きい（0以上）'} 条件を満たす $x$ を探します。</p>
+                    <p className="mt-2">グラフから、<MathEq math={inequalityRegion.boundary} /> 条件を満たす $x$ を探します。</p>
                     <ul className="list-disc pl-4 mt-1">
                       {problem.ansType === 5 && <li>接点のみが条件を満たすため、答えは <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> となります。</li>}
                       {problem.ansType === 6 && <li>接点以外はすべて条件を満たすため、答えは <MathEq math={`x \\neq ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> のすべての実数です。</li>}

@@ -1,6 +1,15 @@
 export type QuadraticInequalitySign = '<' | '>' | '\\le' | '\\ge';
 export type QuadraticInequalityAnswerType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
+export function getQuadraticInequalityRegion(sign: QuadraticInequalitySign): { boundary: string; side: '下' | '上' } {
+  switch (sign) {
+    case '<': return { boundary: '0未満', side: '下' };
+    case '\\le': return { boundary: '0以下', side: '下' };
+    case '>': return { boundary: '0より大きい（0超）', side: '上' };
+    case '\\ge': return { boundary: '0以上', side: '上' };
+  }
+}
+
 export function parseQuadraticInequalityFraction(numerator: string, denominator = ''): { num: number; den: number } | null {
   const isInteger = (value: string) => /^[+-]?\d+$/.test(value.trim());
   if (!isInteger(numerator) || (denominator.trim() !== '' && !isInteger(denominator))) return null;
