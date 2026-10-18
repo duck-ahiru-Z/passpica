@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -189,7 +190,7 @@ export default function EuclideanAlgorithmDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    if (parseInt(ansVal) === problem.ans) {
+    if (parseStrictPositiveInteger(ansVal) === problem.ans) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);

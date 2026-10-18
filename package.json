@@ -42,6 +42,7 @@
     "test:factorization": "node --experimental-strip-types scripts/verify-factorization-questions.mjs",
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",
     "test:trig-synthesis-inputs": "node --experimental-strip-types scripts/verify-trig-synthesis-inputs.mjs",
+    "test:strict-positive-integer": "node --experimental-strip-types scripts/verify-strict-positive-integer.mjs",
     "test:complex-polar-exact": "node --experimental-strip-types scripts/verify-complex-polar-exact.mjs",
     "test:unit-circle-complex-visual": "node scripts/verify-unit-circle-complex-visual.mjs",
     "test:quadratic-inequality": "node --experimental-strip-types scripts/verify-quadratic-inequality.mjs",

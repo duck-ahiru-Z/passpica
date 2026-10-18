@@ -4,9 +4,13 @@ import { generateTrigSynthesisProblem } from '../src/lib/trigSynthesis.ts';
 const cases = [
   ['2', false, 2],
   [' 13 ', false, 13],
+  ['0007', false, 7],
   ['', true, 1],
   ['', false, null],
   ['2.5', false, null],
+  ['1.0', false, null],
+  ['1e0', false, null],
+  ['+2', false, null],
   ['-2', false, null],
   ['0', false, null],
   ['1e100', false, null],
