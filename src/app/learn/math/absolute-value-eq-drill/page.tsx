@@ -413,9 +413,9 @@ export default function AbsoluteValueEqDrillPage() {
                 <div className="flex items-center gap-2">
                   <div className="font-bold text-lg">x = </div>
                   <div className="flex flex-col items-center">
-                    <input type="text" aria-label="1つ目の解の分子" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Num} onChange={e => setAns1Num(e.target.value)} placeholder="分子" />
+                    <input type="text" aria-label="1つ目の解の分子" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Num} onChange={e => { setAns1Num(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="分子" />
                     <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                    <input type="text" aria-label="1つ目の解の分母（整数なら空欄可）" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Den} onChange={e => setAns1Den(e.target.value)} placeholder="分母" />
+                    <input type="text" aria-label="1つ目の解の分母（整数なら空欄可）" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans1Den} onChange={e => { setAns1Den(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="分母" />
                   </div>
                 </div>
 
@@ -423,9 +423,9 @@ export default function AbsoluteValueEqDrillPage() {
 
                 <div className="flex items-center gap-2">
                   <div className="flex flex-col items-center">
-                    <input type="text" aria-label="2つ目の解の分子" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Num} onChange={e => setAns2Num(e.target.value)} placeholder="分子" />
+                    <input type="text" aria-label="2つ目の解の分子" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Num} onChange={e => { setAns2Num(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="分子" />
                     <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                    <input type="text" aria-label="2つ目の解の分母（整数なら空欄可）" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Den} onChange={e => setAns2Den(e.target.value)} placeholder="分母" />
+                    <input type="text" aria-label="2つ目の解の分母（整数なら空欄可）" className="w-12 border border-gray-400 p-1 text-center font-bold" value={ans2Den} onChange={e => { setAns2Den(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="分母" />
                   </div>
                 </div>
 

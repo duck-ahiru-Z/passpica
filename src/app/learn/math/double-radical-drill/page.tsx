@@ -117,7 +117,7 @@ export default function DoubleRadicalDrillPage() {
                       <div className="flex items-stretch">
                         <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                         <div className="border-t-2 border-slate-700 pt-1">
-                          <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); }} placeholder="大" />
+                          <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="大" />
                         </div>
                       </div>
                       
@@ -127,7 +127,7 @@ export default function DoubleRadicalDrillPage() {
                       <div className="flex items-stretch">
                         <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                         <div className="border-t-2 border-slate-700 pt-1">
-                          <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); }} placeholder="小" />
+                          <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="小" />
                         </div>
                       </div>
                     </div>
@@ -142,7 +142,7 @@ export default function DoubleRadicalDrillPage() {
                     <div className="flex items-stretch">
                       <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                       <div className="border-t-[3px] border-slate-700 pt-1">
-                        <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); }} placeholder="大" />
+                        <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="大" />
                       </div>
                     </div>
                     
@@ -152,7 +152,7 @@ export default function DoubleRadicalDrillPage() {
                     <div className="flex items-stretch">
                       <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                       <div className="border-t-[3px] border-slate-700 pt-1">
-                        <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); }} placeholder="小" />
+                        <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="小" />
                       </div>
                     </div>
                   </div>

@@ -357,17 +357,17 @@ export default function TrigIdentityDrillPage() {
                 {problem.pattern === 'pattern4' ? (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math="\sin\theta \cos\theta =" />
-                    <FractionRootInput value={ans3} onChange={setAns3} label="sin θ cos θ" />
+                    <FractionRootInput value={ans3} onChange={value => { setAns3(value); setHasChecked(false); setIsCorrect(false); }} label="sin θ cos θ" />
                   </div>
                 ) : (
                   <>
                     <div className="flex items-center gap-4 bg-gray-50 p-2 border rounded">
                       <div className="w-16 text-right"><MathEq math={`\\${target1}\\theta =`} /></div>
-                      <FractionRootInput value={ans1} onChange={setAns1} label={`${target1} θ`} />
+                      <FractionRootInput value={ans1} onChange={value => { setAns1(value); setHasChecked(false); setIsCorrect(false); }} label={`${target1} θ`} />
                     </div>
                     <div className="flex items-center gap-4 bg-gray-50 p-2 border rounded">
                       <div className="w-16 text-right"><MathEq math={`\\${target2}\\theta =`} /></div>
-                      <FractionRootInput value={ans2} onChange={setAns2} label={`${target2} θ`} />
+                      <FractionRootInput value={ans2} onChange={value => { setAns2(value); setHasChecked(false); setIsCorrect(false); }} label={`${target2} θ`}/>
                     </div>
                   </>
                 )}

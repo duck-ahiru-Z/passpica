@@ -9,7 +9,8 @@ if (!drillPage.includes('role="status" aria-live="polite"')
   || !drillPage.includes('aria-invalid={Boolean(validationError)}')
   || !drillPage.includes("aria-pressed={detailLevel === 'brief'}")
   || !drillPage.includes("aria-pressed={detailLevel === 'normal'}")
-  || !drillPage.includes("aria-pressed={detailLevel === 'detailed'}")) {
+  || !drillPage.includes("aria-pressed={detailLevel === 'detailed'}")
+  || (drillPage.match(/setValidationError\(''\); setHasChecked\(false\); setIsCorrect\(false\);/g) ?? []).length !== 4) {
   throw new Error('double-radical validation, feedback, and explanation-level choices must be exposed accessibly');
 }
 

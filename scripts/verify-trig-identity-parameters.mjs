@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict';
 import { generateTrigSumParameters } from '../src/lib/trigIdentityParameters.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/trig-identity-drill/page.tsx'), 'utf8');
+assert.equal((drillPage.match(/setHasChecked\(false\); setIsCorrect\(false\);/g) ?? []).length, 4, 'mode changes and editing any trig answer must clear stale feedback');
 
 for (let q = 2; q <= 5; q += 1) {
   const maxP = Math.floor(q * Math.SQRT2);

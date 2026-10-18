@@ -24,6 +24,7 @@ for (const label of ['1つ目の解の分子', '1つ目の解の分母', '2つ�
 }
 assert.ok(page.includes('role="status" aria-live="polite"'), 'answer feedback must be announced');
 assert.ok(page.includes("aria-pressed={detailLevel === 'brief'}") && page.includes("aria-pressed={detailLevel === 'normal'}"), 'explanation-level buttons must expose their selected state');
+assert.equal((page.match(/setHasChecked\(false\); setIsCorrect\(false\);/g) ?? []).length, 4, 'editing any answer field must clear stale feedback');
 assert.ok(!page.includes('$x$') && page.includes('<MathEq math="x" />'), 'math notation must render instead of showing literal Markdown delimiters');
 
 console.log(`Absolute-value equation answer parsing verified: ${cases.length} rational-input cases and accessible answer feedback.`);
