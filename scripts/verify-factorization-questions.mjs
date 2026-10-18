@@ -1,4 +1,4 @@
-import { factorizationPatterns, generateFactorizationQuestion, normalizeFactorizationAnswer } from '../src/lib/factorizationQuestions.ts';
+import { areFactorizationsEquivalent, factorizationPatterns, generateFactorizationQuestion, normalizeFactorizationAnswer } from '../src/lib/factorizationQuestions.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -9,13 +9,17 @@ if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage
 if (!drillPage.includes('setChoice(option); setChecked(false);')) {
   throw new Error('changing a factorization strategy must clear the previous feedback');
 }
-for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', 'normalizeFactorizationAnswer(question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
+for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
   if (!drillPage.includes(requirement)) throw new Error(`factorization practice is missing fixed-answer behavior: ${requirement}`);
 }
 
 const fixedRandom = () => 0.42;
 if (normalizeFactorizationAnswer(' (x−3) (x+3) ') !== normalizeFactorizationAnswer('(x-3)(x+3)')) throw new Error('full-width minus and spacing should be accepted in factorization answers');
 if (normalizeFactorizationAnswer('(x+4)²') !== normalizeFactorizationAnswer('(x+4)^2')) throw new Error('superscript powers should be accepted in factorization answers');
+if (!areFactorizationsEquivalent('(x²−5)(x²−3)', '(x^2-3)(x^2-5)')) throw new Error('commuted quadratic factors must be accepted as equivalent');
+if (!areFactorizationsEquivalent('(x-1)(x+4)(x+2)', '(x+2)(x-1)(x+4)')) throw new Error('all reordered groups of factors must be accepted');
+if (!areFactorizationsEquivalent('(x−3) (x+3)', '(x-3)(x+3)')) throw new Error('minus glyph and spacing normalization must still be applied during comparison');
+if (areFactorizationsEquivalent('(x²−5)(x²−2)', '(x^2-3)(x^2-5)')) throw new Error('different factor products must not be accepted');
 for (const pattern of factorizationPatterns) {
   for (let index = 0; index < 500; index += 1) {
     const question = generateFactorizationQuestion(pattern, fixedRandom);
