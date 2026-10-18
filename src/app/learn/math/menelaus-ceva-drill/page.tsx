@@ -346,14 +346,14 @@ export default function MenelausCevaDrill() {
                   type="number" 
                   className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansX} 
-                  onChange={e => setAnsX(e.target.value)} 
+                  onChange={e => { setAnsX(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
                 <span>：</span>
                 <input 
                   type="number" 
                   className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansY} 
-                  onChange={e => setAnsY(e.target.value)} 
+                  onChange={e => { setAnsY(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
               </div>
             </div>

@@ -249,7 +249,7 @@ export default function EuclideanAlgorithmDrill() {
                   type="number" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
-                  onChange={e => setAnsVal(e.target.value)} 
+                  onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="最大公約数" 
                 />
               </div>

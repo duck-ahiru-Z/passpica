@@ -216,16 +216,16 @@ export default function CrossMultiplyDrillPage() {
                 以下の形に因数分解しなさい。
               </div>
               <div className="flex items-center justify-center gap-1 text-lg">
-                <input type="number" className="w-10 border p-1 text-center font-bold bg-yellow-50" value={ansK} onChange={e => setAnsK(e.target.value)} placeholder="k" />
+                <input type="number" className="w-10 border p-1 text-center font-bold bg-yellow-50" value={ansK} onChange={e => { setAnsK(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="k" />
                 (
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansP} onChange={e => setAnsP(e.target.value)} placeholder="p" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansP} onChange={e => { setAnsP(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="p" />
                 <MathEq math="x +" />
-                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansQ} onChange={e => setAnsQ(e.target.value)} placeholder="q" />
+                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansQ} onChange={e => { setAnsQ(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="q" />
                 {problem.hasY && <MathEq math="y" />}
                 ) (
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansR} onChange={e => setAnsR(e.target.value)} placeholder="r" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansR} onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="r" />
                 <MathEq math="x +" />
-                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansS} onChange={e => setAnsS(e.target.value)} placeholder="s" />
+                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansS} onChange={e => { setAnsS(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="s" />
                 {problem.hasY && <MathEq math="y" />}
                 )
               </div>

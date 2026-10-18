@@ -507,7 +507,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansA} 
-                      onChange={e => setAnsA(e.target.value)} 
+                      onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="a (実部)"
                     />
                     <span>+</span>
@@ -515,7 +515,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansB} 
-                      onChange={e => setAnsB(e.target.value)} 
+                      onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="b (虚部)"
                     />
                     <span>i</span>
@@ -530,7 +530,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansR} 
-                      onChange={e => setAnsR(e.target.value)} 
+                      onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="絶対値"
                     />
                   </div>
@@ -540,7 +540,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansTheta} 
-                      onChange={e => setAnsTheta(e.target.value)} 
+                      onChange={e => { setAnsTheta(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="偏角"
                     />
                   </div>

@@ -403,7 +403,7 @@ export default function DataAnalysis2DDrill() {
                     type={problem.pattern === 'pattern3' ? "number" : "text"} step="0.1"
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                     value={ans1} 
-                    onChange={e => setAns1(e.target.value)} 
+                    onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder={problem.pattern === 'pattern3' ? "0.8" : ""}
                   />
                 </div>

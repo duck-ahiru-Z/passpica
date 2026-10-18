@@ -375,17 +375,17 @@ export default function InscribedCircleDrillPage() {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                       <MathEq math="R =" />
-                      <FractionRootInput value={ansVal1} onChange={setAnsVal1} hideSign />
+                      <FractionRootInput value={ansVal1} onChange={value => { setAnsVal1(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                     </div>
                     <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                       <MathEq math="r =" />
-                      <FractionRootInput value={ansVal2} onChange={setAnsVal2} hideSign />
+                      <FractionRootInput value={ansVal2} onChange={value => { setAnsVal2(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math={problem.pattern === 'pattern4' ? 'r_A =' : 'r ='} />
-                    <FractionRootInput value={ansVal1} onChange={setAnsVal1} hideSign />
+                    <FractionRootInput value={ansVal1} onChange={value => { setAnsVal1(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                   </div>
                 )}
               </div>

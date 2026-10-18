@@ -332,7 +332,7 @@ export default function PermutationCombinationDrill() {
                   type="number" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
-                  onChange={e => setAnsVal(e.target.value)} 
+                  onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="答え" 
                 />
                 <span className="font-bold">通り (値)</span>

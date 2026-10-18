@@ -308,7 +308,7 @@ export default function BinomialProbabilityDrill() {
             <div className="space-y-4">
               <div className="flex flex-col items-center justify-center gap-2">
                 <div className="text-gray-500 font-bold mb-2">確率を分数で入力（※ルートは空欄または1のままでOK）</div>
-                <FractionRootInput value={ansVal} onChange={setAnsVal} hideSign />
+                <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
               </div>
             </div>
 

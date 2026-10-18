@@ -321,12 +321,12 @@ export default function SineRuleDrillPage() {
                 {(problem.pattern === 'pattern1' || problem.pattern === 'pattern2') ? (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math={problem.pattern === 'pattern1' ? 'R =' : 'b ='} />
-                    <FractionRootInput value={ansVal} onChange={setAnsVal} hideSign />
+                    <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math={problem.pattern === 'pattern3' ? 'B =' : '\\text{最大の角 } ='} />
-                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => setAnsDeg(e.target.value)} />
+                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => { setAnsDeg(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="text-base">度 (°)</span>
                   </div>
                 )}

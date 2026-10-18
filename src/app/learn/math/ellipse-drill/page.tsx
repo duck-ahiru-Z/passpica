@@ -346,7 +346,7 @@ export default function EllipseDrill() {
                       type="number" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -355,7 +355,7 @@ export default function EllipseDrill() {
                       type="number" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>
@@ -368,7 +368,7 @@ export default function EllipseDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="x"
                     />
                     <span>,</span>
@@ -376,7 +376,7 @@ export default function EllipseDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="y"
                     />
                     <span>)</span>

@@ -336,19 +336,19 @@ export default function CosineRuleDrillPage() {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                       <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'a ='} />
-                      <FractionRootInput value={ansVal1} onChange={setAnsVal1} hideSign />
+                      <FractionRootInput value={ansVal1} onChange={value => { setAnsVal1(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                     </div>
                     {problem.ansTerms && problem.ansTerms.length > 1 && (
                       <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                         <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'a ='} />
-                        <FractionRootInput value={ansVal2} onChange={setAnsVal2} hideSign />
+                        <FractionRootInput value={ansVal2} onChange={value => { setAnsVal2(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math="A =" />
-                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => setAnsDeg(e.target.value)} />
+                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => { setAnsDeg(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="text-base">度 (°)</span>
                   </div>
                 )}

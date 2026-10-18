@@ -367,7 +367,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -376,7 +376,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.5"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -385,7 +385,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans3} 
-                      onChange={e => setAns3(e.target.value)} 
+                      onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>
@@ -398,7 +398,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -420,7 +420,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>

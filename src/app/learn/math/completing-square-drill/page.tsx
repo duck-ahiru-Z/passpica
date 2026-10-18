@@ -313,27 +313,27 @@ export default function CompletingSquareDrillPage() {
               
               <div className="flex items-center justify-center gap-1 text-base md:text-xl font-bold mt-4">
                 <span className="mr-2">y =</span>
-                <input type="text" className="w-10 border p-1 text-center bg-yellow-50" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="a" />
+                <input type="text" className="w-10 border p-1 text-center bg-yellow-50" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
                 <span className="mx-1">(</span>
                 <span>x</span>
-                <select value={ansPSign} onChange={e => setAnsPSign(e.target.value as '+'|'-')} className="mx-1 border p-1 bg-white">
+                <select value={ansPSign} onChange={e => { setAnsPSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
                   <option value="+">+</option>
                   <option value="-">-</option>
                 </select>
                 <div className="flex flex-col items-center justify-center">
-                  <input type="number" className="w-10 border p-1 text-center" value={ansPNum} onChange={e => setAnsPNum(e.target.value)} />
+                  <input type="number" className="w-10 border p-1 text-center" value={ansPNum} onChange={e => { setAnsPNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                  <input type="number" className="w-10 border p-1 text-center bg-gray-50" value={ansPDen} onChange={e => setAnsPDen(e.target.value)} placeholder="1" />
+                  <input type="number" className="w-10 border p-1 text-center bg-gray-50" value={ansPDen} onChange={e => { setAnsPDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
                 </div>
                 <span className="mx-1">)<sup>2</sup></span>
-                <select value={ansQSign} onChange={e => setAnsQSign(e.target.value as '+'|'-')} className="mx-1 border p-1 bg-white">
+                <select value={ansQSign} onChange={e => { setAnsQSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
                   <option value="+">+</option>
                   <option value="-">-</option>
                 </select>
                 <div className="flex flex-col items-center justify-center">
-                  <input type="number" className="w-10 border p-1 text-center" value={ansQNum} onChange={e => setAnsQNum(e.target.value)} />
+                  <input type="number" className="w-10 border p-1 text-center" value={ansQNum} onChange={e => { setAnsQNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-                  <input type="number" className="w-10 border p-1 text-center bg-gray-50" value={ansQDen} onChange={e => setAnsQDen(e.target.value)} placeholder="1" />
+                  <input type="number" className="w-10 border p-1 text-center bg-gray-50" value={ansQDen} onChange={e => { setAnsQDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
                 </div>
               </div>
 
