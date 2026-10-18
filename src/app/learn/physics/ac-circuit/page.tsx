@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { calculateRlcSeriesState } from '@/src/lib/rlcSeriesCircuit';
 
 export default function ACCircuitPage() {
   // --- 状態管理 ---
@@ -14,18 +15,16 @@ export default function ACCircuitPage() {
   // 表示モード
   const [showPhasor, setShowPhasor] = useState<boolean>(true);
 
-  // --- 電気力学計算 ---
-  const omega = 2 * Math.PI * f;               // 角周波数 ω (rad/s)
-  const xl = omega * l;                       // コイルのリアクタンス XL (Ω)
-  const xc = 1 / (omega * c * 1e-6);          // コンデンサのリアクタンス XC (Ω)
-  const x = xl - xc;                          // 合成リアクタンス X (Ω)
-  const z = Math.sqrt(r * r + x * x);         // インピーダンス Z (Ω)
-  const i0 = v0 / z;                          // 電流振幅 I0 (A)
-
-  // 位相差 φ (rad) - 電圧に対する電流の遅れ角（電流基準だと電圧が φ 進む）
-  // tan(φ) = (XL - XC) / R
-  const phi = Math.atan2(x, r);
-  const phiDeg = (phi * 180) / Math.PI;       // 度数法
+  const circuit = calculateRlcSeriesState({
+    resistance: r,
+    inductance: l,
+    capacitanceMicrofarads: c,
+    frequency: f,
+    voltagePeak: v0,
+  });
+  const { angularFrequency: omega, inductiveReactance: xl, capacitiveReactance: xc,
+    impedance: z, currentPeak: i0,
+    voltageLeadAngleRadians: phi, voltageLeadAngleDegrees: phiDeg } = circuit;
 
   // 各素子の最大電圧 (V = I0 * X)
   const vr0 = i0 * r;
