@@ -47,11 +47,15 @@ const checks = {
       && problem.explanation.includes(problem.answer.toFixed(3));
   },
   implicit: problem => {
-    const [, a, constant] = problem.expression.match(/x\^2\+(\d+)xy\+y\^2=(\d+)/);
-    const n = Number(a);
+    const [, a, constant] = problem.expression.match(/x\^2\+(?:(\d+)xy|xy)\+y\^2=(\d+)/);
+    const n = Number(a ?? 1);
     return Number(constant) === 5 + 2 * n
       && close(problem.answer, -(2 + 2 * n) / (n + 4))
       && problem.explanation.includes('陰関数微分')
+      && !problem.expression.includes('1xy')
+      && !problem.explanation.includes('1y')
+      && !problem.explanation.includes('1x')
+      && (n !== 1 || (problem.expression.includes('x^2+xy+y^2') && problem.explanation.includes('2x+y') && problem.explanation.includes('x+2y')))
       && problem.explanation.includes(problem.answer.toFixed(3));
   },
   inverse: problem => {
