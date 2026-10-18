@@ -4,6 +4,7 @@ import { useState, useRef, UIEvent } from "react";
 import Link from "next/link";
 
 import { TEMPLATES, TEMPLATE_OPTIONS } from "@/src/data/pseudo-lang";
+import { parseStrictInteger } from "@/src/lib/strictInteger";
 
 export default function PseudoLangPage() {
   const initialTmpl = TEMPLATES["exam_binary_search"];
@@ -75,8 +76,8 @@ export default function PseudoLangPage() {
     };
     const readInteger = () => {
       const value = readInput('整数');
-      const parsed = Number.parseInt(value, 10);
-      if (Number.isNaN(parsed)) throw new Error(`整数として読み取れません: ${value}`);
+      const parsed = parseStrictInteger(value);
+      if (parsed === null) throw new Error(`整数として読み取れません: ${value}`);
       return parsed;
     };
     const lines = code.split('\n');

@@ -4,6 +4,7 @@ import { exam2026Tsuishi } from '../src/data/pseudo-lang/exam2026Tsuishi.ts';
 import { exam2025TsuishiFig2 } from '../src/data/pseudo-lang/exam2025TsuishiFig2.ts';
 import { exam2025TsuishiFig5 } from '../src/data/pseudo-lang/exam2025TsuishiFig5.ts';
 import { examBinarySearch } from '../src/data/pseudo-lang/examBinarySearch.ts';
+import { parseStrictInteger } from '../src/lib/strictInteger.ts';
 
 assert.ok(!exam2026Honshi.includes('実装してください'), '2026 main preset must not be a placeholder');
 assert.ok(exam2026Honshi.includes('最大値('), '2026 main preset must exercise the maximum function');
@@ -18,4 +19,14 @@ assert.ok(exam2025TsuishiFig5.code.includes('表示する("分類番号："'));
 assert.ok(examBinarySearch.includes('は添字'));
 assert.ok(!examBinarySearch.includes('番目にありました'), 'zero-based search results must not be mislabeled as ordinal positions');
 
-console.log('Information I presets verified: both 2026 examples are implemented, 2025 input presets are interactive, and array-index conventions are set.');
+for (const [input, expected] of [['0', 0], ['-12', -12], ['+7', 7], [' 42 ', 42]]) {
+  assert.equal(parseStrictInteger(input), expected, `integer input ${JSON.stringify(input)} should be accepted`);
+}
+for (const input of ['1.5', '1e2', '12kg', '', '9007199254740992']) {
+  assert.equal(parseStrictInteger(input), null, `integer input ${JSON.stringify(input)} should be rejected`);
+}
+const pseudoLangPage = await (await import('node:fs/promises')).readFile(new URL('../src/app/learn/information/pseudo-lang/page.tsx', import.meta.url), 'utf8');
+assert.ok(pseudoLangPage.includes('const parsed = parseStrictInteger(value);'), 'pseudocode integer input must reject decimals rather than truncating them');
+assert.ok(!pseudoLangPage.includes('Number.parseInt(value, 10)'), 'pseudocode integer input must not silently truncate decimal input');
+
+console.log('Information I presets and strict pseudocode integer input verified.');
