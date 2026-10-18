@@ -6,6 +6,9 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemis
 if (!/type="radio"\s+name="mole-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
   throw new Error('chemistry method selection must be a single-choice radio group');
 }
+if (!drillPage.includes('setMethod(pattern); setChecked(false);') || !drillPage.includes('setAnswer(event.target.value); setChecked(false);')) {
+  throw new Error('changing a chemistry method or answer must clear old feedback');
+}
 
 const stableRandom = () => 0.37;
 const expectedUnits = { mass: 'mol', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', ph: '', yield: '%' };

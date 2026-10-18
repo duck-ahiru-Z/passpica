@@ -6,6 +6,9 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physic
 if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes('onClick={() => setMethod(pattern)}')) {
   throw new Error('mechanics method selection must be a single-choice radio group');
 }
+if (!drillPage.includes('setMethod(pattern); setChecked(false);') || !drillPage.includes('setAnswer(event.target.value); setChecked(false);')) {
+  throw new Error('changing a mechanics method or answer must clear old feedback');
+}
 
 const stableRandom = () => 0.37;
 const checks = {
