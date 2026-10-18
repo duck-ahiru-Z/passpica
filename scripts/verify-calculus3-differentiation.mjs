@@ -39,12 +39,17 @@ const checks = {
   },
   parametric: problem => {
     const [, c] = problem.expression.match(/y=t\^3-(\d+)t/);
-    return close(problem.answer, (3 - Number(c)) / 2) && problem.explanation.includes(`dy/dx=`);
+    return close(problem.answer, (3 - Number(c)) / 2)
+      && problem.explanation.includes(`dy/dx=`)
+      && problem.explanation.includes(problem.answer.toFixed(3));
   },
   implicit: problem => {
     const [, a, constant] = problem.expression.match(/x\^2\+(\d+)xy\+y\^2=(\d+)/);
     const n = Number(a);
-    return Number(constant) === 5 + 2 * n && close(problem.answer, -(2 + 2 * n) / (n + 4)) && problem.explanation.includes('陰関数微分');
+    return Number(constant) === 5 + 2 * n
+      && close(problem.answer, -(2 + 2 * n) / (n + 4))
+      && problem.explanation.includes('陰関数微分')
+      && problem.explanation.includes(problem.answer.toFixed(3));
   },
   inverse: problem => {
     const [, a] = problem.expression.match(/f\(x\)=x\^3\+(\d+)x/);
