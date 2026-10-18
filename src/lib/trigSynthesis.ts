@@ -24,7 +24,7 @@ const patterns: TrigSynthesisPattern[] = ['pattern1', 'pattern2', 'pattern3', 'p
 const mixedPatternPicker = new BalancedRandom(patterns);
 
 function termStr(term: TrigSynthesisTerm, isFirst: boolean): string {
-  let sign = term.sign === -1 ? '-' : isFirst ? '' : '+';
+  const sign = term.sign === -1 ? '-' : isFirst ? '' : '+';
   if (term.c === 1 && term.d === 1) return isFirst ? `${sign}1` : sign;
   if (term.d === 1) return `${sign}${term.c}`;
   return `${sign}${term.c === 1 ? '' : term.c}\\sqrt{${term.d}}`;
