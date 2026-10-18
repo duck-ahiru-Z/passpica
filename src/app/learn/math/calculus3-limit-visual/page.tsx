@@ -16,8 +16,11 @@ export default function Calculus3LimitVisualPage() {
   const sy = (value: number) => HEIGHT - 34 - ((value + 0.2) / 1.4) * (HEIGHT - 60);
 
   const curvePath = useMemo(() => {
-    const points = Array.from({ length: 161 }, (_, index) => -3.2 + index * 0.04);
-    return points.map((value, index) => `${index === 0 ? 'M' : 'L'} ${sx(value).toFixed(1)} ${sy(ratio(value)).toFixed(1)}`).join(' ');
+    const points = Array.from({ length: 161 }, (_, index) => -3.2 + index * 0.04).filter(value => Math.abs(value) > 1e-9);
+    const left = points.filter(value => value < 0);
+    const right = points.filter(value => value > 0);
+    const pathFor = (side: number[]) => side.map((value, index) => `${index === 0 ? 'M' : 'L'} ${sx(value).toFixed(1)} ${sy(ratio(value)).toFixed(1)}`).join(' ');
+    return `${pathFor(left)} ${pathFor(right)}`;
   }, []);
 
   const current = ratio(x);
@@ -38,8 +41,8 @@ export default function Calculus3LimitVisualPage() {
           <h2 className="font-bold text-base">xを0へ近づけると、値はどこへ近づく？</h2>
           <p className="text-slate-600 mt-1 leading-relaxed">スライダーを動かして、左右から近づく点と y = 1 の関係を観察します。x = 0 では式を直接割れませんが、極限値は読み取れます。</p>
         </div>
-        <div className="border border-slate-300 bg-slate-50 p-2 overflow-x-auto">
-          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full min-w-[560px]" role="img" aria-label="sin x を x で割った関数のグラフ">
+        <div className="border border-slate-300 bg-slate-50 p-2">
+          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="block w-full h-auto" role="img" aria-label="sin x を x で割った関数のグラフ。x=0では関数は定義されず、極限値1に白抜きの点があります。">
             <line x1={sx(-3.2)} y1={sy(0)} x2={sx(3.2)} y2={sy(0)} stroke="#64748b" strokeWidth="1" />
             <line x1={sx(0)} y1={sy(-0.2)} x2={sx(0)} y2={sy(1.2)} stroke="#64748b" strokeWidth="1" />
             <line x1={sx(-3.2)} y1={sy(1)} x2={sx(3.2)} y2={sy(1)} stroke="#dc2626" strokeDasharray="5 4" strokeWidth="1.5" />
@@ -48,6 +51,7 @@ export default function Calculus3LimitVisualPage() {
             <line x1={sx(x)} y1={sy(0)} x2={sx(x)} y2={sy(current)} stroke="#16a34a" strokeDasharray="3 3" />
             <circle cx={sx(-x)} cy={sy(mirrored)} r="5" fill="#16a34a" />
             <circle cx={sx(x)} cy={sy(current)} r="5" fill="#16a34a" />
+            <circle cx={sx(0)} cy={sy(1)} r="5" fill="#f8fafc" stroke="#2563eb" strokeWidth="2" aria-hidden="true" />
             <text x={sx(2.55)} y={sy(1) - 7} fill="#b91c1c" fontSize="12">y = 1</text>
             <text x={sx(2.55)} y={sy(0) - 7} fill="#475569" fontSize="12">x</text>
             <text x={sx(0) + 6} y={sy(1.2) + 12} fill="#475569" fontSize="12">y</text>

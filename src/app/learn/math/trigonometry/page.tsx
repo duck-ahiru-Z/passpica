@@ -18,7 +18,8 @@ export default function TrigonometryVisualizerPage() {
 
   const sinVal = Math.sin(rad);
   const cosVal = Math.cos(rad);
-  const tanVal = cosVal !== 0 ? Math.tan(rad) : Infinity;
+  const tanUndefined = angle % 180 === 90;
+  const tanVal = tanUndefined ? Infinity : Math.tan(rad);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
@@ -47,7 +48,7 @@ export default function TrigonometryVisualizerPage() {
 
           {/* SVG描画 */}
           <div className="flex items-center justify-center flex-grow">
-            <svg width="220" height="220" viewBox="0 0 200 200" className="overflow-visible font-mono">
+            <svg width="220" height="220" viewBox="0 0 200 200" className="overflow-visible font-mono" role="img" aria-label={`角度${angle}度の単位円。点Pの座標は(${cosVal.toFixed(3)}, ${sinVal.toFixed(3)})。cosは横座標${cosVal.toFixed(3)}、sinは縦座標${sinVal.toFixed(3)}、tanは${tanUndefined ? '定義されない' : tanVal.toFixed(3)}。`}>
               {/* x軸・y軸の境界線 */}
               <line x1="10" y1="100" x2="190" y2="100" stroke="#94a3b8" strokeWidth="1" />
               <line x1="100" y1="10" x2="100" y2="190" stroke="#94a3b8" strokeWidth="1" />
@@ -93,6 +94,7 @@ export default function TrigonometryVisualizerPage() {
             </div>
             <input
               type="range"
+              aria-label="角度（度）"
               min="0"
               max="360"
               value={angle}
@@ -145,7 +147,7 @@ export default function TrigonometryVisualizerPage() {
               <div className="flex justify-between items-center font-bold">
                 <span className="text-amber-700">tan θ (傾き y/x)</span>
                 <span className="font-mono">
-                  {Math.abs(tanVal) > 99 ? '未定義' : tanVal.toFixed(4)}
+                  {tanUndefined ? '未定義' : tanVal.toFixed(4)}
                 </span>
               </div>
               <div className="w-full bg-gray-200 h-1.5 mt-2 overflow-hidden border border-gray-300">

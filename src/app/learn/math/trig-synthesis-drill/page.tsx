@@ -1,35 +1,16 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateTrigSynthesisProblem, type TrigSynthesisPattern as Pattern, type TrigSynthesisProblem as ProblemData } from '@/src/lib/trigSynthesis';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface Term {
-  sign: 1 | -1;
-  c: number; // outer int
-  d: number; // inner sqrt
-} // value = sign * c * sqrt(d)
-
-interface ProblemData {
-  pattern: Pattern;
-  a: Term;
-  b: Term;
-  rOuter: number;
-  rInner: number;
-  ansAlpha: string; // e.g. "pi/6", "5pi/6", "-pi/4", "alpha"
-  ansCos?: string;  // e.g. "3/5"
-  ansSin?: string;  // e.g. "4/5"
-  qStr: string;
 }
 
 function fractionEquivalent(input: string, expected: string): boolean {
@@ -45,158 +26,9 @@ function fractionEquivalent(input: string, expected: string): boolean {
   return Number.isFinite(actual) && Number.isFinite(target) && Math.abs(actual - target) < 1e-10;
 }
 
-function termStr(t: Term, isFirst: boolean): string {
-  let s = "";
-  if (t.sign === -1) s += "-";
-  else if (!isFirst) s += "+";
-  
-  if (t.c === 1 && t.d === 1) {
-    if (s === "+" || s === "-") return s;
-    if (s === "") return "";
-  }
-  if (t.d === 1) {
-    s += t.c;
-  } else {
-    if (t.c !== 1) s += t.c;
-    s += `\\sqrt{${t.d}}`;
-  }
-  return s;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    let a: Term = { sign: 1, c: 1, d: 1 };
-    let b: Term = { sign: 1, c: 1, d: 1 };
-    let rOuter = 1;
-    let rInner = 1;
-    let ansAlpha = "";
-    let ansCos = "";
-    let ansSin = "";
-
-    if (p === 'pattern1' || p === 'pattern2') {
-      const pairs = [
-        { c1:1, d1:1, c2:1, d2:3, alpha: "pi/3" }, // 1, sqrt(3) -> r=2, cos=1/2, sin=sq3/2 -> 60deg
-        { c1:1, d1:3, c2:1, d2:1, alpha: "pi/6" }, // sqrt(3), 1 -> r=2, cos=sq3/2, sin=1/2 -> 30deg
-        { c1:1, d1:1, c2:1, d2:1, alpha: "pi/4" }  // 1, 1 -> r=sqrt(2) -> 45deg
-      ];
-      const pair = pairs[Math.floor(Math.random() * pairs.length)];
-      
-      a = { sign: 1, c: pair.c1, d: pair.d1 };
-      b = { sign: 1, c: pair.c2, d: pair.d2 };
-      
-      if (p === 'pattern2') {
-        a.sign = Math.random() > 0.5 ? 1 : -1;
-        b.sign = Math.random() > 0.5 ? 1 : -1;
-        if (a.sign === 1 && b.sign === 1) b.sign = -1; // force at least one negative
-      }
-
-      // calculate alpha
-      const x = a.sign * Math.sqrt(a.d) * a.c;
-      const y = b.sign * Math.sqrt(b.d) * b.c;
-      const r = Math.sqrt(x*x + y*y);
-      const angle = Math.atan2(y, x);
-      
-      // format r
-      if (Math.abs(r - 2) < 0.01) { rOuter = 2; rInner = 1; }
-      else if (Math.abs(r - Math.sqrt(2)) < 0.01) { rOuter = 1; rInner = 2; }
-      
-      // format angle
-      const pi = Math.PI;
-      const eps = 0.01;
-      if (Math.abs(angle - pi/6) < eps) ansAlpha = "pi/6";
-      else if (Math.abs(angle - pi/4) < eps) ansAlpha = "pi/4";
-      else if (Math.abs(angle - pi/3) < eps) ansAlpha = "pi/3";
-      else if (Math.abs(angle - 2*pi/3) < eps) ansAlpha = "2pi/3";
-      else if (Math.abs(angle - 3*pi/4) < eps) ansAlpha = "3pi/4";
-      else if (Math.abs(angle - 5*pi/6) < eps) ansAlpha = "5pi/6";
-      else if (Math.abs(angle - (-pi/6)) < eps || Math.abs(angle - 11*pi/6) < eps) ansAlpha = "-pi/6"; // 11pi/6 or -pi/6
-      else if (Math.abs(angle - (-pi/4)) < eps || Math.abs(angle - 7*pi/4) < eps) ansAlpha = "-pi/4";
-      else if (Math.abs(angle - (-pi/3)) < eps || Math.abs(angle - 5*pi/3) < eps) ansAlpha = "-pi/3";
-      else if (Math.abs(angle - (-2*pi/3)) < eps || Math.abs(angle - 4*pi/3) < eps) ansAlpha = "-2pi/3";
-      else if (Math.abs(angle - (-3*pi/4)) < eps || Math.abs(angle - 5*pi/4) < eps) ansAlpha = "-3pi/4";
-      else if (Math.abs(angle - (-5*pi/6)) < eps || Math.abs(angle - 7*pi/6) < eps) ansAlpha = "-5pi/6";
-      
-    } else if (p === 'pattern3') {
-      const pairs = [
-        { c1:1, d1:6, c2:1, d2:2, rO:2, rI:2, aStr:"pi/6" }, // sq6, sq2 -> 2sq2, cos=sq3/2, sin=1/2 -> 30deg
-        { c1:1, d1:2, c2:1, d2:6, rO:2, rI:2, aStr:"pi/3" }, // sq2, sq6 -> 60deg
-        { c1:3, d1:1, c2:1, d2:3, rO:2, rI:3, aStr:"pi/6" }, // 3, sq3 -> r=sqrt(12)=2sq3, cos=3/2sq3=sq3/2 -> 30deg
-        { c1:1, d1:3, c2:3, d2:1, rO:2, rI:3, aStr:"pi/3" }
-      ];
-      const pair = pairs[Math.floor(Math.random() * pairs.length)];
-      a = { sign: 1, c: pair.c1, d: pair.d1 };
-      b = { sign: 1, c: pair.c2, d: pair.d2 };
-      
-      // maybe add sign
-      if (Math.random() > 0.5) {
-        a.sign = Math.random() > 0.5 ? 1 : -1;
-        b.sign = Math.random() > 0.5 ? 1 : -1;
-        if (a.sign === 1 && b.sign === 1) b.sign = -1;
-      }
-
-      rOuter = pair.rO;
-      rInner = pair.rI;
-      
-      const x = a.sign * Math.sqrt(a.d) * a.c;
-      const y = b.sign * Math.sqrt(b.d) * b.c;
-      const angle = Math.atan2(y, x);
-      const pi = Math.PI;
-      const eps = 0.01;
-      // Re-evaluate angle
-      if (Math.abs(angle - pi/6) < eps) ansAlpha = "pi/6";
-      else if (Math.abs(angle - pi/4) < eps) ansAlpha = "pi/4";
-      else if (Math.abs(angle - pi/3) < eps) ansAlpha = "pi/3";
-      else if (Math.abs(angle - 2*pi/3) < eps) ansAlpha = "2pi/3";
-      else if (Math.abs(angle - 3*pi/4) < eps) ansAlpha = "3pi/4";
-      else if (Math.abs(angle - 5*pi/6) < eps) ansAlpha = "5pi/6";
-      else if (Math.abs(angle - (-pi/6)) < eps || Math.abs(angle - 11*pi/6) < eps) ansAlpha = "-pi/6";
-      else if (Math.abs(angle - (-pi/4)) < eps || Math.abs(angle - 7*pi/4) < eps) ansAlpha = "-pi/4";
-      else if (Math.abs(angle - (-pi/3)) < eps || Math.abs(angle - 5*pi/3) < eps) ansAlpha = "-pi/3";
-      else if (Math.abs(angle - (-2*pi/3)) < eps || Math.abs(angle - 4*pi/3) < eps) ansAlpha = "-2pi/3";
-      else if (Math.abs(angle - (-3*pi/4)) < eps || Math.abs(angle - 5*pi/4) < eps) ansAlpha = "-3pi/4";
-      else if (Math.abs(angle - (-5*pi/6)) < eps || Math.abs(angle - 7*pi/6) < eps) ansAlpha = "-5pi/6";
-
-    } else if (p === 'pattern4') {
-      const triples = [
-        { x:3, y:4, r:5 }, { x:4, y:3, r:5 },
-        { x:5, y:12, r:13 }, { x:12, y:5, r:13 },
-        { x:8, y:15, r:17 }
-      ];
-      const tr = triples[Math.floor(Math.random() * triples.length)];
-      const signX = Math.random() > 0.5 ? 1 : -1;
-      const signY = Math.random() > 0.5 ? 1 : -1;
-      a = { sign: signX as 1|-1, c: tr.x, d: 1 };
-      b = { sign: signY as 1|-1, c: tr.y, d: 1 };
-      rOuter = tr.r;
-      rInner = 1;
-      ansAlpha = "alpha";
-      ansCos = `${signX * tr.x}/${tr.r}`;
-      ansSin = `${signY * tr.y}/${tr.r}`;
-    }
-
-    let aStr = termStr(a, true);
-    if (aStr === "" || aStr === "-") aStr += "1"; // should not happen with sin
-    if (aStr === "1") aStr = "";
-    if (aStr === "-1") aStr = "-";
-    
-    let bStr = termStr(b, false);
-    if (bStr === "+" || bStr === "-") bStr += "1";
-    if (bStr === "+1") bStr = "+";
-    if (bStr === "-1") bStr = "-";
-
-    const qStr = `${aStr}\\sin\\theta ${bStr}\\cos\\theta`;
-
-    return { pattern: p, a, b, rOuter, rInner, ansAlpha, ansCos, ansSin, qStr };
-  }
-}
-
 export default function TrigSynthesisDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateTrigSynthesisProblem('mix'));
   
   const [ansROuter, setAnsROuter] = useState<string>('');
   const [ansRInner, setAnsRInner] = useState<string>('');
@@ -208,12 +40,8 @@ export default function TrigSynthesisDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
   const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+    setProblem(generateTrigSynthesisProblem(selectedPattern));
     setAnsROuter('');
     setAnsRInner('');
     setAnsAlpha('');
@@ -226,12 +54,12 @@ export default function TrigSynthesisDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const rOut = parseInt(ansROuter) || 1;
-    const rIn = parseInt(ansRInner) || 1;
+    const rOut = parseStrictPositiveInteger(ansROuter);
+    const rIn = parseStrictPositiveInteger(ansRInner, true);
     
     let isOk = false;
     // check r
-    if (rOut === problem.rOuter && rIn === problem.rInner) {
+    if (rOut !== null && rIn !== null && rOut === problem.rOuter && rIn === problem.rInner) {
       // check alpha
       const uAlp = ansAlpha.trim().replace(/\s+/g, '').toLowerCase();
       // allow 11pi/6 or -pi/6
@@ -260,7 +88,7 @@ export default function TrigSynthesisDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -333,13 +161,13 @@ export default function TrigSynthesisDrill() {
     const ax = cx + 35 * Math.cos(aMid);
     const ay = cy - 35 * Math.sin(aMid);
     ctx.fillText('α', ax, ay);
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let rStr = "";
   if (problem.rInner === 1) rStr = `${problem.rOuter}`;
@@ -413,16 +241,18 @@ export default function TrigSynthesisDrill() {
               <h2 className="text-sm font-bold">
                 ■ 問題
               </h2>
-              <select 
+              <label htmlFor="trig-synthesis-mode" className="sr-only">三角関数の合成の演習パターン</label>
+              <select
+                id="trig-synthesis-mode"
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateTrigSynthesisProblem(pattern)); setAnsROuter(''); setAnsRInner(''); setAnsAlpha(''); setAnsCos(''); setAnsSin(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (第一象限の有名角)</option>
-                <option value="pattern2">パターン2 (マイナスを含む有名角)</option>
-                <option value="pattern3">パターン3 (係数が大きい)</option>
-                <option value="pattern4">パターン4 (有名角にならない発展)</option>
+                <option value="mix">実戦練習：三角関数の合成 全パターンランダム</option>
+                <option value="pattern1">基礎練習：第一象限の有名角だけ</option>
+                <option value="pattern2">基礎練習：マイナスを含む有名角だけ</option>
+                <option value="pattern3">基礎練習：係数が大きい形だけ</option>
+                <option value="pattern4">基礎練習：有名角でない発展形だけ</option>
               </select>
             </div>
 
@@ -436,18 +266,20 @@ export default function TrigSynthesisDrill() {
                 <span className="text-sm font-bold text-gray-500">振幅 <MathEq math="r" /></span>
                 <div className="flex items-center gap-1">
                   <input 
+                    aria-label="振幅の平方根の外側の係数"
                     type="number" 
                     className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                     value={ansROuter} 
-                    onChange={e => setAnsROuter(e.target.value)} 
+                    onChange={e => { setAnsROuter(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder="外"
                   />
                   <span className="text-xl font-bold">√</span>
                   <input 
+                    aria-label="振幅の平方根の内側の数"
                     type="number" 
                     className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                     value={ansRInner} 
-                    onChange={e => setAnsRInner(e.target.value)} 
+                    onChange={e => { setAnsRInner(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder="中"
                   />
                 </div>
@@ -457,10 +289,11 @@ export default function TrigSynthesisDrill() {
               <div className="flex flex-col items-center gap-1 w-full border-t pt-4">
                 <span className="text-sm font-bold text-gray-500">偏角 <MathEq math="\alpha" /></span>
                 <input 
+                  aria-label="偏角 alpha"
                   type="text" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                   value={ansAlpha} 
-                  onChange={e => setAnsAlpha(e.target.value)} 
+                  onChange={e => { setAnsAlpha(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="例: pi/6, alpha"
                 />
                 <span className="text-[10px] text-gray-400">※有名角でない場合は alpha と入力</span>
@@ -472,20 +305,22 @@ export default function TrigSynthesisDrill() {
                   <div className="flex items-center gap-2">
                     <span><MathEq math="\cos\alpha=" /></span>
                     <input 
+                      aria-label="cos alpha の値"
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-base text-slate-800 focus:border-blue-500" 
                       value={ansCos} 
-                      onChange={e => setAnsCos(e.target.value)} 
+                      onChange={e => { setAnsCos(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="3/5"
                     />
                   </div>
                   <div className="flex items-center gap-2">
                     <span><MathEq math="\sin\alpha=" /></span>
                     <input 
+                      aria-label="sin alpha の値"
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-base text-slate-800 focus:border-blue-500" 
                       value={ansSin} 
-                      onChange={e => setAnsSin(e.target.value)} 
+                      onChange={e => { setAnsSin(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="4/5"
                     />
                   </div>

@@ -8,6 +8,7 @@ import { TEMPLATES, TEMPLATE_OPTIONS } from "@/src/data/pseudo-lang";
 export default function PseudoLangPage() {
   const initialTmpl = TEMPLATES["exam_binary_search"];
   const [code, setCode] = useState<string>(typeof initialTmpl === 'string' ? initialTmpl : initialTmpl.code);
+  const [programInput, setProgramInput] = useState('');
   const [output, setOutput] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   
@@ -30,6 +31,7 @@ export default function PseudoLangPage() {
   const handleTemplateChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const tmpl = TEMPLATES[e.target.value];
     setCode(typeof tmpl === 'string' ? tmpl : tmpl.code);
+    setProgramInput(e.target.value === 'exam_2025_tsuishi_fig2' ? '1, 1, 1, 400' : e.target.value === 'exam_2025_tsuishi_fig5' ? 'かん' : '');
     if (typeof tmpl !== 'string' && tmpl.isOneBased !== undefined) {
       setIsOneBased(tmpl.isOneBased);
     } else {
@@ -63,6 +65,20 @@ export default function PseudoLangPage() {
 
   const createRunner = () => {
     const cleanCode = code.replace(/(#|\/\/).*/g, '');
+    const inputQueue = programInput === '' ? [] : programInput.split(/[\n,]/).map(value => value.trim());
+    let inputIndex = 0;
+    const readInput = (kind: string) => {
+      if (inputIndex >= inputQueue.length) {
+        throw new Error(`${kind}の入力値が足りません。上の「プログラムへの入力」を確認してください。`);
+      }
+      return inputQueue[inputIndex++];
+    };
+    const readInteger = () => {
+      const value = readInput('整数');
+      const parsed = Number.parseInt(value, 10);
+      if (Number.isNaN(parsed)) throw new Error(`整数として読み取れません: ${value}`);
+      return parsed;
+    };
     const lines = code.split('\n');
     let jsCode = "";
     const vars = new Set<string>();
@@ -149,12 +165,13 @@ export default function PseudoLangPage() {
                        .replace(/かつ/g, '&&')
                        .replace(/または/g, '||')
                        .replace(/でない/g, '!')
+                       .replace(/【外部からの入力】/g, 'sys_input("値")')
+                       .replace(/【整数を入力】/g, 'sys_int_input()')
+                       .replace(/【文字列を入力】/g, 'sys_input("文字列")')
                        .replace(/要素数/g, 'sys_len')
+                       .replace(/最大値\s*\(/g, 'Math.max(')
                        .replace(/整数/g, 'Math.trunc')
-                       .replace(/乱数\(\)/g, 'sys_ransuu()')
-                       .replace(/【外部からの入力】/g, 'parseInt(window.prompt("値を入力してください:") || "0")')
-                       .replace(/【整数を入力】/g, 'parseInt(window.prompt("整数を入力してください:") || "0")')
-                       .replace(/【文字列を入力】/g, 'window.prompt("文字列を入力してください:") || ""');
+                       .replace(/乱数\(\)/g, 'sys_ransuu()');
 
       content = content.replace(/=\s*(\[.*\])$/, '= sys_arr($1)');
 
@@ -213,7 +230,7 @@ export default function PseudoLangPage() {
     const GeneratorFunction = Object.getPrototypeOf(function*(){}).constructor as any;
     
     const makeGen = new GeneratorFunction(
-      "sys_print", "sys_len", "sys_ransuu", "sys_arr",
+      "sys_print", "sys_len", "sys_ransuu", "sys_arr", "sys_input", "sys_int_input",
       `
       try {
         ${jsCode}
@@ -230,7 +247,9 @@ export default function PseudoLangPage() {
       (arr: any[]) => isOneBased ? arr.length - 1 : arr.length,
       () => Math.random(),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (arr: any[]) => isOneBased ? [undefined, ...arr] : arr
+      (arr: any[]) => isOneBased ? [undefined, ...arr] : arr,
+      (kind: string) => readInput(kind),
+      () => readInteger()
     );
   };
 
@@ -325,6 +344,19 @@ export default function PseudoLangPage() {
             配列の要素番号を1から始める（最近の共通テスト形式）
           </label>
         </div>
+        <label className="flex-1 min-w-[260px] bg-white px-3 py-2 rounded-md border border-gray-300 shadow-sm text-xs">
+          <span className="block text-gray-600 font-semibold mb-1">プログラムへの入力（カンマ / 改行区切り）</span>
+          <input
+            type="text"
+            aria-label="プログラムへの入力"
+            value={programInput}
+            onChange={event => setProgramInput(event.target.value)}
+            disabled={isDebugging}
+            placeholder="例: 1, 1, 1, 400"
+            className="w-full border-b border-gray-300 px-1 py-1 font-mono outline-none focus:border-indigo-500 disabled:bg-gray-100"
+          />
+          <span className="block text-[10px] text-gray-500 mt-1">入力を求める箇所に、左から順番に値を渡します。</span>
+        </label>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6">

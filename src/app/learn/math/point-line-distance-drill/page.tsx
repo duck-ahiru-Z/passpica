@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -34,6 +35,19 @@ interface ProblemData {
   ans1: number | string; // distance or k1
   ans2?: number | string; // k2 for pattern 4
   questionText: string;
+}
+
+function formatSignedProduct(coefficient: number, value: number, first = false) {
+  const product = coefficient * value;
+  // A zero coordinate hides the coefficient's sign in the product; keep it visible
+  // so the worked substitution still matches the signed line equation.
+  const sign = product < 0 || (product === 0 && coefficient < 0) ? '−' : '+';
+  const term = `${Math.abs(coefficient)} \\cdot ${Math.abs(value)}`;
+  return first ? `${sign === '−' ? '−' : ''}${term}` : ` ${sign} ${term}`;
+}
+
+function formatSignedConstant(value: number) {
+  return ` ${value < 0 ? '−' : '+'} ${Math.abs(value)}`;
 }
 
 const triples = [
@@ -144,7 +158,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function PointLineDistanceDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -152,12 +166,16 @@ export default function PointLineDistanceDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
+    setAnsVal('');
+    setHasChecked(false);
+    setIsCorrect(false);
+  };
+
+  const handlePatternChange = (pattern: Pattern | 'mix') => {
+    setSelectedPattern(pattern);
+    setProblem(generateProblem(pattern));
     setAnsVal('');
     setHasChecked(false);
     setIsCorrect(false);
@@ -188,7 +206,7 @@ export default function PointLineDistanceDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -277,26 +295,30 @@ export default function PointLineDistanceDrill() {
       ctx.fillStyle = '#64748b';
       ctx.fillText(`※図は k=${problem.ans1} の場合の直線です`, 10, 20);
     }
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph, hasChecked]);
 
   if (!problem) return null;
 
   let explanationEl = <></>;
   if (hasChecked) {
-    const rootPart = `\\sqrt{${problem.a}^2 + ${problem.b}^2}`;
-    const numPart = `|${problem.a} \\cdot (${problem.px}) + ${problem.b} \\cdot (${problem.py}) + ${problem.pattern==='pattern4'?'k':problem.c}|`;
+    const rootPart = `\\sqrt{(${problem.a})^2 + (${problem.b})^2}`;
+    const baseVal = problem.a * problem.px + problem.b * problem.py;
+    const numPart = problem.pattern === 'pattern4'
+      ? `|${baseVal} + k|`
+      : `|${formatSignedProduct(problem.a, problem.px, true)}${formatSignedProduct(problem.b, problem.py)}${formatSignedConstant(problem.c)}|`;
     const distInt = Math.sqrt(problem.a*problem.a + problem.b*problem.b);
 
     if (problem.pattern === 'pattern4') {
       const distVal = Math.abs(problem.a*problem.px + problem.b*problem.py + Number(problem.ans1)) / distInt;
-      const baseVal = problem.a*problem.px + problem.b*problem.py;
+      const lineA = `${problem.a < 0 ? '−' : ''}${Math.abs(problem.a)}x`;
+      const lineB = `${problem.b < 0 ? '−' : '+'} ${Math.abs(problem.b)}y`;
       explanationEl = (
         <div className="space-y-4">
-          <p>点 <MathEq math={`(${problem.px}, ${problem.py})`} /> と直線 <MathEq math={`${problem.a}x + ${problem.b}y + k = 0`} /> の距離が <MathEq math={`${distVal}`} /> なので、点と直線の距離の公式より：</p>
+          <p>点 <MathEq math={`(${problem.px}, ${problem.py})`} /> と直線 <MathEq math={`${lineA} ${lineB} + k = 0`} /> の距離が <MathEq math={`${distVal}`} /> なので、点と直線の距離の公式より：</p>
           <div className="bg-white p-3 border rounded text-center">
             <MathEq math={`\\frac{${numPart}}{${rootPart}} = ${distVal}`} block />
             <MathEq math={`\\frac{|${baseVal} + k|}{${distInt}} = ${distVal}`} block />
@@ -361,7 +383,7 @@ export default function PointLineDistanceDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => handlePatternChange(e.target.value as Pattern | 'mix')}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -387,7 +409,7 @@ export default function PointLineDistanceDrill() {
                   type="text" 
                   className="w-48 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
-                  onChange={e => setAnsVal(e.target.value)} 
+                  onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
               </div>
             </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -50,16 +51,12 @@ function generateProblem(mode: DrillMode = 'mix'): ProblemData {
 
 export default function SymmetricPolynomialDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   const [ansStr, setAnsStr] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
-
-  useEffect(() => {
-    handleNext('mix');
-  }, []);
 
   const handleNext = (nextMode: DrillMode = mode) => {
     setProblem(generateProblem(nextMode));
@@ -89,7 +86,7 @@ export default function SymmetricPolynomialDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let questionMath = '';
   if (problem.type === 'x2+y2') questionMath = 'x^2 + y^2';
@@ -149,7 +146,7 @@ export default function SymmetricPolynomialDrillPage() {
                   type="number" 
                   className="w-24 border p-2 text-center font-bold" 
                   value={ansStr} 
-                  onChange={e => setAnsStr(e.target.value)} 
+                  onChange={e => { setAnsStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="答え" 
                 />
               </div>

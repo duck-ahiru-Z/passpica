@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -142,7 +142,7 @@ export default function TriangleAreaDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -222,11 +222,11 @@ export default function TriangleAreaDrillPage() {
       ctx.font = 'bold 16px sans-serif';
       ctx.fillText(`S = ${formatTerm(problem.S).replace(/\\/g, '').replace(/frac{([^}]*)}{([^}]*)}/g, '$1/$2')}`, cx, cy - max_y*scale/2);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));
@@ -313,7 +313,7 @@ export default function TriangleAreaDrillPage() {
               <div className="flex flex-col items-center gap-6 text-lg font-bold">
                 <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                   <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'S ='} />
-                  <FractionRootInput value={ansVal} onChange={setAnsVal} hideSign />
+                  <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                 </div>
               </div>
             </div>

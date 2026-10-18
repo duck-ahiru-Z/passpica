@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { randomOrderedDistinctPair } from '@/src/lib/math/randomOrderedDistinctPair';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -90,9 +91,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   }
   
   if (p_type === 'pattern3') {
-    let r1 = Math.floor(Math.random() * 9) - 4;
-    let r2 = Math.floor(Math.random() * 9) - 4;
-    if (r1 >= r2) { r1--; r2++; }
+    const [r1, r2] = randomOrderedDistinctPair(-4, 4);
     const sum = r1 + r2;
     const mProd = - (r1 * r2);
     let cStr = '';
@@ -103,7 +102,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     if (cStr === '') cStr = '0';
     const hasParens = sum !== 0 && mProd !== 0;
-    const eq = `y = x^2 + 2kx + ${hasParens ? `(${cStr})` : cStr}`;
+    const constantExpression = cStr.startsWith('-')
+      ? `- ${cStr.slice(1).trimStart()}`
+      : `+ ${hasParens ? `(${cStr})` : cStr}`;
+    const eq = `y = x^2 + 2kx ${constantExpression}`;
     return { 
       pattern: p_type, eq, ansType: 'between', conditionText: "x軸と共有点をもたない",
       params: { sum, mProd, k_r1: r1, k_r2: r2, cStr }
@@ -159,7 +161,7 @@ export default function DiscriminantDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -210,11 +212,11 @@ export default function DiscriminantDrillPage() {
     ctx.fillStyle = '#1e293b';
     ctx.font = 'bold 14px sans-serif';
     ctx.fillText(`k = ${kVal.toFixed(1)}`, 10, 20);
-  };
+  }, [problem, kVal]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, kVal]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     const p = generateProblem(pattern);
@@ -235,6 +237,9 @@ export default function DiscriminantDrillPage() {
 
   const handleCheck = () => {
     if (!problem) return;
+
+    const requiredInputs = problem.ansType === 'values' || problem.ansType === 'between' ? [ans1Num, ans2Num] : [ans1Num];
+    if (requiredInputs.some(value => !value.trim())) return;
     
     const parse = (nStr: string, dStr: string) => {
       const num = parseInt(nStr);
@@ -284,9 +289,9 @@ export default function DiscriminantDrillPage() {
 
   const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void) => (
     <div className="flex flex-col items-center justify-center inline-flex align-middle">
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => setNum(e.target.value)} />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => { setNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
       <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => setDen(e.target.value)} placeholder="1" />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => { setDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
     </div>
   );
 
@@ -319,11 +324,11 @@ export default function DiscriminantDrillPage() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (接する条件・2つ)</option>
-                <option value="pattern2">パターン2 (共有点の範囲)</option>
-                <option value="pattern3">パターン3 (D/4の利用)</option>
-                <option value="pattern4">パターン4 (2次の係数に文字)</option>
+                <option value="mix">実戦練習：判別式 全パターンランダム</option>
+                <option value="pattern1">基礎練習：接する条件・2つだけ</option>
+                <option value="pattern2">基礎練習：共有点の範囲だけ</option>
+                <option value="pattern3">基礎練習：D/4の利用だけ</option>
+                <option value="pattern4">基礎練習：2次の係数に文字だけ</option>
               </select>
             </div>
 
@@ -344,7 +349,7 @@ export default function DiscriminantDrillPage() {
                   <>k = <span className="ml-2">{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</span></>
                 )}
                 {problem.ansType === 'ineq' && (
-                  <>k <select value={ansIneqSign} onChange={e => setAnsIneqSign(e.target.value as '<'|'>')} className="mx-2 border p-1"><option value="<">&lt;</option><option value=">">&gt;</option></select> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</>
+                  <>k <select value={ansIneqSign} onChange={e => { setAnsIneqSign(e.target.value as '<'|'>'); setHasChecked(false); setIsCorrect(false); }} className="mx-2 border p-1"><option value="<">&lt;</option><option value=">">&gt;</option></select> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</>
                 )}
                 {problem.ansType === 'between' && (
                   <>{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="mx-2"><MathEq math="< k <" /></span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den)}</>
@@ -360,6 +365,7 @@ export default function DiscriminantDrillPage() {
             <div className="mt-8 flex gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={(problem.ansType !== 'value' && !ans1Num.trim()) || ((problem.ansType === 'values' || problem.ansType === 'between') && !ans2Num.trim())}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -437,6 +443,7 @@ export default function DiscriminantDrillPage() {
                   <p>となります。</p>
                 </div>
 
+                {detailLevel === 'normal' && (
                 <div className="bg-gray-50 p-2 border">
                   <p className="font-bold border-b pb-1 mb-1">計算の実行</p>
                   {problem.pattern === 'pattern1' && (
@@ -458,8 +465,8 @@ export default function DiscriminantDrillPage() {
                     <>
                       <p className="text-emerald-700 font-bold mb-1">※ xの係数が2の倍数なので、<MathEq math="D/4" /> の公式を使うと計算量が減ります！</p>
                       <MathEq math={`D/4 = k^2 - 1 \\cdot (${problem.params.cStr}) < 0`} /><br/>
-                      <MathEq math={`k^2 ${problem.params.sum !== 0 ? problem.params.sum > 0 ? '-' : '+' : ''} ${Math.abs(problem.params.sum)===1?'':Math.abs(problem.params.sum)}k ${problem.params.mProd !== 0 ? problem.params.mProd > 0 ? '-' : '+' : ''} ${Math.abs(problem.params.mProd)} < 0`} /><br/>
-                      <MathEq math={`(k ${problem.params.k_r1 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r1)})(k ${problem.params.k_r2 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r2)}) < 0`} /><br/>
+                      <MathEq math={`k^2${problem.params.sum === 0 ? '' : ` ${problem.params.sum > 0 ? '-' : '+'} ${Math.abs(problem.params.sum) === 1 ? '' : Math.abs(problem.params.sum)}k`}${problem.params.mProd === 0 ? '' : ` ${problem.params.mProd > 0 ? '-' : '+'} ${Math.abs(problem.params.mProd)}`} < 0`} /><br/>
+                      <MathEq math={`${problem.params.k_r1 === 0 ? 'k' : `(k ${problem.params.k_r1 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r1)})`}${problem.params.k_r2 === 0 ? 'k' : `(k ${problem.params.k_r2 > 0 ? '-' : '+'} ${Math.abs(problem.params.k_r2)})`} < 0`} /><br/>
                       これを解いて、<MathEq math={`${problem.params.k_r1} < k < ${problem.params.k_r2}`} />。
                     </>
                   )}
@@ -472,6 +479,7 @@ export default function DiscriminantDrillPage() {
                     </>
                   )}
                 </div>
+                )}
 
               </div>
             )}

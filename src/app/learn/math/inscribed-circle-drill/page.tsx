@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -114,7 +115,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function InscribedCircleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal1, setAnsVal1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansVal2, setAnsVal2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -124,11 +125,7 @@ export default function InscribedCircleDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -289,11 +286,13 @@ export default function InscribedCircleDrillPage() {
     ctx.fillText('A', mA.x - 10, mA.y + 12);
     ctx.fillText('B', mB.x + 10, mB.y + 12);
     ctx.fillText('C', mC.x, mC.y - 8);
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
+
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -321,8 +320,6 @@ export default function InscribedCircleDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
-
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -349,7 +346,7 @@ export default function InscribedCircleDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal1(defaultFractionRoot); setAnsVal2(defaultFractionRoot); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -378,17 +375,17 @@ export default function InscribedCircleDrillPage() {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                       <MathEq math="R =" />
-                      <FractionRootInput value={ansVal1} onChange={setAnsVal1} hideSign />
+                      <FractionRootInput value={ansVal1} onChange={value => { setAnsVal1(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                     </div>
                     <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                       <MathEq math="r =" />
-                      <FractionRootInput value={ansVal2} onChange={setAnsVal2} hideSign />
+                      <FractionRootInput value={ansVal2} onChange={value => { setAnsVal2(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                     </div>
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math={problem.pattern === 'pattern4' ? 'r_A =' : 'r ='} />
-                    <FractionRootInput value={ansVal1} onChange={setAnsVal1} hideSign />
+                    <FractionRootInput value={ansVal1} onChange={value => { setAnsVal1(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                   </div>
                 )}
               </div>

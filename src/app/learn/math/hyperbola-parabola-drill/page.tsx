@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -113,13 +114,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       // (y-cy)^2 = 4p(x-cx) -> y^2 - 2cy y + cy^2 = 4p x - 4p cx -> y^2 - 2cy y - 4p x + (cy^2 + 4p cx) = 0
-      const isH = true; // keep it simple, horizontal only for completing square
       let p_val = Math.floor(Math.random() * 5) - 2; // -2..2
       if (p_val === 0) p_val = 1;
       const cx = Math.floor(Math.random() * 7) - 3; // -3..3
       const cy = Math.floor(Math.random() * 7) - 3;
       
-      const A = 1; // y^2
       const B = -2 * cy; // y
       const C = -4 * p_val; // x
       const D = cy*cy + 4*p_val*cx; // const
@@ -149,7 +148,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function HyperbolaParabolaDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<string>('');
   const [ans2, setAns2] = useState<string>('');
@@ -159,10 +158,6 @@ export default function HyperbolaParabolaDrill() {
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -201,7 +196,7 @@ export default function HyperbolaParabolaDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -353,13 +348,13 @@ export default function HyperbolaParabolaDrill() {
         ctx.setLineDash([]);
       }
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let explanationEl = <></>;
   if (hasChecked) {
@@ -405,7 +400,7 @@ export default function HyperbolaParabolaDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAns1(''); setAns2(''); setAns3(''); setAns4(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -434,7 +429,7 @@ export default function HyperbolaParabolaDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="x"
                     />
                     <span>,</span>
@@ -442,7 +437,7 @@ export default function HyperbolaParabolaDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="y"
                     />
                     <span>)</span>
@@ -452,7 +447,7 @@ export default function HyperbolaParabolaDrill() {
                     type="text" 
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500 text-xl" 
                     value={ans3} 
-                    onChange={e => setAns3(e.target.value)} 
+                    onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder="4/3"
                   />
                 </div>
@@ -466,14 +461,14 @@ export default function HyperbolaParabolaDrill() {
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>,</span>
                     <input 
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>)</span>
                   </div>
@@ -482,7 +477,7 @@ export default function HyperbolaParabolaDrill() {
                     type="number" 
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500 text-xl" 
                     value={ans3} 
-                    onChange={e => setAns3(e.target.value)} 
+                    onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   />
                 </div>
               )}
@@ -495,14 +490,14 @@ export default function HyperbolaParabolaDrill() {
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>,</span>
                     <input 
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>)</span>
                   </div>
@@ -513,14 +508,14 @@ export default function HyperbolaParabolaDrill() {
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans3} 
-                      onChange={e => setAns3(e.target.value)} 
+                      onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>,</span>
                     <input 
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans4} 
-                      onChange={e => setAns4(e.target.value)} 
+                      onChange={e => { setAns4(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>)</span>
                   </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -87,17 +88,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function MenelausCevaDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -123,7 +120,7 @@ export default function MenelausCevaDrill() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let questionEl = <></>;
   let formulaStr = "";
@@ -328,7 +325,7 @@ export default function MenelausCevaDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -349,14 +346,14 @@ export default function MenelausCevaDrill() {
                   type="number" 
                   className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansX} 
-                  onChange={e => setAnsX(e.target.value)} 
+                  onChange={e => { setAnsX(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
                 <span>：</span>
                 <input 
                   type="number" 
                   className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansY} 
-                  onChange={e => setAnsY(e.target.value)} 
+                  onChange={e => { setAnsY(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
               </div>
             </div>

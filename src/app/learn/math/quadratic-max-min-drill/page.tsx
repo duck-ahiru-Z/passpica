@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { isQuadraticExtremumAnswerCorrect } from '@/src/lib/quadraticMaxMin';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -116,7 +117,7 @@ export default function QuadraticMaxMinDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -212,11 +213,11 @@ export default function QuadraticMaxMinDrillPage() {
         ctx.fillText(`Min`, mapX(x), mapY(y) + 18);
       });
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));
@@ -229,21 +230,8 @@ export default function QuadraticMaxMinDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const checkVals = (uV: string, ux1: string, ux2: string, pV: number, pX: number[]) => {
-      if (parseInt(uV) !== pV) return false;
-      const uX = [];
-      if (ux1.trim() !== '') uX.push(parseInt(ux1));
-      if (ux2.trim() !== '') uX.push(parseInt(ux2));
-      uX.sort((a,b)=>a-b);
-      if (uX.length !== pX.length) return false;
-      for (let i=0; i<uX.length; i++) {
-        if (uX[i] !== pX[i]) return false;
-      }
-      return true;
-    };
-
-    const maxOk = checkVals(ansMaxV, ansMaxX1, ansMaxX2, problem.maxV, problem.maxX);
-    const minOk = checkVals(ansMinV, ansMinX1, ansMinX2, problem.minV, problem.minX);
+    const maxOk = isQuadraticExtremumAnswerCorrect(ansMaxV, ansMaxX1, ansMaxX2, problem.maxV, problem.maxX);
+    const minOk = isQuadraticExtremumAnswerCorrect(ansMinV, ansMinX1, ansMinX2, problem.minV, problem.minX);
 
     setIsCorrect(maxOk && minOk);
     setHasChecked(true);
@@ -280,11 +268,11 @@ export default function QuadraticMaxMinDrillPage() {
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (軸が定義域の内側)</option>
-                <option value="pattern2">パターン2 (軸が外側・単調増減)</option>
-                <option value="pattern3">パターン3 (軸が中央・対称)</option>
-                <option value="pattern4">パターン4 (上に凸 a&lt;0)</option>
+                <option value="mix">実戦練習：最大・最小 全パターンランダム</option>
+                <option value="pattern1">基礎練習：軸が定義域の内側だけ</option>
+                <option value="pattern2">基礎練習：軸が外側・単調増減だけ</option>
+                <option value="pattern3">基礎練習：軸が中央・対称だけ</option>
+                <option value="pattern4">基礎練習：上に凸 a&lt;0 だけ</option>
               </select>
             </div>
 
@@ -304,22 +292,22 @@ export default function QuadraticMaxMinDrillPage() {
               <div className="flex flex-col gap-4 max-w-sm mx-auto">
                 <div className="flex items-center gap-2 bg-red-50 p-2 border border-red-200 rounded">
                   <div className="font-bold text-red-700 w-12 text-right">最大値:</div>
-                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMaxV} onChange={e => setAnsMaxV(e.target.value)} />
+                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMaxV} onChange={e => { setAnsMaxV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="ml-2 text-[10px] text-gray-600">
-                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX1} onChange={e => setAnsMaxX1(e.target.value)} />
+                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX1} onChange={e => { setAnsMaxX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="mx-1">,</span>
-                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX2} onChange={e => setAnsMaxX2(e.target.value)} placeholder="空" />
+                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX2} onChange={e => { setAnsMaxX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
                     のとき)
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 bg-blue-50 p-2 border border-blue-200 rounded">
                   <div className="font-bold text-blue-700 w-12 text-right">最小値:</div>
-                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMinV} onChange={e => setAnsMinV(e.target.value)} />
+                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMinV} onChange={e => { setAnsMinV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="ml-2 text-[10px] text-gray-600">
-                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX1} onChange={e => setAnsMinX1(e.target.value)} />
+                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX1} onChange={e => { setAnsMinX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="mx-1">,</span>
-                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX2} onChange={e => setAnsMinX2(e.target.value)} placeholder="空" />
+                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX2} onChange={e => { setAnsMinX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
                     のとき)
                   </div>
                 </div>

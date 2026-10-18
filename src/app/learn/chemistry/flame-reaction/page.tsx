@@ -18,7 +18,7 @@ const METALS: MetalSalt[] = [
   { formula: 'NaCl', name: 'Sodium', jpName: 'ナトリウム', colorName: '黄色', colorHex: '#eab308', mnemonic: '無き（Na:黄）', explain: '炎色反応は黄色。食塩（塩化ナトリウム）や、かつてトンネル照明に使用されたナトリウムランプでおなじみです。' },
   { formula: 'KCl', name: 'Potassium', jpName: 'カリウム', colorName: '赤紫色', colorHex: '#c084fc', mnemonic: 'Kの村（K:紫）', explain: '炎色反応は赤紫色。植物の生長を支える「肥料の三要素」の主成分であり、細胞液の浸透圧調節に重要です。' },
   { formula: 'CuCl2', name: 'Copper', jpName: '銅', colorName: '青緑色', colorHex: '#0d9488', mnemonic: '動力（Cu:緑）', explain: '炎色反応は青緑色。花火の着色剤として配合されます。電気の良導体であり、電線や配線に大量に使用されます。' },
-  { formula: 'CaCl2', name: 'Calcium', jpName: 'カルシウム', colorName: '橙赤色', colorHex: '#f97316', mnemonic: '借りるとう（Ca:橙）', explain: '炎色反応は橙赤色。融雪剤（塩化カルシウム）として道路に散布されるほか、骨や歯を構成する必須元素です。' },
+  { formula: 'CaCl2', name: 'Calcium', jpName: 'カルシウム', colorName: '橙赤色', colorHex: '#ff4500', mnemonic: '借りるとう（Ca:橙）', explain: '炎色反応は橙赤色。融雪剤（塩化カルシウム）として道路に散布されるほか、骨や歯を構成する必須元素です。' },
   { formula: 'BaCl2', name: 'Barium', jpName: 'バリウム', colorName: '黄緑色', colorHex: '#84cc16', mnemonic: '馬力（Ba:緑）', explain: '炎色反応は黄緑色。消化管（胃）のレントゲン検査で用いられる造影剤（硫酸バリウム）として有名です。' }
 ];
 
@@ -52,7 +52,14 @@ export default function FlameReactionPage() {
 
           {/* フラットな線画SVGガスバーナーと炎 */}
           <div className="flex items-center justify-center flex-grow py-6">
-            <svg width="180" height="240" viewBox="0 0 120 160" className="overflow-visible">
+            <svg
+              width="180"
+              height="240"
+              viewBox="0 0 120 160"
+              className="overflow-visible"
+              role="img"
+              aria-label={selectedMetal ? `${selectedMetal.jpName}の炎色反応。炎は${selectedMetal.colorName}。` : '青色のガスバーナーの炎。試薬を選ぶと炎色反応を観察できます。'}
+            >
               {/* 炎（選択されたイオンの発色） */}
               <path 
                 d="M 60 20 C 35 55 45 100 60 100 C 75 100 85 55 60 20 Z" 
@@ -75,7 +82,7 @@ export default function FlameReactionPage() {
           {/* 操作バー */}
           <div className="w-full border-t border-gray-200 pt-4 text-center">
             <span className="text-xs font-bold block mb-2 text-slate-700">
-              {selectedMetal ? `現在、${selectedMetal.jpName} (${selectedMetal.formula}) の炎色反応を観察中` : '下の試薬瓶をクリックすると炎に投入されます。'}
+              {selectedMetal ? `現在、${selectedMetal.jpName} (${selectedMetal.formula}) の${selectedMetal.colorName}の炎色反応を観察中` : '下の試薬瓶をクリックすると炎に投入されます。'}
             </span>
             {selectedMetal && (
               <button 
@@ -102,6 +109,8 @@ export default function FlameReactionPage() {
               {METALS.map((m) => (
                 <button
                   key={m.formula}
+                  type="button"
+                  aria-pressed={selectedMetal?.formula === m.formula}
                   onClick={() => setSelectedMetal(m)}
                   className={`border border-gray-400 p-2 text-center text-xs font-bold transition-all bg-slate-50 hover:bg-slate-100 ${selectedMetal?.formula === m.formula ? 'bg-amber-100 border-amber-600' : ''}`}
                 >

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -136,22 +137,17 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function SineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansDeg, setAnsDeg] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -179,7 +175,6 @@ export default function SineRuleDrillPage() {
     ctx.fill();
 
     // Angles
-    const A_rad = problem.A * Math.PI / 180;
     const B_rad = problem.B * Math.PI / 180;
     const C_rad = problem.C * Math.PI / 180;
 
@@ -225,11 +220,11 @@ export default function SineRuleDrillPage() {
       ctx.font = '12px sans-serif';
       ctx.fillText(`R = ${problem.R}`, cx + 20, cy - 20);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -255,7 +250,7 @@ export default function SineRuleDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -283,7 +278,7 @@ export default function SineRuleDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal(defaultFractionRoot); setAnsDeg(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -326,12 +321,12 @@ export default function SineRuleDrillPage() {
                 {(problem.pattern === 'pattern1' || problem.pattern === 'pattern2') ? (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math={problem.pattern === 'pattern1' ? 'R =' : 'b ='} />
-                    <FractionRootInput value={ansVal} onChange={setAnsVal} hideSign />
+                    <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math={problem.pattern === 'pattern3' ? 'B =' : '\\text{最大の角 } ='} />
-                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => setAnsDeg(e.target.value)} />
+                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => { setAnsDeg(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="text-base">度 (°)</span>
                   </div>
                 )}

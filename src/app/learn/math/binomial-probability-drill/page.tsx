@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -100,7 +101,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function BinomialProbabilityDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<FractionRootValue>(defaultFractionRoot);
   
@@ -109,11 +110,7 @@ export default function BinomialProbabilityDrill() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -206,11 +203,13 @@ export default function BinomialProbabilityDrill() {
       ctx.fillText(`求める確率 (余事象を引く)`, barX + barW * 0.4, barY + barH/2);
       ctx.fillText(`全部失敗`, barX + barW * 0.9, barY + barH/2);
     }
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
+
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -229,8 +228,6 @@ export default function BinomialProbabilityDrill() {
     setIsCorrect(isOk);
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   const eventName = problem.pattern === 'pattern2' 
     ? (problem.p_num === 1 && problem.p_den === 6 ? '「1の目」' : problem.p_num === 1 && problem.p_den === 3 ? '「3の倍数の目」' : '「2以下の目」')
@@ -262,7 +259,14 @@ export default function BinomialProbabilityDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAnsVal(defaultFractionRoot);
+                  setHasChecked(false);
+                  setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -304,7 +308,7 @@ export default function BinomialProbabilityDrill() {
             <div className="space-y-4">
               <div className="flex flex-col items-center justify-center gap-2">
                 <div className="text-gray-500 font-bold mb-2">確率を分数で入力（※ルートは空欄または1のままでOK）</div>
-                <FractionRootInput value={ansVal} onChange={setAnsVal} hideSign />
+                <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
               </div>
             </div>
 

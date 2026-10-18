@@ -132,7 +132,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '力学・計算',
     title: '物理 力学・計算ドリル',
-    description: '平均速度・加速度・自由落下・仕事・運動量・運動エネルギー・ばねを個別練習と全パターンランダムで反復します。',
+    description: '平均の速さ・加速度・自由落下・仕事・運動量・運動エネルギー・ばねを個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/physics/motion-calculation-drill'
@@ -159,6 +159,17 @@ const CONTENTS: LearningContent[] = [
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/cross-multiply-drill'
+  },
+  {
+    slug: 'factorization-strategy-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '数と式（因数分解）',
+    title: '因数分解・解法選択ドリル',
+    description: '共通因数・展開公式・たすき掛け・置き換え・高次式を個別練習し、実戦では全パターンをバランスよく混ぜます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/factorization-strategy-drill'
   },
   {
     slug: 'math1-mixed-drill',
@@ -605,7 +616,7 @@ export default function DrillPortalPage() {
         {/* 科目フィルター */}
         <div className="space-y-1.5">
           <span className="font-bold text-slate-700 block">■ 科目で絞り込む</span>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap gap-1.5" role="group" aria-label="科目で絞り込む">
             {[
               { id: 'all', name: 'すべての科目' },
               { id: 'math', name: '数学' },
@@ -615,6 +626,8 @@ export default function DrillPortalPage() {
             ].map(sub => (
               <button
                 key={sub.id}
+                type="button"
+                aria-pressed={selectedSubject === sub.id}
                 onClick={() => setSelectedSubject(sub.id)}
                 className={`retro-btn-classic ${selectedSubject === sub.id ? 'bg-[#cbd5e1] font-bold' : ''}`}
               >
@@ -627,7 +640,7 @@ export default function DrillPortalPage() {
         {/* 難易度フィルター */}
         <div className="space-y-1.5">
           <span className="font-bold text-slate-700 block">■ 難易度で絞り込む</span>
-          <div className="flex gap-1.5">
+          <div className="flex gap-1.5" role="group" aria-label="難易度で絞り込む">
             {[
               { id: 'all', name: 'すべて' },
               { id: '基礎', name: '基礎' },
@@ -636,6 +649,8 @@ export default function DrillPortalPage() {
             ].map(diff => (
               <button
                 key={diff.id}
+                type="button"
+                aria-pressed={selectedDifficulty === diff.id}
                 onClick={() => setSelectedDifficulty(diff.id)}
                 className={`retro-btn-classic ${selectedDifficulty === diff.id ? 'bg-[#cbd5e1] font-bold' : ''}`}
               >

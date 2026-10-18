@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -223,7 +223,7 @@ export default function DataAnalysis1DDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current || problem.pattern === 'pattern4') return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -287,11 +287,11 @@ export default function DataAnalysis1DDrill() {
       ctx.fillStyle = '#ef4444';
       ctx.fillText('平均', px, baseY - 65);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
@@ -367,7 +367,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -376,7 +376,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.5"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -385,7 +385,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans3} 
-                      onChange={e => setAns3(e.target.value)} 
+                      onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>
@@ -398,7 +398,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>
@@ -411,7 +411,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                   <div className="flex items-center gap-4 text-xl">
@@ -420,7 +420,7 @@ export default function DataAnalysis1DDrill() {
                       type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                   </div>
                 </div>

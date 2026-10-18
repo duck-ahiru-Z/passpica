@@ -14,6 +14,17 @@ interface AlkaliMetalInfo {
   safetyRule: string;
 }
 
+const ATOMIC_MASS = { carbon: 12.011, hydrogen: 1.008, nitrogen: 14.007, oxygen: 15.999 };
+function celluloseNitrateNitrogenPercent(degree: 1 | 2 | 3): number {
+  const molarMass = 6 * ATOMIC_MASS.carbon + (10 - degree) * ATOMIC_MASS.hydrogen + degree * ATOMIC_MASS.nitrogen + (5 + 2 * degree) * ATOMIC_MASS.oxygen;
+  return degree * ATOMIC_MASS.nitrogen / molarMass * 100;
+}
+function reactionEnergyProfile(activationEnergy: number, heatReleased: number) {
+  const reactantY = 180;
+  const pixelsPerKilojoule = 0.45;
+  return { reactantY, transitionY: reactantY - activationEnergy * pixelsPerKilojoule, productY: reactantY + heatReleased * pixelsPerKilojoule };
+}
+
 const ALKALI_METALS: AlkaliMetalInfo[] = [
   {
     name: 'リチウム',
@@ -41,7 +52,7 @@ const ALKALI_METALS: AlkaliMetalInfo[] = [
     atomicNum: 19,
     mp: '63.5 ℃',
     density: '0.86 g/cm³ (水に浮く)',
-    waterReaction: '水に入れると瞬時に融解し、赤紫色の美しい炎（カリウム自体の炎色反応）を出して激しく爆発的に反応します。',
+    waterReaction: '水と激しく反応し、発生した水素が発火する場合があります。炎色はカリウム由来の赤紫色です。',
     flameColor: '赤紫（紫色）',
     safetyRule: 'ナトリウムよりさらに反応性が高く危険です。保管期間が長いと表面に超酸化物の爆発性皮膜を作るため古すぎるものは注意。'
   }
@@ -59,16 +70,11 @@ export default function ReactionSafetyPage() {
   // ニトロセルロースの硝酸エステル化度（エステル化されるOH基の数 1〜3）
   const [nitrationDegree, setNitrationDegree] = useState<number>(2);
 
-  // --- エネルギー図用の座標計算 ---
-  // Reactants (左): x=50, y=180
-  // Transition State (中央山頂): x=200, y=180 - activationEnergy
-  // Products (右): x=350, y=180 + reactionHeat
+  // エネルギー図はEaと放出熱を同一縮尺で示し、全スライダー範囲を図内に収める。
   const rx = 50;
-  const ry = 180;
+  const { reactantY: ry, transitionY: ty, productY: py } = reactionEnergyProfile(activationEnergy, reactionHeat);
   const tx = 200;
-  const ty = 180 - activationEnergy;
   const px = 350;
-  const py = 180 + reactionHeat;
 
   // ベジェ曲線パスの生成
   const energyPath = `M ${rx} ${ry} C 120 ${ry}, 150 ${ty}, ${tx} ${ty} C 250 ${ty}, 280 ${py}, ${px} ${py} L ${px + 50} ${py}`;
@@ -79,27 +85,27 @@ export default function ReactionSafetyPage() {
       case 1:
         return {
           name: 'モノニトロセルロース (低硝化度)',
-          nitrogen: '約 6.7 %',
+          nitrogen: `約 ${celluloseNitrateNitrogenPercent(1).toFixed(1)} %`,
           usage: 'セルロイド（プラスチック玩具、ピンポン玉など）の原料。比較的穏やかに燃焼します。',
-          speed: '★☆☆☆☆ (低速燃焼)',
+          speed: '硝化度に応じて性質が変化',
           structure: '[ C₆H₉O₄(ONO₂) ]n'
         };
       case 2:
         return {
           name: 'ジニトロセルロース (中硝化度)',
-          nitrogen: '約 11.0 %',
-          usage: 'コロジオン（液体絆創膏、古い写真湿板）や硝化綿塗料の原料。アルコール・エーテル混合溶媒に溶けます。',
-          speed: '★★★☆☆ (中速燃焼)',
+          nitrogen: `約 ${celluloseNitrateNitrogenPercent(2).toFixed(1)} %`,
+          usage: 'コロジオンなどに関連する性質を持ちます。',
+          speed: '硝化度に応じて性質が変化',
           structure: '[ C₆H₈O₃(ONO₂)₂ ]n'
         };
       case 3:
       default:
         return {
-          name: 'トリニトロセルロース (高硝化度/強綿薬)',
-          nitrogen: '約 13.4 %',
-          usage: '無煙火薬やロケット推進剤の原料。自己燃焼性（分子内に酸素供給源を持つ）が高く、極めて速やかに燃焼します。',
-          speed: '★★★★★ (急速燃焼・デフラグレーション)',
-          structure: '[ C₆H₇O₂(ONO₃)₃ ]n'
+          name: 'トリ硝酸セルロース（高置換度）',
+          nitrogen: `約 ${celluloseNitrateNitrogenPercent(3).toFixed(1)} %`,
+          usage: '高エネルギー物質に分類され、厳格な法規制と専門的管理の対象です。',
+          speed: '熱分解・燃焼の危険性が高い',
+          structure: '[ C₆H₇O₂(ONO₂)₃ ]n'
         };
     }
   };
@@ -118,7 +124,7 @@ export default function ReactionSafetyPage() {
           急激な化学反応と安全対策学習まとめ
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          アルカリ金属の性質や、高分子の硝酸エステル化度（ニトロセルロース）と燃焼特性など、熱エネルギーの急激な解放と取扱安全を科学的に学習します。
+          アルカリ金属や高分子の性質を通じて、反応エネルギーと安全上の注意を学びます。
         </p>
       </div>
 
@@ -144,7 +150,7 @@ export default function ReactionSafetyPage() {
 
           {/* SVGプロット */}
           <div className="w-full aspect-[5/3] border border-gray-200 bg-gray-50 flex items-center justify-center p-2">
-            <svg viewBox="0 0 450 280" className="w-full h-full overflow-visible font-mono">
+            <svg role="img" aria-label={`発熱反応の模式図。活性化エネルギー ${activationEnergy} kJ、エンタルピー変化 ΔH −${reactionHeat} kJ`} viewBox="0 0 450 280" className="w-full h-full overflow-visible font-mono">
               {/* x軸・y軸 */}
               <line x1="30" y1="240" x2="420" y2="240" stroke="#94a3b8" strokeWidth="1.5" />
               <line x1="30" y1="20" x2="30" y2="240" stroke="#94a3b8" strokeWidth="1.5" />
@@ -184,7 +190,7 @@ export default function ReactionSafetyPage() {
               <g transform="translate(260, 20)">
                 <rect x="0" y="0" width="160" height="42" rx="3" fill="#f8fafc" stroke="#e2e8f0" strokeWidth="1" />
                 <text x="10" y="16" fill="#475569" fontSize="8">活性化障壁 Ea : {activationEnergy} kJ</text>
-                <text x="10" y="32" fill="#475569" fontSize="8">発生熱量 ΔH : {reactionHeat} kJ</text>
+              <text x="10" y="32" fill="#475569" fontSize="8">エンタルピー変化 ΔH : −{reactionHeat} kJ</text>
               </g>
             </svg>
           </div>
@@ -197,6 +203,7 @@ export default function ReactionSafetyPage() {
                 <span className="font-mono text-blue-700">{activationEnergy} kJ</span>
               </div>
               <input
+                aria-label="活性化エネルギー"
                 type="range"
                 min="40"
                 max="150"
@@ -211,9 +218,10 @@ export default function ReactionSafetyPage() {
             <div className="space-y-1 border-t border-gray-200 pt-2.5">
               <div className="flex justify-between text-[10px] font-bold text-slate-700">
                 <span>■ 反応熱 ΔH（熱の放出規模）：</span>
-                <span className="font-mono text-emerald-700">{reactionHeat} kJ</span>
+                <span className="font-mono text-emerald-700">ΔH = −{reactionHeat} kJ</span>
               </div>
               <input
+                aria-label="放出熱量"
                 type="range"
                 min="20"
                 max="120"
@@ -242,6 +250,8 @@ export default function ReactionSafetyPage() {
             {ALKALI_METALS.map((m, idx) => (
               <button
                 key={m.symbol}
+                type="button"
+                aria-pressed={selectedMetal === idx}
                 onClick={() => setSelectedMetal(idx)}
                 className={`retro-btn-classic font-bold text-center ${selectedMetal === idx ? 'bg-[#cbd5e1]' : ''}`}
               >
@@ -304,7 +314,7 @@ export default function ReactionSafetyPage() {
           <span>■</span> 有機化学の視覚化：セルロースの硝酸エステル化度（ニトロセルロース）
         </h2>
         <p className="text-gray-500 text-[10px] leading-relaxed">
-          天然高分子であるセルロースのグルコース単位には、3個のヒドロキシ基（-OH 基）があります。これを混酸（濃硝酸と濃硫酸の混合液）で処理すると、ヒドロキシ基が硝酸エステル結合（-O-NO₂ 基）に置き換わります。このエステル化（硝化）が進むほど、分子内部に含まれる酸素割合が高まり、燃焼速度が爆発的に上昇します。
+          天然高分子であるセルロースのグルコース単位には、3個のヒドロキシ基（-OH 基）があります。硝酸エステル化では、ヒドロキシ基の水素が硝酸エステル基（-O-NO₂）に置き換わります。置換数によって組成や性質が変化し、高置換度のものは熱分解・燃焼の危険性が高まります。
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -318,6 +328,7 @@ export default function ReactionSafetyPage() {
                 <span className="text-base">{nitrationDegree} / 3 個</span>
               </div>
               <input
+                aria-label="セルロースの硝酸エステル化度"
                 type="range"
                 min="1"
                 max="3"
@@ -370,7 +381,7 @@ export default function ReactionSafetyPage() {
                 一般の有機物（セルロースなど）は、燃えるときに空気中の酸素（O₂）が表面に拡散してくるのを待つ必要があります（拡散燃焼）。そのため、燃焼速度は緩やかです。
               </p>
               <p>
-                一方、ニトロセルロースは分子構造の内部に <strong className="text-red-700">ニトロ基（エステル結合した硝酸基 -O-NO₂）としてあらかじめ酸素を豊富に抱え込んでいます</strong>。熱分解時に分子内で一瞬にして酸化還元反応が起きるため、酸素の拡散速度に制限されず、音速レベルの極めて速い自己燃焼（デフラグレーション）が進行します。
+                硝酸セルロースの分子には <strong className="text-red-700">硝酸エステル基（-O-NO₂）</strong>が含まれます。加熱による分解や燃焼は急速に進む危険があり、デフラグレーション（爆燃）は音速未満で伝わる燃焼です。衝撃波を伴い音速を超える爆轟とは異なる現象です。
               </p>
             </div>
           </div>

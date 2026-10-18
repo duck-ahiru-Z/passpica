@@ -25,7 +25,7 @@ export const TEMPLATES: Record<string, TemplateValue> = {
   "exam_2025_tsuishi_fig5": exam2025TsuishiFig5,
   "exam_2025_tsuishi_fig6": exam2025TsuishiFig6,
   "exam_2026_honshi": { code: exam2026Honshi, isOneBased: true },
-  "exam_2026_tsuishi": { code: exam2026Tsuishi, isOneBased: true },
+  "exam_2026_tsuishi": { code: exam2026Tsuishi, isOneBased: false },
 };
 
 export const TEMPLATE_OPTIONS = [
@@ -36,8 +36,8 @@ export const TEMPLATE_OPTIONS = [
   { value: "exam_2025_tsuishi_fig4", label: "2025年 追試験（図4）" },
   { value: "exam_2025_tsuishi_fig5", label: "2025年 追試験（図5）" },
   { value: "exam_2025_tsuishi_fig6", label: "2025年 追試験（図6）" },
-  { value: "exam_2026_honshi", label: "2026年 本試験" },
-  { value: "exam_2026_tsuishi", label: "2026年 追試験" },
+  { value: "exam_2026_honshi", label: "2026年 本試験（待ち時間計算）" },
+  { value: "exam_2026_tsuishi", label: "2026年 追試験（クイズ選定・縮小例）" },
   { value: "sample_basic", label: "基本構文と代入" },
   { value: "sample_if", label: "条件分岐（if文）" },
   { value: "sample_loop", label: "配列と繰り返し（for文）" },

@@ -21,28 +21,31 @@ export default function UnitCircleComplexPage() {
   // --- 数学計算 ---
   const rad1 = (theta1 * Math.PI) / 180;
   const rad2 = (theta2 * Math.PI) / 180;
+  const cleanCoordinate = (value: number) => (Math.abs(value) < 1e-12 ? 0 : value);
 
   // デカルト座標表示
-  const z1_x = r1 * Math.cos(rad1);
-  const z1_y = r1 * Math.sin(rad1);
+  const z1_x = cleanCoordinate(r1 * Math.cos(rad1));
+  const z1_y = cleanCoordinate(r1 * Math.sin(rad1));
 
-  const z2_x = r2 * Math.cos(rad2);
-  const z2_y = r2 * Math.sin(rad2);
+  const z2_x = cleanCoordinate(r2 * Math.cos(rad2));
+  const z2_y = cleanCoordinate(r2 * Math.sin(rad2));
 
   // 積 z3 = z1 * z2
   const r3 = r1 * r2;
   const theta3 = (theta1 + theta2) % 360;
   const rad3 = (theta3 * Math.PI) / 180;
   
-  const z3_x = r3 * Math.cos(rad3);
-  const z3_y = r3 * Math.sin(rad3);
+  const z3_x = cleanCoordinate(r3 * Math.cos(rad3));
+  const z3_y = cleanCoordinate(r3 * Math.sin(rad3));
 
   // --- SVGプロット定数 ---
   const width = 320;
   const height = 320;
   const cx = 160;
   const cy = 160;
-  const radius = 80; // 絶対値 = 1.0 が 80px に対応
+  // Keep the product vector inside the plot even when both factors are at max magnitude.
+  const plotScale = 130 / Math.max(1.5, r1, r2, r3);
+  const radius = plotScale; // absolute value = 1.0 maps to plotScale pixels
 
   // ベクトル座標マッピング
   const getVecCoords = (x: number, y: number) => {
@@ -82,7 +85,7 @@ export default function UnitCircleComplexPage() {
       </div>
 
       {/* メイングリッド：複素数平面 ＋ コントロール */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 items-start gap-8">
         
         {/* 左側：複素数平面 (2/3) */}
         <div className="lg:col-span-2 border border-gray-300 bg-white p-6 flex flex-col items-center justify-between min-h-[400px]">
@@ -101,6 +104,8 @@ export default function UnitCircleComplexPage() {
               height={height} 
               viewBox={`0 0 ${width} ${height}`} 
               className="overflow-visible font-mono"
+              role="img"
+              aria-label={`複素数平面。実軸と虚軸、単位円を表示。${showZ1 ? `z1は絶対値${r1.toFixed(2)}、偏角${theta1}度、座標(${z1_x.toFixed(2)}, ${z1_y.toFixed(2)})。` : 'z1は非表示。'}${showZ2 ? `z2は絶対値${r2.toFixed(2)}、偏角${theta2}度、座標(${z2_x.toFixed(2)}, ${z2_y.toFixed(2)})。` : 'z2は非表示。'}積z3=z1×z2は絶対値${r3.toFixed(2)}、偏角${theta3}度、座標(${z3_x.toFixed(2)}, ${z3_y.toFixed(2)})。複素数の積では絶対値を掛け、偏角を足します。`}
             >
               {/* グリッド補助円（r = 0.5, 1.0, 1.5） */}
               {showGrid && (
@@ -211,6 +216,7 @@ export default function UnitCircleComplexPage() {
                   step="0.05"
                   value={r1}
                   onChange={(e) => setR1(parseFloat(e.target.value))}
+                  aria-label="z1の絶対値"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -227,6 +233,7 @@ export default function UnitCircleComplexPage() {
                   step="5"
                   value={theta1}
                   onChange={(e) => setTheta1(parseInt(e.target.value))}
+                  aria-label="z1の偏角（度）"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -248,6 +255,7 @@ export default function UnitCircleComplexPage() {
                   step="0.05"
                   value={r2}
                   onChange={(e) => setR2(parseFloat(e.target.value))}
+                  aria-label="z2の絶対値"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -264,6 +272,7 @@ export default function UnitCircleComplexPage() {
                   step="5"
                   value={theta2}
                   onChange={(e) => setTheta2(parseInt(e.target.value))}
+                  aria-label="z2の偏角（度）"
                   className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
                 />
               </div>
@@ -329,15 +338,15 @@ export default function UnitCircleComplexPage() {
               <ul className="list-disc pl-4 space-y-1.5">
                 <li>
                   <strong className="text-slate-800">絶対値 (長さ) の積</strong>:<br />
-                  |z₃| = |z₁|・|z₂| (長さは掛け算になります。1.0 × 1.2 = {r3.toFixed(2)})。
+                  |z₃| = |z₁|・|z₂| (長さは掛け算になります。{r1.toFixed(1)} × {r2.toFixed(1)} = {r3.toFixed(2)})。
                 </li>
                 <li>
                   <strong className="text-slate-800">偏角 (角度) の和</strong>:<br />
-                  arg(z₃) = arg(z₁) + arg(z₂) (角度は足し算になります。{theta1}° + {theta2}° = {theta3}°)。
+                  arg(z₃) ≡ arg(z₁) + arg(z₂) (mod 360°)。{theta1}° + {theta2}° = {theta1 + theta2}° ≡ {theta3}° (mod 360°)。
                 </li>
               </ul>
               <p className="border-t border-gray-200 pt-2 text-[9px] text-gray-500">
-                これにより、絶対値が1の複素数（単位円上の点）を掛けることは、平面上の点（またはベクトル）を**「長さは変えずに、角度だけ回転させる」**ことと同等になります。
+                これにより、絶対値が1の複素数（単位円上の点）を掛けることは、平面上の点（またはベクトル）を<strong>「長さは変えずに、角度だけ回転させる」</strong>ことと同等になります。
               </p>
             </div>
           </div>

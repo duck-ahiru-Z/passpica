@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -130,7 +131,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function CosineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansVal1, setAnsVal1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ansVal2, setAnsVal2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -138,15 +139,10 @@ export default function CosineRuleDrillPage() {
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -227,11 +223,13 @@ export default function CosineRuleDrillPage() {
       ctx.fillStyle = '#f59e0b';
       ctx.fillText(`${problem.A}°`, ptA.x + 35, ptA.y - 10);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
+
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -249,7 +247,6 @@ export default function CosineRuleDrillPage() {
     if (problem.pattern === 'pattern3') {
       isOk = parseInt(ansDeg) === problem.ansAngle;
     } else {
-      const ok1 = false, ok2 = false;
       if (problem.ansTerms && problem.ansTerms.length === 1) {
         isOk = checkFractionRoot(ansVal1, 1, problem.ansTerms[0].num, problem.ansTerms[0].root, problem.ansTerms[0].den);
       } else if (problem.ansTerms && problem.ansTerms.length === 2) {
@@ -265,8 +262,6 @@ export default function CosineRuleDrillPage() {
     setIsCorrect(isOk);
     setHasChecked(true);
   };
-
-  if (!problem) return null;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -294,7 +289,13 @@ export default function CosineRuleDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAnsVal1(defaultFractionRoot); setAnsVal2(defaultFractionRoot);
+                  setAnsDeg(''); setHasChecked(false); setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -335,19 +336,19 @@ export default function CosineRuleDrillPage() {
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                       <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'a ='} />
-                      <FractionRootInput value={ansVal1} onChange={setAnsVal1} hideSign />
+                      <FractionRootInput value={ansVal1} onChange={value => { setAnsVal1(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                     </div>
                     {problem.ansTerms && problem.ansTerms.length > 1 && (
                       <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                         <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'a ='} />
-                        <FractionRootInput value={ansVal2} onChange={setAnsVal2} hideSign />
+                        <FractionRootInput value={ansVal2} onChange={value => { setAnsVal2(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                       </div>
                     )}
                   </div>
                 ) : (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math="A =" />
-                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => setAnsDeg(e.target.value)} />
+                    <input type="number" className="w-20 border border-gray-400 p-2 text-center" value={ansDeg} onChange={e => { setAnsDeg(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="text-base">度 (°)</span>
                   </div>
                 )}

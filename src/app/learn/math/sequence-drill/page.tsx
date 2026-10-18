@@ -4,7 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { createSequenceProblem, getSequenceTerms, sequencePatternLabels, sequencePatterns, type SequenceMode, type SequenceProblem } from '@/src/lib/sequenceRecurrence';
 
 // --- ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -12,20 +13,9 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-interface SequenceProblem {
-  a1: number;
-  p: number;
-  q: number;
-  alpha: number;
-  C: number;
-}
-
-type DrillMode = 'mix' | 'positive' | 'negative';
-const signPicker = new BalancedRandom<'positive' | 'negative'>(['positive', 'negative']);
-
 export default function SequenceDrillPage() {
-  const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<SequenceProblem | null>(null);
+  const [mode, setMode] = useState<SequenceMode>('mix');
+  const [problem, setProblem] = useClientGeneratedState<SequenceProblem>(() => createSequenceProblem('mix'));
   
   // 入力状態
   const [inC, setInC] = useState('');
@@ -40,23 +30,8 @@ export default function SequenceDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateProblem = (nextMode: DrillMode = mode) => {
-    const alpha = Math.floor(Math.random() * 11) - 5; // -5 to 5
-    
-    const mixedSign = signPicker.next();
-    const pChoices = nextMode === 'positive' ? [2, 3, 4, 5] : nextMode === 'negative' ? [-3, -2] : mixedSign === 'positive' ? [2, 3, 4, 5] : [-3, -2];
-    const p = pChoices[Math.floor(Math.random() * pChoices.length)];
-    
-    const q = alpha * (1 - p);
-    
-    let a1 = alpha;
-    while (a1 === alpha) {
-      a1 = Math.floor(Math.random() * 11) - 5;
-    }
-    
-    const C = a1 - alpha;
-
-    setProblem({ a1, p, q, alpha, C });
+  const generateProblem = (nextMode: SequenceMode = mode) => {
+    setProblem(createSequenceProblem(nextMode));
     setInC('');
     setInP('');
     setInAlpha('');
@@ -66,14 +41,10 @@ export default function SequenceDrillPage() {
     setShowGraph(true);
   };
 
-  const handleModeChange = (nextMode: DrillMode) => {
+  const handleModeChange = (nextMode: SequenceMode) => {
     setMode(nextMode);
     generateProblem(nextMode);
   };
-
-  useEffect(() => {
-    generateProblem();
-  }, []);
 
   // グラフ描画 (コブウェブプロット)
   useEffect(() => {
@@ -90,20 +61,16 @@ export default function SequenceDrillPage() {
     const graphH = H - 2 * pad;
 
     // 計算ステップ
-    const steps = [problem.a1];
-    for (let i = 0; i < 4; i++) {
-      steps.push(problem.p * steps[i] + problem.q);
-    }
+    const steps = getSequenceTerms(problem, 3);
 
     // 表示範囲の決定
-    let minV = Math.min(...steps.slice(0, 3), problem.alpha, 0) - 2;
-    let maxV = Math.max(...steps.slice(0, 3), problem.alpha, 0) + 2;
-
-    // 広すぎる場合は制限する
-    if (maxV - minV > 100) {
-      minV = Math.max(minV, -50);
-      maxV = Math.min(maxV, 50);
-    }
+    const visibleValues = [...steps, problem.alpha, 0];
+    const initialMin = Math.min(...visibleValues);
+    const initialMax = Math.max(...visibleValues);
+    const range = Math.max(initialMax - initialMin, 1);
+    const padding = Math.max(2, range * 0.12);
+    const minV = initialMin - padding;
+    const maxV = initialMax + padding;
 
     const mapX = (x: number) => pad + ((x - minV) / (maxV - minV)) * graphW;
     const mapY = (y: number) => H - pad - ((y - minV) / (maxV - minV)) * graphH;
@@ -125,54 +92,51 @@ export default function SequenceDrillPage() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    // y = px + q の直線
+    // y = px + q の直線。表示範囲内に収まる部分だけ描く。
     ctx.strokeStyle = '#3b82f6'; // blue-500
     ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(mapX(minV), mapY(problem.p * minV + problem.q));
-    ctx.lineTo(mapX(maxV), mapY(problem.p * maxV + problem.q));
-    ctx.stroke();
+    const xAtMinY = (minV - problem.q) / problem.p;
+    const xAtMaxY = (maxV - problem.q) / problem.p;
+    const lineStart = Math.max(minV, Math.min(xAtMinY, xAtMaxY));
+    const lineEnd = Math.min(maxV, Math.max(xAtMinY, xAtMaxY));
+    if (lineStart <= lineEnd) {
+      ctx.beginPath();
+      ctx.moveTo(mapX(lineStart), mapY(problem.p * lineStart + problem.q));
+      ctx.lineTo(mapX(lineEnd), mapY(problem.p * lineEnd + problem.q));
+      ctx.stroke();
+    }
 
     // コブウェブのステップ描画
     ctx.strokeStyle = 'rgba(239, 68, 68, 0.7)'; // red-500
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(mapX(steps[0]), mapY(0));
+    ctx.moveTo(mapX(steps[0]), mapY(steps[0]));
     
     for (let i = 0; i < steps.length - 1; i++) {
       const x = steps[i];
       const y = steps[i+1];
       
-      // 垂直に移動 (x, x) -> (x, y)
+      // 垂直に y=f(x) まで進み、y=x に戻る。
       ctx.lineTo(mapX(x), mapY(y));
-      // 水平に移動 (x, y) -> (y, y)
       ctx.lineTo(mapX(y), mapY(y));
       
       // 点を描画
       ctx.fillStyle = '#ef4444';
       ctx.beginPath();
-      ctx.arc(mapX(x), mapY(y), 3, 0, 2*Math.PI);
+      ctx.arc(mapX(y), mapY(y), 3, 0, 2*Math.PI);
       ctx.fill();
     }
     ctx.stroke();
 
-    // ラベル
-    ctx.fillStyle = '#1e293b';
-    ctx.font = '12px sans-serif';
-    ctx.fillText('y = x', mapX(maxV - 5), mapY(maxV - 5) - 5);
-    ctx.fillStyle = '#3b82f6';
-    ctx.fillText(`y = ${problem.p}x ${problem.q >= 0 ? '+' : ''}${problem.q}`, mapX(minV + 2), mapY(problem.p * (minV + 2) + problem.q) - 5);
-
-    // a1 と 特性解の強調
+    // 初項と特性解を点で強調する。文字ラベルは図外の凡例に置き、重なりを防ぐ。
     ctx.fillStyle = '#10b981'; // emerald
     ctx.beginPath();
     ctx.arc(mapX(problem.alpha), mapY(problem.alpha), 5, 0, 2*Math.PI);
     ctx.fill();
-    ctx.fillStyle = '#0f766e';
-    ctx.fillText(`α=${problem.alpha}`, mapX(problem.alpha) + 8, mapY(problem.alpha) + 12);
-
-    ctx.fillStyle = '#64748b';
-    ctx.fillText(`a₁=${problem.a1}`, mapX(problem.a1) + 5, mapY(0) - 5);
+    ctx.fillStyle = '#0f172a';
+    ctx.beginPath();
+    ctx.arc(mapX(problem.a1), mapY(problem.a1), 4, 0, 2*Math.PI);
+    ctx.fill();
 
   }, [problem]);
 
@@ -180,11 +144,16 @@ export default function SequenceDrillPage() {
     e.preventDefault();
     if (!problem) return;
 
-    const userC = parseInt(inC);
-    const userP = parseInt(inP);
-    const userAlpha = parseInt(inAlpha);
+    const userC = Number(inC);
+    const userP = Number(inP);
+    const userAlpha = Number(inAlpha);
 
-    if (userC === problem.C && userP === problem.p && userAlpha === problem.alpha) {
+    if (
+      inC.trim() !== '' && Number.isSafeInteger(userC) &&
+      inP.trim() !== '' && Number.isFinite(userP) &&
+      inAlpha.trim() !== '' && Number.isSafeInteger(userAlpha) &&
+      userC === problem.C && userP === problem.p && userAlpha === problem.alpha
+    ) {
       setIsCorrect(true);
       setFeedbackMsg('大正解！完璧です。');
     } else {
@@ -207,19 +176,18 @@ export default function SequenceDrillPage() {
           数列・隣接2項間の漸化式ドリル
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          特性方程式を用いて漸化式を解き、一般項を求める計算演習と、その収束・発散をコブウェブプロットで視覚化します。
+          特性方程式を用いて一般項を求め、正負の公比・収束・発散を階段図で比べます。個別の型で練習した後、全パターンランダムに挑戦できます。
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
           <span className="font-bold text-slate-700">演習モード：</span>
           <select
             aria-label="数列の演習モード"
             value={mode}
-            onChange={e => handleModeChange(e.target.value as DrillMode)}
+            onChange={e => handleModeChange(e.target.value as SequenceMode)}
             className="border border-slate-300 rounded px-2 py-1 bg-white"
           >
-            <option value="mix">実戦練習：公比の符号 全パターンランダム</option>
-            <option value="positive">基礎練習：公比が正の型だけ</option>
-            <option value="negative">基礎練習：公比が負の型だけ</option>
+            <option value="mix">実戦練習：収束・発散 全パターンランダム</option>
+            {sequencePatterns.map(pattern => <option key={pattern} value={pattern}>{sequencePatternLabels[pattern]}</option>)}
           </select>
         </div>
       </div>
@@ -254,7 +222,7 @@ export default function SequenceDrillPage() {
                 <MathEq math="\cdot \Big(" />
                 <input
                   type="number" value={inP} onChange={e => setInP(e.target.value)}
-                  placeholder="公比" required className="retro-input w-20 text-center font-mono text-base mx-1"
+                  placeholder="公比" step="any" required className="retro-input w-20 text-center font-mono text-base mx-1"
                 />
                 <MathEq math="\Big)^{n-1} +" />
                 <input
@@ -294,7 +262,20 @@ export default function SequenceDrillPage() {
                </button>
              </div>
              {showGraph ? (
-               <canvas ref={canvasRef} width={500} height={300} className="w-full h-auto border border-gray-200 bg-gray-50" />
+               <>
+                 <canvas ref={canvasRef} width={500} height={300} className="w-full h-auto border border-gray-200 bg-gray-50" />
+                 <div className="mt-2 space-y-1 text-[11px] text-slate-600">
+                   <div className="flex flex-wrap gap-x-4 gap-y-1">
+                     <span>点線：y = x</span>
+                     <span className="text-blue-700">青線：y = {problem.p}x {problem.q >= 0 ? '+' : ''}{problem.q}</span>
+                     <span className="text-red-600">赤：反復経路</span>
+                     <span className="text-emerald-700">緑：固定点 α = {problem.alpha}</span>
+                     <span className="text-slate-800">黒：初項 a₁ = {problem.a1}</span>
+                   </div>
+                   <p>反復値：{getSequenceTerms(problem, 3).map((value, index) => <span key={index}>{index > 0 ? ' → ' : ''}a{index + 1}={Number(value.toFixed(3))}</span>)}</p>
+                   <p>目安：|p| &lt; 1 なら固定点へ収束、|p| &gt; 1 なら初項が固定点と異なるため発散します。</p>
+                 </div>
+               </>
              ) : (
                <div className="h-48 flex items-center justify-center text-gray-400 bg-gray-50 border border-dashed border-gray-300">
                  グラフは非表示です

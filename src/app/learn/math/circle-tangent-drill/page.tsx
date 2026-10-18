@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -35,10 +36,30 @@ interface CircleProblem {
 type StrategyMode = 'mix' | 'contact' | 'distance';
 const strategyPicker = new BalancedRandom<'contact' | 'distance'>(['contact', 'distance']);
 
+function createCircleProblem(): CircleProblem {
+  const basePoints = [[3, 4], [4, 3], [-3, 4], [4, -3], [3, -4], [-4, 3], [1, 2], [2, 1], [-1, 2], [2, -1], [1, -2], [-2, 1], [2, 3], [3, 2], [-2, 3], [3, -2], [2, -3], [-3, 2], [1, 3], [3, 1], [-1, 3], [3, -1], [1, -3], [-3, 1]];
+  const [x1, y1] = basePoints[Math.floor(Math.random() * basePoints.length)];
+  const R2 = x1*x1 + y1*y1;
+  const kChoices = [-2, -1, 1, 2];
+  const k = kChoices[Math.floor(Math.random() * kChoices.length)];
+  const s = x1 - k * y1, t = y1 + k * x1;
+  const normalizeLine = (a: number, b: number, c: number) => {
+    const g = gcd3(a, b, c); let na = a / g, nb = b / g, nc = c / g;
+    if (na < 0 || (na === 0 && nb < 0)) { na = -na; nb = -nb; nc = -nc; }
+    return [na, nb, nc];
+  };
+  const [A1, B1, C1] = normalizeLine(x1, y1, R2);
+  const s2_t2 = s*s - t*t, st2 = 2*s*t;
+  const X2_scaled = s2_t2 * x1 + st2 * y1, Y2_scaled = st2 * x1 - s2_t2 * y1;
+  const normFactor = s*s + t*t;
+  const [A2, B2, C2] = normalizeLine(X2_scaled, Y2_scaled, normFactor * R2);
+  return { s, t, R2, A1, B1, C1, A2, B2, C2, x1, y1, x2: X2_scaled / normFactor, y2: Y2_scaled / normFactor };
+}
+
 export default function CircleTangentDrillPage() {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
-  const [strategy, setStrategy] = useState<'contact' | 'distance'>('contact');
-  const [problem, setProblem] = useState<CircleProblem | null>(null);
+  const [strategy, setStrategy] = useClientGeneratedState<'contact' | 'distance'>(() => strategyPicker.next());
+  const [problem, setProblem] = useClientGeneratedState<CircleProblem>(() => createCircleProblem());
   
   // 入力状態
   const [L1_A, setL1_A] = useState('');
@@ -58,51 +79,7 @@ export default function CircleTangentDrillPage() {
 
   const generateProblem = (nextMode: StrategyMode = strategyMode) => {
     setStrategy(nextMode === 'mix' ? strategyPicker.next() : nextMode);
-    // 適当な格子点(x1, y1)
-    const basePoints = [
-      [3, 4], [4, 3], [-3, 4], [4, -3], [3, -4], [-4, 3],
-      [1, 2], [2, 1], [-1, 2], [2, -1], [1, -2], [-2, 1],
-      [2, 3], [3, 2], [-2, 3], [3, -2], [2, -3], [-3, 2],
-      [1, 3], [3, 1], [-1, 3], [3, -1], [1, -3], [-3, 1],
-    ];
-    const [x1, y1] = basePoints[Math.floor(Math.random() * basePoints.length)];
-    const R2 = x1*x1 + y1*y1;
-    
-    // 接線1: x1*x + y1*y = R2 上の点P(s, t)
-    const kChoices = [-2, -1, 1, 2];
-    const k = kChoices[Math.floor(Math.random() * kChoices.length)];
-    const s = x1 - k * y1;
-    const t = y1 + k * x1;
-    
-    // 答えの正規化関数
-    const normalizeLine = (a: number, b: number, c: number) => {
-      const g = gcd3(a, b, c);
-      let na = a / g, nb = b / g, nc = c / g;
-      if (na < 0 || (na === 0 && nb < 0)) {
-        na = -na; nb = -nb; nc = -nc;
-      }
-      return [na, nb, nc];
-    };
-
-    const [nA1, nB1, nC1] = normalizeLine(x1, y1, R2);
-    
-    // 接線2の導出 (Pを通るもう1つの接線)
-    // T(x1, y1)のOP(s, t)に対する対称点U(x2, y2)
-    const s2_t2 = s*s - t*t;
-    const st2 = 2*s*t;
-    const X2_scaled = s2_t2 * x1 + st2 * y1;
-    const Y2_scaled = st2 * x1 - s2_t2 * y1;
-    const normFactor = s*s + t*t;
-    
-    const [nA2, nB2, nC2] = normalizeLine(X2_scaled, Y2_scaled, normFactor * R2);
-
-    setProblem({ 
-      s, t, R2, 
-      A1: nA1, B1: nB1, C1: nC1, 
-      A2: nA2, B2: nB2, C2: nC2, 
-      x1, y1,
-      x2: X2_scaled / normFactor, y2: Y2_scaled / normFactor
-    });
+    setProblem(createCircleProblem());
 
     setL1_A(''); setL1_B(''); setL1_C('');
     setL2_A(''); setL2_B(''); setL2_C('');
@@ -111,10 +88,6 @@ export default function CircleTangentDrillPage() {
     setShowExplanation(false);
     setShowGraph(true);
   };
-
-  useEffect(() => {
-    generateProblem();
-  }, []);
 
   // グラフ描画
   useEffect(() => {
@@ -253,7 +226,7 @@ export default function CircleTangentDrillPage() {
     return `${res} = ${c}`;
   };
 
-  if (!problem) return <div className="p-8 text-center">生成中...</div>;
+  if (!problem || !strategy) return <div className="p-8 text-center">生成中...</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">

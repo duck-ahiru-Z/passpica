@@ -1,163 +1,27 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { getQuadraticInequalityRegion, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
+import { generateQuadraticInequalityProblem, type QuadraticInequalityPattern, type QuadraticInequalityProblem } from '@/src/lib/quadraticInequalityProblems';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
+type AnsType = QuadraticInequalityAnswerType;
+type Pattern = QuadraticInequalityPattern;
+type ProblemData = QuadraticInequalityProblem;
 
-interface Root {
-  num: number;
-  den: number;
-}
-
-function simplifyFraction(n: number, d: number): Root {
-  if (d === 0) return { num: 0, den: 1 };
-  const g = gcd(n, d);
-  let num = n / g;
-  let den = d / g;
-  if (den < 0) {
-    num *= -1;
-    den *= -1;
-  }
-  return { num, den };
-}
-
-type InequalityType = '<' | '>' | '\\le' | '\\ge';
-type AnsType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  a: number; b: number; c: number;
-  ineqSign: InequalityType;
-  roots: Root[]; // 2 roots (sorted) or 1 root (D=0)
-  ansType: AnsType;
-  eq: string;
-}
-
-function getAnsType(a: number, D: number, sign: InequalityType): AnsType {
-  if (D > 0) {
-    if (a > 0) {
-      if (sign === '<') return 1;
-      if (sign === '\\le') return 3;
-      if (sign === '>') return 2;
-      if (sign === '\\ge') return 4;
-    } else {
-      if (sign === '<') return 2;
-      if (sign === '\\le') return 4;
-      if (sign === '>') return 1;
-      if (sign === '\\ge') return 3;
-    }
-  } else if (D === 0) {
-    if (a > 0) {
-      if (sign === '<') return 8; // 解なし
-      if (sign === '\\le') return 5; // x = p
-      if (sign === '>') return 6; // x != p
-      if (sign === '\\ge') return 7; // すべての実数
-    } else {
-      if (sign === '<') return 6; // x != p
-      if (sign === '\\le') return 7; // すべての実数
-      if (sign === '>') return 8; // 解なし
-      if (sign === '\\ge') return 5; // x = p
-    }
-  }
-  return 8;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p_type = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  const signs: InequalityType[] = ['<', '>', '\\le', '\\ge'];
-
-  while (true) {
-    const sign = signs[Math.floor(Math.random() * signs.length)];
-    let p, q, r, s, a, b, c;
-    let roots: Root[] = [];
-
-    if (p_type === 'pattern4') {
-      const root_val = Math.floor(Math.random() * 19) - 9;
-      const sign_a = Math.random() < 0.5 ? 1 : -1;
-      a = sign_a;
-      b = -2 * sign_a * root_val;
-      c = sign_a * root_val * root_val;
-      roots = [simplifyFraction(root_val, 1)];
-      if (a === 0 || b === 0 || c === 0) continue; // to make it look like a full polynomial
-    } else {
-      if (p_type === 'pattern1') {
-        p = 1; r = 1;
-        q = Math.floor(Math.random() * 11) - 5;
-        s = Math.floor(Math.random() * 11) - 5;
-      } else if (p_type === 'pattern2') {
-        p = -1; r = 1;
-        q = Math.floor(Math.random() * 11) - 5;
-        s = Math.floor(Math.random() * 11) - 5;
-      } else {
-        // pattern3
-        p = Math.floor(Math.random() * 5) + 1;
-        r = Math.floor(Math.random() * 5) + 1;
-        if (p === 1 && r === 1) r = 2;
-        q = Math.floor(Math.random() * 11) - 5;
-        s = Math.floor(Math.random() * 11) - 5;
-      }
-      if (q === 0 || s === 0) continue;
-      
-      const root1 = simplifyFraction(-q, p);
-      const root2 = simplifyFraction(-s, r);
-      const v1 = root1.num / root1.den;
-      const v2 = root2.num / root2.den;
-      if (v1 === v2) continue; // D>0 needs distinct roots
-      
-      roots = v1 < v2 ? [root1, root2] : [root2, root1];
-      a = p * r;
-      b = p * s + q * r;
-      c = q * s;
-    }
-
-    if (a === 0) continue;
-
-    const D = b * b - 4 * a * c;
-    const ansType = getAnsType(a, D, sign);
-
-    let eq = '';
-    if (a === 1) eq += 'x^2';
-    else if (a === -1) eq += '-x^2';
-    else eq += `${a}x^2`;
-    
-    if (b > 0) eq += ` + ${b === 1 ? '' : b}x`;
-    else if (b < 0) eq += ` - ${Math.abs(b) === 1 ? '' : Math.abs(b)}x`;
-    
-    if (c > 0) eq += ` + ${c}`;
-    else if (c < 0) eq += ` - ${Math.abs(c)}`;
-
-    eq += ` ${sign} 0`;
-    
-    return { pattern: p_type, a, b, c, ineqSign: sign, roots, ansType, eq };
-  }
-}
+const generateProblem = generateQuadraticInequalityProblem;
 
 export default function QuadraticInequalityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [userAnsType, setUserAnsType] = useState<AnsType>(1);
   const [ans1Num, setAns1Num] = useState<string>('');
@@ -171,11 +35,7 @@ export default function QuadraticInequalityDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -241,24 +101,31 @@ export default function QuadraticInequalityDrillPage() {
     }
 
     if (hasChecked) {
-      // Fill Region
+      // Fill each continuous solution interval along the parabola and x-axis.
       ctx.fillStyle = problem.ineqSign === '<' || problem.ineqSign === '\\le' ? 'rgba(59, 130, 246, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-      ctx.beginPath();
+      const satisfiesInequality = (y: number) =>
+        problem.ineqSign === '<' || problem.ineqSign === '\\le' ? y <= 0 : y >= 0;
+      let region: Array<{ x: number; y: number }> = [];
+      const fillRegion = () => {
+        if (region.length === 0) return;
+        const first = region[0];
+        const last = region[region.length - 1];
+        ctx.beginPath();
+        ctx.moveTo(mapX(first.x), mapY(0));
+        region.forEach(point => ctx.lineTo(mapX(point.x), mapY(point.y)));
+        ctx.lineTo(mapX(last.x), mapY(0));
+        ctx.closePath();
+        ctx.fill();
+        region = [];
+      };
+
       for (let i = 0; i <= 200; i++) {
         const x = minX + (rangeX * i) / 200;
         const y = func(x);
-        let condition = false;
-        if (problem.ineqSign === '<' || problem.ineqSign === '\\le') condition = y <= 0;
-        else condition = y >= 0;
-        
-        if (condition) {
-          if (i === 0 || !((problem.ineqSign === '<' || problem.ineqSign === '\\le') ? func(minX + (rangeX * (i-1))/200) <= 0 : func(minX + (rangeX * (i-1))/200) >= 0)) {
-            ctx.moveTo(mapX(x), mapY(y));
-          }
-          ctx.lineTo(mapX(x), mapY(0));
-        }
+        if (satisfiesInequality(y)) region.push({ x, y });
+        else fillRegion();
       }
-      ctx.fill();
+      fillRegion();
 
       // Draw Roots Dots
       ctx.fillStyle = '#000';
@@ -297,14 +164,14 @@ export default function QuadraticInequalityDrillPage() {
     }
     ctx.stroke();
 
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
-  const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
+    setProblem(generateProblem(pattern));
     setUserAnsType(1);
     setAns1Num(''); setAns1Den('');
     setAns2Num(''); setAns2Den('');
@@ -314,6 +181,10 @@ export default function QuadraticInequalityDrillPage() {
 
   const handleCheck = () => {
     if (!problem) return;
+
+    const firstRequired = [1, 2, 3, 4, 5, 6].includes(userAnsType);
+    const secondRequired = [1, 2, 3, 4].includes(userAnsType);
+    if ((firstRequired && !ans1Num.trim()) || (secondRequired && !ans2Num.trim())) return;
     
     if (userAnsType !== problem.ansType) {
       setIsCorrect(false);
@@ -328,24 +199,23 @@ export default function QuadraticInequalityDrillPage() {
       return;
     }
     
-    const parse = (nStr: string, dStr: string) => {
-      let num = parseInt(nStr);
-      let den = dStr.trim() === '' ? 1 : parseInt(dStr);
-      if (isNaN(num)) num = 0;
-      if (isNaN(den) || den === 0) den = 1;
-      return simplifyFraction(num, den);
-    };
-
-    const u1 = parse(ans1Num, ans1Den);
+    const u1 = parseQuadraticInequalityFraction(ans1Num, ans1Den);
+    const u2 = [1, 2, 3, 4].includes(problem.ansType)
+      ? parseQuadraticInequalityFraction(ans2Num, ans2Den)
+      : null;
+    if (!u1 || ([1, 2, 3, 4].includes(problem.ansType) && !u2)) {
+      setIsCorrect(false);
+      setHasChecked(true);
+      return;
+    }
     const r1 = problem.roots[0];
     
     if (problem.ansType === 5 || problem.ansType === 6) {
       if (u1.num === r1.num && u1.den === r1.den) setIsCorrect(true);
       else setIsCorrect(false);
     } else {
-      const u2 = parse(ans2Num, ans2Den);
       const r2 = problem.roots[1];
-      if (u1.num === r1.num && u1.den === r1.den && u2.num === r2.num && u2.den === r2.den) setIsCorrect(true);
+      if (u1.num === r1.num && u1.den === r1.den && u2?.num === r2.num && u2.den === r2.den) setIsCorrect(true);
       else setIsCorrect(false);
     }
     
@@ -354,11 +224,29 @@ export default function QuadraticInequalityDrillPage() {
 
   if (!problem) return null;
 
+  const formatRoot = ({ num, den }: ProblemData['roots'][number]) => den === 1 ? `${num}` : `${num}/${den}`;
+  const rootsLabel = problem.roots.map(formatRoot);
+  const normalizedSign = problem.a < 0 ? reverseQuadraticInequalitySign(problem.ineqSign) : problem.ineqSign;
+  const inequalityRegion = getQuadraticInequalityRegion(normalizedSign);
+  const solutionLabel = (() => {
+    switch (problem.ansType) {
+      case 1: return `${rootsLabel[0]} < x < ${rootsLabel[1]}`;
+      case 2: return `x < ${rootsLabel[0]} または ${rootsLabel[1]} < x`;
+      case 3: return `${rootsLabel[0]} ≤ x ≤ ${rootsLabel[1]}`;
+      case 4: return `x ≤ ${rootsLabel[0]} または ${rootsLabel[1]} ≤ x`;
+      case 5: return `x = ${rootsLabel[0]}`;
+      case 6: return `x = ${rootsLabel[0]} 以外のすべての実数`;
+      case 7: return 'すべての実数';
+      case 8: return '解なし';
+    }
+  })();
+  const graphDescription = `${problem.eq} のグラフ。${problem.a > 0 ? '下に凸' : '上に凸'}の放物線で、x軸との交点は ${rootsLabel.join(' と ')}。${hasChecked ? `色付き部分が不等式を満たす範囲で、解は ${solutionLabel}。` : '解答後に不等式を満たす範囲が色付きで表示されます。'}`;
+
   const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void) => (
     <div className="flex flex-col items-center justify-center inline-flex align-middle">
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => setNum(e.target.value)} />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => { setNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
       <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => setDen(e.target.value)} placeholder="1" />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => { setDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
     </div>
   );
 
@@ -388,14 +276,18 @@ export default function QuadraticInequalityDrillPage() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const pattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(pattern);
+                  handleNext(pattern);
+                }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (基本・内側/外側)</option>
-                <option value="pattern2">パターン2 (マイナス係数)</option>
-                <option value="pattern3">パターン3 (解が分数)</option>
-                <option value="pattern4">パターン4 (D=0の特殊解)</option>
+                <option value="mix">実戦練習：二次不等式 全パターンランダム</option>
+                <option value="pattern1">基礎練習：基本・内側/外側だけ</option>
+                <option value="pattern2">基礎練習：マイナス係数だけ</option>
+                <option value="pattern3">基礎練習：解が分数だけ</option>
+                <option value="pattern4">基礎練習：D=0の特殊解だけ</option>
               </select>
             </div>
 
@@ -410,35 +302,35 @@ export default function QuadraticInequalityDrillPage() {
               
               <div className="grid grid-cols-2 gap-2 text-[11px] mb-4">
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 1} onChange={() => setUserAnsType(1)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 1} onChange={() => { setUserAnsType(1); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="A < x < B" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 3} onChange={() => setUserAnsType(3)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 3} onChange={() => { setUserAnsType(3); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="A \le x \le B" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 2} onChange={() => setUserAnsType(2)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 2} onChange={() => { setUserAnsType(2); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x < A, \quad B < x" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 4} onChange={() => setUserAnsType(4)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 4} onChange={() => { setUserAnsType(4); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x \le A, \quad B \le x" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 5} onChange={() => setUserAnsType(5)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 5} onChange={() => { setUserAnsType(5); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x = A" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 6} onChange={() => setUserAnsType(6)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 6} onChange={() => { setUserAnsType(6); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x \neq A \text{ のすべての実数}" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 7} onChange={() => setUserAnsType(7)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 7} onChange={() => { setUserAnsType(7); setHasChecked(false); setIsCorrect(false); }} />
                   すべての実数
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 8} onChange={() => setUserAnsType(8)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 8} onChange={() => { setUserAnsType(8); setHasChecked(false); setIsCorrect(false); }} />
                   解なし
                 </label>
               </div>
@@ -459,12 +351,13 @@ export default function QuadraticInequalityDrillPage() {
             <div className="mt-8 flex gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={([1, 2, 3, 4, 5, 6].includes(userAnsType) && !ans1Num.trim()) || ([1, 2, 3, 4].includes(userAnsType) && !ans2Num.trim())}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
               </button>
               <button 
-                onClick={handleNext}
+                onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
                 次の問題へ ➔
@@ -499,6 +392,8 @@ export default function QuadraticInequalityDrillPage() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
+                role="img"
+                aria-label={graphDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
@@ -514,29 +409,29 @@ export default function QuadraticInequalityDrillPage() {
                   <div className="bg-red-50 p-2 border border-red-200">
                     <p className="font-bold text-red-600 mb-1">【重要】最初に x² の係数をプラスにする！</p>
                     <p>両辺に <MathEq math="-1" /> を掛けます。<strong className="text-red-600 underline">このとき不等号の向きが逆になることに注意！</strong></p>
-                    <MathEq math={`${-problem.a === 1 ? '' : -problem.a}x^2 ${-problem.b > 0 ? '+' : ''} ${-problem.b === 1 ? '' : -problem.b === -1 ? '-' : -problem.b}x ${-problem.c > 0 ? '+' : ''} ${-problem.c === 0 ? '' : -problem.c} ${problem.ineqSign === '<' ? '>' : problem.ineqSign === '>' ? '<' : problem.ineqSign === '\\le' ? '\\ge' : '\\le'} 0`} block />
+                    <MathEq math={`${-problem.a === 1 ? '' : -problem.a}x^2 ${-problem.b > 0 ? '+' : ''} ${-problem.b === 1 ? '' : -problem.b === -1 ? '-' : -problem.b}x ${-problem.c > 0 ? '+' : ''} ${-problem.c === 0 ? '' : -problem.c} ${normalizedSign} 0`} block />
                   </div>
                 )}
 
                 {problem.roots.length === 2 && (
                   <div className="bg-gray-50 p-2 border">
                     <p>因数分解すると、左辺は <MathEq math={`= 0`} /> のとき、<MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}, \\quad ${problem.roots[1].den === 1 ? problem.roots[1].num : `\\frac{${problem.roots[1].num}}{${problem.roots[1].den}}`}`} /> となります。</p>
-                    <p>グラフを描くと、{problem.a > 0 ? '下に凸' : '上に凸'}の放物線になります。</p>
-                    <p className="mt-2">今回は {problem.ineqSign === '<' || problem.ineqSign === '\\le' ? '0より小さい（0以下）なので、x軸より「下」' : '0より大きい（0以上）なので、x軸より「上」'} の部分を探します。</p>
+                    <p>{problem.a < 0 ? '変形後の式' : '左辺'}のグラフは、下に凸の放物線になります。</p>
+                    <p className="mt-2">今回は <MathEq math={inequalityRegion.boundary} /> 条件なので、x軸より「{inequalityRegion.side}」の部分を探します。</p>
                     <p>グラフの色付き部分に対応する $x$ の範囲が答えです。</p>
                   </div>
                 )}
 
                 {problem.roots.length === 1 && (
                   <div className="bg-gray-50 p-2 border">
-                    <p>左辺は完全平方式 <MathEq math={`(${problem.a > 0 ? '' : '-'}(x - ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`})^2`} /> になります。</p>
+                    <p>{problem.a < 0 ? '変形後の左辺' : '左辺'}は完全平方式 <MathEq math={`${Math.abs(problem.a) === 1 ? '' : Math.abs(problem.a)}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
                     <p>判別式 <MathEq math="D=0" /> であり、放物線は x軸と <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> で接します。</p>
-                    <p className="mt-2">グラフから、{problem.ineqSign === '<' || problem.ineqSign === '\\le' ? '0より小さい（0以下）' : '0より大きい（0以上）'} 条件を満たす $x$ を探します。</p>
+                    <p className="mt-2">{problem.a < 0 ? '変形後のグラフから' : 'グラフから'}、<MathEq math={inequalityRegion.boundary} /> 条件を満たす $x$ を探します。</p>
                     <ul className="list-disc pl-4 mt-1">
                       {problem.ansType === 5 && <li>接点のみが条件を満たすため、答えは <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> となります。</li>}
                       {problem.ansType === 6 && <li>接点以外はすべて条件を満たすため、答えは <MathEq math={`x \\neq ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> のすべての実数です。</li>}
                       {problem.ansType === 7 && <li>すべての点で条件を満たすため、答えは「すべての実数」です。</li>}
-                      {problem.ansType === 8 && <li>条件を満たす点はひとつもないため、答えは「解なし」です。</li>}
+                      {problem.ansType === 8 && <li>二次式は実数範囲で常に{problem.a > 0 ? '0以上' : '0以下'}です。したがって、この不等号を満たす値はなく、答えは「解なし」です。</li>}
                     </ul>
                   </div>
                 )}

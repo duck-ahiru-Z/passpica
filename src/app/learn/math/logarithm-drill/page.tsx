@@ -254,7 +254,7 @@ export default function LogarithmDrill() {
                   type="text" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
-                  onChange={e => setAnsVal(e.target.value)} 
+                  onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="解答"
                 />
               </div>

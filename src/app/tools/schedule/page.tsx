@@ -45,8 +45,7 @@ export default function SchedulePage() {
       try {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setSchedule(JSON.parse(saved));
-      } catch (_e) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+      } catch {
         setSchedule([]);
       }
     }

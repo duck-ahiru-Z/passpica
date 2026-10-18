@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -54,7 +55,7 @@ function generateProblem(mode: DrillMode = 'mix'): ProblemData {
 
 export default function RationalizationDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -68,10 +69,6 @@ export default function RationalizationDrillPage() {
   
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
-
-  useEffect(() => {
-    handleNext('mix');
-  }, []);
 
   const handleNext = (nextMode: DrillMode = mode) => {
     setProblem(generateProblem(nextMode));
@@ -111,7 +108,7 @@ export default function RationalizationDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -160,13 +157,13 @@ export default function RationalizationDrillPage() {
               </div>
               <div className="flex items-center justify-center gap-2 text-xl">
                 <MathEq math="=" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="A" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="A" />
                 <MathEq math="\sqrt{" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => setAns_a(e.target.value)} placeholder="a" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => { setAns_a(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
                 <MathEq math={`} ${problem.ansSign}`} />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="B" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="B" />
                 <MathEq math="\sqrt{" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => setAns_b(e.target.value)} placeholder="b" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => { setAns_b(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="b" />
                 <MathEq math="}" />
               </div>
               <div className="text-[10px] text-gray-500 text-center">

@@ -2,40 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { getIndicatorDisplay, type IndicatorKey } from '@/src/lib/chemistryIndicator';
 
 export default function AcidBasePage() {
-  const [indicator, setIndicator] = useState<'pp' | 'litmus' | 'mo'>('pp');
+  const [indicator, setIndicator] = useState<IndicatorKey>('pp');
   const [pH, setPH] = useState<number>(7);
-
-  // 指示薬の色計算
-  const getLiquidColor = () => {
-    if (indicator === 'pp') {
-      // フェノールフタレイン: 酸性・中性は無色、塩基性で赤ピンク
-      if (pH >= 8.3) {
-        const opacity = Math.min((pH - 8.3) / (14 - 8.3) + 0.3, 0.95);
-        return `rgba(244, 114, 182, ${opacity})`;
-      }
-      return 'rgba(255, 255, 255, 0.2)';
-    } else if (indicator === 'litmus') {
-      // リトマス液: 酸性で赤、中性で紫、塩基性で青
-      if (pH < 5.0) {
-        return 'rgba(239, 68, 68, 0.7)'; // 赤
-      } else if (pH > 8.0) {
-        return 'rgba(59, 130, 246, 0.7)'; // 青
-      } else {
-        return 'rgba(139, 92, 246, 0.6)'; // 紫
-      }
-    } else {
-      // メチルオレンジ: 強酸性で赤、pH 4.4以上で黄色
-      if (pH < 3.1) {
-        return 'rgba(239, 68, 68, 0.8)'; // 赤
-      } else if (pH < 4.4) {
-        return 'rgba(249, 115, 22, 0.8)'; // オレンジ
-      } else {
-        return 'rgba(234, 179, 8, 0.7)'; // 黄色
-      }
-    }
-  };
+  const display = getIndicatorDisplay(indicator, pH);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
@@ -46,7 +18,7 @@ export default function AcidBasePage() {
           <Link href="/">トップ</Link> &gt; <Link href="/learn">学習室</Link> &gt; 化学・酸と塩基
         </nav>
         <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-          指示薬・pH中和滴定シミュレーター
+          酸塩基指示薬・pH色変化シミュレーター
         </h1>
         <p className="text-xs text-gray-500 mt-1">
           pH値の増減による、フェノールフタレイン等の主要指示薬の色調変化をシミュレートします。
@@ -70,18 +42,17 @@ export default function AcidBasePage() {
           </div>
 
           {/* フラットなビーカー */}
-          <div className="flex items-center justify-center py-6 w-full relative h-[180px]">
-            {/* 液体描画 */}
-            <div 
-              className="w-32 h-24 absolute bottom-1 border border-transparent transition-colors duration-300"
-              style={{
-                backgroundColor: getLiquidColor(),
-                borderRadius: '0 0 4px 4px'
-              }}
-            ></div>
-            
+          <div
+            className="flex items-center justify-center py-6 w-full relative h-[180px]"
+            role="img"
+            aria-label={`${display.indicatorName}を加えたpH${pH.toFixed(1)}の溶液。${display.colorName}。`}
+          >
             {/* ビーカーの線画 */}
             <div className="w-36 h-28 border-x-2 border-b-2 border-slate-700 rounded-b relative z-20 flex items-end">
+              <div
+                className="absolute left-1 right-1 bottom-1 h-24 border border-transparent transition-colors duration-300"
+                style={{ backgroundColor: display.backgroundColor, borderRadius: '0 0 4px 4px' }}
+              />
               <div className="absolute left-1 top-4 w-3 h-0.5 bg-slate-400"></div>
               <div className="absolute left-1 top-10 w-1.5 h-0.5 bg-slate-400"></div>
               <div className="absolute left-1 top-16 w-3 h-0.5 bg-slate-400"></div>
@@ -94,15 +65,18 @@ export default function AcidBasePage() {
             <div className="flex justify-between items-center mb-1 text-xs font-bold text-slate-700">
               <span>溶液のpH調整スライダー：</span>
               <span className="bg-gray-100 border border-gray-400 px-3 py-1 font-mono text-slate-800 font-bold">
-                pH = {pH} ({pH < 7 ? '酸性' : pH === 7 ? '中性' : '塩基性'})
+                pH = {pH.toFixed(1)} ({pH < 7 ? '酸性' : pH === 7 ? '中性' : '塩基性'})
               </span>
             </div>
             <input
               type="range"
+              aria-label="溶液のpH"
               min="1"
               max="14"
+              step="0.1"
+              aria-valuetext={`pH ${pH.toFixed(1)}、${pH < 7 ? '酸性' : pH === 7 ? '中性' : '塩基性'}、${display.colorName}`}
               value={pH}
-              onChange={(e) => setPH(parseInt(e.target.value))}
+              onChange={(e) => setPH(parseFloat(e.target.value))}
               className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
             />
           </div>
@@ -120,8 +94,10 @@ export default function AcidBasePage() {
 
             <div className="flex flex-col gap-2">
               <button
+                type="button"
+                aria-pressed={indicator === 'pp'}
                 onClick={() => setIndicator('pp')}
-                className={`border border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'pp' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
+                className={`border-2 p-2.5 text-left transition-all flex items-center justify-between ${indicator === 'pp' ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-300 font-bold' : 'bg-slate-50 border-gray-300 hover:bg-slate-100'}`}
               >
                 <div>
                   <div className="text-xs">フェノールフタレイン</div>
@@ -131,8 +107,10 @@ export default function AcidBasePage() {
               </button>
 
               <button
+                type="button"
+                aria-pressed={indicator === 'litmus'}
                 onClick={() => setIndicator('litmus')}
-                className={`border border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'litmus' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
+                className={`border-2 p-2.5 text-left transition-all flex items-center justify-between ${indicator === 'litmus' ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-300 font-bold' : 'bg-slate-50 border-gray-300 hover:bg-slate-100'}`}
               >
                 <div>
                   <div className="text-xs">リトマス液</div>
@@ -142,8 +120,10 @@ export default function AcidBasePage() {
               </button>
 
               <button
+                type="button"
+                aria-pressed={indicator === 'mo'}
                 onClick={() => setIndicator('mo')}
-                className={`border-2 border-gray-400 p-2.5 text-left transition-all bg-slate-50 hover:bg-slate-100 flex items-center justify-between ${indicator === 'mo' ? 'bg-amber-100 border-amber-600 font-bold' : ''}`}
+                className={`border-2 p-2.5 text-left transition-all flex items-center justify-between ${indicator === 'mo' ? 'bg-amber-100 border-amber-600 ring-2 ring-amber-300 font-bold' : 'bg-slate-50 border-gray-300 hover:bg-slate-100'}`}
               >
                 <div>
                   <div className="text-xs">メチルオレンジ</div>

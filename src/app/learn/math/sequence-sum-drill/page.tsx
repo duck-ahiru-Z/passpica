@@ -4,187 +4,18 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateSequenceSumProblem, type SequenceSumPattern } from '@/src/lib/sequenceSumQuestions';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
+type Pattern = SequenceSumPattern;
+const generateProblem = generateSequenceSumProblem;
 
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  qStr: string;
-  ansNum: number;
-  ansDen: number;
-  expLines: string[];
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    if (p === 'pattern1') {
-      const a = Math.floor(Math.random() * 21) - 10;
-      const d = Math.floor(Math.random() * 21) - 10;
-      const n = Math.floor(Math.random() * 16) + 5; // 5..20
-      if (d === 0) continue;
-      
-      const sum = (n * (2 * a + (n - 1) * d)) / 2;
-      const qStr = `初項 ${a} 、公差 ${d} の等差数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
-      
-      const expLines = [
-        `\\text{等差数列の和の公式 } S_n = \\frac{n}{2}\\{2a + (n-1)d\\} \\text{ に代入します。}`,
-        `S_{${n}} = \\frac{${n}}{2} \\{ 2 \\cdot (${a}) + (${n}-1) \\cdot (${d}) \\}`,
-        `= \\frac{${n}}{2} \\{ ${2*a} + ${n-1} \\cdot (${d}) \\}`,
-        `= \\frac{${n}}{2} \\{ ${2*a + (n-1)*d} \\}`,
-        `= ${sum}`
-      ];
-      
-      return { pattern: p, qStr, ansNum: sum, ansDen: 1, expLines };
-    } 
-    else if (p === 'pattern2') {
-      const a = Math.floor(Math.random() * 21) - 10;
-      const l = Math.floor(Math.random() * 41) - 20;
-      const n = Math.floor(Math.random() * 16) + 5; // 5..20
-      if (a === l) continue;
-      
-      let sumNum = n * (a + l);
-      let sumDen = 2;
-      const g = gcd(sumNum, sumDen);
-      sumNum /= g; sumDen /= g;
-      if (sumDen < 0) { sumNum = -sumNum; sumDen = -sumDen; }
-      
-      const qStr = `初項 ${a} 、末項 ${l} 、項数 ${n} の等差数列の和 S_{${n}} を求めよ。`;
-      
-      const expLines = [
-        `\\text{末項がわかっている場合の公式 } S_n = \\frac{n}{2}(a+l) \\text{ を用います。}`,
-        `S_{${n}} = \\frac{${n}}{2} ( ${a} + (${l}) )`,
-        `= \\frac{${n}}{2} \\cdot (${a+l})`
-      ];
-      if (sumDen === 1) {
-        expLines.push(`= ${sumNum}`);
-      } else {
-        expLines.push(`= \\frac{${sumNum}}{${sumDen}}`);
-      }
-      
-      return { pattern: p, qStr, ansNum: sumNum, ansDen: sumDen, expLines };
-    }
-    else if (p === 'pattern3') {
-      const a = Math.floor(Math.random() * 5) + 1; // 1..5
-      const r = Math.floor(Math.random() * 3) + 2; // 2..4
-      const n = Math.floor(Math.random() * 4) + 4; // 4..7
-      
-      const sum = a * (Math.pow(r, n) - 1) / (r - 1);
-      
-      const qStr = `初項 ${a} 、公比 ${r} の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
-      
-      const expLines = [
-        `\\text{等比数列の和の公式 } S_n = \\frac{a(r^n - 1)}{r - 1} \\text{ に代入します。}`,
-        `S_{${n}} = \\frac{${a} \\cdot (${r}^{${n}} - 1)}{${r} - 1}`,
-        `= \\frac{${a} \\cdot (${Math.pow(r, n)} - 1)}{${r - 1}}`,
-        `= \\frac{${a} \\cdot ${Math.pow(r, n) - 1}}{${r - 1}}`,
-        `= ${sum}`
-      ];
-      
-      return { pattern: p, qStr, ansNum: sum, ansDen: 1, expLines };
-    }
-    else if (p === 'pattern4') {
-      // r = -2 or 1/2 or -1/2
-      const choices = [-2, 0.5, -0.5];
-      const r_val = choices[Math.floor(Math.random() * choices.length)];
-      let a = 0, n = 0;
-      let rStr = "";
-      
-      if (r_val === -2) {
-        a = Math.floor(Math.random() * 5) + 1;
-        n = Math.floor(Math.random() * 4) + 5; // 5..8
-        rStr = "-2";
-      } else if (r_val === 0.5) {
-        const powers = [8, 16, 32, 64];
-        a = powers[Math.floor(Math.random() * powers.length)];
-        n = Math.floor(Math.random() * 4) + 4; // 4..7
-        rStr = "\\frac{1}{2}";
-      } else if (r_val === -0.5) {
-        const powers = [8, 16, 32];
-        a = powers[Math.floor(Math.random() * powers.length)];
-        n = Math.floor(Math.random() * 3) + 4; // 4..6
-        rStr = "-\\frac{1}{2}";
-      }
-      
-      const qStr = `初項 ${a} 、公比 $${rStr}$ の等比数列の初項から第 ${n} 項までの和 S_{${n}} を求めよ。`;
-      
-      const rPowN = 0;
-      let rNum = 0, rDen = 1;
-      let powNum = 0, powDen = 1;
-
-      if (r_val === -2) {
-        rNum = -2; rDen = 1;
-        powNum = Math.pow(-2, n); powDen = 1;
-      } else if (r_val === 0.5) {
-        rNum = 1; rDen = 2;
-        powNum = 1; powDen = Math.pow(2, n);
-      } else if (r_val === -0.5) {
-        rNum = -1; rDen = 2;
-        powNum = n % 2 === 0 ? 1 : -1;
-        powDen = Math.pow(2, n);
-      }
-
-      // sum = a * (1 - r^n) / (1 - r)
-      // num = a * (1 - powNum/powDen) = a * (powDen - powNum) / powDen
-      // den = 1 - rNum/rDen = (rDen - rNum) / rDen
-      // sum = [ a * (powDen - powNum) * rDen ] / [ powDen * (rDen - rNum) ]
-      
-      let num = a * (powDen - powNum) * rDen;
-      let den = powDen * (rDen - rNum);
-      const g = gcd(num, den);
-      num /= g; den /= g;
-      if (den < 0) { num = -num; den = -den; }
-
-      let expLines = [];
-      if (r_val === -2) {
-        expLines = [
-          `\\text{公比が負の場合は } S_n = \\frac{a(1 - r^n)}{1 - r} \\text{ の形が安全です。}`,
-          `S_{${n}} = \\frac{${a} \\{ 1 - (-2)^{${n}} \\}}{1 - (-2)}`,
-          `= \\frac{${a} \\{ 1 - (${Math.pow(-2, n)}) \\}}{3}`,
-          `= \\frac{${a} \\cdot (${1 - Math.pow(-2, n)})}{3}`,
-          `= ${num}` // den must be 1 for r=-2 ? Not necessarily, if a not div by 3. But usually we just show final fraction.
-        ];
-        if (den !== 1) expLines[4] = `= \\frac{${num}}{${den}}`;
-      } else {
-        expLines = [
-          `\\text{公比が分数の場合は } S_n = \\frac{a(1 - r^n)}{1 - r} \\text{ を用います。}`,
-          `S_{${n}} = \\frac{${a} \\left\\{ 1 - \\left(${rStr}\\right)^{${n}} \\right\\}}{1 - \\left(${rStr}\\right)}`,
-          `= \\frac{${a} \\left( 1 - \\frac{${powNum}}{${powDen}} \\right)}{\\frac{${rDen - rNum}}{${rDen}}}`,
-          `= ${a} \\left( \\frac{${powDen - powNum}}{${powDen}} \\right) \\times \\frac{${rDen}}{${rDen - rNum}}`
-        ];
-        if (den === 1) {
-          expLines.push(`= ${num}`);
-        } else {
-          expLines.push(`= \\frac{${num}}{${den}}`);
-        }
-      }
-      
-      return { pattern: p, qStr, ansNum: num, ansDen: den, expLines };
-    }
-  }
-}
 
 export default function SequenceSumDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
@@ -205,18 +36,10 @@ export default function SequenceSumDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let uNum = 0, uDen = 1;
-    const uStr = ansVal.trim().replace(/\s+/g, '');
-    if (uStr.includes('/')) {
-      const parts = uStr.split('/');
-      uNum = parseInt(parts[0]);
-      uDen = parseInt(parts[1]);
-    } else {
-      uNum = parseInt(uStr);
-      uDen = 1;
-    }
-    
-    if (!isNaN(uNum) && !isNaN(uDen) && uNum * problem.ansDen === problem.ansNum * uDen) {
+    const userAnswer = parseRationalAnswer(ansVal);
+    const expectedAnswer = { numerator: problem.ansNum, denominator: problem.ansDen };
+
+    if (rationalEquals(userAnswer, expectedAnswer)) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -274,15 +97,20 @@ export default function SequenceSumDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="数列の和の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (等差数列の和・基本)</option>
-                <option value="pattern2">パターン2 (等差数列の和・末項指定)</option>
-                <option value="pattern3">パターン3 (等比数列の和・正の公比)</option>
-                <option value="pattern4">パターン4 (等比数列の和・負/分数公比)</option>
+                <optgroup label="実戦練習">
+                  <option value="mix">数列の和 全パターンランダム</option>
+                </optgroup>
+                <optgroup label="基礎練習">
+                  <option value="pattern1">等差数列の和（初項・公差）</option>
+                  <option value="pattern2">等差数列の和（末項指定）</option>
+                  <option value="pattern3">等比数列の和（正の公比）</option>
+                  <option value="pattern4">等比数列の和（負・分数公比）</option>
+                </optgroup>
               </select>
             </div>
 
@@ -296,10 +124,11 @@ export default function SequenceSumDrill() {
                   分数になる場合は 15/2 のようにスラッシュで入力
                 </div>
                 <input 
+                  aria-label="数列の和の答え"
                   type="text" 
                   className="w-40 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
-                  onChange={e => setAnsVal(e.target.value)} 
+                  onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="解答"
                 />
               </div>
@@ -307,12 +136,15 @@ export default function SequenceSumDrill() {
 
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
               <button 
+                type="button"
                 onClick={handleCheck}
-                className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
+                disabled={!ansVal.trim()}
+                className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 解答する
               </button>
               <button 
+                type="button"
                 onClick={() => handleNext()}
                 className="retro-btn-classic"
               >
@@ -321,7 +153,7 @@ export default function SequenceSumDrill() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！公式の適用と計算が完璧です。' : '不正解... 公式への代入や符号の処理を確認しましょう。'}
               </div>
             )}

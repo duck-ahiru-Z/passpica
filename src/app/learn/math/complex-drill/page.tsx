@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -30,13 +31,6 @@ const PROBLEMS = [
 
 type DrillMode = 'mix' | 'sqrt2' | 'two' | 'unit';
 
-function problemMatchesMode(problem: typeof PROBLEMS[0], mode: DrillMode) {
-  if (mode === 'mix') return true;
-  if (mode === 'unit') return problem.r === 1;
-  if (mode === 'sqrt2') return problem.r === Math.sqrt(2);
-  return problem.r === 2;
-}
-
 const problemPickers: Record<DrillMode, BalancedRandom<typeof PROBLEMS[number]>> = {
   mix: new BalancedRandom(PROBLEMS),
   sqrt2: new BalancedRandom(PROBLEMS.filter(p => p.r === Math.sqrt(2))),
@@ -46,7 +40,7 @@ const problemPickers: Record<DrillMode, BalancedRandom<typeof PROBLEMS[number]>>
 
 export default function ComplexDrillPage() {
   const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useState<typeof PROBLEMS[0] | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<typeof PROBLEMS[number]>(() => problemPickers.mix.next());
   
   // 入力状態
   const [inN, setInN] = useState('');
@@ -75,10 +69,6 @@ export default function ComplexDrillPage() {
     setMode(nextMode);
     generateProblem(nextMode);
   };
-
-  useEffect(() => {
-    generateProblem();
-  }, []);
 
   // グラフ描画
   useEffect(() => {

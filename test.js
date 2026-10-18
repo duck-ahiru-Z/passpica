@@ -122,9 +122,14 @@ console.log("=== JS CODE ===");
 console.log(jsCode);
 
 // test execution
+// These bindings are looked up by the dynamically evaluated pseudo-language source below.
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sys_print = (...args) => console.log(...args);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sys_len = (arr) => arr.length - 1;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sys_ransuu = () => Math.random();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const sys_arr = (arr) => [undefined, ...arr];
 
 try {

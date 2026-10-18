@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -128,7 +129,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function RootsCoefficientsDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansSign, setAnsSign] = useState<'+' | '-'>('+');
   const [ansNumStr, setAnsNumStr] = useState<string>('');
@@ -136,10 +137,6 @@ export default function RootsCoefficientsDrill() {
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -166,7 +163,7 @@ export default function RootsCoefficientsDrill() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   const eqStr = formatPoly(problem.a, problem.b, problem.c);
 
@@ -252,7 +249,7 @@ export default function RootsCoefficientsDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsSign('+'); setAnsNumStr(''); setAnsDenStr(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -275,7 +272,7 @@ export default function RootsCoefficientsDrill() {
                   <select 
                     className="border-b-2 bg-transparent outline-none text-2xl font-bold focus:border-blue-500 pb-1"
                     value={ansSign}
-                    onChange={(e) => setAnsSign(e.target.value as '+' | '-')}
+                    onChange={(e) => { setAnsSign(e.target.value as '+' | '-'); setHasChecked(false); setIsCorrect(false); }}
                   >
                     <option value="+">+</option>
                     <option value="-">-</option>
@@ -286,7 +283,7 @@ export default function RootsCoefficientsDrill() {
                       type="number" 
                       className="w-16 bg-transparent outline-none text-center font-bold text-xl text-slate-800" 
                       value={ansNumStr} 
-                      onChange={e => setAnsNumStr(e.target.value)} 
+                      onChange={e => { setAnsNumStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="分子"
                     />
                     <div className="w-full h-0.5 bg-slate-800"></div>
@@ -294,7 +291,7 @@ export default function RootsCoefficientsDrill() {
                       type="number" 
                       className="w-16 bg-transparent outline-none text-center font-bold text-xl text-slate-800" 
                       value={ansDenStr} 
-                      onChange={e => setAnsDenStr(e.target.value)} 
+                      onChange={e => { setAnsDenStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="分母"
                     />
                   </div>

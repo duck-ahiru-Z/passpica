@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 const formulaTypes = ['1/6_line', '1/6_para', '1/12', '1/20', '1/30'] as const;
 const mixedFormulaPicker = new BalancedRandom<string>(formulaTypes);
@@ -115,9 +116,42 @@ interface ProblemData {
   power: number;
 }
 
+function createCalculusProblem(mode: string): ProblemData {
+  let type = mode;
+  if (type === 'mix') type = mixedFormulaPicker.next();
+  const aChoices = [-3, -2, -1, 1, 2, 3];
+  const a = aChoices[Math.floor(Math.random() * aChoices.length)];
+  let r1 = 0, r2 = 0;
+  while (r1 === r2) { r1 = Math.floor(Math.random() * 9) - 4; r2 = Math.floor(Math.random() * 9) - 4; }
+  if (r1 > r2) [r1, r2] = [r2, r1];
+  let power1 = 0, power2 = 0, denom = 1, power = 1;
+  let formulaName = '', formulaDisplay = '';
+  if (type.startsWith('1/6')) { power1 = 1; power2 = 1; denom = 6; power = 3; formulaName = '1/6公式'; formulaDisplay = '\\frac{|a|}{6}(\\beta - \\alpha)^3'; }
+  else if (type === '1/12') { power1 = Math.random() > 0.5 ? 2 : 1; power2 = power1 === 2 ? 1 : 2; denom = 12; power = 4; formulaName = '1/12公式'; formulaDisplay = '\\frac{|a|}{12}(\\beta - \\alpha)^4'; }
+  else if (type === '1/20') { power1 = Math.random() > 0.5 ? 3 : 1; power2 = power1 === 3 ? 1 : 3; denom = 20; power = 5; formulaName = '1/20公式'; formulaDisplay = '\\frac{|a|}{20}(\\beta - \\alpha)^5'; }
+  else if (type === '1/30') { power1 = 2; power2 = 2; denom = 30; power = 5; formulaName = '1/30公式'; formulaDisplay = '\\frac{|a|}{30}(\\beta - \\alpha)^5'; }
+  let P = [1];
+  for (let i = 0; i < power1; i++) P = multiply(P, [-r1, 1]);
+  for (let i = 0; i < power2; i++) P = multiply(P, [-r2, 1]);
+  P = scale(P, a);
+  let S_num = Math.abs(a) * Math.pow(r2 - r1, power), S_den = denom;
+  const gDiv = gcd(S_num, S_den); S_num /= gDiv; S_den /= gDiv;
+  let f: number[] = [], g: number[] = [];
+  if (type === '1/6_para') {
+    let k2 = 0;
+    while (k2 === 0 || k2 === -P[2]) k2 = Math.floor(Math.random() * 5) - 2;
+    const k1 = Math.floor(Math.random() * 5) - 2, k0 = Math.floor(Math.random() * 5) - 2;
+    f = [P[0] + k0, P[1] + k1, P[2] + k2]; g = [k0, k1, k2];
+  } else {
+    const c1 = Math.floor(Math.random() * 7) - 3, c0 = Math.floor(Math.random() * 7) - 3;
+    f = [...P]; f[1] = c1; f[0] = c0; g = [c0 - P[0], c1 - P[1]];
+  }
+  return { type, a, r1, r2, power1, power2, f, g, P, S_num, S_den, formulaName, formulaDisplay, denom, power };
+}
+
 export default function CalculusDrillPage() {
   const [selectedMode, setSelectedMode] = useState<string>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => createCalculusProblem('mix'));
   
   // 入力状態
   const [inputNum, setInputNum] = useState<string>('');
@@ -137,87 +171,7 @@ export default function CalculusDrillPage() {
 
   // 問題生成ロジック
   const generateProblem = (mode: string) => {
-    let type = mode;
-    if (type === 'mix') {
-      type = mixedFormulaPicker.next();
-    }
-
-    const aChoices = [-3, -2, -1, 1, 2, 3];
-    const a = aChoices[Math.floor(Math.random() * aChoices.length)];
-
-    let r1 = 0, r2 = 0;
-    while (r1 === r2) {
-      r1 = Math.floor(Math.random() * 9) - 4; // -4 to 4
-      r2 = Math.floor(Math.random() * 9) - 4;
-    }
-    if (r1 > r2) {
-      const temp = r1; r1 = r2; r2 = temp;
-    }
-
-    let power1 = 0, power2 = 0;
-    let denom = 1, power = 1;
-    let formulaName = '', formulaDisplay = '';
-
-    if (type.startsWith('1/6')) {
-      power1 = 1; power2 = 1; denom = 6; power = 3;
-      formulaName = '1/6公式';
-      formulaDisplay = '\\frac{|a|}{6}(\\beta - \\alpha)^3';
-    } else if (type === '1/12') {
-      power1 = Math.random() > 0.5 ? 2 : 1;
-      power2 = power1 === 2 ? 1 : 2;
-      denom = 12; power = 4;
-      formulaName = '1/12公式';
-      formulaDisplay = '\\frac{|a|}{12}(\\beta - \\alpha)^4';
-    } else if (type === '1/20') {
-      power1 = Math.random() > 0.5 ? 3 : 1;
-      power2 = power1 === 3 ? 1 : 3;
-      denom = 20; power = 5;
-      formulaName = '1/20公式';
-      formulaDisplay = '\\frac{|a|}{20}(\\beta - \\alpha)^5';
-    } else if (type === '1/30') {
-      power1 = 2; power2 = 2; denom = 30; power = 5;
-      formulaName = '1/30公式';
-      formulaDisplay = '\\frac{|a|}{30}(\\beta - \\alpha)^5';
-    }
-
-    // 多項式の構築
-    let P = [1];
-    for (let i = 0; i < power1; i++) P = multiply(P, [-r1, 1]);
-    for (let i = 0; i < power2; i++) P = multiply(P, [-r2, 1]);
-    P = scale(P, a);
-
-    // 面積の計算 S = |a|/denom * (r2 - r1)^power
-    let S_num = Math.abs(a) * Math.pow(r2 - r1, power);
-    let S_den = denom;
-    const gDiv = gcd(S_num, S_den);
-    S_num /= gDiv;
-    S_den /= gDiv;
-
-    // f(x)とg(x)への分割
-    let f: number[] = [];
-    let g: number[] = [];
-
-    if (type === '1/6_para') {
-      // 2次関数同士の面積
-      let k2 = 0;
-      while (k2 === 0 || k2 === -P[2]) {
-        k2 = Math.floor(Math.random() * 5) - 2;
-      }
-      const k1 = Math.floor(Math.random() * 5) - 2;
-      const k0 = Math.floor(Math.random() * 5) - 2;
-      f = [P[0] + k0, P[1] + k1, P[2] + k2];
-      g = [k0, k1, k2];
-    } else {
-      // 放物線以上の曲線(f) と 直線(g)
-      const c1 = Math.floor(Math.random() * 7) - 3;
-      const c0 = Math.floor(Math.random() * 7) - 3;
-      f = [...P];
-      f[1] = c1;
-      f[0] = c0;
-      g = [c0 - P[0], c1 - P[1]];
-    }
-
-    setProblem({ type, a, r1, r2, power1, power2, f, g, P, S_num, S_den, formulaName, formulaDisplay, denom, power });
+    setProblem(createCalculusProblem(mode));
     setInputNum('');
     setInputDen('');
     setIsAnswered(false);
@@ -226,11 +180,6 @@ export default function CalculusDrillPage() {
     setShowGraph(true);
     setShowExplanation(false);
   };
-
-  // 初回マウント時
-  useEffect(() => {
-    generateProblem(selectedMode);
-  }, [selectedMode]);
 
   // グラフ描画
   useEffect(() => {

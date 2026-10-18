@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -90,7 +91,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function LinearDiophantineDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
@@ -100,11 +101,7 @@ export default function LinearDiophantineDrill() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -192,11 +189,11 @@ export default function LinearDiophantineDrill() {
     ctx.fillStyle = '#1e293b';
     ctx.textAlign = 'left';
     ctx.fillText(`${A}x ${B > 0 ? '+' : ''}${B}y = ${C} 上の格子点`, 10, 20);
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -226,7 +223,7 @@ export default function LinearDiophantineDrill() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   let eqStr = `${problem.A}x `;
   if (problem.B > 0) {
@@ -262,7 +259,7 @@ export default function LinearDiophantineDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -285,7 +282,7 @@ export default function LinearDiophantineDrill() {
                   type="number" 
                   className="w-20 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansX} 
-                  onChange={e => setAnsX(e.target.value)} 
+                  onChange={e => { setAnsX(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
                 <span className="w-8"></span>
                 <MathEq math="y =" />
@@ -293,7 +290,7 @@ export default function LinearDiophantineDrill() {
                   type="number" 
                   className="w-20 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansY} 
-                  onChange={e => setAnsY(e.target.value)} 
+                  onChange={e => { setAnsY(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                 />
               </div>
             </div>

@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -160,7 +161,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       choices.sort((a,b) => a-b);
       
-      const qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('　/　')}$`;
+      const qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('\\quad / \\quad')}$`;
       
       const dir = rNum > 0.4 ? '右上がり（正の相関）' : (rNum < -0.4 ? '右下がり（負の相関）' : 'バラバラ（無相関）');
       
@@ -208,17 +209,13 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function DataAnalysis2DDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -238,7 +235,7 @@ export default function DataAnalysis2DDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current || problem.pattern === 'pattern4') return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -287,13 +284,13 @@ export default function DataAnalysis2DDrill() {
       const s = toScr(p.x, p.y);
       ctx.beginPath(); ctx.arc(s.x, s.y, 4, 0, Math.PI*2); ctx.fill();
     }
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   let explanationEl = <></>;
   if (hasChecked) {
@@ -339,7 +336,12 @@ export default function DataAnalysis2DDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAns1(''); setHasChecked(false); setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -401,7 +403,7 @@ export default function DataAnalysis2DDrill() {
                     type={problem.pattern === 'pattern3' ? "number" : "text"} step="0.1"
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                     value={ans1} 
-                    onChange={e => setAns1(e.target.value)} 
+                    onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder={problem.pattern === 'pattern3' ? "0.8" : ""}
                   />
                 </div>

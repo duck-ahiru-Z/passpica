@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { calculateRlcSeriesState } from '@/src/lib/rlcSeriesCircuit';
 
 export default function ACCircuitPage() {
   // --- 状態管理 ---
@@ -14,18 +15,16 @@ export default function ACCircuitPage() {
   // 表示モード
   const [showPhasor, setShowPhasor] = useState<boolean>(true);
 
-  // --- 電気力学計算 ---
-  const omega = 2 * Math.PI * f;               // 角周波数 ω (rad/s)
-  const xl = omega * l;                       // コイルのリアクタンス XL (Ω)
-  const xc = 1 / (omega * c * 1e-6);          // コンデンサのリアクタンス XC (Ω)
-  const x = xl - xc;                          // 合成リアクタンス X (Ω)
-  const z = Math.sqrt(r * r + x * x);         // インピーダンス Z (Ω)
-  const i0 = v0 / z;                          // 電流振幅 I0 (A)
-
-  // 位相差 φ (rad) - 電圧に対する電流の遅れ角（電流基準だと電圧が φ 進む）
-  // tan(φ) = (XL - XC) / R
-  const phi = Math.atan2(x, r);
-  const phiDeg = (phi * 180) / Math.PI;       // 度数法
+  const circuit = calculateRlcSeriesState({
+    resistance: r,
+    inductance: l,
+    capacitanceMicrofarads: c,
+    frequency: f,
+    voltagePeak: v0,
+  });
+  const { angularFrequency: omega, inductiveReactance: xl, capacitiveReactance: xc,
+    impedance: z, currentPeak: i0,
+    voltageLeadAngleRadians: phi, voltageLeadAngleDegrees: phiDeg } = circuit;
 
   // 各素子の最大電圧 (V = I0 * X)
   const vr0 = i0 * r;
@@ -39,16 +38,14 @@ export default function ACCircuitPage() {
     const iPoints: string[] = [];
     
     const w = 400; // グラフ横幅
-    const h = 160; // グラフ縦幅
     const cy = 80;  // 基準線 Y
     
     // 表示範囲は 2周期分とする
     const tMax = 2 / f; // 2周期 (秒)
     
     // 描画倍率
-    const scaleT = (w - 40) / tMax;
     const scaleV = 55 / v0; // 電圧最大振幅が55pxになるよう調整
-    const scaleI = 55 / (v0 / r); // 電流も抵抗のみの時と同じスケール感になるよう調整 (I0_max = V0/R)
+    const scaleI = 55 / (v0 / r); // 抵抗のみのときの電流振幅 V0/R を55pxとして比較
 
     for (let px = 20; px <= w - 20; px++) {
       // 画面座標 px から 時間 t (s) を逆算
@@ -60,7 +57,7 @@ export default function ACCircuitPage() {
       const it = i0 * Math.sin(omega * t - phi);
 
       const pyV = cy - vt * scaleV;
-      const pyI = cy - it * scaleI * r * 0.8; // 視覚的に重ねやすくなるよう調整
+      const pyI = cy - it * scaleI;
 
       if (px === 20) {
         vPoints.push(`M ${px} ${pyV.toFixed(1)}`);
@@ -117,12 +114,22 @@ export default function ACCircuitPage() {
         </p>
       </div>
 
-      {/* RLC直列回路の概略図 (Geocities風アスキー/SVGモデル) */}
+      {/* RLC直列回路の概略図 */}
       <div className="border border-gray-300 bg-gray-50 p-4 text-center">
-        <span className="font-bold text-[10px] text-gray-500 block mb-2 select-none">【RLC 直列交流回路モデル】</span>
-        <div className="flex justify-center items-center gap-2 font-mono text-slate-600 text-sm">
-          <span>~ (AC電源) ─── [ R: 抵抗 ] ─── [ L: コイル ] ─── [ C: コンデンサ ] ─── (閉回路)</span>
-        </div>
+        <span className="font-bold text-[10px] text-gray-500 block mb-2">【RLC 直列交流回路モデル】</span>
+        <svg viewBox="0 0 500 130" className="w-full max-w-2xl mx-auto" role="img" aria-label="交流電源、抵抗、コイル、コンデンサが一つの閉回路に直列接続された模式図">
+          <path d="M60 25 V45 M60 85 V105 H450 V25 H410 M130 25 H150 M220 25 H250 M330 25 H370 M390 25 H410" fill="none" stroke="#475569" strokeWidth="2" />
+          <circle cx="60" cy="65" r="20" fill="white" stroke="#475569" strokeWidth="2" />
+          <path d="M48 65 C52 55 56 75 60 65 C64 55 68 75 72 65" fill="none" stroke="#2563eb" strokeWidth="1.5" />
+          <path d="M150 25 L158 15 L168 35 L178 15 L188 35 L198 15 L208 35 L220 25" fill="none" stroke="#dc2626" strokeWidth="2" />
+          <path d="M250 25 C250 5 270 5 270 25 C270 5 290 5 290 25 C290 5 310 5 310 25 C310 5 330 5 330 25" fill="none" stroke="#16a34a" strokeWidth="2" />
+          <line x1="370" y1="12" x2="370" y2="38" stroke="#ea580c" strokeWidth="3" />
+          <line x1="390" y1="12" x2="390" y2="38" stroke="#ea580c" strokeWidth="3" />
+          <text x="60" y="125" textAnchor="middle" fill="#475569" fontSize="10">交流電源</text>
+          <text x="185" y="55" textAnchor="middle" fill="#b91c1c" fontSize="10">R</text>
+          <text x="290" y="55" textAnchor="middle" fill="#15803d" fontSize="10">L</text>
+          <text x="380" y="55" textAnchor="middle" fill="#c2410c" fontSize="10">C</text>
+        </svg>
       </div>
 
       {/* メイングリッド：左グラフィック、右コントロール */}
@@ -136,18 +143,18 @@ export default function ACCircuitPage() {
             <div className="flex justify-between items-center border-b border-gray-200 pb-2 mb-2">
               <span className="font-bold text-slate-700">■ 電圧 v(t) と電流 i(t) の瞬時値波形（2周期分）</span>
               <div className="flex gap-4 text-[10px]">
-                <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-red-600 inline-block"></span> 電圧 v(t)</span>
-                <span className="flex items-center gap-1"><span className="w-4 h-0.5 bg-blue-600 inline-block"></span> 電流 i(t) (x80倍拡大表示)</span>
+                <span className="flex items-center gap-1"><span className="w-4 border-t-2 border-solid border-red-600 inline-block"></span> 電圧 v(t)（赤実線）</span>
+                <span className="flex items-center gap-1"><span className="w-4 border-t-2 border-dashed border-blue-600 inline-block"></span> 電流 i(t)（青破線・V₀/R基準）</span>
               </div>
             </div>
 
             <div className="w-full aspect-[5/2] max-h-[240px]">
-              <svg viewBox="0 0 400 160" className="w-full h-full overflow-visible font-mono">
+              <svg viewBox="0 0 400 160" className="w-full h-full overflow-visible font-mono" role="img" aria-label={`電圧は赤い実線、電流は青い破線。2周期分を表示し、位相差は${phiDeg.toFixed(2)}度です。`}>
                 {/* 軸 */}
                 <line x1="15" y1="80" x2="385" y2="80" stroke="#94a3b8" strokeWidth="1" />
                 <line x1="20" y1="10" x2="20" y2="150" stroke="#94a3b8" strokeWidth="1" />
                 <text x="370" y="93" fill="#64748b" fontSize="8" fontWeight="bold">時間 t ➔</text>
-                <text x="25" y="15" fill="#64748b" fontSize="8" fontWeight="bold">振幅 ➔</text>
+                <text x="25" y="15" fill="#64748b" fontSize="8" fontWeight="bold">振幅（各波形を基準値で規格化）</text>
 
                 {/* 補助縦線（周期区切り） */}
                 <line x1="200" y1="15" x2="200" y2="145" stroke="#f1f5f9" strokeWidth="1" />
@@ -159,7 +166,7 @@ export default function ACCircuitPage() {
                 <path d={vPath} fill="none" stroke="#dc2626" strokeWidth="2" />
 
                 {/* 2. 電流波形（青線） */}
-                <path d={iPath} fill="none" stroke="#2563eb" strokeWidth="2.5" />
+                <path d={iPath} fill="none" stroke="#2563eb" strokeWidth="2.5" strokeDasharray="6 3" />
               </svg>
             </div>
             
@@ -187,7 +194,7 @@ export default function ACCircuitPage() {
               
               <div className="flex flex-col items-center justify-center">
                 <span className="font-bold text-slate-700 text-[10px] mb-3 select-none">■ 各素子の電圧フェーザ（電流基準）</span>
-                <svg viewBox="0 0 200 200" className="w-48 h-48 overflow-visible border border-gray-100 bg-gray-50/50">
+                <svg viewBox="0 0 200 200" className="w-48 h-48 overflow-visible border border-gray-100 bg-gray-50/50" role="img" aria-label={`電流を基準にしたフェーザ図。位相差${phiDeg.toFixed(2)}度。抵抗電圧は同相、コイル電圧は90度進み、コンデンサ電圧は90度遅れます。`}>
                   {/* 軸 */}
                   <line x1="10" y1="100" x2="190" y2="100" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2,2" />
                   <line x1="100" y1="10" x2="100" y2="190" stroke="#cbd5e1" strokeWidth="1" strokeDasharray="2,2" />
@@ -281,6 +288,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="抵抗 R（オーム）"
                 min="10"
                 max="200"
                 step="5"
@@ -294,13 +302,14 @@ export default function ACCircuitPage() {
             <div className="space-y-1 border-t border-gray-200 pt-2.5">
               <div className="flex justify-between items-center text-slate-700 font-bold">
                 <span>L : 自己インダクタンス</span>
-                <span className="font-mono text-xs text-green-600">{l.toFixed(2)} H</span>
+                <span className="font-mono text-xs text-green-600">{l.toFixed(5)} H</span>
               </div>
               <input
                 type="range"
+                aria-label="自己インダクタンス L（ヘンリー）"
                 min="0.05"
                 max="2.0"
-                step="0.05"
+                step="0.00001"
                 value={l}
                 onChange={(e) => setL(parseFloat(e.target.value))}
                 className="w-full cursor-ew-resize h-1 bg-gray-200 rounded appearance-none border border-gray-400"
@@ -315,6 +324,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="電気容量 C（マイクロファラド）"
                 min="5"
                 max="200"
                 step="5"
@@ -332,6 +342,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="電源周波数 f（ヘルツ）"
                 min="10"
                 max="120"
                 step="5"
@@ -349,6 +360,7 @@ export default function ACCircuitPage() {
               </div>
               <input
                 type="range"
+                aria-label="電源電圧の最大値 V0（ボルト）"
                 min="10"
                 max="100"
                 step="5"
@@ -362,13 +374,13 @@ export default function ACCircuitPage() {
             <div className="border-t border-gray-200 pt-3 text-center">
               <button
                 onClick={() => {
-                  setF(50);
-                  setL(0.5);
-                  setC(20);
+                  setF(25);
+                  setL(0.45032);
+                  setC(90);
                 }}
                 className="retro-btn-classic bg-emerald-50 border-emerald-400 text-emerald-800 font-bold hover:bg-emerald-100 py-1.5 px-3 text-[10px]"
               >
-                共振状態に設定 (50Hz, 0.5H, 20μF)
+                共振状態に設定 (25Hz, 0.45032H, 90μF)
               </button>
             </div>
 

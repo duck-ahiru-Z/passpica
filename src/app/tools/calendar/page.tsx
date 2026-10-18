@@ -44,8 +44,7 @@ export default function CalendarPage() {
       try {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setCustomEvents(JSON.parse(savedCustoms));
-      } catch (_e) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+      } catch {
         setCustomEvents([]);
       }
     }
@@ -53,10 +52,8 @@ export default function CalendarPage() {
     const savedMocks = localStorage.getItem('passpica_calendar_selected_mocks');
     if (savedMocks) {
       try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedMockIds(JSON.parse(savedMocks));
-      } catch (_e) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+      } catch {
         setSelectedMockIds([]);
       }
     }
@@ -64,16 +61,13 @@ export default function CalendarPage() {
     const savedNationals = localStorage.getItem('passpica_calendar_selected_nationals');
     if (savedNationals) {
       try {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         setSelectedNationalIds(JSON.parse(savedNationals));
-      } catch (_e) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+      } catch {
         setSelectedNationalIds(NATIONAL_MASTER_DATA.map(n => n.id));
       }
     } else {
       // 初回はすべて選択状態にして保存
       const allNationalIds = NATIONAL_MASTER_DATA.map(n => n.id);
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSelectedNationalIds(allNationalIds);
       localStorage.setItem('passpica_calendar_selected_nationals', JSON.stringify(allNationalIds));
     }
@@ -359,7 +353,7 @@ export default function CalendarPage() {
                   {sortedEvents.map((ev) => (
                     <tr key={ev.id} className="hover:bg-gray-50/50">
                       <td className="font-mono text-center text-[10px] md:text-xs">{ev.date.replace(/-/g, '/')}</td>
-                      <td className="text-center">
+                      <td className="text-center whitespace-nowrap">
                         <span className={`px-1 py-0.5 rounded text-[9px] md:text-[10px] border whitespace-nowrap ${getBadgeColor(ev.badge)}`}>
                           {ev.badge || '予定'}
                         </span>
@@ -372,14 +366,14 @@ export default function CalendarPage() {
                         {ev.type === 'custom' ? (
                           <button 
                             onClick={() => deleteCustomEvent(ev.id)}
-                            className="text-red-500 hover:text-red-700 font-bold text-[10px] md:text-xs"
+                            className="whitespace-nowrap text-red-500 hover:text-red-700 font-bold text-[10px] md:text-xs"
                           >
                             削除
                           </button>
                         ) : ev.parentMockId ? (
                           <button 
                             onClick={() => removeEventGroup(ev.parentMockId!, ev.type)}
-                            className="text-gray-500 hover:text-gray-700 text-[10px] md:text-xs"
+                            className="whitespace-nowrap text-gray-500 hover:text-gray-700 text-[10px] md:text-xs"
                             title="この日程・模試をカレンダーから外す"
                           >
                             はずす

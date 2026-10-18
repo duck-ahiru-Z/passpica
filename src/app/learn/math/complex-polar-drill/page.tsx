@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { formatExactTrigComponent } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -57,22 +59,6 @@ function parseAngleStr(thVal: number): string {
   if (Math.abs(thVal - 11*pi/6) < eps) return "11pi/6";
   if (Math.abs(thVal - 2*pi) < eps) return "2pi";
   return "0";
-}
-
-function formatComplex(x: number, yStr: string): string {
-  let res = "";
-  if (x !== 0) res += x;
-  if (yStr === "0") return res === "" ? "0" : res;
-  
-  if (yStr.startsWith("-")) {
-    if (yStr === "-1") res += "-i";
-    else res += yStr + "i";
-  } else {
-    if (x !== 0) res += "+";
-    if (yStr === "1") res += "i";
-    else res += yStr + "i";
-  }
-  return res;
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
@@ -272,8 +258,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (ansB === "-1\\sqrt{2}") ansB = "-\\sqrt{2}";
       
       // if fractional like 1.5, write as 3/2 etc
-      if (ansA.includes(".")) ansA = `${rRes}/2`; // if rRes is odd
-      if (ansB.includes(".")) ansB = `${rRes}/2`;
+      if (ansA.includes(".") && !ansA.includes("\\sqrt")) ansA = `${rRes}/2`;
+      if (ansB.includes(".") && !ansB.includes("\\sqrt")) ansB = `${rRes}/2`;
+      ansA = formatExactTrigComponent(rRes, cosVal);
+      ansB = formatExactTrigComponent(rRes, sinVal);
       
       let finalThDisplay = thStr.replace("pi", "\\pi");
       if (finalThDisplay.startsWith("1\\pi")) finalThDisplay = finalThDisplay.replace("1\\pi", "\\pi");
@@ -287,8 +275,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         `\\text{極形式の${isProduct ? '積' : '商'}の性質を利用します。}`,
         `${isProduct ? 'z_1 z_2' : '\\frac{z_1}{z_2}'} = ${isProduct ? `${r1} \\times ${r2}` : `\\frac{${r1}}{${r2}}`}\\left\\{ \\cos\\left(${a1.s} ${isProduct ? '+' : '-'} ${a2.s}\\right) + i\\sin\\left(${a1.s} ${isProduct ? '+' : '-'} ${a2.s}\\right) \\right\\}`,
         `= ${rRes}\\left(\\cos ${finalThDisplay} + i\\sin ${finalThDisplay}\\right)`,
-        `= ${rRes}\\left( ${ansA === '0' ? '0' : ansA} + ${ansB === '0' ? '0' : ansB}i \\right)`,
-        `= ${ansA === '0' ? '' : ansA} ${ansB === '0' ? '' : (ansB.startsWith('-') ? ansB : (ansA === '0' ? ansB : '+'+ansB)) + 'i'}`
+        `= ${ansA === '0' ? '0' : ansA} ${ansB === '0' ? '' : (ansB.startsWith('-') ? ansB : (ansA === '0' ? ansB : '+' + ansB)) + 'i'}`
       ];
       
       return { 
@@ -303,7 +290,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function ComplexPolarDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ansR, setAnsR] = useState<string>('');
   const [ansTheta, setAnsTheta] = useState<string>('');
@@ -313,10 +300,6 @@ export default function ComplexPolarDrill() {
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -355,7 +338,7 @@ export default function ComplexPolarDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -438,13 +421,13 @@ export default function ComplexPolarDrill() {
         ctx.fillText('r', cx + (problem.zX*scale)/2 - 10, cy - (problem.zY*scale)/2 - 10);
       }
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
 
   let explanationEl = <></>;
   if (hasChecked) {
@@ -490,7 +473,13 @@ export default function ComplexPolarDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => {
+                  const nextPattern = e.target.value as Pattern | 'mix';
+                  setSelectedPattern(nextPattern);
+                  setProblem(generateProblem(nextPattern));
+                  setAnsA(''); setAnsB(''); setAnsR(''); setAnsTheta('');
+                  setHasChecked(false); setIsCorrect(false);
+                }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -518,7 +507,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansA} 
-                      onChange={e => setAnsA(e.target.value)} 
+                      onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="a (実部)"
                     />
                     <span>+</span>
@@ -526,7 +515,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansB} 
-                      onChange={e => setAnsB(e.target.value)} 
+                      onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="b (虚部)"
                     />
                     <span>i</span>
@@ -541,7 +530,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansR} 
-                      onChange={e => setAnsR(e.target.value)} 
+                      onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="絶対値"
                     />
                   </div>
@@ -551,7 +540,7 @@ export default function ComplexPolarDrill() {
                       type="text" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansTheta} 
-                      onChange={e => setAnsTheta(e.target.value)} 
+                      onChange={e => { setAnsTheta(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="偏角"
                     />
                   </div>

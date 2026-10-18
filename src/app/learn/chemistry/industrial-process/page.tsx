@@ -19,13 +19,13 @@ const PROCESSES: Record<string, ProcessInfo> = {
     name: '接触法（硫酸 H2SO4 の製造）',
     overallReaction: '2S + 3O2 + 2H2O ➔ 2H2SO4',
     catalyst: '酸化バナジウム(V) V2O5',
-    rawMaterials: '硫黄 S (または黄鉄鉱 FeS2) , 空気 , 水',
+    rawMaterials: '硫黄 S または黄鉄鉱 FeS2 , 空気 , 水',
     stages: [
-      { name: '1. 硫黄の燃焼', reaction: 'S + O2 ➔ SO2' },
-      { name: '2. 二酸化硫黄の酸化 (触媒: V2O5)', reaction: '2SO2 + O2 ⇄ 2SO3' },
-      { name: '3. 三酸化硫黄を濃硫酸に吸収させ、希硫酸で希釈', reaction: 'SO3 + H2O ➔ H2SO4' }
+      { name: '1. 硫黄の燃焼（または黄鉄鉱の焙焼）', reaction: 'S + O2 ➔ SO2; 4FeS2 + 11O2 ➔ 2Fe2O3 + 8SO2' },
+      { name: '2. 二酸化硫黄の酸化 (V2O5, 約450℃)', reaction: '2SO2 + O2 ⇄ 2SO3' },
+      { name: '3. SO3を濃硫酸に吸収して発煙硫酸（oleum）を作り、水で希釈', reaction: 'SO3 + H2SO4 ➔ H2S2O7; H2S2O7 + H2O ➔ 2H2SO4' }
     ],
-    explain: '接触法の最大の鍵は「二酸化硫黄(SO2)の酸化」の可逆反応段階です。ここで触媒として「酸化バナジウム(V) V2O5」を用いて効率よく三酸化硫黄(SO3)を得ます。生成したSO3を直接水に加えると多量の熱が発生して酸霧（細かい霧状）になり吸収しにくいため、一旦「濃硫酸」に吸収させて「発煙硫酸」とし、それを希硫酸で薄めることで安全かつ効率的に高濃度硫酸を製造します。'
+    explain: '接触法の最大の鍵は「二酸化硫黄(SO2)の酸化」の可逆反応段階です。ここで触媒として「酸化バナジウム(V) V2O5」を用いて効率よく三酸化硫黄(SO3)を得ます。生成したSO3を直接水に加えると多量の熱が発生して酸霧（細かい霧状）になり吸収しにくいため、一旦「濃硫酸」に吸収させて「発煙硫酸」とし、それを水で希釈して高濃度硫酸を製造します。'
   },
   ostwald: {
     id: 'ostwald',
@@ -36,7 +36,7 @@ const PROCESSES: Record<string, ProcessInfo> = {
     stages: [
       { name: '1. アンモニアの酸化 (触媒: Pt, 800℃)', reaction: '4NH3 + 5O2 ➔ 4NO + 6H2O' },
       { name: '2. 一酸化窒素の酸化（常温で速やかに進行）', reaction: '2NO + O2 ➔ 2NO2' },
-      { name: '3. 二酸化窒素を温水に吸収させる', reaction: '3NO2 + H2O ➔ 2HNO3 + NO' }
+      { name: '3. 二酸化窒素を水に吸収（副生NOを循環）', reaction: '3NO2 + H2O ➔ 2HNO3 + NO' }
     ],
     explain: 'アンモニア(NH3)を出発原料として硝酸を作ります。第1段階のアンモニア酸化反応では「白金 Pt」触媒が高温(約800℃)で必要になります。第3段階の水への吸収反応で副生する一酸化窒素(NO)は、第2段階に戻して循環利用されるため、効率よく原料を硝酸へと変換できます。'
   },
@@ -44,7 +44,7 @@ const PROCESSES: Record<string, ProcessInfo> = {
     id: 'solvay',
     name: 'アンモニアソーダ法／ソルベー法（炭酸ナトリウム Na2CO3 の製造）',
     overallReaction: '2NaCl + CaCO3 ➔ Na2CO3 + CaCl2',
-    catalyst: 'なし（副生成物アンモニア・CO2は100%循環回収）',
+    catalyst: 'なし（NH3・CO2を工程内で循環利用）',
     rawMaterials: '塩化ナトリウム NaCl , 石灰石 CaCO3',
     stages: [
       { name: '1. 食塩水にNH3を飽和させ、CO2を通す', reaction: 'NaCl + H2O + NH3 + CO2 ➔ NaHCO3↓ + NH4Cl' },
@@ -53,7 +53,7 @@ const PROCESSES: Record<string, ProcessInfo> = {
       { name: '4. 生石灰に水を加え消石灰に', reaction: 'CaO + H2O ➔ Ca(OH)2' },
       { name: '5. 塩化アンモニウムと消石灰からNH3を回収', reaction: '2NH4Cl + Ca(OH)2 ➔ CaCl2 + 2H2O + 2NH3' }
     ],
-    explain: '安価な食塩(NaCl)と石灰石(CaCO3)から、工業的に重要な炭酸ナトリウム(Na2CO3)を製造します。この製法の特徴は、炭酸水素ナトリウム(NaHCO3)の沈殿を作るために一時的にアンモニア(NH3)を介在させますが、最終段階の水酸化カルシウム(消石灰)との反応により、そのアンモニアを全て排気せずに100%回収して循環再利用する点にあります。全体での実質的な反応は「食塩＋石灰石 ➔ 炭酸ナトリウム＋塩化カルシウム」になります。'
+    explain: '安価な食塩(NaCl)と石灰石(CaCO3)から、工業的に重要な炭酸ナトリウム(Na2CO3)を製造します。炭酸水素ナトリウム(NaHCO3)を沈殿させるためにアンモニア(NH3)を使い、最終段階で塩化アンモニウムと消石灰を反応させてNH3を回収し、工程内で循環利用します。CO2も工程内で再利用されます。全体での実質的な反応は「食塩＋石灰石 ➔ 炭酸ナトリウム＋塩化カルシウム」です。'
   }
 };
 
@@ -83,6 +83,7 @@ export default function IndustrialProcessPage() {
           <button
             key={p.id}
             onClick={() => setSelectedProcess(p.id)}
+            aria-pressed={selectedProcess === p.id}
             className={`retro-btn-classic font-bold py-1.5 px-4 ${selectedProcess === p.id ? 'bg-[#cbd5e1]' : ''}`}
           >
             {p.name.split('（')[0]}
@@ -96,12 +97,14 @@ export default function IndustrialProcessPage() {
         <div className="lg:col-span-2 border border-gray-300 bg-white p-6 flex flex-col items-center justify-between min-h-[420px]">
           
           <div className="text-center w-full border-b border-gray-200 pb-2 mb-4 font-bold text-slate-700 text-sm">
-            製造ライン流程図：{proc.name}
+            製造プロセス図：{proc.name}
           </div>
 
           {/* SVGによるプロセスパイプライン */}
-          <div className="flex items-center justify-center flex-grow py-6 w-full">
-            <svg width="340" height="200" viewBox="0 0 340 200" className="overflow-visible font-sans">
+          <div className="flex-grow py-6 w-full min-w-0">
+            <p className="md:hidden text-[10px] text-slate-500 mb-1">図は左右にスクロールできます。</p>
+            <div className="flex items-center justify-start md:justify-center w-full min-w-0 overflow-x-auto">
+            <svg width="510" height="300" viewBox="0 0 340 200" className="w-[510px] min-w-[510px] max-w-none h-auto overflow-visible font-sans" role="img" aria-label={`${proc.name}。実質反応式：${proc.overallReaction}。${proc.stages.map(stage => `${stage.name}、${stage.reaction}`).join('。')}`}>
               
               {/* 接触法・オストワルト法（直列フロー） */}
               {(selectedProcess === 'contact' || selectedProcess === 'ostwald') && (
@@ -109,10 +112,10 @@ export default function IndustrialProcessPage() {
                   {/* 反応段階ボックス 1 */}
                   <rect x="15" y="60" width="80" height="40" fill="#f8fafc" stroke="#334155" strokeWidth="1.5" />
                   <text x="55" y="80" fill="#0f172a" fontSize="8" fontWeight="bold" textAnchor="middle">
-                    {selectedProcess === 'contact' ? '原料: 硫黄 S' : '原料: アンモニア NH3'}
+                    {selectedProcess === 'contact' ? '原料: S / FeS2' : '原料: アンモニア NH3'}
                   </text>
                   <text x="55" y="93" fill="#64748b" fontSize="7" textAnchor="middle">
-                    {selectedProcess === 'contact' ? 'S + O2 ➔ SO2' : '4NH3 + 5O2 ➔ 4NO'}
+                    {selectedProcess === 'contact' ? '燃焼・焙焼 → SO2' : '4NH3 + 5O2 ➔ 4NO'}
                   </text>
 
                   {/* 矢印 1 */}
@@ -133,7 +136,7 @@ export default function IndustrialProcessPage() {
                   {/* 接触法の触媒表示 */}
                   {selectedProcess === 'contact' && (
                     <text x="165" y="52" fill="#ef4444" fontSize="7" fontWeight="bold" textAnchor="middle">
-                      触媒: V2O5
+                      触媒: V2O5・約450℃
                     </text>
                   )}
 
@@ -150,7 +153,7 @@ export default function IndustrialProcessPage() {
                     {selectedProcess === 'contact' ? '製品: 硫酸 H2SO4' : '製品: 硝酸 HNO3'}
                   </text>
                   <text x="277.5" y="93" fill="#15803d" fontSize="7" textAnchor="middle">
-                    {selectedProcess === 'contact' ? 'SO3 + H2O ➔ H2SO4' : '3NO2 + H2O ➔ 2HNO3'}
+                    {selectedProcess === 'contact' ? 'SO3→H2S2O7→H2SO4' : '3NO2+H2O→2HNO3+NO'}
                   </text>
 
                   {/* オストワルト法のNOリサイクル矢印 */}
@@ -170,7 +173,7 @@ export default function IndustrialProcessPage() {
                 <g>
                   {/* 主要反応経路 */}
                   <rect x="15" y="25" width="90" height="35" fill="#f8fafc" stroke="#334155" strokeWidth="1.5" />
-                  <text x="60" y="42" fill="#0f172a" fontSize="7.5" fontWeight="bold" textAnchor="middle">① NaCl + NH3 + CO2</text>
+                  <text x="60" y="42" fill="#0f172a" fontSize="7.5" fontWeight="bold" textAnchor="middle">① 食塩水 + NH3 + CO2</text>
                   <text x="60" y="52" fill="#64748b" fontSize="6.5" textAnchor="middle">➔ NaHCO3↓ + NH4Cl</text>
 
                   <line x1="105" y1="42" x2="135" y2="42" stroke="#475569" strokeWidth="1.5" />
@@ -180,6 +183,16 @@ export default function IndustrialProcessPage() {
                   <rect x="135" y="25" width="85" height="35" fill="#f0fdf4" stroke="#16a34a" strokeWidth="1.5" />
                   <text x="177.5" y="42" fill="#166534" fontSize="7.5" fontWeight="bold" textAnchor="middle">② Na2CO3 (炭酸ナトリウム)</text>
                   <text x="177.5" y="52" fill="#15803d" fontSize="6.5" textAnchor="middle">※副生CO2は①へリサイクル</text>
+
+                  {/* ①で生じるNH4Clを⑤へ送る */}
+                  <path d="M 60 60 L 60 72 L 200 72" fill="none" stroke="#2563eb" strokeWidth="1" strokeDasharray="3,3" />
+                  <polygon points="200,72 194,69 194,75" fill="#2563eb" />
+                  <text x="130" y="68" fill="#2563eb" fontSize="7" textAnchor="middle">副生NH4Clを⑤へ</text>
+
+                  {/* ②で副生したCO2を①の炭酸化工程へ戻す */}
+                  <path d="M 220 42 L 330 42 L 330 160 L 8 160 L 8 42 L 15 42" fill="none" stroke="#d97706" strokeWidth="1.2" strokeDasharray="3,3" />
+                  <polygon points="15,42 10,39 10,45" fill="#d97706" />
+                  <text x="165" y="156" fill="#b45309" fontSize="7" textAnchor="middle">副生CO2を①へ循環</text>
 
                   {/* 原料発生経路 */}
                   <rect x="15" y="105" width="90" height="35" fill="#f8fafc" stroke="#334155" strokeWidth="1.5" />
@@ -205,11 +218,13 @@ export default function IndustrialProcessPage() {
 
                   {/* アンモニア循環リサイクル */}
                   <path d="M 245 55 L 245 10 L 60 10 L 60 25" fill="none" stroke="#2563eb" strokeWidth="1" strokeDasharray="3,3" />
-                  <text x="152.5" y="6" fill="#2563eb" fontSize="7" textAnchor="middle">アンモニア NH3 を100%回収・循環利用</text>
+                  <polygon points="60,25 57,19 63,19" fill="#2563eb" />
+              <text x="152.5" y="6" fill="#2563eb" fontSize="7" textAnchor="middle">アンモニア NH3 を回収・循環利用</text>
                 </g>
               )}
 
             </svg>
+            </div>
           </div>
 
           <div className="w-full border-t border-gray-200 pt-4 text-center">
@@ -232,7 +247,7 @@ export default function IndustrialProcessPage() {
             <table className="classic-table text-[10px]">
               <tbody>
                 <tr>
-                  <td className="bg-gray-50 font-bold w-20">実質反応式</td>
+                  <td className="bg-gray-50 font-bold w-20">{selectedProcess === 'contact' ? '総括式（S原料）' : '実質反応式'}</td>
                   <td className="font-bold text-slate-800 font-mono break-all">{proc.overallReaction}</td>
                 </tr>
                 <tr>

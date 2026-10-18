@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { doubleRadicalPatterns, generateDoubleRadicalProblem, parseRadicandAnswer, type DoubleRadicalMode, type DoubleRadicalPattern } from '@/src/lib/doubleRadicalProblems';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 // --- 数学ユーティリティ ---
@@ -13,77 +13,17 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function getSquareFactors(n: number): number[] {
-  const factors = [];
-  for (let k = 2; k * k <= n; k++) {
-    if (n % (k * k) === 0) factors.push(k);
-  }
-  return factors;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  a: number;
-  b: number;
-  eq: string;
-  sign: '+' | '-';
-  sum: number;
-  prod: number;
-  k?: number; // for pattern3
-  inner?: number; // for pattern3
-  X?: number; // for pattern4
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    const a = Math.floor(Math.random() * 8) + 2; // 2 to 9
-    const b = Math.floor(Math.random() * 8) + 2; // 2 to 9
-    if (a <= b) continue; // 必ず a > b
-    
-    const sum = a + b;
-    const prod = a * b;
-    
-    if (p === 'pattern1' || p === 'pattern2') {
-      // ユーザー要望: 答えが整数になる場合はそのまま √の中身として扱っても良いが、
-      // 逆算ロジックとしては単に a+b, ab を使えばOK
-      const sign: '+' | '-' = p === 'pattern1' ? '+' : '-';
-      const eq = `\\sqrt{${sum} ${sign} 2\\sqrt{${prod}}}`;
-      return { pattern: p, a, b, eq, sign, sum, prod };
-    }
-    
-    if (p === 'pattern3') {
-      const kFactors = getSquareFactors(prod);
-      if (kFactors.length === 0) continue; // 係数として外に出せる数がない場合はやり直し
-      const k = kFactors[kFactors.length - 1]; // 最大の平方因数のルート
-      const inner = prod / (k * k);
-      const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      const coef = 2 * k; // 2以外の偶数係数 (4, 6, 8...)
-      const eq = `\\sqrt{${sum} ${sign} ${coef}\\sqrt{${inner}}}`;
-      return { pattern: p, a, b, eq, sign, sum, prod, k, inner };
-    }
-    
-    if (p === 'pattern4') {
-      if (a % 2 === 0 || b % 2 === 0) continue; // a, b は奇数（和が偶数になるように）
-      const X = sum / 2;
-      // prodが4で割り切れると係数が出てしまうので除外
-      if (prod % 4 === 0) continue;
-      const sign: '+' | '-' = Math.random() < 0.5 ? '+' : '-';
-      const eq = `\\sqrt{${X} ${sign} \\sqrt{${prod}}}`;
-      return { pattern: p, a, b, eq, sign, sum, prod, X };
-    }
-  }
-}
+const patternLabels: Record<DoubleRadicalPattern, string> = {
+  pattern1: '基本の和',
+  pattern2: '基本の差',
+  pattern3: '係数付き',
+  pattern4: '係数なし・√2で割る形',
+};
 
 export default function DoubleRadicalDrillPage() {
-  const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [selectedPattern, setSelectedPattern] = useState<DoubleRadicalMode>('mix');
+  const [problem, setProblem] = useClientGeneratedState(() => generateDoubleRadicalProblem('mix'));
+  const [strategy, setStrategy] = useState<DoubleRadicalPattern | ''>('');
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -92,31 +32,34 @@ export default function DoubleRadicalDrillPage() {
   // 判定状態
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showGraph, setShowGraph] = useState(false); // 二重根号はグラフ不要ですが、要件統一のためUIは用意するか？(後述)
-  
+  const [validationError, setValidationError] = useState('');
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
-  const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
-    setProblem(generateProblem(pattern));
+  const handleNext = (pattern: DoubleRadicalMode = selectedPattern) => {
+    setProblem(generateDoubleRadicalProblem(pattern));
+    setStrategy(pattern === 'mix' ? '' : pattern);
     setAnsA('');
     setAnsB('');
     setHasChecked(false);
     setIsCorrect(false);
+    setValidationError('');
   };
 
   const handleCheck = () => {
     if (!problem) return;
     
-    const ua = parseInt(ansA);
-    const ub = parseInt(ansB);
+    const ua = parseRadicandAnswer(ansA);
+    const ub = parseRadicandAnswer(ansB);
     
-    if (isNaN(ua) || isNaN(ub)) {
-      alert('枠に整数を入力してください。');
+    if (ua === null || ub === null) {
+      setValidationError('2つの枠に正の整数を入力してください。小数や空欄は使えません。');
       return;
     }
+
+    setValidationError('');
     
-    if (ua === problem.a && ub === problem.b) {
+    if (strategy === problem.pattern && ua === problem.a && ub === problem.b) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -139,7 +82,7 @@ export default function DoubleRadicalDrillPage() {
           二重根号の外し方ドリル
         </h1>
         <p className="text-gray-500">
-          ルートの中のルート（二重根号）を外す計算を、基本から応用までパターン別に反復練習します。
+          まず基礎練習で苦手な形を固定して反復し、慣れたら実戦練習で形を見て解法を選びます。
         </p>
       </div>
 
@@ -153,15 +96,16 @@ export default function DoubleRadicalDrillPage() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="二重根号の演習パターン"
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
+                onChange={e => { const pattern = e.target.value as DoubleRadicalMode; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (基本の和)</option>
-                <option value="pattern2">パターン2 (基本の差)</option>
-                <option value="pattern3">パターン3 (係数が2以外の偶数)</option>
-                <option value="pattern4">パターン4 (係数なし・割るルート2)</option>
+                <option value="mix">実戦練習：二重根号 全パターンランダム</option>
+                <option value="pattern1">基礎練習：基本の和だけ</option>
+                <option value="pattern2">基礎練習：基本の差だけ</option>
+                <option value="pattern3">基礎練習：係数付きだけ</option>
+                <option value="pattern4">基礎練習：係数なし・√2で割る形だけ</option>
               </select>
             </div>
 
@@ -170,9 +114,17 @@ export default function DoubleRadicalDrillPage() {
             </div>
             
             <div className="space-y-4">
-              <div className="text-center font-bold text-gray-700">
-                二重根号を外しなさい。
-              </div>
+              <div className="text-center font-bold text-gray-700">二重根号を外しなさい。</div>
+              {selectedPattern === 'mix' ? (
+                <fieldset className="space-y-2">
+                  <legend className="w-full text-center font-bold">実戦練習：式の形から解法パターンを選んでください。</legend>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {doubleRadicalPatterns.map(pattern => <label key={pattern} className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${strategy === pattern ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}><input type="radio" name="double-radical-strategy" value={pattern} checked={strategy === pattern} onChange={() => { setStrategy(pattern); setHasChecked(false); setIsCorrect(false); }} className="accent-blue-600" />{patternLabels[pattern]}</label>)}
+                  </div>
+                </fieldset>
+              ) : (
+                <p role="status" aria-live="polite" className="text-center font-bold text-blue-800">基礎練習：{patternLabels[selectedPattern]}に固定して繰り返します。</p>
+              )}
               <div className="flex items-center justify-center gap-2 text-xl">
                 <MathEq math="=" />
                 {problem.pattern === 'pattern4' ? (
@@ -182,7 +134,7 @@ export default function DoubleRadicalDrillPage() {
                       <div className="flex items-stretch">
                         <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                         <div className="border-t-2 border-slate-700 pt-1">
-                          <input type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
+                          <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="大" />
                         </div>
                       </div>
                       
@@ -192,7 +144,7 @@ export default function DoubleRadicalDrillPage() {
                       <div className="flex items-stretch">
                         <div className="text-2xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                         <div className="border-t-2 border-slate-700 pt-1">
-                          <input type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
+                          <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-12 bg-transparent border-b outline-none text-center font-bold text-lg text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="小" />
                         </div>
                       </div>
                     </div>
@@ -207,7 +159,7 @@ export default function DoubleRadicalDrillPage() {
                     <div className="flex items-stretch">
                       <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                       <div className="border-t-[3px] border-slate-700 pt-1">
-                        <input type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="大" />
+                        <input aria-label="大きい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansA} onChange={e => { setAnsA(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="大" />
                       </div>
                     </div>
                     
@@ -217,12 +169,13 @@ export default function DoubleRadicalDrillPage() {
                     <div className="flex items-stretch">
                       <div className="text-3xl font-serif text-slate-700 flex items-center pr-1 select-none">√</div>
                       <div className="border-t-[3px] border-slate-700 pt-1">
-                        <input type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="小" />
+                        <input aria-label="小さい数の根号内" aria-invalid={Boolean(validationError)} aria-describedby={validationError ? 'radical-answer-error' : undefined} type="number" className="w-16 bg-transparent border-b outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" value={ansB} onChange={e => { setAnsB(e.target.value); setValidationError(''); setHasChecked(false); setIsCorrect(false); }} placeholder="小" />
                       </div>
                     </div>
                   </div>
                 )}
               </div>
+              {validationError && <p id="radical-answer-error" role="alert" className="text-center text-red-700 font-semibold">{validationError}</p>}
               <div className="text-[10px] text-gray-500 text-center">
                 ※ 引き算の場合、必ず大きい数字を左側（大）に入力してください。<br/>
                 ※ 答えが整数になる場合もルートのまま（例：\(\sqrt{4}\)）入力してください。<br/>
@@ -245,8 +198,8 @@ export default function DoubleRadicalDrillPage() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！素晴らしい！' : '不正解... 解説を見てみよう。'}
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+                {isCorrect ? '正解！素晴らしい！' : `不正解... 解法パターンは「${patternLabels[problem.pattern]}」です。解説を見てみよう。`}
               </div>
             )}
           </div>
@@ -261,9 +214,9 @@ export default function DoubleRadicalDrillPage() {
               </h2>
               {hasChecked && (
                 <div className="flex gap-1 text-[10px]">
-                  <button type="button" onClick={() => setDetailLevel('brief')} className={`px-2 py-1 border ${detailLevel === 'brief' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>略解</button>
-                  <button type="button" onClick={() => setDetailLevel('normal')} className={`px-2 py-1 border ${detailLevel === 'normal' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>標準</button>
-                  <button type="button" onClick={() => setDetailLevel('detailed')} className={`px-2 py-1 border ${detailLevel === 'detailed' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>丁寧</button>
+                  <button type="button" aria-pressed={detailLevel === 'brief'} onClick={() => setDetailLevel('brief')} className={`px-2 py-1 border ${detailLevel === 'brief' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>略解</button>
+                  <button type="button" aria-pressed={detailLevel === 'normal'} onClick={() => setDetailLevel('normal')} className={`px-2 py-1 border ${detailLevel === 'normal' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>標準</button>
+                  <button type="button" aria-pressed={detailLevel === 'detailed'} onClick={() => setDetailLevel('detailed')} className={`px-2 py-1 border ${detailLevel === 'detailed' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>丁寧</button>
                 </div>
               )}
             </div>

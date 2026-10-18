@@ -13,6 +13,7 @@ interface LearningContent {
   difficulty: '基礎' | '標準' | '応用';
   type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル';
   link: string;
+  practiceLink?: string;
 }
 
 const CONTENTS: LearningContent[] = [
@@ -48,7 +49,8 @@ const CONTENTS: LearningContent[] = [
     description: '単位円上の複素数 z1, z2 を回してその積 z1*z2 をプロットし、複素数の掛け算が「回転と伸縮」を表す幾何学的イメージを定着させます。',
     difficulty: '応用',
     type: 'ビジュアル図解',
-    link: '/learn/math/unit-circle-complex'
+    link: '/learn/math/unit-circle-complex',
+    practiceLink: '/learn/math/complex-polar-drill'
   },
   {
     slug: 'derivative-graph',
@@ -59,7 +61,8 @@ const CONTENTS: LearningContent[] = [
     description: '点を動かしながら、関数の値・導関数・接線の傾きと増減の関係を同時に確認します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/math/derivative-graph'
+    link: '/learn/math/derivative-graph',
+    practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
 
   {
@@ -71,7 +74,8 @@ const CONTENTS: LearningContent[] = [
     description: 'xを0へ近づけたとき、sin x / x の値が1へ近づく様子をグラフとスライダーで観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-limit-visual'
+    link: '/learn/math/calculus3-limit-visual',
+    practiceLink: '/learn/math/calculus3-limit-drill'
   },
   {
     slug: 'calculus3-derivative-visual',
@@ -82,7 +86,8 @@ const CONTENTS: LearningContent[] = [
     description: '三次関数上の点を動かし、接線の傾き・導関数の符号・増減・極値候補の関係を同時に観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-derivative-visual'
+    link: '/learn/math/calculus3-derivative-visual',
+    practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
   {
     slug: 'calculus3-integral-visual',
@@ -93,18 +98,32 @@ const CONTENTS: LearningContent[] = [
     description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-integral-visual'
+    link: '/learn/math/calculus3-integral-visual',
+    practiceLink: '/learn/math/calculus3-integral-drill'
+  },
+  {
+    slug: 'calculus3-volume-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '積分法（回転体の体積）',
+    title: '回転体の体積・断面円板ビジュアル',
+    description: 'y=x²の領域をx軸回転し、断面円板の半径・面積と右端円板和、正確な体積の差をスライダーで比較します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-volume-visual',
+    practiceLink: '/learn/math/calculus3-area-volume-drill'
   },
   {
     slug: 'calculus3-curvature-visual',
     subject: 'math',
     subjectJp: '数学III',
-    field: '微分法（凹凸・変曲点）',
-    title: '凹凸と変曲点ビジュアル装置',
-    description: '四次関数上の点を動かし、接線の傾き・二階導関数の符号・凹凸の切り替わりを観察します。',
+    field: '微分法（極値・凹凸・変曲点）',
+    title: '凹凸・極値・変曲点ビジュアル装置',
+    description: '四次関数上の移動点と接線を見ながら、極大・極小の位置、f′′の符号、変曲点での凹凸の切り替わりを確認します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-curvature-visual'
+    link: '/learn/math/calculus3-curvature-visual',
+    practiceLink: '/learn/math/calculus3-curve-analysis-drill'
   },
   {
     slug: 'calculus3-parametric-visual',
@@ -115,18 +134,32 @@ const CONTENTS: LearningContent[] = [
     description: '楕円上を動く点の座標と、dx/dt・dy/dtから求める接線の傾きをスライダーで観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/math/calculus3-parametric-visual'
+    link: '/learn/math/calculus3-parametric-visual',
+    practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
   {
     slug: 'projectile-visual',
     subject: 'physics',
     subjectJp: '物理',
-    field: '力学（水平投射）',
-    title: '水平投射と放物運動ビジュアル装置',
-    description: '時間スライダーで水平位置・高さ・鉛直速度を追跡し、水平運動と自由落下の分解を視覚的に理解します。',
+    field: '力学（水平投射・斜方投射）',
+    title: '水平投射・斜方投射ビジュアル装置',
+    description: '射出角と時刻を変え、水平・鉛直の速度成分、軌道、高さ、到達距離の関係を視覚的に理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/physics/projectile-visual'
+    link: '/learn/physics/projectile-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'energy-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（力学的エネルギー）',
+    title: '力学的エネルギーの変換ビジュアル',
+    description: '落下位置を動かし、位置エネルギーと運動エネルギーの移り変わりと合計保存を図と数値で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/energy-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
     slug: 'motion-visual',
@@ -137,7 +170,8 @@ const CONTENTS: LearningContent[] = [
     description: '時刻スライダーで位置・速度・加速度の変化を同時に観察し、運動方程式の関係を直感的に理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/physics/motion-visual'
+    link: '/learn/physics/motion-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
     slug: 'concentration-visual',
@@ -148,7 +182,8 @@ const CONTENTS: LearningContent[] = [
     description: '体積スライダーで物質量を一定にした希釈を再現し、モル濃度 c=n/V の変化を観察します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/concentration-visual'
+    link: '/learn/chemistry/concentration-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
 
   // 化学基礎・化学（新設含む）
@@ -224,7 +259,7 @@ const CONTENTS: LearningContent[] = [
     subject: 'chemistry',
     subjectJp: '化学基礎',
     field: '酸と塩基（中和反応）',
-    title: '指示薬・pH中和滴定シミュレーター',
+    title: '酸塩基指示薬・pH色変化シミュレーター',
     description: 'pHスライダーを動かし、フェノールフタレインなどの指示薬の色の変化と、中和点の特性を理解します。',
     difficulty: '基礎',
     type: '実験シミュレータ',
@@ -305,7 +340,8 @@ export default function LearnPortalPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
   const filteredContents = CONTENTS.filter(c => {
-    const matchSubject = selectedSubject === 'all' || c.subject === selectedSubject;
+    const matchSubject = selectedSubject === 'all'
+      || (selectedSubject === 'math3' ? c.subjectJp === '数学III' : c.subject === selectedSubject);
     const matchDifficulty = selectedDifficulty === 'all' || c.difficulty === selectedDifficulty;
     return matchSubject && matchDifficulty;
   });
@@ -333,12 +369,15 @@ export default function LearnPortalPage() {
             {[
               { id: 'all', name: 'すべての科目' },
               { id: 'math', name: '数学' },
+              { id: 'math3', name: '数学III' },
               { id: 'chemistry', name: '化学' },
               { id: 'physics', name: '物理' },
               { id: 'information', name: '情報I' }
             ].map(sub => (
               <button
                 key={sub.id}
+                type="button"
+                aria-pressed={selectedSubject === sub.id}
                 onClick={() => setSelectedSubject(sub.id)}
                 className={`retro-btn-classic ${selectedSubject === sub.id ? 'bg-[#cbd5e1] font-bold' : ''}`}
               >
@@ -360,6 +399,8 @@ export default function LearnPortalPage() {
             ].map(diff => (
               <button
                 key={diff.id}
+                type="button"
+                aria-pressed={selectedDifficulty === diff.id}
                 onClick={() => setSelectedDifficulty(diff.id)}
                 className={`retro-btn-classic ${selectedDifficulty === diff.id ? 'bg-[#cbd5e1] font-bold' : ''}`}
               >
@@ -370,6 +411,8 @@ export default function LearnPortalPage() {
         </div>
 
       </div>
+
+      <p className="text-slate-500" aria-live="polite">表示中：{filteredContents.length}件</p>
 
       {/* 教材一覧 (デスクトップ版テーブル) */}
       <div className="hidden md:block border border-gray-300 overflow-x-auto">
@@ -400,12 +443,10 @@ export default function LearnPortalPage() {
                   <div className="text-gray-500 text-[11px] leading-relaxed">{c.description}</div>
                 </td>
                 <td className="text-center">
-                  <Link 
-                    href={c.link}
-                    className="retro-btn-classic font-bold"
-                  >
-                    開く ➔
-                  </Link>
+                  <div className="flex flex-col items-center gap-1">
+                    <Link href={c.link} className="retro-btn-classic font-bold">開く ➔</Link>
+                    {c.practiceLink && <Link href={c.practiceLink} className="text-blue-700 underline underline-offset-2">関連演習</Link>}
+                  </div>
                 </td>
               </tr>
             ))}
@@ -445,12 +486,10 @@ export default function LearnPortalPage() {
             </div>
 
             <div className="pt-2 border-t border-gray-100 flex justify-end">
-              <Link 
-                href={c.link}
-                className="retro-btn-classic font-bold text-xs px-4"
-              >
-                開く ➔
-              </Link>
+              <div className="flex items-center gap-3">
+                {c.practiceLink && <Link href={c.practiceLink} className="text-blue-700 underline underline-offset-2">関連演習</Link>}
+                <Link href={c.link} className="retro-btn-classic font-bold text-xs px-4">開く ➔</Link>
+              </div>
             </div>
           </div>
         ))}

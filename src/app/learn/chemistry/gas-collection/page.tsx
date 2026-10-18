@@ -27,9 +27,9 @@ const GASES: GasInfo[] = [
     density: 'lighter',
     densityExplain: '空気（平均分子量28.8）より軽い（分子量 17.0）',
     colorOdor: '無色・刺激臭',
-    dryAgent: 'ソーダ石灰（塩基性乾燥剤）',
+    dryAgent: '生石灰（酸性乾燥剤は不可）',
     reaction: '2NH4Cl + Ca(OH)2 ➔ CaCl2 + 2H2O + 2NH3',
-    explain: '水に極めて溶けやすく、空気より軽いため、乾いた試験管や集気ビンを逆さにする「上方置換法」で捕集します。水に溶けるとアンモニア水（弱塩基性）になり、赤色リトマス紙を青変させます。酸性の乾燥剤（濃硫酸など）とは塩を作って反応してしまうため、ソーダ石灰を用いて乾燥させます。'
+    explain: '水に極めて溶けやすく、空気より軽いため、乾いた試験管や集気ビンを逆さにする「上方置換法」で捕集します。水に溶けるとアンモニア水（弱塩基性）になり、赤色リトマス紙を青変させます。酸性の乾燥剤（濃硫酸など）とは塩を作って反応してしまうため、生石灰（CaO）で乾燥させます。'
   },
   {
     formula: 'Cl2',
@@ -66,7 +66,7 @@ const GASES: GasInfo[] = [
     density: 'heavier',
     densityExplain: '空気とほぼ同等（分子量 32.0）',
     colorOdor: '無色・無臭',
-    dryAgent: '濃硫酸、ソーダ石灰など何でも可',
+    dryAgent: '濃硫酸、塩化カルシウムなど（O₂と反応しないもの）',
     reaction: '2H2O2 ➔ 2H2O + O2 (触媒: MnO2)',
     explain: '水にほとんど溶けないため、気体を最も純粋に（空気が混ざらずに）回収できる「水上置換法」を使用します。助燃性があり、火のついた線香を入れると激しく炎を上げて燃えます。'
   },
@@ -79,9 +79,9 @@ const GASES: GasInfo[] = [
     density: 'lighter',
     densityExplain: '最も軽い気体（分子量 2.0）',
     colorOdor: '無色・無臭',
-    dryAgent: '濃硫酸、ソーダ石灰など何でも可',
+    dryAgent: '濃硫酸、塩化カルシウムなど（H₂と反応しないもの）',
     reaction: 'Zn + H2SO4 ➔ ZnSO4 + H2',
-    explain: 'すべての気体の中で最も軽く、水に難溶なため「水上置換法」で集めます（非常に軽いため、水上置換の方が漏れを最小限に抑えられます）。可燃性があり、空気との混合気体に点火すると「ポッ」と音を立てて爆発的に燃焼し、水（H2O）を生じます。'
+    explain: 'すべての気体の中で最も軽く、水にほとんど溶けないため水上置換法で集められます。水上置換を選ぶ直接の理由は水への溶けにくさで、空気との相対密度だけでは捕集法は決まりません。水素は可燃性があり、空気との混合気体は引火・爆発する危険があるため、火気を近づけず、学校の実験手順に従って扱います。'
   },
   {
     formula: 'CO2',
@@ -113,7 +113,7 @@ export default function GasCollectionPage() {
           気体の発生装置と捕集法
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          気体の性質（水への溶解性、空気に対する密度）に応じて、最適な捕集法（水上・上方・下方置換）が決定されます。
+          まず水に溶けにくく反応しない気体は水上置換を選びます。それ以外は、空気との密度差に応じて上方・下方置換を選びます。
         </p>
       </div>
 
@@ -128,7 +128,12 @@ export default function GasCollectionPage() {
 
           {/* SVGによる捕集装置線画 */}
           <div className="flex items-center justify-center flex-grow py-6">
-            <svg width="240" height="240" viewBox="0 0 160 160" className="overflow-visible">
+            <svg width="240" height="240" viewBox="0 0 160 160" className="overflow-visible" role="img" aria-label={`${selectedGas.name}を${selectedGas.methodJp}で捕集する装置。${selectedGas.method === 'water' ? '水に溶けにくい気体を水上で集めます。' : selectedGas.method === 'upward' ? '軽い気体が逆さの集気びんに上がり、空気を下へ押し出します。' : '重い気体が集気びんの底に入り、空気を上へ押し出します。'}`}>
+              <defs>
+                <marker id="gas-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+                  <path d="M 0 0 L 6 3 L 0 6 Z" fill="#64748b" />
+                </marker>
+              </defs>
               
               {/* 水上置換法 */}
               {selectedGas.method === 'water' && (
@@ -139,8 +144,7 @@ export default function GasCollectionPage() {
                   <line x1="20" y1="120" x2="140" y2="120" stroke="#2563eb" strokeWidth="1.5" />
                   
                   {/* 集気ビン（逆さ） */}
-                  <rect x="65" y="60" width="30" height="70" fill="none" stroke="#475569" strokeWidth="1.5" />
-                  <rect x="60" y="130" width="40" height="6" fill="#cbd5e1" stroke="#475569" strokeWidth="1.5" />
+                  <path d="M 65 60 H 95 V 130 M 65 60 V 130" fill="none" stroke="#475569" strokeWidth="1.5" />
                   
                   {/* ビンの中の水面 */}
                   <line x1="65" y1="90" x2="95" y2="90" stroke="#2563eb" strokeWidth="1.5" />
@@ -155,7 +159,7 @@ export default function GasCollectionPage() {
                   <circle cx="73" cy="65" r="3" fill="none" stroke="#2563eb" strokeWidth="1" />
                   
                   {/* 捕集した気体の領域 */}
-                  <rect x="66" y="61" width="28" height="28" fill="#eab308" opacity="0.1" />
+                  <rect x="66" y="61" width="28" height="28" fill="#eab308" opacity="0.18" />
 
                   {/* テキスト説明 */}
                   <text x="80" y="145" fill="#475569" fontSize="9" textAnchor="middle">水</text>
@@ -171,17 +175,19 @@ export default function GasCollectionPage() {
                   <line x1="100" y1="140" x2="140" y2="140" stroke="#94a3b8" strokeWidth="2" />
 
                   {/* 集気ビン（逆さ・口が下向き） */}
-                  <rect x="50" y="40" width="36" height="80" fill="none" stroke="#475569" strokeWidth="1.5" />
-                  <rect x="45" y="120" width="46" height="6" fill="#cbd5e1" stroke="#475569" strokeWidth="1.5" />
+                  <path d="M 50 40 H 86 V 120 M 50 40 V 120" fill="none" stroke="#475569" strokeWidth="1.5" />
 
-                  {/* 導入管（深く挿入する） */}
-                  <path d="M 20 145 L 70 145 L 70 55" fill="none" stroke="#0f172a" strokeWidth="2" />
+                  {/* 気体は開いた口の下から入り、びん内を上昇する */}
+                  <path d="M 20 145 L 68 145 L 68 124" fill="none" stroke="#0f172a" strokeWidth="2" />
 
                   {/* 気体（ビン上部に溜まる） */}
-                  <rect x="51" y="41" width="34" height="40" fill="#eab308" opacity="0.1" />
+                  <rect x="51" y="41" width="34" height="40" fill="#eab308" opacity="0.18" />
+                  <circle cx="68" cy="115" r="2.5" fill="none" stroke="#2563eb" strokeWidth="1" />
+                  <circle cx="72" cy="104" r="2.5" fill="none" stroke="#2563eb" strokeWidth="1" />
+                  <circle cx="68" cy="93" r="2.5" fill="none" stroke="#2563eb" strokeWidth="1" />
 
                   {/* 空気（下から押し出される） */}
-                  <path d="M 60 115 L 60 132" fill="none" stroke="#94a3b8" strokeWidth="1" markerEnd="url(#arrow)" />
+                  <path d="M 95 100 L 95 122" fill="none" stroke="#64748b" strokeWidth="1.5" markerEnd="url(#gas-arrow)" />
                   <text x="68" y="50" fill="#0f172a" fontSize="9" textAnchor="middle" fontWeight="bold">ビン上部へ捕集</text>
                 </g>
               )}
@@ -190,18 +196,17 @@ export default function GasCollectionPage() {
               {selectedGas.method === 'downward' && (
                 <g>
                   {/* 集気ビン（上向き） */}
-                  <rect x="50" y="50" width="36" height="80" fill="none" stroke="#475569" strokeWidth="1.5" />
-                  <rect x="45" y="44" width="46" height="6" fill="#cbd5e1" stroke="#475569" strokeWidth="1.5" />
+                  <path d="M 50 50 V 130 H 86 V 50" fill="none" stroke="#475569" strokeWidth="1.5" />
 
                   {/* 導入管（底付近まで深く挿入する） */}
                   <path d="M 20 25 L 68 25 L 68 115" fill="none" stroke="#0f172a" strokeWidth="2" />
 
                   {/* 気体（ビン底に溜まる） */}
-                  <rect x="51" y="90" width="34" height="39" fill="#eab308" opacity="0.1" />
+                  <rect x="51" y="90" width="34" height="39" fill="#eab308" opacity="0.18" />
 
-                  {/* 空気（上から押し出される） */}
-                  <path d="M 58 65 L 58 35" fill="none" stroke="#94a3b8" strokeWidth="1" />
-                  <text x="68" y="125" fill="#0f172a" fontSize="9" textAnchor="middle" fontWeight="bold">ビン底部へ捕集</text>
+                  {/* 空気は開いた口から上へ抜ける */}
+                  <path d="M 96 92 L 96 58" fill="none" stroke="#64748b" strokeWidth="1.5" markerEnd="url(#gas-arrow)" />
+                  <text x="119" y="126" fill="#0f172a" fontSize="8" textAnchor="middle" fontWeight="bold">びん底部へ</text>
                 </g>
               )}
 
@@ -215,13 +220,13 @@ export default function GasCollectionPage() {
             </span>
             <div className="grid grid-cols-3 gap-2 max-w-sm mx-auto text-[10px]">
               <div className="border border-blue-200 bg-blue-50/50 p-1.5 rounded">
-                <strong>水に難溶</strong><br/>➔ 水上置換
+                <strong>水に難溶・反応しない</strong><br/>➔ 水上置換
               </div>
               <div className="border border-red-200 bg-red-50/50 p-1.5 rounded">
-                <strong>水溶・空気より軽い</strong><br/>➔ 上方置換
+                <strong>水に溶けやすい・空気より軽い</strong><br/>➔ 上方置換
               </div>
               <div className="border border-amber-200 bg-amber-50/50 p-1.5 rounded">
-                <strong>水溶・空気より重い</strong><br/>➔ 下方置換
+                <strong>水に溶けやすい・空気より重い</strong><br/>➔ 下方置換
               </div>
             </div>
           </div>
@@ -242,6 +247,7 @@ export default function GasCollectionPage() {
                 <button
                   key={g.formula}
                   onClick={() => setSelectedGas(g)}
+                  aria-pressed={selectedGas.formula === g.formula}
                   className={`border border-gray-400 py-2 text-center rounded text-xs font-bold transition-all bg-slate-50 hover:bg-slate-100 ${selectedGas.formula === g.formula ? 'bg-amber-100 border-amber-600' : ''}`}
                 >
                   <div className="font-mono">{g.formula}</div>

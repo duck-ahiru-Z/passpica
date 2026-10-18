@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { generateTrigSumParameters } from '@/src/lib/trigIdentityParameters';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -86,16 +88,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   if (p_type === 'pattern4') {
-    const q = Math.floor(Math.random() * 4) + 2; // 2, 3, 4, 5
-    const maxP = Math.floor(q * 1.414); // sqrt(2)
-    let p = Math.floor(Math.random() * (maxP * 2 + 1)) - maxP;
-    if (p === q || p === -q || p === 0) p = 1; // avoid 0, 1, -1 for non-trivial
+    const { p, q } = generateTrigSumParameters();
     
     // sum = p/q. (sin+cos)^2 = p^2/q^2 => 1 + 2sin cos = p^2/q^2 => sin cos = (p^2 - q^2)/(2q^2)
-    const sqNum = Math.abs(p * p - q * q);
-    const signProd = p * p - q * q >= 0 ? 1 : -1;
-    const sqDen = 2 * q * q;
-    
     // We can just use getVal to simplify (p^2 - q^2) / (2q^2) 
     // wait, getVal takes squared values. The actual value is (p^2-q^2)/(2q^2), not its sqrt.
     // So we need a standard fraction simplifier.
@@ -162,7 +157,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 
 export default function TrigIdentityDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useState<ProblemData | null>(null);
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<FractionRootValue>(defaultFractionRoot);
   const [ans2, setAns2] = useState<FractionRootValue>(defaultFractionRoot);
@@ -170,15 +165,10 @@ export default function TrigIdentityDrillPage() {
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [detailLevel, setDetailLevel] = useState<'brief' | 'normal'>('normal');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  useEffect(() => {
-    handleNext();
-  }, [selectedPattern]);
-
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -263,11 +253,11 @@ export default function TrigIdentityDrillPage() {
       ctx.fillText("y", px + 8, cy + (py-cy)/2);
       ctx.fillText("x", cx + (px-cx)/2, cy + 15);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
@@ -304,7 +294,7 @@ export default function TrigIdentityDrillPage() {
     setHasChecked(true);
   };
 
-  if (!problem) return null;
+  if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   const target1 = problem.givenType === 'sin' ? 'cos' : 'sin';
   const target2 = problem.givenType === 'tan' ? 'cos' : 'tan';
@@ -333,16 +323,18 @@ export default function TrigIdentityDrillPage() {
               <h2 className="text-sm font-bold">
                 ■ 問題
               </h2>
-              <select 
+              <label htmlFor="trig-identity-mode" className="sr-only">三角比の演習パターン</label>
+              <select
+                id="trig-identity-mode"
                 value={selectedPattern}
-                onChange={e => setSelectedPattern(e.target.value as Pattern | 'mix')}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAns1(defaultFractionRoot); setAns2(defaultFractionRoot); setAns3(defaultFractionRoot); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (鋭角の基本)</option>
-                <option value="pattern2">パターン2 (鈍角の処理)</option>
-                <option value="pattern3">パターン3 (平方根を含む値)</option>
-                <option value="pattern4">パターン4 (式の値の計算)</option>
+                <option value="mix">実戦練習：三角比 全パターンランダム</option>
+                <option value="pattern1">基礎練習：鋭角の基本だけ</option>
+                <option value="pattern2">基礎練習：鈍角の処理だけ</option>
+                <option value="pattern3">基礎練習：平方根を含む値だけ</option>
+                <option value="pattern4">基礎練習：式の値の計算だけ</option>
               </select>
             </div>
 
@@ -365,17 +357,17 @@ export default function TrigIdentityDrillPage() {
                 {problem.pattern === 'pattern4' ? (
                   <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                     <MathEq math="\sin\theta \cos\theta =" />
-                    <FractionRootInput value={ans3} onChange={setAns3} />
+                    <FractionRootInput value={ans3} onChange={value => { setAns3(value); setHasChecked(false); setIsCorrect(false); }} label="sin θ cos θ" />
                   </div>
                 ) : (
                   <>
                     <div className="flex items-center gap-4 bg-gray-50 p-2 border rounded">
                       <div className="w-16 text-right"><MathEq math={`\\${target1}\\theta =`} /></div>
-                      <FractionRootInput value={ans1} onChange={setAns1} />
+                      <FractionRootInput value={ans1} onChange={value => { setAns1(value); setHasChecked(false); setIsCorrect(false); }} label={`${target1} θ`} />
                     </div>
                     <div className="flex items-center gap-4 bg-gray-50 p-2 border rounded">
                       <div className="w-16 text-right"><MathEq math={`\\${target2}\\theta =`} /></div>
-                      <FractionRootInput value={ans2} onChange={setAns2} />
+                      <FractionRootInput value={ans2} onChange={value => { setAns2(value); setHasChecked(false); setIsCorrect(false); }} label={`${target2} θ`}/>
                     </div>
                   </>
                 )}
@@ -390,12 +382,14 @@ export default function TrigIdentityDrillPage() {
 
             <div className="mt-8 flex gap-4 justify-center">
               <button 
+                type="button"
                 onClick={handleCheck}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
               </button>
               <button 
+                type="button"
                 onClick={handleNext}
                 className="retro-btn-classic"
               >
@@ -404,7 +398,7 @@ export default function TrigIdentityDrillPage() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！図との対応も確認しましょう。' : '不正解... 解説を見てみよう。'}
               </div>
             )}
