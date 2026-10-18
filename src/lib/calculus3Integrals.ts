@@ -34,10 +34,12 @@ export function generateIntegralProblem(mode: IntegralMode, random = Math.random
   const radicalUpper = radius % 2 === 0 ? String(radius / 2) : `\\frac{${radius}}{2}`;
   const radicalUpperText = radius % 2 === 0 ? String(radius / 2) : `${radius}/2`;
   const trigIntegral = Array.from({ length: (oddPower - 1) / 2 }, (_, index) => 2 * (index + 1) / (2 * (index + 1) + 1)).reduce((value, factor) => value * factor, 1);
+  const rationalNumeratorX = partialA + partialB;
+  const rationalNumeratorConstant = 2 * partialA + partialB;
   const problems: Record<IntegralPattern, IntegralProblem> = {
     substitution: { pattern, expression: `\\int_0^1 2x(x^2+1)^{${power}}\\,dx`, answer: (2 ** (power + 1) - 1) / (power + 1), hint: '内側の式を u と置く', explanation: `u=x²+1 と置くと区間は1から2。積分値は (2^${power + 1}−1)/${power + 1}。` },
     parts: { pattern, expression: `\\int_0^1 x e^{${rate}x}\\,dx`, answer: (Math.exp(rate) * (rate - 1) + 1) / rate ** 2, hint: '多項式 × 指数関数', explanation: `部分積分で [xe^(${rate}x)/${rate}−e^(${rate}x)/${rate}²]₀¹ = e^${rate}/${rate}−(e^${rate}−1)/${rate}² = (${rate}e^${rate}−e^${rate}+1)/${rate}² ≈ ${((Math.exp(rate) * (rate - 1) + 1) / rate ** 2).toFixed(3)}。` },
-    rational: { pattern, expression: `\\int_0^1 \\frac{${partialA + partialB}x+${2 * partialA + partialB}}{(x+1)(x+2)}\\,dx`, answer: partialA * Math.log(2) + partialB * Math.log(1.5), hint: '分母を一次式の積に分ける', explanation: `部分分数分解すると ${partialA}/(x+1)+${partialB}/(x+2)。積分値は ${partialA} ln 2 + ${partialB} ln(3/2)。` },
+    rational: { pattern, expression: `\\int_0^1 \\frac{${rationalNumeratorX}x+${rationalNumeratorConstant}}{(x+1)(x+2)}\\,dx`, answer: partialA * Math.log(2) + partialB * Math.log(1.5), hint: '分母を一次式の積に分ける', explanation: `部分分数分解すると ${partialA}/(x+1)+${partialB}/(x+2)。積分値は ${partialA} ln 2 + ${partialB} ln(3/2)。` },
     trig: { pattern, expression: `\\int_0^{\\pi/2} \\sin^{${oddPower}} x\\,dx`, answer: trigIntegral, hint: 'sin x を1つ残して cos x に置換し、残りを整理', explanation: `sin の奇数乗を1つ残して置換するか、漸化式を使う。積分値は約 ${trigIntegral.toFixed(3)}。` },
     radical: {
       pattern,

@@ -40,7 +40,9 @@ const checks = {
     const a = Number(constant) - Number(xCoefficient);
     const b = 2 * Number(xCoefficient) - Number(constant);
     return close(problem.answer, a * Math.log(2) + b * Math.log(1.5))
-      && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`);
+      && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`)
+      && (a + b) === Number(xCoefficient)
+      && (2 * a + b) === Number(constant);
   },
   trig: problem => {
     const [, exponent] = problem.expression.match(/\\sin\^\{(\d+)\}/);
