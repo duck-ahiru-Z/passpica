@@ -15,5 +15,8 @@ if (page.includes('左下がり')) {
 if (!page.includes('正の傾き (右上がり／右傾斜)') || !page.includes('M 90 85 Q 83 50 78 15')) {
   throw new Error('the CO2 positive slope and water negative-slope SVG geometry must both remain present');
 }
+if (!page.includes("aria-pressed={selectedPhase === 'h2o'}") || !page.includes("aria-pressed={selectedPhase === 'co2'}")) {
+  throw new Error('the selected phase-diagram tab must be exposed to assistive technology');
+}
 
-console.log('Phase-diagram visual verified: axis direction, water negative slope, CO2 positive slope, and plotted curve geometry agree.');
+console.log('Phase-diagram visual verified: axis direction, both slope conventions, plotted geometry, and accessible selected-tab state agree.');

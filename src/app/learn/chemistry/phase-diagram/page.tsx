@@ -60,12 +60,16 @@ export default function PhaseDiagramPage() {
       {/* タブ切り替え */}
       <div className="flex gap-2">
         <button
+          type="button"
+          aria-pressed={selectedPhase === 'h2o'}
           onClick={() => setSelectedPhase('h2o')}
           className={`retro-btn-classic font-bold py-1.5 px-4 ${selectedPhase === 'h2o' ? 'bg-[#cbd5e1]' : ''}`}
         >
           水 (H2O) の状態図
         </button>
         <button
+          type="button"
+          aria-pressed={selectedPhase === 'co2'}
           onClick={() => setSelectedPhase('co2')}
           className={`retro-btn-classic font-bold py-1.5 px-4 ${selectedPhase === 'co2' ? 'bg-[#cbd5e1]' : ''}`}
         >
