@@ -243,9 +243,9 @@ export default function QuadraticInequalityDrillPage() {
 
   const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void) => (
     <div className="flex flex-col items-center justify-center inline-flex align-middle">
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => setNum(e.target.value)} />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => { setNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
       <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => setDen(e.target.value)} placeholder="1" />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => { setDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
     </div>
   );
 
@@ -301,35 +301,35 @@ export default function QuadraticInequalityDrillPage() {
               
               <div className="grid grid-cols-2 gap-2 text-[11px] mb-4">
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 1} onChange={() => setUserAnsType(1)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 1} onChange={() => { setUserAnsType(1); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="A < x < B" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 3} onChange={() => setUserAnsType(3)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 3} onChange={() => { setUserAnsType(3); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="A \le x \le B" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 2} onChange={() => setUserAnsType(2)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 2} onChange={() => { setUserAnsType(2); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x < A, \quad B < x" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 4} onChange={() => setUserAnsType(4)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 4} onChange={() => { setUserAnsType(4); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x \le A, \quad B \le x" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 5} onChange={() => setUserAnsType(5)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 5} onChange={() => { setUserAnsType(5); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x = A" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 6} onChange={() => setUserAnsType(6)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 6} onChange={() => { setUserAnsType(6); setHasChecked(false); setIsCorrect(false); }} />
                   <MathEq math="x \neq A \text{ のすべての実数}" />
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 7} onChange={() => setUserAnsType(7)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 7} onChange={() => { setUserAnsType(7); setHasChecked(false); setIsCorrect(false); }} />
                   すべての実数
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
-                  <input type="radio" name="ansType" checked={userAnsType === 8} onChange={() => setUserAnsType(8)} />
+                  <input type="radio" name="ansType" checked={userAnsType === 8} onChange={() => { setUserAnsType(8); setHasChecked(false); setIsCorrect(false); }} />
                   解なし
                 </label>
               </div>

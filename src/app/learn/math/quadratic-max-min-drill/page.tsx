@@ -304,22 +304,22 @@ export default function QuadraticMaxMinDrillPage() {
               <div className="flex flex-col gap-4 max-w-sm mx-auto">
                 <div className="flex items-center gap-2 bg-red-50 p-2 border border-red-200 rounded">
                   <div className="font-bold text-red-700 w-12 text-right">最大値:</div>
-                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMaxV} onChange={e => setAnsMaxV(e.target.value)} />
+                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMaxV} onChange={e => { setAnsMaxV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="ml-2 text-[10px] text-gray-600">
-                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX1} onChange={e => setAnsMaxX1(e.target.value)} />
+                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX1} onChange={e => { setAnsMaxX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="mx-1">,</span>
-                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX2} onChange={e => setAnsMaxX2(e.target.value)} placeholder="空" />
+                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX2} onChange={e => { setAnsMaxX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
                     のとき)
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 bg-blue-50 p-2 border border-blue-200 rounded">
                   <div className="font-bold text-blue-700 w-12 text-right">最小値:</div>
-                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMinV} onChange={e => setAnsMinV(e.target.value)} />
+                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMinV} onChange={e => { setAnsMinV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="ml-2 text-[10px] text-gray-600">
-                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX1} onChange={e => setAnsMinX1(e.target.value)} />
+                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX1} onChange={e => { setAnsMinX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="mx-1">,</span>
-                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX2} onChange={e => setAnsMinX2(e.target.value)} placeholder="空" />
+                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX2} onChange={e => { setAnsMinX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
                     のとき)
                   </div>
                 </div>

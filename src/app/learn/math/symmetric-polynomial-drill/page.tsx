@@ -146,7 +146,7 @@ export default function SymmetricPolynomialDrillPage() {
                   type="number" 
                   className="w-24 border p-2 text-center font-bold" 
                   value={ansStr} 
-                  onChange={e => setAnsStr(e.target.value)} 
+                  onChange={e => { setAnsStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="答え" 
                 />
               </div>

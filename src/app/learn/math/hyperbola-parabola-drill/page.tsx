@@ -429,7 +429,7 @@ export default function HyperbolaParabolaDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="x"
                     />
                     <span>,</span>
@@ -437,7 +437,7 @@ export default function HyperbolaParabolaDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="y"
                     />
                     <span>)</span>
@@ -447,7 +447,7 @@ export default function HyperbolaParabolaDrill() {
                     type="text" 
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500 text-xl" 
                     value={ans3} 
-                    onChange={e => setAns3(e.target.value)} 
+                    onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder="4/3"
                   />
                 </div>
@@ -461,14 +461,14 @@ export default function HyperbolaParabolaDrill() {
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>,</span>
                     <input 
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>)</span>
                   </div>
@@ -477,7 +477,7 @@ export default function HyperbolaParabolaDrill() {
                     type="number" 
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500 text-xl" 
                     value={ans3} 
-                    onChange={e => setAns3(e.target.value)} 
+                    onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   />
                 </div>
               )}
@@ -490,14 +490,14 @@ export default function HyperbolaParabolaDrill() {
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
-                      onChange={e => setAns1(e.target.value)} 
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>,</span>
                     <input 
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
-                      onChange={e => setAns2(e.target.value)} 
+                      onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>)</span>
                   </div>
@@ -508,14 +508,14 @@ export default function HyperbolaParabolaDrill() {
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans3} 
-                      onChange={e => setAns3(e.target.value)} 
+                      onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>,</span>
                     <input 
                       type="number" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans4} 
-                      onChange={e => setAns4(e.target.value)} 
+                      onChange={e => { setAns4(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     />
                     <span>)</span>
                   </div>

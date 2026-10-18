@@ -289,9 +289,9 @@ export default function DiscriminantDrillPage() {
 
   const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void) => (
     <div className="flex flex-col items-center justify-center inline-flex align-middle">
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => setNum(e.target.value)} />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => { setNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
       <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => setDen(e.target.value)} placeholder="1" />
+      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => { setDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
     </div>
   );
 
@@ -349,7 +349,7 @@ export default function DiscriminantDrillPage() {
                   <>k = <span className="ml-2">{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</span></>
                 )}
                 {problem.ansType === 'ineq' && (
-                  <>k <select value={ansIneqSign} onChange={e => setAnsIneqSign(e.target.value as '<'|'>')} className="mx-2 border p-1"><option value="<">&lt;</option><option value=">">&gt;</option></select> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</>
+                  <>k <select value={ansIneqSign} onChange={e => { setAnsIneqSign(e.target.value as '<'|'>'); setHasChecked(false); setIsCorrect(false); }} className="mx-2 border p-1"><option value="<">&lt;</option><option value=">">&gt;</option></select> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</>
                 )}
                 {problem.ansType === 'between' && (
                   <>{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="mx-2"><MathEq math="< k <" /></span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den)}</>
