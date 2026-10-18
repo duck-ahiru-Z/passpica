@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { checkRationalizationAnswer, generateRationalizationProblem, parseRationalizationInteger, type RationalizationMode } from '@/src/lib/rationalizationProblem';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -13,49 +13,9 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function getSquareFactors(n: number): number[] {
-  const factors = [];
-  for (let k = 2; k * k <= n; k++) {
-    if (n % (k * k) === 0) factors.push(k);
-  }
-  return factors;
-}
-
-type DrillMode = 'mix' | '+' | '-';
-const mixedSignPicker = new BalancedRandom<'+' | '-'>(['+', '-']);
-
-interface ProblemData {
-  a: number;
-  b: number;
-  C: number;
-  k: number;
-  sign: '+' | '-';
-  ansSign: '+' | '-';
-}
-
-function generateProblem(mode: DrillMode = 'mix'): ProblemData {
-  while (true) {
-    const a = Math.floor(Math.random() * 15) + 2; // 2 to 16
-    const b = Math.floor(Math.random() * 15) + 1; // 1 to 15
-    if (a <= b) continue;
-    
-    // a, b がこれ以上簡単にならないようにする
-    if (getSquareFactors(a).length > 0 || getSquareFactors(b).length > 0) continue;
-    
-    const diff = a - b;
-    const k = Math.floor(Math.random() * 3) + 1; // 1 to 3
-    const C = k * diff;
-    
-    const sign: '+' | '-' = mode === 'mix' ? mixedSignPicker.next() : mode;
-    const ansSign: '+' | '-' = sign === '+' ? '-' : '+';
-    
-    return { a, b, C, k, sign, ansSign };
-  }
-}
-
 export default function RationalizationDrillPage() {
-  const [mode, setMode] = useState<DrillMode>('mix');
-  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [mode, setMode] = useState<RationalizationMode>('mix');
+  const [problem, setProblem] = useClientGeneratedState(() => generateRationalizationProblem('mix'));
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -70,8 +30,8 @@ export default function RationalizationDrillPage() {
   // 解説レベル
   const [detailLevel, setDetailLevel] = useState<'brief' | 'normal' | 'detailed'>('normal');
 
-  const handleNext = (nextMode: DrillMode = mode) => {
-    setProblem(generateProblem(nextMode));
+  const handleNext = (nextMode: RationalizationMode = mode) => {
+    setProblem(generateRationalizationProblem(nextMode));
     setAnsA('');
     setAns_a('');
     setAnsB('');
@@ -80,7 +40,7 @@ export default function RationalizationDrillPage() {
     setIsCorrect(false);
   };
 
-  const handleModeChange = (nextMode: DrillMode) => {
+  const handleModeChange = (nextMode: RationalizationMode) => {
     setMode(nextMode);
     handleNext(nextMode);
   };
@@ -88,18 +48,18 @@ export default function RationalizationDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const uA = parseInt(ansA);
-    const u_a = parseInt(ans_a);
-    const uB = parseInt(ansB);
-    const u_b = parseInt(ans_b);
+    const uA = parseRationalizationInteger(ansA);
+    const u_a = parseRationalizationInteger(ans_a);
+    const uB = parseRationalizationInteger(ansB);
+    const u_b = parseRationalizationInteger(ans_b);
     
-    if (isNaN(uA) || isNaN(u_a) || isNaN(uB) || isNaN(u_b)) {
+    if (uA === null || u_a === null || uB === null || u_b === null) {
       alert('すべての枠に整数を入力してください。');
       return;
     }
     
-    // 正解は k\sqrt{a} \pm k\sqrt{b}
-    if (uA === problem.k && u_a === problem.a && uB === problem.k && u_b === problem.b) {
+    // 正解は k\sqrt{a} と k\sqrt{b} の和または差
+    if (checkRationalizationAnswer(problem, { coefficientA: uA, radicandA: u_a, coefficientB: uB, radicandB: u_b })) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -129,7 +89,7 @@ export default function RationalizationDrillPage() {
           <select
             aria-label="有理化の演習モード"
             value={mode}
-            onChange={e => handleModeChange(e.target.value as DrillMode)}
+            onChange={e => handleModeChange(e.target.value as RationalizationMode)}
             className="border border-slate-300 rounded px-2 py-1 bg-white"
           >
             <option value="mix">実戦練習：足し算・引き算ランダム</option>
@@ -148,7 +108,7 @@ export default function RationalizationDrillPage() {
               ■ 問題
             </h2>
             <div className="text-center my-8 text-2xl font-bold bg-white p-4 border border-gray-300 rounded shadow-sm">
-              <MathEq math={`\\frac{${problem.C}}{\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}}`} />
+              <MathEq math={`\\frac{${problem.numerator}}{\\sqrt{${problem.a}} ${problem.denominatorSign} \\sqrt{${problem.b}}}`} />
             </div>
             
             <div className="space-y-4">
@@ -160,7 +120,7 @@ export default function RationalizationDrillPage() {
                 <input type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="A" />
                 <MathEq math="\sqrt{" />
                 <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => { setAns_a(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
-                <MathEq math={`} ${problem.ansSign}`} />
+                <MathEq math={`} ${problem.answerSign}`} />
                 <input type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="B" />
                 <MathEq math="\sqrt{" />
                 <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => { setAns_b(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="b" />
@@ -218,16 +178,16 @@ export default function RationalizationDrillPage() {
             ) : (
               <div className="space-y-4 text-xs leading-relaxed">
                 <div className="bg-white p-3 border text-center font-bold text-lg mb-4 text-emerald-700 shadow-sm">
-                  <MathEq math={`= ${problem.k === 1 ? '' : problem.k}\\sqrt{${problem.a}} ${problem.ansSign} ${problem.k === 1 ? '' : problem.k}\\sqrt{${problem.b}}`} />
+                  <MathEq math={`= ${problem.coefficient === 1 ? '' : problem.coefficient}\\sqrt{${problem.a}} ${problem.answerSign} ${problem.coefficient === 1 ? '' : problem.coefficient}\\sqrt{${problem.b}}`} />
                 </div>
 
                 {detailLevel === 'brief' && (
                   <div>
-                    分母と分子に共役な数 <MathEq math={`\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}}`} /> を掛けます。<br/>
+                    分母と分子に共役な数 <MathEq math={`\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}}`} /> を掛けます。<br/>
                     分母は <MathEq math={`(${problem.a}) - (${problem.b}) = ${problem.a - problem.b}`} /> となります。<br/>
                     よって、<br/>
-                    <MathEq math={`\\frac{${problem.C}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}{${problem.a - problem.b}}`} block />
-                    <MathEq math={`= ${problem.k === 1 ? '' : problem.k}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})`} block />
+                    <MathEq math={`\\frac{${problem.numerator}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}{${problem.a - problem.b}}`} block />
+                    <MathEq math={`= ${problem.coefficient === 1 ? '' : problem.coefficient}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})`} block />
                     となります。
                   </div>
                 )}
@@ -235,20 +195,20 @@ export default function RationalizationDrillPage() {
                 {detailLevel === 'normal' && (
                   <div>
                     分母のルートを消すために、<MathEq math={`(x+y)(x-y) = x^2-y^2`} /> の公式を利用します。<br/>
-                    分母が <MathEq math={`\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}`} /> なので、符号を逆にした <MathEq math={`\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}}`} /> を分母と分子の両方に掛けます。<br/>
+                    分母が <MathEq math={`\\sqrt{${problem.a}} ${problem.denominatorSign} \\sqrt{${problem.b}}`} /> なので、符号を逆にした <MathEq math={`\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}}`} /> を分母と分子の両方に掛けます。<br/>
                     <br/>
                     <div className="overflow-x-auto pb-2">
-                      <MathEq math={`= \\frac{${problem.C} \\times (\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}{(\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}})(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}`} block />
+                      <MathEq math={`= \\frac{${problem.numerator} \\times (\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}{(\\sqrt{${problem.a}} ${problem.denominatorSign} \\sqrt{${problem.b}})(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}`} block />
                     </div>
                     分母を展開すると、ルートが外れて整数の引き算になります。<br/>
-                    <MathEq math={`= \\frac{${problem.C}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}{${problem.a} - ${problem.b}}`} block />
-                    <MathEq math={`= \\frac{${problem.C}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}{${problem.a - problem.b}}`} block />
-                    {problem.k !== 1 && (
+                    <MathEq math={`= \\frac{${problem.numerator}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}{${problem.a} - ${problem.b}}`} block />
+                    <MathEq math={`= \\frac{${problem.numerator}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}{${problem.a - problem.b}}`} block />
+                    {problem.coefficient !== 1 && (
                       <div className="mt-2">
-                        分子の <MathEq math={`${problem.C}`} /> と分母の <MathEq math={`${problem.a - problem.b}`} /> を約分して、<MathEq math={`${problem.k}`} /> が残ります。<br/>
+                        分子の <MathEq math={`${problem.numerator}`} /> と分母の <MathEq math={`${problem.a - problem.b}`} /> を約分して、<MathEq math={`${problem.coefficient}`} /> が残ります。<br/>
                       </div>
                     )}
-                    <MathEq math={`= ${problem.k === 1 ? '' : problem.k}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})`} block />
+                    <MathEq math={`= ${problem.coefficient === 1 ? '' : problem.coefficient}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})`} block />
                     展開して、答えは上のようになります。
                   </div>
                 )}
@@ -266,12 +226,12 @@ export default function RationalizationDrillPage() {
 
                     <p className="font-bold border-b border-gray-300 pb-1 mt-4 mb-2">1. 逆符号のペアを掛ける</p>
                     <p>
-                      今回の分母は <MathEq math={`\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}`} /> です。<br/>
-                      これの真ん中の符号を逆にした <strong><span className="text-red-600"><MathEq math={`\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}}`} /></span></strong> を分母と分子の両方に掛けます。（※両方に同じものを掛ければ分数の大きさは変わりません）
+                      今回の分母は <MathEq math={`\\sqrt{${problem.a}} ${problem.denominatorSign} \\sqrt{${problem.b}}`} /> です。<br/>
+                      これの真ん中の符号を逆にした <strong><span className="text-red-600"><MathEq math={`\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}}`} /></span></strong> を分母と分子の両方に掛けます。（※両方に同じものを掛ければ分数の大きさは変わりません）
                     </p>
 
                     <div className="bg-gray-50 p-3 border overflow-x-auto text-center">
-                      <MathEq math={`= \\frac{${problem.C} \\times \\textcolor{red}{(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}}{(\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}) \\times \\textcolor{red}{(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}}`} />
+                      <MathEq math={`= \\frac{${problem.numerator} \\times \\textcolor{red}{(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}}{(\\sqrt{${problem.a}} ${problem.denominatorSign} \\sqrt{${problem.b}}) \\times \\textcolor{red}{(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}}`} />
                     </div>
 
                     <p className="font-bold border-b border-gray-300 pb-1 mt-4 mb-2">2. 分母を計算する</p>
@@ -287,17 +247,17 @@ export default function RationalizationDrillPage() {
 
                     <p className="font-bold border-b border-gray-300 pb-1 mt-4 mb-2">3. 全体を整理する</p>
                     <div className="bg-gray-50 p-3 border overflow-x-auto text-center">
-                      <MathEq math={`= \\frac{${problem.C}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})}{${problem.a - problem.b}}`} />
+                      <MathEq math={`= \\frac{${problem.numerator}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})}{${problem.a - problem.b}}`} />
                     </div>
                     <p>
-                      {problem.C === problem.a - problem.b ? (
-                        <span>分母と分子の <MathEq math={`${problem.C}`} /> が綺麗に約分されて消えます。</span>
+                      {problem.numerator === problem.a - problem.b ? (
+                        <span>分母と分子の <MathEq math={`${problem.numerator}`} /> が綺麗に約分されて消えます。</span>
                       ) : (
-                        <span>分子の <MathEq math={`${problem.C}`} /> と分母の <MathEq math={`${problem.a - problem.b}`} /> を約分すると <MathEq math={`${problem.k}`} /> になります。</span>
+                        <span>分子の <MathEq math={`${problem.numerator}`} /> と分母の <MathEq math={`${problem.a - problem.b}`} /> を約分すると <MathEq math={`${problem.coefficient}`} /> になります。</span>
                       )}
                     </p>
                     <div className="flex justify-center mt-2">
-                      <MathEq math={`= ${problem.k === 1 ? '' : problem.k}(\\sqrt{${problem.a}} ${problem.ansSign} \\sqrt{${problem.b}})`} />
+                      <MathEq math={`= ${problem.coefficient === 1 ? '' : problem.coefficient}(\\sqrt{${problem.a}} ${problem.answerSign} \\sqrt{${problem.b}})`} />
                     </div>
                     <p>これを展開したものが最終的な答えです。</p>
                   </div>
