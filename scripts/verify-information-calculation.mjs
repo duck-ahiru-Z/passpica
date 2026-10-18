@@ -6,6 +6,11 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/inform
 if (!/type="radio"\s+name="information-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
   throw new Error('information method selection must be a single-choice radio group');
 }
+if (!drillPage.includes('onChange={() => { setMethod(pattern); setChecked(false); }}')
+  || !drillPage.includes('setAnswer(event.target.value); setChecked(false);')
+  || !drillPage.includes('role="status" aria-live="polite"')) {
+  throw new Error('changing an information answer must clear stale feedback and announce new feedback');
+}
 
 const stableRandom = () => 0.37;
 const checks = {
