@@ -2,10 +2,25 @@ import { BalancedRandom } from './balancedRandom.ts';
 
 export type GeometryPattern = 'between-curves' | 'x-axis-rotation' | 'y-axis-rotation' | 'shell-method' | 'curve-length';
 export type GeometryMode = GeometryPattern | 'mix';
-export type GeometryProblem = { pattern: GeometryPattern; prompt: string; expression: string; answer: number; explanation: string };
+export type GeometryProblem = {
+  pattern: GeometryPattern;
+  prompt: string;
+  expression: string;
+  answer: number;
+  explanation: string;
+  alternativeExplanations?: Partial<Record<GeometryPattern, string>>;
+};
 
 export const geometryPatterns: readonly GeometryPattern[] = ['between-curves', 'x-axis-rotation', 'y-axis-rotation', 'shell-method', 'curve-length'];
 export const geometryLabels: Record<GeometryPattern, string> = { 'between-curves': '2曲線間の面積', 'x-axis-rotation': 'x軸回転体の体積（円板法）', 'y-axis-rotation': 'y軸回転体の体積（円環法）', 'shell-method': 'y軸回転体の体積（円筒殻法）', 'curve-length': '曲線の長さ' };
+
+export function isGeometryStrategyValid(problem: GeometryProblem, strategy: GeometryPattern | ''): boolean {
+  return strategy === problem.pattern || Boolean(strategy && problem.alternativeExplanations?.[strategy]);
+}
+
+export function getGeometryExplanation(problem: GeometryProblem, strategy: GeometryPattern | ''): string {
+  return (strategy && problem.alternativeExplanations?.[strategy]) || problem.explanation;
+}
 
 const picker = new BalancedRandom(geometryPatterns);
 const variants = {
@@ -40,6 +55,9 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       expression: `y=\\sqrt{x}\\quad(0\\le x\\le${value})`,
       answer: (4 * Math.PI * value ** 2.5) / 5,
       explanation: `高さ y の断面は内半径 y²、外半径 ${value} の円環。V=π∫₀^√${value}(${value}²−y⁴)dy=4π×${value}^(5/2)/5。`,
+      alternativeExplanations: {
+        'shell-method': `円筒殻法では半径 x、高さ √x の殻を積み上げる。V=2π∫₀^${value}x√x dx=4π×${value}^(5/2)/5。`,
+      },
     },
     'shell-method': {
       pattern,
@@ -47,6 +65,9 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       expression: `y=x\\quad(0\\le x\\le${value})`,
       answer: (2 * Math.PI * value ** 3) / 3,
       explanation: `高さ x、半径 x の円筒殻で考える。V=2π∫₀^${value} x·x dx=2π×${value}³/3。`,
+      alternativeExplanations: {
+        'y-axis-rotation': `高さ y の断面は内半径 y、外半径 ${value} の円環。V=π∫₀^${value}(${value}²−y²)dy=2π×${value}³/3。`,
+      },
     },
     'curve-length': {
       pattern,
