@@ -270,7 +270,7 @@ export default function TrigSynthesisDrill() {
                     type="number" 
                     className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                     value={ansROuter} 
-                    onChange={e => setAnsROuter(e.target.value)} 
+                    onChange={e => { setAnsROuter(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder="外"
                   />
                   <span className="text-xl font-bold">√</span>
@@ -279,7 +279,7 @@ export default function TrigSynthesisDrill() {
                     type="number" 
                     className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                     value={ansRInner} 
-                    onChange={e => setAnsRInner(e.target.value)} 
+                    onChange={e => { setAnsRInner(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                     placeholder="中"
                   />
                 </div>
@@ -293,7 +293,7 @@ export default function TrigSynthesisDrill() {
                   type="text" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-xl text-slate-800 focus:border-blue-500" 
                   value={ansAlpha} 
-                  onChange={e => setAnsAlpha(e.target.value)} 
+                  onChange={e => { setAnsAlpha(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                   placeholder="例: pi/6, alpha"
                 />
                 <span className="text-[10px] text-gray-400">※有名角でない場合は alpha と入力</span>
@@ -309,7 +309,7 @@ export default function TrigSynthesisDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-base text-slate-800 focus:border-blue-500" 
                       value={ansCos} 
-                      onChange={e => setAnsCos(e.target.value)} 
+                      onChange={e => { setAnsCos(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="3/5"
                     />
                   </div>
@@ -320,7 +320,7 @@ export default function TrigSynthesisDrill() {
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-base text-slate-800 focus:border-blue-500" 
                       value={ansSin} 
-                      onChange={e => setAnsSin(e.target.value)} 
+                      onChange={e => { setAnsSin(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="4/5"
                     />
                   </div>

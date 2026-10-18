@@ -157,13 +157,13 @@ export default function RationalizationDrillPage() {
               </div>
               <div className="flex items-center justify-center gap-2 text-xl">
                 <MathEq math="=" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => setAnsA(e.target.value)} placeholder="A" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="A" />
                 <MathEq math="\sqrt{" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => setAns_a(e.target.value)} placeholder="a" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => { setAns_a(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
                 <MathEq math={`} ${problem.ansSign}`} />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => setAnsB(e.target.value)} placeholder="B" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="B" />
                 <MathEq math="\sqrt{" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => setAns_b(e.target.value)} placeholder="b" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => { setAns_b(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="b" />
                 <MathEq math="}" />
               </div>
               <div className="text-[10px] text-gray-500 text-center">

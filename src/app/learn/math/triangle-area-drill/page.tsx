@@ -313,7 +313,7 @@ export default function TriangleAreaDrillPage() {
               <div className="flex flex-col items-center gap-6 text-lg font-bold">
                 <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                   <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'S ='} />
-                  <FractionRootInput value={ansVal} onChange={setAnsVal} hideSign />
+                  <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
                 </div>
               </div>
             </div>

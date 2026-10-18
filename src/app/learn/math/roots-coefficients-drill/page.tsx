@@ -272,7 +272,7 @@ export default function RootsCoefficientsDrill() {
                   <select 
                     className="border-b-2 bg-transparent outline-none text-2xl font-bold focus:border-blue-500 pb-1"
                     value={ansSign}
-                    onChange={(e) => setAnsSign(e.target.value as '+' | '-')}
+                    onChange={(e) => { setAnsSign(e.target.value as '+' | '-'); setHasChecked(false); setIsCorrect(false); }}
                   >
                     <option value="+">+</option>
                     <option value="-">-</option>
@@ -283,7 +283,7 @@ export default function RootsCoefficientsDrill() {
                       type="number" 
                       className="w-16 bg-transparent outline-none text-center font-bold text-xl text-slate-800" 
                       value={ansNumStr} 
-                      onChange={e => setAnsNumStr(e.target.value)} 
+                      onChange={e => { setAnsNumStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="分子"
                     />
                     <div className="w-full h-0.5 bg-slate-800"></div>
@@ -291,7 +291,7 @@ export default function RootsCoefficientsDrill() {
                       type="number" 
                       className="w-16 bg-transparent outline-none text-center font-bold text-xl text-slate-800" 
                       value={ansDenStr} 
-                      onChange={e => setAnsDenStr(e.target.value)} 
+                      onChange={e => { setAnsDenStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="分母"
                     />
                   </div>
