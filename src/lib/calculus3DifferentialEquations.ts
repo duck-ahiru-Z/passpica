@@ -16,7 +16,8 @@ export function normalizeDifferentialEquationAnswer(value: string): string {
     .replaceAll('³', '^3')
     .replaceAll('−', '-')
     .replaceAll(/e\^\((\d*x)\)/g, 'e^$1')
-    .replaceAll(/e\^1x/g, 'e^x');
+    .replaceAll(/e\^1x/g, 'e^x')
+    .replaceAll(/y=1e\^/g, 'y=e^');
 }
 
 const picker = new BalancedRandom(differentialEquationPatterns);
@@ -32,7 +33,11 @@ export function generateDifferentialEquationProblem(mode: DifferentialEquationMo
   switch (pattern) {
     case 'separation': {
       const { rate, initial } = variants.separation.next(random);
-      return { pattern, expression: `dy/dx = ${rate}y,  y(0)=${initial} の解`, answer: `y=${initial}e^(${rate}x)`, explanation: `dy/y=${rate}dx と変数分離して積分する。初期条件 y(0)=${initial} から積分定数を決め、解は y=${initial}e^(${rate}x)。` };
+      const rateCoefficient = rate === 1 ? '' : String(rate);
+      const initialCoefficient = initial === 1 ? '' : String(initial);
+      const exponential = rate === 1 ? 'e^x' : `e^(${rate}x)`;
+      const solution = `y=${initialCoefficient}${exponential}`;
+      return { pattern, expression: `dy/dx = ${rateCoefficient}y,  y(0)=${initial} の解`, answer: solution, explanation: `dy/y=${rateCoefficient}dx と変数分離して積分する。初期条件 y(0)=${initial} から積分定数を決め、解は ${solution}。` };
     }
     case 'initial': {
       const { coefficient, constant } = variants.initial.next(random);
