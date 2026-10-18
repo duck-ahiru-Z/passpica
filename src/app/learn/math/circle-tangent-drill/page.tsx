@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -183,10 +184,11 @@ export default function CircleTangentDrillPage() {
     e.preventDefault();
     if (!problem) return;
 
-    const normalizeUserLine = (a: string, b: string, c: string) => {
-      let va = parseInt(a) || 0;
-      let vb = parseInt(b) || 0;
-      let vc = parseInt(c) || 0;
+    const normalizeUserLine = (a: string, b: string, c: string): [number, number, number] | null => {
+      let va = parseStrictInteger(a, 0);
+      let vb = parseStrictInteger(b, 0);
+      let vc = parseStrictInteger(c, 0);
+      if (va === null || vb === null || vc === null) return null;
       const g = gcd3(va, vb, vc);
       if (g > 0) { va /= g; vb /= g; vc /= g; }
       if (va < 0 || (va === 0 && vb < 0)) {
@@ -195,14 +197,16 @@ export default function CircleTangentDrillPage() {
       return [va, vb, vc];
     };
 
-    const [uA1, uB1, uC1] = normalizeUserLine(L1_A, L1_B, L1_C);
-    const [uA2, uB2, uC2] = normalizeUserLine(L2_A, L2_B, L2_C);
+    const line1 = normalizeUserLine(L1_A, L1_B, L1_C);
+    const line2 = normalizeUserLine(L2_A, L2_B, L2_C);
 
-    const isMatch1 = (uA1 === problem.A1 && uB1 === problem.B1 && uC1 === problem.C1) &&
-                     (uA2 === problem.A2 && uB2 === problem.B2 && uC2 === problem.C2);
+    const isMatch1 = line1 !== null && line2 !== null
+      && line1[0] === problem.A1 && line1[1] === problem.B1 && line1[2] === problem.C1
+      && line2[0] === problem.A2 && line2[1] === problem.B2 && line2[2] === problem.C2;
     
-    const isMatch2 = (uA1 === problem.A2 && uB1 === problem.B2 && uC1 === problem.C2) &&
-                     (uA2 === problem.A1 && uB2 === problem.B1 && uC2 === problem.C1);
+    const isMatch2 = line1 !== null && line2 !== null
+      && line1[0] === problem.A2 && line1[1] === problem.B2 && line1[2] === problem.C2
+      && line2[0] === problem.A1 && line2[1] === problem.B1 && line2[2] === problem.C1;
 
     if (isMatch1 || isMatch2) {
       setIsCorrect(true);

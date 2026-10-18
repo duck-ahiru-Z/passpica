@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -184,14 +185,16 @@ export default function EllipseDrill() {
     // In Pattern 1: ans1 is c, ans2 is 0.
     // If they type -c, we should accept it.
     if (problem.pattern === 'pattern1') {
-      const v1 = Math.abs(parseInt(ans1.trim()));
-      const v2 = parseInt(ans2.trim());
-      if (v1 === parseInt(problem.ans1!) && v2 === 0) isOk = true;
+      const rawV1 = parseStrictInteger(ans1);
+      const v2 = parseStrictInteger(ans2);
+      const expected = parseStrictInteger(problem.ans1!);
+      if (rawV1 !== null && v2 !== null && expected !== null && Math.abs(rawV1) === expected && v2 === 0) isOk = true;
     }
     if (problem.pattern === 'pattern2') {
-      const v1 = parseInt(ans1.trim());
-      const v2 = Math.abs(parseInt(ans2.trim()));
-      if (v1 === 0 && v2 === parseInt(problem.ans2!)) isOk = true;
+      const v1 = parseStrictInteger(ans1);
+      const rawV2 = parseStrictInteger(ans2);
+      const expected = parseStrictInteger(problem.ans2!);
+      if (v1 !== null && rawV2 !== null && expected !== null && v1 === 0 && Math.abs(rawV2) === expected) isOk = true;
     }
     
     setIsCorrect(isOk);

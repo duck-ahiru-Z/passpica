@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -174,21 +175,23 @@ export default function HyperbolaParabolaDrill() {
     let isOk = false;
     
     if (problem.pattern === 'pattern1' || problem.pattern === 'pattern2') {
-      const v1 = Math.abs(parseInt(ans1.trim() || '0'));
-      const v2 = Math.abs(parseInt(ans2.trim() || '0'));
+      const rawV1 = parseStrictInteger(ans1, 0);
+      const rawV2 = parseStrictInteger(ans2, 0);
+      const v1 = rawV1 === null ? null : Math.abs(rawV1);
+      const v2 = rawV2 === null ? null : Math.abs(rawV2);
       const m = ans3.trim().replace(/\s+/g, '');
       if (problem.pattern === 'pattern1' && v1 === parseInt(problem.ans1!) && v2 === 0 && m === problem.ans3) isOk = true;
       if (problem.pattern === 'pattern2' && v1 === 0 && v2 === parseInt(problem.ans2!) && m === problem.ans3) isOk = true;
     } else if (problem.pattern === 'pattern3') {
-      const v1 = parseInt(ans1.trim());
-      const v2 = parseInt(ans2.trim());
-      const dir = parseInt(ans3.trim());
+      const v1 = parseStrictInteger(ans1);
+      const v2 = parseStrictInteger(ans2);
+      const dir = parseStrictInteger(ans3);
       if (v1 === parseInt(problem.ans1!) && v2 === parseInt(problem.ans2!) && dir === parseInt(problem.ans3!)) isOk = true;
     } else if (problem.pattern === 'pattern4') {
-      const vx = parseInt(ans1.trim());
-      const vy = parseInt(ans2.trim());
-      const fx = parseInt(ans3.trim());
-      const fy = parseInt(ans4.trim());
+      const vx = parseStrictInteger(ans1);
+      const vy = parseStrictInteger(ans2);
+      const fx = parseStrictInteger(ans3);
+      const fy = parseStrictInteger(ans4);
       if (vx === parseInt(problem.ans1!) && vy === parseInt(problem.ans2!) && fx === parseInt(problem.ans3!) && fy === parseInt(problem.ans4!)) isOk = true;
     }
     

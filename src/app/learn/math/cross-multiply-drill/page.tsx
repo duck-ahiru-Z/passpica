@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -137,13 +138,13 @@ export default function CrossMultiplyDrillPage() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const uk = ansK.trim() === '' ? 1 : parseInt(ansK);
-    const up = parseInt(ansP);
-    const uq = parseInt(ansQ);
-    const ur = parseInt(ansR);
-    const us = parseInt(ansS);
+    const uk = parseStrictInteger(ansK, 1);
+    const up = parseStrictInteger(ansP);
+    const uq = parseStrictInteger(ansQ);
+    const ur = parseStrictInteger(ansR);
+    const us = parseStrictInteger(ansS);
     
-    if (isNaN(uk) || isNaN(up) || isNaN(uq) || isNaN(ur) || isNaN(us)) {
+    if (uk === null || up === null || uq === null || ur === null || us === null) {
       alert('枠に整数を入力してください。（先頭の括り出しがない場合は空欄または1）');
       return;
     }
