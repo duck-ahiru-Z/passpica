@@ -54,7 +54,8 @@
     "test:chemistry-indicators": "node --experimental-strip-types scripts/verify-chemistry-indicators.mjs",
     "test:math2-bc-mixed": "node --experimental-strip-types scripts/verify-math2-bc-mixed-questions.mjs",
     "test:math": "node --experimental-strip-types scripts/verify-discriminant-pattern.mjs",
-    "test:coverage": "node scripts/verify-learning-coverage.mjs"
+    "test:coverage": "node scripts/verify-learning-coverage.mjs",
+    "test:all": "node scripts/verify-all.mjs"
   },
   "dependencies": {
     "@types/katex": "^0.16.8",
