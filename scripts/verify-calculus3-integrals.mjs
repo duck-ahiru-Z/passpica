@@ -52,8 +52,13 @@ const checks = {
   trig: problem => {
     const [, exponent] = problem.expression.match(/\\sin\^\{(\d+)\}/);
     const n = Number(exponent);
-    const expected = Array.from({ length: (n - 1) / 2 }, (_, index) => 2 * (index + 1) / (2 * (index + 1) + 1)).reduce((product, factor) => product * factor, 1);
-    return close(problem.answer, expected) && problem.hint.includes('置換');
+    const factors = Array.from({ length: (n - 1) / 2 }, (_, index) => `${n - 1 - 2 * index}/${n - 2 * index}`);
+    const expected = factors.reduce((product, factor) => {
+      const [numerator, denominator] = factor.split('/').map(Number);
+      return product * numerator / denominator;
+    }, 1);
+    return close(problem.answer, expected) && problem.hint.includes('置換')
+      && problem.explanation.includes(`I_${n}=${factors.join('×')}=${expected.toFixed(3)}`);
   },
   radical: problem => {
     const [, upper, radius] = problem.expression.match(/\\int_0\^\{(.*?)\} \\sqrt\{(\d+)\^2-x\^2\}/);
