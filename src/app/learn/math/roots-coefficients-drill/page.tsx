@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseRationalParts, rationalEquals } from '@/src/lib/rationalInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -150,16 +151,12 @@ export default function RootsCoefficientsDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    let uNum = parseInt(ansNumStr) || 0;
-    const uDen = parseInt(ansDenStr) || 1;
-    if (ansSign === '-') uNum = -uNum;
-    
-    // cross multiply check for fraction equality
-    if (uNum * problem.ansDen === problem.ansNum * uDen) {
-      setIsCorrect(true);
-    } else {
-      setIsCorrect(false);
-    }
+    const parsedAnswer = parseRationalParts(ansNumStr.trim() === '' ? '0' : ansNumStr, ansDenStr);
+    const signedAnswer = parsedAnswer && {
+      numerator: ansSign === '-' ? -parsedAnswer.numerator : parsedAnswer.numerator,
+      denominator: parsedAnswer.denominator,
+    };
+    setIsCorrect(rationalEquals(signedAnswer, { numerator: problem.ansNum, denominator: problem.ansDen }));
     setHasChecked(true);
   };
 
