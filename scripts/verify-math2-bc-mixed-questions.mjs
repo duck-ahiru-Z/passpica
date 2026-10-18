@@ -1,5 +1,14 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { generateMath2Question, math2Areas } from '../src/lib/math2MixedQuestions.ts';
 import { generateMathBcQuestion, mathBcAreas } from '../src/lib/mathBcMixedQuestions.ts';
+
+for (const pageName of ['math2-mixed-drill', 'mathbc-mixed-drill']) {
+  const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math', pageName, 'page.tsx'), 'utf8');
+  if (!page.includes('aria-pressed={answer === option}') || !page.includes('disabled={!answer}') || !page.includes('role="status" aria-live="polite"')) {
+    throw new Error(`${pageName} must announce selected answers, block empty submissions, and announce feedback`);
+  }
+}
 
 const stableRandom = () => 0.37;
 

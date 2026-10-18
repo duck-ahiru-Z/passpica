@@ -1,4 +1,11 @@
 import { generateMath1Question, math1Areas } from '../src/lib/math1MixedQuestions.ts';
+import fs from 'node:fs';
+import path from 'node:path';
+
+const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/math1-mixed-drill/page.tsx'), 'utf8');
+if (!page.includes('aria-pressed={answer === option}')) throw new Error('Math I answer options must expose the selected state');
+if (!page.includes('disabled={!answer}')) throw new Error('Math I answers must not be submitted before choosing an option');
+if (!page.includes('role="status" aria-live="polite"')) throw new Error('Math I answer feedback must be announced to assistive technology');
 
 const stableRandom = () => 0.37;
 

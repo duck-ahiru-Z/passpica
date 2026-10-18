@@ -1,5 +1,12 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import { generateMathAQuestion, mathAAreas } from '../src/lib/mathAMixedQuestions.ts';
+
+const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/matha-mixed-drill/page.tsx'), 'utf8');
+assert.ok(page.includes('aria-pressed={answer === option}'));
+assert.ok(page.includes('disabled={!answer}'));
+assert.ok(page.includes('role="status" aria-live="polite"'));
 
 for (const area of mathAAreas) {
   const seen = new Set();
