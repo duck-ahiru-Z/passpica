@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -206,16 +207,16 @@ export default function LinearDiophantineDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const ux = parseInt(ansX);
-    const uy = parseInt(ansY);
+    const ux = parseStrictInteger(ansX);
+    const uy = parseStrictInteger(ansY);
     
-    if (isNaN(ux) || isNaN(uy)) {
+    if (ux === null || uy === null) {
       alert("整数を入力してください");
       return;
     }
     
     // Any valid solution is accepted!
-    if (problem.A * ux + problem.B * uy === problem.C) {
+    if (BigInt(problem.A) * BigInt(ux) + BigInt(problem.B) * BigInt(uy) === BigInt(problem.C)) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);

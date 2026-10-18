@@ -48,6 +48,7 @@
     "test:strict-answer-parsing": "node --experimental-strip-types scripts/verify-strict-answer-parsing.mjs",
     "test:strict-integer-drills": "node --experimental-strip-types scripts/verify-strict-integer-drills.mjs",
     "test:hyperbola-parabola": "node --experimental-strip-types scripts/verify-hyperbola-parabola.mjs",
+    "test:strict-integer-answers": "node --experimental-strip-types scripts/verify-strict-integer-answers.mjs",
     "test:complex-polar-exact": "node --experimental-strip-types scripts/verify-complex-polar-exact.mjs",
     "test:unit-circle-complex-visual": "node scripts/verify-unit-circle-complex-visual.mjs",
     "test:quadratic-inequality": "node --experimental-strip-types scripts/verify-quadratic-inequality.mjs",

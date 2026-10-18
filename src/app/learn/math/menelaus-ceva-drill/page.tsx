@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -107,12 +108,12 @@ export default function MenelausCevaDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    const ux = parseInt(ansX);
-    const uy = parseInt(ansY);
+    const ux = parseStrictInteger(ansX);
+    const uy = parseStrictInteger(ansY);
     
     // allow multiples (e.g. 2:4 for 1:2 is correct geometrically, though we usually want simplest form)
     // we'll enforce simplest form or proportional. Let's do proportional.
-    if (!isNaN(ux) && !isNaN(uy) && ux * problem.ansY === uy * problem.ansX) {
+    if (ux !== null && uy !== null && BigInt(ux) * BigInt(problem.ansY) === BigInt(uy) * BigInt(problem.ansX)) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
