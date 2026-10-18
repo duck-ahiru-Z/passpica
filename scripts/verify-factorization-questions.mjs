@@ -6,6 +6,9 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/f
 if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={choice === option}') || !drillPage.includes('role="status" aria-live="polite"')) {
   throw new Error('factorization choices must be a single-choice radio group with accessible answer feedback');
 }
+if (!drillPage.includes('setChoice(option); setChecked(false);')) {
+  throw new Error('changing a factorization strategy must clear the previous feedback');
+}
 
 const fixedRandom = () => 0.42;
 for (const pattern of factorizationPatterns) {
