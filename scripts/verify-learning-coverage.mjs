@@ -31,6 +31,12 @@ const requiredVisuals = [
 ];
 
 const drillEntries = readPortalEntries(drill);
+for (const filter of ['aria-label="科目で絞り込む"', 'aria-label="難易度で絞り込む"']) {
+  if (!drill.includes(filter)) throw new Error(`Drill portal filter group must have an accessible name: ${filter}`);
+}
+if (!drill.includes('aria-pressed={selectedSubject === sub.id}') || !drill.includes('aria-pressed={selectedDifficulty === diff.id}')) {
+  throw new Error('Drill portal filters must expose their selected state to assistive technology');
+}
 const drillSlugs = new Set(drillEntries.map(entry => entry.slug));
 for (const slug of requiredDrills) {
   if (!drillSlugs.has(slug)) throw new Error(`Missing drill portal entry: ${slug}`);
