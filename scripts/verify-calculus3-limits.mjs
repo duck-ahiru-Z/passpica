@@ -18,6 +18,10 @@ if (!drillPage.includes('実戦練習：極限 全パターンランダム') || 
 if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("{mode === 'mix' ? (") || !drillPage.includes('基礎練習：{limitLabels[mode]}に固定して繰り返します。')) {
   throw new Error('fixed limit practice must lock its pattern while mixed practice asks learners to identify it');
 }
+if (!drillPage.includes("isContinuity ? 'overflow-x-auto p-3 text-base sm:p-6 sm:text-lg lg:text-xl' : 'p-8 text-2xl'")
+  || !drillPage.includes("isContinuity ? 'whitespace-nowrap' : undefined")) {
+  throw new Error('the long continuity piecewise expression must remain legible without awkward line breaks on narrow screens');
+}
 
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-12;
