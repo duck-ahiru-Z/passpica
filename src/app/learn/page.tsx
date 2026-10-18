@@ -214,8 +214,8 @@ const CONTENTS: LearningContent[] = [
     subject: 'chemistry',
     subjectJp: '化学',
     field: '有機化学（立体構造）',
-    title: '有機・高分子3D立体モデルビューア（シクロヘキサン立体配座）',
-    description: 'メタンなどの基本有機物、シクロヘキサンの「椅子型」「舟型」配座、高分子（天然ゴム）のシス型折れ曲がり構造を3次元で自在に回転・観察できます。',
+    title: '有機・高分子3D分子モデルビューア（立体構造）',
+    description: 'メタン・ベンゼンなどの基本分子、シクロヘキサンの椅子型・舟型、シス・トランス異性体を3次元で回転・観察できます。',
     difficulty: '標準',
     type: 'ビジュアル図解',
     link: '/learn/chemistry/organic-3d'
