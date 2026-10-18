@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -105,7 +105,7 @@ export default function PermutationCombinationDrill() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -242,11 +242,11 @@ export default function PermutationCombinationDrill() {
         });
       }
     }
-  };
+  }, [problem]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));

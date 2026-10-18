@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -161,7 +161,7 @@ export default function DiscriminantDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -212,11 +212,11 @@ export default function DiscriminantDrillPage() {
     ctx.fillStyle = '#1e293b';
     ctx.font = 'bold 14px sans-serif';
     ctx.fillText(`k = ${kVal.toFixed(1)}`, 10, 20);
-  };
+  }, [problem, kVal]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, kVal]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     const p = generateProblem(pattern);

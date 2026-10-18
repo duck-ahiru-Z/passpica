@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -198,7 +198,7 @@ export default function EllipseDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -266,11 +266,11 @@ export default function EllipseDrill() {
       ctx.beginPath(); ctx.moveTo(left.x, left.y); ctx.lineTo(right.x, right.y); ctx.stroke();
       ctx.setLineDash([]);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 

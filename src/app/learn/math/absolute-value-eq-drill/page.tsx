@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -170,7 +170,7 @@ export default function AbsoluteValueEqDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current || !showGraph) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -186,11 +186,11 @@ export default function AbsoluteValueEqDrillPage() {
 
     if (problem.pattern === 'pattern1') {
       funcL = (x) => Math.abs(x - problem.a);
-      funcR = (x) => problem.b;
+      funcR = () => problem.b;
       turnPoints = [problem.a];
     } else if (problem.pattern === 'pattern2') {
       funcL = (x) => Math.abs(problem.a * x - problem.b);
-      funcR = (x) => problem.c!;
+      funcR = () => problem.c!;
       turnPoints = [problem.b / problem.a];
     } else if (problem.pattern === 'pattern3') {
       funcL = (x) => Math.abs(problem.a * x - problem.b);
@@ -198,7 +198,7 @@ export default function AbsoluteValueEqDrillPage() {
       turnPoints = [problem.b / problem.a];
     } else if (problem.pattern === 'pattern4') {
       funcL = (x) => Math.abs(x - problem.a) + Math.abs(x - problem.b);
-      funcR = (x) => problem.c!;
+      funcR = () => problem.c!;
       turnPoints = [problem.a, problem.b];
     }
 
@@ -295,7 +295,6 @@ export default function AbsoluteValueEqDrillPage() {
       // 無縁根プロット (パターン3)
       if (problem.pattern === 'pattern3' && problem.invalidRoot) {
         const x = problem.invalidRoot.num / problem.invalidRoot.den;
-        const yL = funcL(x);
         const yR = funcR(x);
         
         // 偽の交点 (赤い直線上の点)
@@ -316,11 +315,11 @@ export default function AbsoluteValueEqDrillPage() {
         ctx.fillText(`無縁根`, mapX(x), mapY(-0.5));
       }
     }
-  };
+  }, [problem, hasChecked, showGraph]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked, showGraph]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));

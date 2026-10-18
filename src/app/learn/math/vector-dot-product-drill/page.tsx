@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -110,8 +110,6 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (by === 0) by = -1;
       
       const a: Vector2D = { xStr: ax.toString(), yStr: ay.toString(), xVal: ax, yVal: ay };
-      const b: Vector2D = { xStr: "x", yStr: by.toString(), xVal: 0, yVal: by }; // xVal unused here
-      
       // ax * x + ay * by = 0  => ax * x = -ay * by
       let num = -ay * by;
       let den = ax;
@@ -202,7 +200,7 @@ export default function VectorDotProductDrill() {
     setHasChecked(true);
   };
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -305,11 +303,11 @@ export default function VectorDotProductDrill() {
         ctx.fillText('θ', origin.x + 35*Math.cos(mid), origin.y + 35*Math.sin(mid));
       }
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 

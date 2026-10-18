@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -125,7 +125,7 @@ export default function CompletingSquareDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const drawGraph = () => {
+  const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -219,11 +219,11 @@ export default function CompletingSquareDrillPage() {
       const textY = problem.a > 0 ? mapY(vy) + 16 : mapY(vy) - 8;
       ctx.fillText(`頂点 (${pStr}, ${qStr})`, mapX(vx), textY);
     }
-  };
+  }, [problem, hasChecked]);
 
   useEffect(() => {
     drawGraph();
-  }, [problem, hasChecked]);
+  }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));
