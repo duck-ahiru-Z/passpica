@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { rightDiskApproximation, rotationVolume } from '@/src/lib/calculus3VolumeVisual';
+import { rightDiskApproximation, rotationDiskRadius, rotationSectionIndices, rotationVolume } from '@/src/lib/calculus3VolumeVisual';
 
 const W = 720;
 const H = 330;
@@ -29,7 +29,7 @@ export default function Calculus3VolumeVisualPage() {
   const solidCenterY = 160;
   const solidRadius = 105;
   const solidX = (index: number) => solidLeft + (solidRight - solidLeft) * index / sliceCount;
-  const diskRadius = (index: number) => solidRadius * (index / sliceCount) ** 2;
+  const diskRadius = (index: number) => rotationDiskRadius(index, sliceCount, solidRadius);
   const solidOutline = [
     ...Array.from({ length: sliceCount + 1 }, (_, index) => `L ${solidX(index).toFixed(1)} ${(solidCenterY - diskRadius(index)).toFixed(1)}`),
     ...Array.from({ length: sliceCount + 1 }, (_, offset) => {
@@ -37,8 +37,7 @@ export default function Calculus3VolumeVisualPage() {
       return `L ${solidX(index).toFixed(1)} ${(solidCenterY + diskRadius(index)).toFixed(1)}`;
     }),
   ].join(' ');
-  const sectionIndices = [...new Set([1, Math.round(sliceCount / 4), Math.round(sliceCount / 2), Math.round(3 * sliceCount / 4), sliceCount])]
-    .filter(index => index > 0 && index <= sliceCount);
+  const sectionIndices = rotationSectionIndices(sliceCount);
 
   return (
     <main className="max-w-5xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
