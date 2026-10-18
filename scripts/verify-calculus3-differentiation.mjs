@@ -53,7 +53,9 @@ const checks = {
   },
   inverse: problem => {
     const [, a] = problem.expression.match(/f\(x\)=x\^3\+(\d+)x/);
-    return close(problem.answer, 1 / (Number(a) + 3)) && problem.explanation.includes('逆関数の微分公式');
+    return close(problem.answer, 1 / (Number(a) + 3))
+      && problem.expression.includes('g=f^{-1}')
+      && problem.explanation.includes('逆関数の微分公式');
   },
   higher: problem => {
     const [, a] = problem.expression.match(/y=e\^\{(\d+)x\}/);
@@ -72,6 +74,7 @@ for (const pattern of differentiationPatterns) {
   for (let index = 0; index < 500; index += 1) {
     const problem = generateDifferentiationProblem(pattern, stableRandom);
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
+      if (/[ぁ-んァ-ヶ一-龠]/u.test(problem.expression)) throw new Error(`non-mathematical text must not be sent to KaTeX in ${pattern}`);
     seen.add(problem.expression);
   }
   if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
