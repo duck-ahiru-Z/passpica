@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -158,19 +159,8 @@ export default function LogarithmDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    // Parse user input as fraction or integer
-    let uNum = 0, uDen = 1;
-    const uStr = ansVal.trim().replace(/\s+/g, '');
-    if (uStr.includes('/')) {
-      const parts = uStr.split('/');
-      uNum = parseInt(parts[0]);
-      uDen = parseInt(parts[1]);
-    } else {
-      uNum = parseInt(uStr);
-      uDen = 1;
-    }
-    
-    if (!isNaN(uNum) && !isNaN(uDen) && uNum * problem.ansDen === problem.ansNum * uDen) {
+    const answer = parseRationalAnswer(ansVal);
+    if (rationalEquals(answer, { numerator: problem.ansNum, denominator: problem.ansDen })) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);

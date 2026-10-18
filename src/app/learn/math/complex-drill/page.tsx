@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 
 // --- ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -167,8 +168,8 @@ export default function ComplexDrillPage() {
     e.preventDefault();
     if (!problem) return;
 
-    const userN = parseInt(inN);
-    const userZn = parseInt(inZn);
+    const userN = parseStrictPositiveInteger(inN);
+    const userZn = parseStrictPositiveInteger(inZn);
 
     if (userN === problem.n && userZn === problem.zn) {
       setIsCorrect(true);
