@@ -12,6 +12,9 @@ if (!/const correct = strategy === problem\.pattern && isCurveAnswerCorrect\(ans
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('curve-analysis feedback must announce the result and distinguish strategy from value errors');
 }
+if (!drillPage.includes('setStrategy(pattern); setChecked(false);') || !drillPage.includes('setAnswer(e.target.value); setChecked(false);')) {
+  throw new Error('changing a curve-analysis strategy or answer must clear stale feedback');
+}
 
 const stableRandom = () => 0.37;
 if (!isCurveAnswerCorrect('-0.333', -1 / 3)) throw new Error('three-decimal displayed answers should be accepted');

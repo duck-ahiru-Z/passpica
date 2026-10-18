@@ -9,6 +9,9 @@ if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includ
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
 }
+if (!drillPage.includes('setStrategy(p); setChecked(false);') || !drillPage.includes('setAnswer(e.target.value); setChecked(false);')) {
+  throw new Error('changing a geometry strategy or answer must clear stale feedback');
+}
 if (!drillPage.includes('実戦練習：面積・体積 全パターンランダム') || !drillPage.includes('基礎練習：{geometryLabels[p]}だけ')) {
   throw new Error('the learner must be able to choose mixed practice or one fixed geometry pattern');
 }
