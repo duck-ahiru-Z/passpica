@@ -56,20 +56,21 @@ const triples = [
   { a: 8, b: 15 }, { a: 15, b: 8 }
 ];
 
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
+function generatePointLineDistanceProblem(selectedPattern: Pattern | 'mix', random = Math.random): ProblemData {
   const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
+    ? mixedPatternPicker.next(random)
     : selectedPattern;
+  const draw = () => random();
 
   while (true) {
-    const t = triples[Math.floor(Math.random() * triples.length)];
-    const a = t.a * (Math.random() > 0.5 ? 1 : -1);
-    const b = t.b * (Math.random() > 0.5 ? 1 : -1);
+    const t = triples[Math.floor(draw() * triples.length)];
+    const a = t.a * (draw() > 0.5 ? 1 : -1);
+    const b = t.b * (draw() > 0.5 ? 1 : -1);
     const dist = Math.sqrt(a*a + b*b);
     let px = 0, py = 0, c = 0;
     
     if (p === 'pattern1') {
-      c = Math.floor(Math.random() * 50) - 25;
+      c = Math.floor(draw() * 50) - 25;
       if (c === 0) continue;
       let dStr = `${Math.abs(c)}/${dist}`;
       if (c % dist === 0) dStr = `${Math.abs(c) / dist}`;
@@ -82,9 +83,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       };
     } 
     else if (p === 'pattern2') {
-      px = Math.floor(Math.random() * 10) - 5;
-      py = Math.floor(Math.random() * 10) - 5;
-      c = Math.floor(Math.random() * 50) - 25;
+      px = Math.floor(draw() * 10) - 5;
+      py = Math.floor(draw() * 10) - 5;
+      c = Math.floor(draw() * 50) - 25;
       const num = Math.abs(a * px + b * py + c);
       if (num === 0) continue; // point on line
       
@@ -100,9 +101,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern3') {
       // y = mx + n form
-      px = Math.floor(Math.random() * 10) - 5;
-      py = Math.floor(Math.random() * 10) - 5;
-      c = Math.floor(Math.random() * 30) - 15;
+      px = Math.floor(draw() * 10) - 5;
+      py = Math.floor(draw() * 10) - 5;
+      c = Math.floor(draw() * 30) - 15;
       
       // ax + by + c = 0 => by = -ax - c => y = (-a/b)x - c/b
       // To make it look like a nice y = mx + n, let's just write the string
@@ -133,9 +134,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       // distance from (px, py) to ax+by+k=0 is distVal
-      px = Math.floor(Math.random() * 10) - 5;
-      py = Math.floor(Math.random() * 10) - 5;
-      const distVal = Math.floor(Math.random() * 4) + 1; // distance 1..4
+      px = Math.floor(draw() * 10) - 5;
+      py = Math.floor(draw() * 10) - 5;
+      const distVal = Math.floor(draw() * 4) + 1; // distance 1..4
       // |a*px + b*py + k| / dist = distVal
       // |a*px + b*py + k| = distVal * dist
       const C_val = distVal * dist;
@@ -154,6 +155,10 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       };
     }
   }
+}
+
+function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
+  return generatePointLineDistanceProblem(selectedPattern);
 }
 
 export default function PointLineDistanceDrill() {
