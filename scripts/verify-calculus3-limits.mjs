@@ -32,21 +32,24 @@ const checks = {
     return Number(problem.answer) === 2 * n && problem.explanation.includes(`(x−${n})(x+${n})`);
   },
   rationalize: problem => {
-    const [, coefficient] = problem.expression.match(/\\sqrt\{1\+(\d+)x\}/);
-    const n = Number(coefficient);
-    return Number(problem.answer) === n / 2 && problem.explanation.includes(`${n}/(√(1+${n}x)+1)`);
+    const [, coefficient] = problem.expression.match(/\\sqrt\{1\+(?:(\d+)x|x)\}/);
+    const n = Number(coefficient ?? 1);
+    const radicalTerm = n === 1 ? 'x' : `${n}x`;
+    return Number(problem.answer) === n / 2 && problem.explanation.includes(`${n}/(√(1+${radicalTerm})+1)`);
   },
   dominant: problem => {
-    const [, a, c] = problem.expression.match(/\\frac\{(\d+)x\^2-x\+1\}\{(\d+)x\^2\+4\}/);
-    return close(Number(problem.answer), Number(a) / Number(c)) && problem.explanation.includes(`${a}/${c}`);
+    const [, aText, cText] = problem.expression.match(/\\frac\{(?:(\d+)x\^2|x\^2)-x\+1\}\{(?:(\d+)x\^2|x\^2)\+4\}/);
+    const a = Number(aText ?? 1); const c = Number(cText ?? 1);
+    return close(Number(problem.answer), a / c) && problem.explanation.includes(`${a}/${c}`);
   },
   squeeze: problem => {
     const [, coefficient] = problem.expression.match(/\\sin\\frac\{(\d+)\}\{x\}/);
     return Number(problem.answer) === 0 && problem.explanation.includes(`sin(${coefficient}/x)`);
   },
   sequence: problem => {
-    const [, a, c] = problem.expression.match(/\\frac\{(\d+)n\+1\}\{(\d+)n\+2\}/);
-    return close(Number(problem.answer), Number(a) / Number(c)) && problem.explanation.includes(`${a}/${c}`);
+    const [, aText, cText] = problem.expression.match(/\\frac\{(?:(\d+)n|n)\+1\}\{(?:(\d+)n|n)\+2\}/);
+    const a = Number(aText ?? 1); const c = Number(cText ?? 1);
+    return close(Number(problem.answer), a / c) && problem.explanation.includes(`${a}/${c}`);
   },
   trigonometric: problem => {
     const [, coefficient] = problem.expression.match(/\\sin\((?:(\d+)x|x)\)/);
@@ -68,6 +71,9 @@ for (const pattern of limitPatterns) {
   for (let index = 0; index < 500; index += 1) {
     const problem = generateLimitProblem(pattern, stableRandom);
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
+    if (pattern === 'rationalize' && problem.expression.includes('+1x')) throw new Error('radical coefficient 1 should be omitted');
+    if (pattern === 'dominant' && /\\frac\{1x\^2|\}\{1x\^2/.test(problem.expression)) throw new Error('leading coefficient 1 should be omitted in rational functions');
+    if (pattern === 'sequence' && /\\frac\{1n|\}\{1n/.test(problem.expression)) throw new Error('leading coefficient 1 should be omitted in sequence terms');
     seen.add(problem.expression);
   }
   if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
