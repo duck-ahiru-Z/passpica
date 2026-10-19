@@ -66,6 +66,7 @@ function verifyGeneratedProblem(problem, expectedPattern) {
   if (problem.pattern === 'pattern1' && problem.a !== 1) throw new Error('pattern1 must be monic');
   if (problem.pattern === 'pattern2' && problem.a !== -1) throw new Error('pattern2 must have a negative leading coefficient');
   if (problem.pattern === 'pattern3' && problem.a <= 1) throw new Error('pattern3 must use a non-unit positive leading coefficient');
+  if (problem.pattern === 'pattern3' && problem.roots.some(root => root.den === 1)) throw new Error('pattern3 must have two non-integer rational roots');
   if (problem.pattern === 'pattern4' && (discriminant !== 0 || problem.b === 0 || problem.c === 0)) throw new Error('pattern4 must be a full repeated-root quadratic');
 
   const rootValues = problem.roots.map(root => root.num / root.den);
