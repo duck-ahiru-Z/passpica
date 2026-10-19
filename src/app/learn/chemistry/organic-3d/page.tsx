@@ -568,7 +568,7 @@ export default function Organic3DPage() {
           <Link href="/">トップ</Link> &gt; <Link href="/learn">学習室</Link> &gt; 有機化学・立体構造
         </nav>
         <h1 className="text-xl md:text-2xl font-bold text-slate-900">
-          有機・高分子3D立体モデルビューア（シクロヘキサン立体配座）
+          有機・高分子3D分子モデルビューア（立体構造）
         </h1>
         <p className="text-xs text-gray-500 mt-1">
           メタンやベンゼンといった代表的な有機分子、シクロヘキサンの「椅子型」「舟型」配座、高分子のシス・トランスによる折れ曲がり構造を3D回転モデルで直感的に学びます。

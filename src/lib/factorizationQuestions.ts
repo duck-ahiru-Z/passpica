@@ -101,3 +101,40 @@ export function generateFactorizationQuestion(mode: FactorizationMode, random = 
 export function normalizeFactorizationAnswer(value: string): string {
   return value.trim().replace(/\s+/g, '').replace(/[×·]/g, '*').replaceAll('−', '-').replaceAll('²', '^2').replaceAll('³', '^3').replaceAll('*', '');
 }
+
+function splitParenthesizedFactors(expression: string): string[] | null {
+  const factors: string[] = [];
+  let index = 0;
+
+  while (index < expression.length) {
+    if (expression[index] !== '(') return null;
+    const start = index;
+    let depth = 0;
+    for (; index < expression.length; index += 1) {
+      if (expression[index] === '(') depth += 1;
+      if (expression[index] === ')') depth -= 1;
+      if (depth === 0) {
+        index += 1;
+        break;
+      }
+    }
+    if (depth !== 0) return null;
+    factors.push(expression.slice(start, index));
+  }
+
+  return factors.length > 1 ? factors : null;
+}
+
+export function areFactorizationsEquivalent(input: string, expected: string): boolean {
+  const normalizedInput = normalizeFactorizationAnswer(input);
+  const normalizedExpected = normalizeFactorizationAnswer(expected);
+  if (normalizedInput === normalizedExpected) return true;
+
+  const inputFactors = splitParenthesizedFactors(normalizedInput);
+  const expectedFactors = splitParenthesizedFactors(normalizedExpected);
+  if (inputFactors === null || expectedFactors === null || inputFactors.length !== expectedFactors.length) return false;
+
+  const sortedInputFactors = inputFactors.sort();
+  const sortedExpectedFactors = expectedFactors.sort();
+  return sortedInputFactors.every((factor, index) => factor === sortedExpectedFactors[index]);
+}

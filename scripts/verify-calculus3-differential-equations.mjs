@@ -14,8 +14,15 @@ if (drillPage.includes('aria-pressed={strategy === pattern}')) throw new Error('
 const stableRandom = () => 0.37;
 const checks = {
   separation: problem => {
-    const [, rate, initial] = problem.expression.match(/dy\/dx = (\d+)y,\s*y\(0\)=(\d+)/);
-    return problem.answer === `y=${initial}e^(${rate}x)` && problem.explanation.includes(`dy/y=${rate}dx`);
+    const [, rate, initial] = problem.expression.match(/dy\/dx = (?:(\d+)y|y),\s*y\(0\)=(\d+)/);
+    const rateValue = Number(rate ?? 1);
+    const initialValue = Number(initial);
+    const solution = `y=${initialValue === 1 ? '' : initial}e^${rateValue === 1 ? 'x' : `(${rateValue}x)`}`;
+    return problem.answer === solution
+      && problem.explanation.includes(`dy/y=${rateValue === 1 ? '' : rateValue}dx`)
+      && !problem.expression.includes('= 1y')
+      && !problem.answer.includes('1e^')
+      && (rateValue !== 1 || problem.answer === `${initialValue === 1 ? 'y=' : `y=${initial}`}e^x`);
   },
   initial: problem => {
     const [, rate, initialValue] = problem.expression.match(/dy\/dx = (\d+)x²,\s*y\(1\)=(\d+)/);
@@ -44,6 +51,9 @@ if (normalizeDifferentialEquationAnswer(' y = 2x³ + 4 ') !== normalizeDifferent
 if (normalizeDifferentialEquationAnswer('y=4e^(1x)') !== normalizeDifferentialEquationAnswer('y=4e^x')
   || normalizeDifferentialEquationAnswer('y=4e^(5x)') !== normalizeDifferentialEquationAnswer('y=4e^5x')) {
   throw new Error('equivalent exponential notation with an implicit coefficient 1 should be accepted');
+}
+if (normalizeDifferentialEquationAnswer('y=1e^x') !== normalizeDifferentialEquationAnswer('y=e^x')) {
+  throw new Error('an explicit leading coefficient of 1 should be accepted as equivalent');
 }
 if (normalizeDifferentialEquationAnswer('y=4e^(5x)') === normalizeDifferentialEquationAnswer('y=4e^(4x)')) {
   throw new Error('different exponential rates must not be normalized to the same answer');

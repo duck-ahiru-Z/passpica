@@ -55,6 +55,12 @@ for (const entry of learnEntries) {
   const file = routeFile(entry.link);
   if (!file || !fs.existsSync(file)) throw new Error(`Missing learning page for ${entry.slug}: ${entry.link}`);
 }
+const organic3dPage = fs.readFileSync(routeFile(learnEntries.find(entry => entry.slug === 'organic-3d').link), 'utf8');
+if (!learn.includes("title: '有機・高分子3D分子モデルビューア（立体構造）'")
+  || !organic3dPage.includes('有機・高分子3D分子モデルビューア（立体構造）')
+  || !learn.includes('シス・トランス異性体を3次元で回転・観察できます。')) {
+  throw new Error('The organic 3D portal card must accurately describe the models and match its page heading.');
+}
 const volumeVisual = fs.readFileSync(path.join(root, 'src/app/learn/math/calculus3-volume-visual/page.tsx'), 'utf8');
 if (!volumeVisual.includes('πx⁴') || !volumeVisual.includes('πb⁵/5') || !volumeVisual.includes('aria-label={`y=x²をx軸の周りに回転')) {
   throw new Error('Calculus III volume visual must connect the disk cross-section to the rotation volume and expose an accessible summary');

@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { randomOrderedDistinctPair } from '@/src/lib/math/randomOrderedDistinctPair';
+import { parseRationalParts } from '@/src/lib/rationalInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -241,12 +242,9 @@ export default function DiscriminantDrillPage() {
     const requiredInputs = problem.ansType === 'values' || problem.ansType === 'between' ? [ans1Num, ans2Num] : [ans1Num];
     if (requiredInputs.some(value => !value.trim())) return;
     
-    const parse = (nStr: string, dStr: string) => {
-      const num = parseInt(nStr);
-      let den = dStr.trim() === '' ? 1 : parseInt(dStr);
-      if (isNaN(num)) return null;
-      if (isNaN(den) || den === 0) den = 1;
-      return simplifyFraction(num, den);
+    const parse = (nStr: string, dStr: string): Root | null => {
+      const value = parseRationalParts(nStr, dStr);
+      return value ? { num: value.numerator, den: value.denominator } : null;
     };
 
     const u1 = parse(ans1Num, ans1Den);
@@ -256,10 +254,9 @@ export default function DiscriminantDrillPage() {
 
     if (problem.ansType === 'values') {
       if (u1 && u2) {
-        const v1 = u1.num / u1.den;
-        const v2 = u2.num / u2.den;
         const ans = problem.params.k_ans;
-        if ((v1 === ans[0] && v2 === ans[1]) || (v1 === ans[1] && v2 === ans[0])) correct = true;
+        const firstMatches = (value: Root, expected: number) => value.num === expected && value.den === 1;
+        if ((firstMatches(u1, ans[0]) && firstMatches(u2, ans[1])) || (firstMatches(u1, ans[1]) && firstMatches(u2, ans[0]))) correct = true;
       }
     } else if (problem.ansType === 'value') {
       if (u1) {
@@ -273,11 +270,9 @@ export default function DiscriminantDrillPage() {
       }
     } else if (problem.ansType === 'between') {
       if (u1 && u2) {
-        const v1 = u1.num / u1.den;
-        const v2 = u2.num / u2.den;
         const ans1 = problem.params.k_r1;
         const ans2 = problem.params.k_r2;
-        if (v1 === ans1 && v2 === ans2) correct = true; // since r1 < r2
+        if (u1.num === ans1 && u1.den === 1 && u2.num === ans2 && u2.den === 1) correct = true; // since r1 < r2
       }
     }
 

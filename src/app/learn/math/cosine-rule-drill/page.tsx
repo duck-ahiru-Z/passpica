@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -245,7 +246,7 @@ export default function CosineRuleDrillPage() {
     
     let isOk = false;
     if (problem.pattern === 'pattern3') {
-      isOk = parseInt(ansDeg) === problem.ansAngle;
+      isOk = parseStrictPositiveInteger(ansDeg) === problem.ansAngle;
     } else {
       if (problem.ansTerms && problem.ansTerms.length === 1) {
         isOk = checkFractionRoot(ansVal1, 1, problem.ansTerms[0].num, problem.ansTerms[0].root, problem.ansTerms[0].den);

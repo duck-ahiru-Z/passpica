@@ -6,21 +6,13 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseStrictInteger } from '@/src/lib/strictInteger';
+import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
+import { getHyperbolaMetrics } from '@/src/lib/hyperbolaParabola';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
-}
-
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
@@ -71,24 +63,28 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       const a2 = a*a;
       const b2 = b*b;
+      const metrics = getHyperbolaMetrics(a, b, isH);
       
       const qStr = `$\\frac{x^2}{${a2}} - \\frac{y^2}{${b2}} = ${isH ? '1' : '-1'}$ の焦点の座標と、漸近線の方程式 $y = \\pm mx$ の $m$ を求めよ。`;
       
+      const { standardA2, standardB2, focusDistance: focus, slopeNumerator: mNum, slopeDenominator: mDen } = metrics;
+      const mStr = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
+      const standardForm = isH
+        ? `\\frac{x^2}{${standardA2}} - \\frac{y^2}{${standardB2}} = 1`
+        : `\\frac{y^2}{${standardA2}} - \\frac{x^2}{${standardB2}} = 1`;
+      const slopeFormula = isH ? '\\frac{b}{a}' : '\\frac{a}{b}';
       const expLines = [
-        `\\text{与えられた方程式は双曲線の標準形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,
+        `\\text{与えられた方程式を標準形に直すと } ${standardForm} \\text{ です。}`,
+        `a^2 = ${standardA2}, b^2 = ${standardB2}`,
         `\\text{右辺が } ${isH ? '1 なので、焦点は x 軸上にあります。' : '-1 なので、焦点は y 軸上にあります。'}`,
-        `c^2 = a^2 + b^2 = ${a2} + ${b2} = ${c*c} \\implies c = ${c}`,
-        `\\text{よって焦点は } ${isH ? `(\\pm ${c}, 0)` : `(0, \\pm ${c})`} \\text{ です。}`,
-        `\\text{また、漸近線は } \\frac{x^2}{a^2} - \\frac{y^2}{b^2} = 0 \\text{ より } y = \\pm \\frac{b}{a} x \\text{ となるため、}`,
-        `m = \\frac{${b}}{${a}} \\text{ です。}`
+        `c^2 = a^2 + b^2 = ${standardA2} + ${standardB2} = ${focus*focus} \\implies c = ${focus}`,
+        `\\text{よって焦点は } ${isH ? `(\\pm ${focus}, 0)` : `(0, \\pm ${focus})`} \\text{ です。}`,
+        `\\text{また、漸近線は } y = \\pm ${slopeFormula}x \\text{ です。}`,
+        `m = \\frac{${mNum}}{${mDen}} \\text{ です。}`
       ];
       
-      const g = gcd(b, a);
-      const mNum = b/g; const mDen = a/g;
-      const mStr = mDen === 1 ? mNum.toString() : `${mNum}/${mDen}`;
-      
-      const ans1 = isH ? c.toString() : "0";
-      const ans2 = isH ? "0" : c.toString();
+      const ans1 = isH ? focus.toString() : "0";
+      const ans2 = isH ? "0" : focus.toString();
       
       return { pattern: p, qStr, type: isH ? 'hyperbolaH' : 'hyperbolaV', a, b, c, cx: 0, cy: 0, ans1, ans2, ans3: mStr, expLines };
     }
@@ -174,21 +170,25 @@ export default function HyperbolaParabolaDrill() {
     let isOk = false;
     
     if (problem.pattern === 'pattern1' || problem.pattern === 'pattern2') {
-      const v1 = Math.abs(parseInt(ans1.trim() || '0'));
-      const v2 = Math.abs(parseInt(ans2.trim() || '0'));
-      const m = ans3.trim().replace(/\s+/g, '');
-      if (problem.pattern === 'pattern1' && v1 === parseInt(problem.ans1!) && v2 === 0 && m === problem.ans3) isOk = true;
-      if (problem.pattern === 'pattern2' && v1 === 0 && v2 === parseInt(problem.ans2!) && m === problem.ans3) isOk = true;
+      const rawV1 = parseStrictInteger(ans1, 0);
+      const rawV2 = parseStrictInteger(ans2, 0);
+      const v1 = rawV1 === null ? null : Math.abs(rawV1);
+      const v2 = rawV2 === null ? null : Math.abs(rawV2);
+      const m = parseRationalAnswer(ans3);
+      const expectedM = parseRationalAnswer(problem.ans3!);
+      const slopeMatches = rationalEquals(m, expectedM!);
+      if (problem.pattern === 'pattern1' && v1 === parseInt(problem.ans1!) && v2 === 0 && slopeMatches) isOk = true;
+      if (problem.pattern === 'pattern2' && v1 === 0 && v2 === parseInt(problem.ans2!) && slopeMatches) isOk = true;
     } else if (problem.pattern === 'pattern3') {
-      const v1 = parseInt(ans1.trim());
-      const v2 = parseInt(ans2.trim());
-      const dir = parseInt(ans3.trim());
+      const v1 = parseStrictInteger(ans1);
+      const v2 = parseStrictInteger(ans2);
+      const dir = parseStrictInteger(ans3);
       if (v1 === parseInt(problem.ans1!) && v2 === parseInt(problem.ans2!) && dir === parseInt(problem.ans3!)) isOk = true;
     } else if (problem.pattern === 'pattern4') {
-      const vx = parseInt(ans1.trim());
-      const vy = parseInt(ans2.trim());
-      const fx = parseInt(ans3.trim());
-      const fy = parseInt(ans4.trim());
+      const vx = parseStrictInteger(ans1);
+      const vy = parseStrictInteger(ans2);
+      const fx = parseStrictInteger(ans3);
+      const fy = parseStrictInteger(ans4);
       if (vx === parseInt(problem.ans1!) && vy === parseInt(problem.ans2!) && fx === parseInt(problem.ans3!) && fy === parseInt(problem.ans4!)) isOk = true;
     }
     
@@ -448,7 +448,7 @@ export default function HyperbolaParabolaDrill() {
                     className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500 text-xl" 
                     value={ans3} 
                     onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
-                    placeholder="4/3"
+                    placeholder={problem.ans3 ?? ''}
                   />
                 </div>
               )}

@@ -1,4 +1,4 @@
-import { generateGeometryProblem, geometryPatterns } from '../src/lib/calculus3Geometry.ts';
+import { generateGeometryProblem, geometryPatterns, getGeometryExplanation, isGeometryStrategyValid } from '../src/lib/calculus3Geometry.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 
@@ -8,6 +8,9 @@ if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includ
 }
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
+}
+if (!drillPage.includes('isGeometryStrategyValid(problem, strategy)') || !drillPage.includes('getGeometryExplanation(problem, strategy)')) {
+  throw new Error('geometry feedback must accept and explain mathematically equivalent y-axis washer and shell methods');
 }
 if (!drillPage.includes('setStrategy(pattern); setChecked(false);') || !drillPage.includes('setAnswer(e.target.value); setChecked(false);')) {
   throw new Error('changing a geometry strategy or answer must clear stale feedback');
@@ -60,6 +63,25 @@ for (const pattern of geometryPatterns) {
     variants.add(problem.expression);
   }
   if (variants.size !== 5) throw new Error(`${pattern} generated ${variants.size}/5 expected coefficient or interval variants`);
+}
+
+for (let value = 1; value <= 5; value += 1) {
+  const washer = generateGeometryProblem('y-axis-rotation', () => (value - 0.5) / 5);
+  const shell = generateGeometryProblem('shell-method', () => (value - 0.5) / 5);
+  const washerBound = Number(washer.expression.match(/0\\le x\\le(\d+)/)?.[1]);
+  const shellBound = Number(shell.expression.match(/0\\le x\\le(\d+)/)?.[1]);
+  if (Math.abs(washer.answer - (4 * Math.PI * washerBound ** 2.5) / 5) > 1e-10) throw new Error(`shell-method derivation must equal the washer result for y=√x and upper bound ${washerBound}`);
+  if (Math.abs(shell.answer - (2 * Math.PI * shellBound ** 3) / 3) > 1e-10) throw new Error(`washer derivation must equal the shell result for y=x and upper bound ${shellBound}`);
+  if (!isGeometryStrategyValid(washer, 'shell-method') || !isGeometryStrategyValid(shell, 'y-axis-rotation')) {
+    throw new Error(`equivalent y-axis rotation methods must both be accepted`);
+  }
+  if (isGeometryStrategyValid(washer, 'x-axis-rotation') || isGeometryStrategyValid(shell, 'curve-length')) {
+    throw new Error('unrelated geometry strategies must remain invalid');
+  }
+  if (!getGeometryExplanation(washer, 'shell-method').includes('円筒殻法')
+    || !getGeometryExplanation(shell, 'y-axis-rotation').includes('円環')) {
+    throw new Error('accepted alternate method must show its own derivation');
+  }
 }
 
 const mixed = Array.from({ length: 500 }, () => generateGeometryProblem('mix', stableRandom).pattern);

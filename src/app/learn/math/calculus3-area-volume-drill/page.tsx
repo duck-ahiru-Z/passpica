@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { generateGeometryProblem, geometryLabels, geometryPatterns, type GeometryMode, type GeometryPattern } from '@/src/lib/calculus3Geometry';
+import { generateGeometryProblem, geometryLabels, geometryPatterns, getGeometryExplanation, isGeometryStrategyValid, type GeometryMode, type GeometryPattern } from '@/src/lib/calculus3Geometry';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 type Pattern = GeometryPattern;
@@ -15,8 +15,8 @@ export default function Calculus3AreaVolumeDrillPage() {
   const next = (selectedMode: Mode = mode) => { setProblem(generateGeometryProblem(selectedMode)); setStrategy(selectedMode === 'mix' ? '' : selectedMode); setAnswer(''); setChecked(false); };
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const numericAnswer = Number(answer);
-  const correct = answer.trim() !== '' && Number.isFinite(numericAnswer) && strategy === problem.pattern && Math.abs(numericAnswer - problem.answer) <= 0.0005 + 1e-12;
-  const strategyIsCorrect = strategy === problem.pattern;
+  const strategyIsCorrect = isGeometryStrategyValid(problem, strategy);
+  const correct = answer.trim() !== '' && Number.isFinite(numericAnswer) && strategyIsCorrect && Math.abs(numericAnswer - problem.answer) <= 0.0005 + 1e-12;
   const valueIsCorrect = answer.trim() !== '' && Number.isFinite(numericAnswer) && Math.abs(numericAnswer - problem.answer) <= 0.0005 + 1e-12;
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -45,7 +45,7 @@ export default function Calculus3AreaVolumeDrillPage() {
           <button onClick={() => setChecked(true)} disabled={!strategy || answer.trim() === ''} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed">解答する</button>
           <button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button>
         </div>
-        {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : <>不正解。{!strategyIsCorrect && <>方針は「{geometryLabels[problem.pattern]}」です。 </>}{!valueIsCorrect && <>答えは約 {problem.answer.toFixed(3)} です。</>}</>}<div className="mt-2 font-normal text-slate-700">{problem.explanation}</div></div>}
+        {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : <>不正解。{!strategyIsCorrect && <>方針は「{geometryLabels[problem.pattern]}」です。 </>}{!valueIsCorrect && <>答えは約 {problem.answer.toFixed(3)} です。</>}</>}<div className="mt-2 font-normal text-slate-700">{getGeometryExplanation(problem, strategy)}</div></div>}
       </section>
     </main>
   );

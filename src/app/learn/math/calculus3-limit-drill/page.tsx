@@ -35,7 +35,9 @@ export default function Calculus3LimitDrillPage() {
             {limitPatterns.map(pattern => <option key={pattern} value={pattern}>基礎練習：{limitLabels[pattern]}だけ</option>)}
           </select>
         </div>
-        <div className="bg-white border p-8 text-center text-2xl"><MathEq math={problem.expression} /></div>
+        <div className={`bg-white border text-center ${isContinuity ? 'overflow-x-auto p-3 text-base sm:p-6 sm:text-lg lg:text-xl' : 'p-8 text-2xl'}`}>
+          <span className={isContinuity ? 'whitespace-nowrap' : undefined}><MathEq math={problem.expression} /></span>
+        </div>
         {mode === 'mix' ? (
           <fieldset className="space-y-2">
             <legend className="w-full text-center font-bold">実戦練習：最初に使う方針を一つ選び、{answerLabel}を{isContinuity ? '求めなさい。' : '小数第3位まで入力しなさい。'}</legend>

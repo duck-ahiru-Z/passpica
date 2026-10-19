@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { parseRationalParts, rationalEquals } from '@/src/lib/rationalInput';
 
 const formulaTypes = ['1/6_line', '1/6_para', '1/12', '1/20', '1/30'] as const;
 const mixedFormulaPicker = new BalancedRandom<string>(formulaTypes);
@@ -296,17 +297,13 @@ export default function CalculusDrillPage() {
     e.preventDefault();
     if (!problem) return;
 
-    const userNum = parseInt(inputNum) || 0;
-    const userDen = inputDen.trim() === '' ? 1 : parseInt(inputDen) || 1;
+    const parsedAnswer = parseRationalParts(inputNum, inputDen);
+    const answerIsCorrect = rationalEquals(parsedAnswer, { numerator: problem.S_num, denominator: problem.S_den });
 
-    // ユーザー入力を既約分数にする
-    const userGcd = gcd(userNum, userDen);
-    const simplifiedNum = userNum / userGcd * Math.sign(userNum * userDen);
-    const simplifiedDen = Math.abs(userDen / userGcd);
-
-    if (simplifiedNum === problem.S_num && simplifiedDen === problem.S_den) {
+    if (answerIsCorrect) {
       setIsCorrect(true);
-      if (userDen !== problem.S_den) {
+      const enteredDenominator = inputDen.trim() === '' ? 1 : Number(inputDen);
+      if (enteredDenominator !== problem.S_den) {
         setFeedbackMsg('正解です！（自動的に約分・整形されました）');
       } else {
         setFeedbackMsg('大正解！完璧です。');
