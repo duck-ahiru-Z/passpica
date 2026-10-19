@@ -4,39 +4,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
+import { generateSineRuleProblem, getSinVal, type SineRulePattern, type SineRuleProblem, type TermVal } from '@/src/lib/sineRule';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
-}
-
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-interface TermVal {
-  num: number;
-  root: number;
-  den: number;
-}
-
-function getSinVal(angle: number): TermVal {
-  if (angle === 30 || angle === 150) return { num: 1, root: 1, den: 2 };
-  if (angle === 45 || angle === 135) return { num: 1, root: 2, den: 2 };
-  if (angle === 60 || angle === 120) return { num: 1, root: 3, den: 2 };
-  if (angle === 90) return { num: 1, root: 1, den: 1 };
-  return { num: 0, root: 1, den: 1 };
 }
 
 function formatTerm(v: TermVal): string {
@@ -51,90 +26,9 @@ function formatTerm(v: TermVal): string {
   return `\\frac{${numStr}}{${v.den}}`;
 }
 
-function simplifyTerm(num: number, root: number, den: number): TermVal {
-  const g = gcd(num, den);
-  return { num: num / g, root, den: den / g };
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  A: number; B: number; C: number;
-  R: number;
-  a: TermVal; b: TermVal; c: TermVal;
-  ratioStr?: string;
-  ansTerm?: TermVal;
-  ansAngle?: number;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p_type = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  if (p_type === 'pattern4') {
-    const sets = [
-      { angles: [30, 60, 90], ratio: "1 : \\sqrt{3} : 2" },
-      { angles: [45, 45, 90], ratio: "1 : 1 : \\sqrt{2}" },
-      { angles: [30, 30, 120], ratio: "1 : 1 : \\sqrt{3}" }
-    ];
-    const set = sets[Math.floor(Math.random() * sets.length)];
-    const angles = [...set.angles];
-    // shuffle
-    for (let i = angles.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [angles[i], angles[j]] = [angles[j], angles[i]];
-    }
-    const maxAngle = Math.max(...angles);
-    
-    // ratio corresponds to sides a:b:c which is sinA:sinB:sinC
-    // we just use the set ratio, assuming it matches the sorted angles.
-    // actually, let's build the ratio dynamically to match A, B, C!
-    const sinA = getSinVal(angles[0]);
-    const sinB = getSinVal(angles[1]);
-    const sinC = getSinVal(angles[2]);
-    // To format ratio properly, we just multiply by 2.
-    const getRatioPart = (s: TermVal) => s.root === 1 ? `${s.num * 2 / s.den}` : `${s.num * 2 / s.den === 1 ? '' : s.num * 2 / s.den}\\sqrt{${s.root}}`;
-    const ratioStr = `${getRatioPart(sinA)} : ${getRatioPart(sinB)} : ${getRatioPart(sinC)}`;
-
-    return {
-      pattern: p_type,
-      A: angles[0], B: angles[1], C: angles[2],
-      R: 1, a: {num:1,root:1,den:1}, b: {num:1,root:1,den:1}, c: {num:1,root:1,den:1},
-      ratioStr, ansAngle: maxAngle
-    };
-  }
-
-  // Common for 1, 2, 3
-  const angles = [30, 45, 60, 90, 120, 135, 150];
-  let A = 0, B = 0, C = 0;
-  while (true) {
-    A = angles[Math.floor(Math.random() * angles.length)];
-    B = angles[Math.floor(Math.random() * angles.length)];
-    if (A + B < 180) {
-      C = 180 - A - B;
-      break;
-    }
-  }
-
-  const R = Math.floor(Math.random() * 5) + 2; // 2 to 6
-
-  const sinA = getSinVal(A);
-  const sinB = getSinVal(B);
-  const sinC = getSinVal(C);
-
-  const a = simplifyTerm(2 * R * sinA.num, sinA.root, sinA.den);
-  const b = simplifyTerm(2 * R * sinB.num, sinB.root, sinB.den);
-  const c = simplifyTerm(2 * R * sinC.num, sinC.root, sinC.den);
-
-  return {
-    pattern: p_type, A, B, C, R, a, b, c,
-    ansTerm: p_type === 'pattern1' ? {num: R, root: 1, den: 1} : b,
-    ansAngle: B
-  };
-}
+type Pattern = SineRulePattern;
+type ProblemData = SineRuleProblem;
+const generateProblem = generateSineRuleProblem;
 
 export default function SineRuleDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
@@ -371,8 +265,12 @@ export default function SineRuleDrillPage() {
                 ref={canvasRef} 
                 width={200} 
                 height={200} 
+                role="img"
+                aria-label={`外接円上の三角形ABC。角Aは${problem.A}度、角Bは${problem.B}度、角Cは${problem.C}度。`}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
-              />
+              >
+                三角形ABCの外接円。角Aは{problem.A}度、角Bは{problem.B}度、角Cは{problem.C}度。
+              </canvas>
             </div>
 
             {!hasChecked ? (
