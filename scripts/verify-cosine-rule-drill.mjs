@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import { generateCosineRuleAmbiguousTriangle, getCosineRuleAmbiguousTriangleCount } from '../src/lib/cosineRuleAmbiguous.ts';
 
 // Reproduce each supported angle/side coefficient case from the production generator.
 // For pattern 4, verify the quadratic coefficient is 2b cos(A), including radicals.
@@ -32,9 +33,8 @@ for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
 }
 assert.ok(production.includes('c_other = two_b_cosA - c_orig'), 'pattern 4 must compute the second side from the quadratic root sum');
 assert.ok(production.includes('? 60'), 'pattern 4 must use a rational cosine so both answers fit the current exact input format');
-assert.ok(production.includes('a2 = oppositeSide * oppositeSide'), 'pattern 4 must derive an exact integer opposite side from its validated triple');
-assert.ok(production.includes('exactIntegerAmbiguousSides'), 'pattern 4 must draw from a prevalidated pool of exact integer triangles');
-assert.ok(production.includes('const [sideB, sideC, oppositeSide]'), 'pattern 4 must load all triangle sides from the selected valid triple');
+assert.ok(production.includes('a2 = triangle.opposite * triangle.opposite'), 'pattern 4 must derive an exact integer opposite side from its tested generator');
+assert.ok(production.includes('generateCosineRuleAmbiguousTriangle'), 'pattern 4 must use its directly tested production generator');
 assert.ok(production.includes('ansTerms!.length > 1'), 'pattern 4 must support both valid positive roots');
 assert.ok(production.includes('余弦定理の適用'), 'checked answers must show a solution explanation');
 
@@ -50,17 +50,26 @@ const random = () => {
   seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
   return seed / 4294967296;
 };
-const exactIntegerAmbiguousSides = [
-  [8, 3, 7], [8, 5, 7], [15, 7, 13], [15, 8, 13], [16, 6, 14], [16, 10, 14],
-  [21, 5, 19], [21, 16, 19], [24, 9, 21], [24, 15, 21], [30, 14, 26], [30, 16, 26],
-  [32, 12, 28], [32, 20, 28], [35, 11, 31], [35, 24, 31], [40, 7, 37], [40, 15, 35],
-  [40, 25, 35], [40, 33, 37], [42, 10, 38], [42, 32, 38], [45, 21, 39], [45, 24, 39],
-  [48, 13, 43], [48, 18, 42], [48, 30, 42], [48, 35, 43],
-];
+const seenPattern4 = new Set();
+for (let index = 0; index < 10_000; index += 1) {
+  const triangle = generateCosineRuleAmbiguousTriangle(random);
+  assert.equal(triangle.angle, 60);
+  assert.equal(triangle.opposite ** 2, triangle.adjacentB ** 2 + triangle.adjacentC ** 2 - triangle.adjacentB * triangle.adjacentC,
+    'generated sides must satisfy the cosine rule exactly');
+  assert.equal(triangle.alternateC, triangle.adjacentB - triangle.adjacentC);
+  assert.ok(triangle.alternateC > 0);
+  assert.notEqual(triangle.alternateC, triangle.adjacentC);
+  for (const root of [triangle.adjacentC, triangle.alternateC]) {
+    assert.equal(root ** 2 - triangle.adjacentB * root + triangle.adjacentB ** 2 - triangle.opposite ** 2, 0,
+      'both displayed c answers must solve the quadratic');
+  }
+  seenPattern4.add(`${triangle.adjacentB},${triangle.adjacentC},${triangle.opposite}`);
+}
+assert.equal(seenPattern4.size, getCosineRuleAmbiguousTriangleCount(), 'every valid triangle must appear in the generated sample');
 for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
   const counts = new Map();
   for (let index = 0; index < 1_000; index += 1) {
-    const A = pattern === 'pattern1' ? [60, 120][Math.floor(random() * 2)]
+    let A = pattern === 'pattern1' ? [60, 120][Math.floor(random() * 2)]
       : pattern === 'pattern2' ? [45, 135][Math.floor(random() * 2)]
         : pattern === 'pattern4' ? 60
           : [30, 45, 60, 90, 120, 135, 150][Math.floor(random() * 7)];
@@ -69,10 +78,11 @@ for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
     let a2 = 0;
     let attempts = 0;
     if (pattern === 'pattern4') {
-      const [sideB, sideC, oppositeSide] = exactIntegerAmbiguousSides[Math.floor(random() * exactIntegerAmbiguousSides.length)];
-      b = { num: sideB, root: 1 };
-      c = { num: sideC, root: 1 };
-      a2 = oppositeSide ** 2;
+      const triangle = generateCosineRuleAmbiguousTriangle(random);
+      A = triangle.angle;
+      b = { num: triangle.adjacentB, root: 1 };
+      c = { num: triangle.adjacentC, root: 1 };
+      a2 = triangle.opposite ** 2;
     }
     while (pattern !== 'pattern4' && a2 <= 0) {
       assert.ok(attempts++ < 100, 'generator must not loop indefinitely');

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateCosineRuleAmbiguousTriangle } from '@/src/lib/cosineRuleAmbiguous';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
@@ -34,13 +35,6 @@ function formatTerm(v: TermVal): string {
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-const exactIntegerAmbiguousSides = [
-  [8, 3, 7], [8, 5, 7], [15, 7, 13], [15, 8, 13], [16, 6, 14], [16, 10, 14],
-  [21, 5, 19], [21, 16, 19], [24, 9, 21], [24, 15, 21], [30, 14, 26], [30, 16, 26],
-  [32, 12, 28], [32, 20, 28], [35, 11, 31], [35, 24, 31], [40, 7, 37], [40, 15, 35],
-  [40, 25, 35], [40, 33, 37], [42, 10, 38], [42, 32, 38], [45, 21, 39], [45, 24, 39],
-  [48, 13, 43], [48, 18, 42], [48, 30, 42], [48, 35, 43],
-] as const;
 
 interface ProblemData {
   pattern: Pattern;
@@ -68,10 +62,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   let a2 = 0;
 
   if (p_type === 'pattern4') {
-    const [sideB, sideC, oppositeSide] = exactIntegerAmbiguousSides[Math.floor(Math.random() * exactIntegerAmbiguousSides.length)];
-    b = { num: sideB, root: 1, den: 1 };
-    c = { num: sideC, root: 1, den: 1 };
-    a2 = oppositeSide * oppositeSide;
+    const triangle = generateCosineRuleAmbiguousTriangle();
+    A = triangle.angle;
+    b = { num: triangle.adjacentB, root: 1, den: 1 };
+    c = { num: triangle.adjacentC, root: 1, den: 1 };
+    a2 = triangle.opposite * triangle.opposite;
   }
 
   while (p_type !== 'pattern4') {
