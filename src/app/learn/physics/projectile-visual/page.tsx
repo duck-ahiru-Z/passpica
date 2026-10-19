@@ -14,7 +14,7 @@ const H = 330;
 
 export default function ProjectileVisualPage() {
   const [angleDeg, setAngleDeg] = useState(0);
-  const [timeFraction, setTimeFraction] = useState(0.5);
+  const [timeFraction, setTimeFraction] = useState(1);
   const state = calculateProjectileState(angleDeg, timeFraction);
   const { vx0, vy0, flightTime, maxHeight, range: maxX, time, x, displayedY, vy } = state;
   const mapX = (value: number) => 55 + (value / (maxX + 4)) * (W - 90);
