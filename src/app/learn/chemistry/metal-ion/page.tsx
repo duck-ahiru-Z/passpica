@@ -186,8 +186,9 @@ export default function MetalIonPage() {
                   const columns = Math.min(step.remains.length > 4 ? 3 : 2, step.remains.length);
                   const row = Math.floor(idx / columns);
                   const column = idx % columns;
-                  const x = columns === 1 ? 80 : columns === 2 ? 62 + column * 36 : 48 + column * 32;
-                  const y = step.remains.length > 4 ? 57 + row * 14 : step.remains.length > 2 ? 60 + row * 16 : 66 + row * 16;
+                  const hasLongComplex = step.remains.length === 3 && step.remains.some((remainingIon) => remainingIon.length > 9);
+                  const x = hasLongComplex ? (idx === 0 ? 80 : idx === 1 ? 62 : 98) : columns === 1 ? 80 : columns === 2 ? 62 + column * 36 : 48 + column * 32;
+                  const y = hasLongComplex ? (idx === 0 ? 65 : 82) : step.remains.length > 4 ? 57 + row * 14 : step.remains.length > 2 ? 60 + row * 16 : 66 + row * 16;
                   return (
                     <text key={ion} x={x} y={y} fill="#1e3a8a" fontSize="10" fontWeight="bold" textAnchor="middle">
                       {ion}
@@ -215,8 +216,9 @@ export default function MetalIonPage() {
                     const count = step.precipitates.length;
                     const segmentWidth = count === 2 ? 44 : 88 / count;
                     const segmentX = count === 2 ? 36 + idx * 44 : 36;
-                    const segmentY = count === 2 ? 82 : 90;
-                    const segmentHeight = count === 2 ? 8 : 14;
+                    const isMixedColorPair = count === 2 && step.precipitateColors[0] !== step.precipitateColors[1];
+                    const segmentY = isMixedColorPair ? 82 : 90;
+                    const segmentHeight = isMixedColorPair ? 8 : 14;
                     const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
                     return (
                       <rect
@@ -236,12 +238,14 @@ export default function MetalIonPage() {
                   {step.precipitates.map((precipitate, idx) => {
                     const count = step.precipitates.length;
                     const x = count === 2 ? 58 + idx * 44 : 80;
-                    const y = 100;
+                    const isMixedColorPair = count === 2 && step.precipitateColors[0] !== step.precipitateColors[1];
+                    const y = isMixedColorPair ? 88 : 100;
                     const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
                     const textFill = color === '#f8fafc' || color === '#f1f5f9' ? '#334155' : '#ffffff';
+                    const shortLabel = precipitate.replace(/ \(.+\)$/, '');
                     return (
                       <text key={`label-${precipitate}`} x={x} y={y} fill={textFill} fontSize={count === 2 ? 6 : 8} fontWeight="bold" textAnchor="middle">
-                        {precipitate}
+                        {shortLabel}
                       </text>
                     );
                   })}

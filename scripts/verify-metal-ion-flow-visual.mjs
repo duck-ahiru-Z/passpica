@@ -21,6 +21,12 @@ if (!page.includes('step.remains.length === 0 ? (') || !page.includes('（イオ
 if (!page.includes("precipitateColors: ['#b45309', '#f8fafc']")) {
   throw new Error('iron and aluminum hydroxide precipitates must retain distinct brown and white colors');
 }
+if (!page.includes('const isMixedColorPair = count === 2 && step.precipitateColors[0] !== step.precipitateColors[1];')) {
+  throw new Error('mixed-color sediment labels must stay centered on their own color segments');
+}
+if (!page.includes('const hasLongComplex = step.remains.length === 3 && step.remains.some((remainingIon) => remainingIon.length > 9);')) {
+  throw new Error('long dissolved-complex labels must not collide with the other remaining ions');
+}
 if (!page.includes('step.precipitates.map((precipitate, idx) => {')) {
   throw new Error('each precipitate must have a separately drawn segment');
 }
