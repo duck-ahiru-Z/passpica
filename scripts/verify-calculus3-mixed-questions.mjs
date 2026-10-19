@@ -10,6 +10,9 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/c
 for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}']) {
   if (!drillPage.includes(requirement)) throw new Error(`Math III mixed drill is missing expected UI behavior: ${requirement}`);
 }
+if (!drillPage.includes("mode === 'all' ? '解法選択' : '方針を選択'")) {
+  throw new Error('the mixed practice mode must clearly label its strategy-selection task');
+}
 if (drillPage.includes('aria-pressed=') || drillPage.includes('question.options.map(option => <button')) {
   throw new Error('single-choice method selection must be exposed as a radio group');
 }
