@@ -53,7 +53,7 @@ const STEPS: Step[] = [
     id: 3,
     reagent: '③ 濾液を煮沸してH2Sを除去後、硝酸を加えて酸化し、過剰のアンモニア水を加える',
     reagentFormula: 'HNO3 ➔ NH3水 (過剰)',
-    precipitates: ['Fe(OH)3 (赤褐色)', 'Al(OH)3 (白色ゲル状)'],
+    precipitates: ['Fe(OH)3', 'Al(OH)3'],
     remains: ['[Zn(NH3)4]2+ (溶解)', 'Ca2+', 'Na+'],
     precipitateColor: '赤褐色 ＆ 白色ゲル状',
     precipitateColors: ['#b45309', '#f8fafc'],
@@ -178,16 +178,16 @@ export default function MetalIonPage() {
               <rect x="35" y="25" width="90" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
               
               {/* 上層：濾液 (残っているイオン) */}
-              <rect x="36" y="45" width="88" height="60" fill="#f0f9ff" opacity="0.8" />
+              <rect x="36" y="45" width="88" height="47" fill="#f0f9ff" opacity="0.8" />
               
               {/* 濾液内のイオン表記 */}
               <g>
                 {step.remains.map((ion, idx) => {
-                  const columns = Math.min(3, step.remains.length);
+                  const columns = Math.min(step.remains.length > 4 ? 3 : 2, step.remains.length);
                   const row = Math.floor(idx / columns);
                   const column = idx % columns;
-                  const x = columns === 1 ? 80 : 48 + column * (64 / (columns - 1));
-                  const y = step.remains.length > 5 ? 60 + row * 17 : 67 + row * 23;
+                  const x = columns === 1 ? 80 : columns === 2 ? 62 + column * 36 : 48 + column * 32;
+                  const y = step.remains.length > 4 ? 59 + row * 16 : step.remains.length > 2 ? 63 + row * 19 : 70 + row * 19;
                   return (
                     <text key={ion} x={x} y={y} fill="#1e3a8a" fontSize="10" fontWeight="bold" textAnchor="middle">
                       {ion}
@@ -213,15 +213,18 @@ export default function MetalIonPage() {
                   {/* 沈殿物の層 */}
                   {step.precipitates.map((precipitate, idx) => {
                     const count = step.precipitates.length;
-                    const segmentWidth = 88 / count;
+                    const segmentWidth = count === 2 ? 54 : 88 / count;
+                    const segmentX = count === 2 ? 36 + idx * 34 : 36;
+                    const segmentY = count === 2 && idx === 1 ? 85 : 92;
+                    const segmentHeight = count === 2 ? 19 : 12;
                     const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
                     return (
                       <rect
                         key={`${precipitate}-${idx}`}
-                        x={36 + idx * segmentWidth}
-                        y="92"
+                        x={segmentX}
+                        y={segmentY}
                         width={segmentWidth}
-                        height="12"
+                        height={segmentHeight}
                         fill={color}
                         stroke="#475569"
                         strokeWidth="1"
@@ -229,17 +232,19 @@ export default function MetalIonPage() {
                       />
                     );
                   })}
-                  {/* 沈殿物のテキスト */}
-                  <text 
-                    x="80" 
-                    y="101" 
-                    fill={step.precipitateColors.every((color) => color === '#f8fafc' || color === '#f1f5f9') ? '#334155' : '#ffffff'}
-                    fontSize="8" 
-                    fontWeight="bold" 
-                    textAnchor="middle"
-                  >
-                    {step.precipitates.join(' , ')}
-                  </text>
+                  {/* 沈殿物名は二色沈殿でも色境界をまたがないよう、層の上に表示 */}
+                  {step.precipitates.map((precipitate, idx) => {
+                    const count = step.precipitates.length;
+                    const x = count === 2 ? 63 + idx * 34 : 80;
+                    const y = count === 2 && idx === 1 ? 98 : 101;
+                    const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
+                    const textFill = color === '#f8fafc' || color === '#f1f5f9' ? '#334155' : '#ffffff';
+                    return (
+                      <text key={`label-${precipitate}`} x={x} y={y} fill={textFill} fontSize={count === 2 ? 6 : 8} fontWeight="bold" textAnchor="middle">
+                        {precipitate}
+                      </text>
+                    );
+                  })}
                 </g>
               )}
 

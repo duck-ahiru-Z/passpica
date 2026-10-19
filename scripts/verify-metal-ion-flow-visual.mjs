@@ -24,7 +24,7 @@ if (!page.includes("precipitateColors: ['#b45309', '#f8fafc']")) {
 if (!page.includes('step.precipitates.map((precipitate, idx) => {')) {
   throw new Error('each precipitate must have a separately drawn segment');
 }
-if (!page.includes('const columns = Math.min(3, step.remains.length);')) {
+if (!page.includes('const columns = Math.min(step.remains.length > 4 ? 3 : 2, step.remains.length);')) {
   throw new Error('remaining ions must use a responsive grid instead of overlapping fixed labels');
 }
 
