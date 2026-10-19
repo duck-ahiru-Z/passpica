@@ -34,6 +34,13 @@ function formatTerm(v: TermVal): string {
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+const exactIntegerAmbiguousSides = [
+  [8, 3, 7], [8, 5, 7], [15, 7, 13], [15, 8, 13], [16, 6, 14], [16, 10, 14],
+  [21, 5, 19], [21, 16, 19], [24, 9, 21], [24, 15, 21], [30, 14, 26], [30, 16, 26],
+  [32, 12, 28], [32, 20, 28], [35, 11, 31], [35, 24, 31], [40, 7, 37], [40, 15, 35],
+  [40, 25, 35], [40, 33, 37], [42, 10, 38], [42, 32, 38], [45, 21, 39], [45, 24, 39],
+  [48, 13, 43], [48, 18, 42], [48, 30, 42], [48, 35, 43],
+] as const;
 
 interface ProblemData {
   pattern: Pattern;
@@ -59,8 +66,15 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
   let b = { num: 1, root: 1, den: 1 };
   let c = { num: 1, root: 1, den: 1 };
   let a2 = 0;
-  
-  while (true) {
+
+  if (p_type === 'pattern4') {
+    const [sideB, sideC, oppositeSide] = exactIntegerAmbiguousSides[Math.floor(Math.random() * exactIntegerAmbiguousSides.length)];
+    b = { num: sideB, root: 1, den: 1 };
+    c = { num: sideC, root: 1, den: 1 };
+    a2 = oppositeSide * oppositeSide;
+  }
+
+  while (p_type !== 'pattern4') {
     if (A === 60 || A === 120 || A === 90) {
       b.num = Math.floor(Math.random() * 8) + 2;
       c.num = Math.floor(Math.random() * 8) + 2;
@@ -72,7 +86,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       b.root = 2;
       c.num = Math.floor(Math.random() * 8) + 2;
       c.root = 1;
-      if (p_type !== 'pattern4' && Math.random() < 0.5) { const t = b; b = c; c = t; }
+      if (Math.random() < 0.5) { const t = b; b = c; c = t; }
       const cosA_sign = A === 45 ? 1 : -1;
       const b_is_root2 = b.root === 2;
       const b_coef = b_is_root2 ? b.num : c.num;
@@ -83,7 +97,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       b.root = 3;
       c.num = Math.floor(Math.random() * 8) + 2;
       c.root = 1;
-      if (p_type !== 'pattern4' && Math.random() < 0.5) { const t = b; b = c; c = t; }
+      if (Math.random() < 0.5) { const t = b; b = c; c = t; }
       const cosA_sign = A === 30 ? 1 : -1;
       const b_is_root3 = b.root === 3;
       const b_coef = b_is_root3 ? b.num : c.num;
@@ -91,8 +105,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       a2 = b.num*b.num*b.root + c.num*c.num*c.root - 3 * b_coef * c_coef * cosA_sign;
     }
     
-    const pattern4OtherRoot = 2 * b.num * Math.cos(A * Math.PI / 180) - c.num;
-    if (a2 > 0 && (p_type !== 'pattern4' || (Number.isInteger(Math.sqrt(a2)) && Math.sqrt(a2) > 0 && Number.isInteger(pattern4OtherRoot) && pattern4OtherRoot > 0))) break;
+    if (a2 > 0) break;
   }
   
   const a = { num: 1, root: 1, den: 1 };

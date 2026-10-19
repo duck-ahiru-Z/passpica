@@ -32,8 +32,9 @@ for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
 }
 assert.ok(production.includes('c_other = two_b_cosA - c_orig'), 'pattern 4 must compute the second side from the quadratic root sum');
 assert.ok(production.includes('? 60'), 'pattern 4 must use a rational cosine so both answers fit the current exact input format');
-assert.ok(production.includes('Number.isInteger(Math.sqrt(a2))'), 'pattern 4 must generate an exact integer opposite side');
-assert.ok(production.includes('pattern4OtherRoot > 0'), 'pattern 4 must ensure its second triangle side is positive');
+assert.ok(production.includes('a2 = oppositeSide * oppositeSide'), 'pattern 4 must derive an exact integer opposite side from its validated triple');
+assert.ok(production.includes('exactIntegerAmbiguousSides'), 'pattern 4 must draw from a prevalidated pool of exact integer triangles');
+assert.ok(production.includes('const [sideB, sideC, oppositeSide]'), 'pattern 4 must load all triangle sides from the selected valid triple');
 assert.ok(production.includes('ansTerms!.length > 1'), 'pattern 4 must support both valid positive roots');
 assert.ok(production.includes('余弦定理の適用'), 'checked answers must show a solution explanation');
 
@@ -49,6 +50,13 @@ const random = () => {
   seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
   return seed / 4294967296;
 };
+const exactIntegerAmbiguousSides = [
+  [8, 3, 7], [8, 5, 7], [15, 7, 13], [15, 8, 13], [16, 6, 14], [16, 10, 14],
+  [21, 5, 19], [21, 16, 19], [24, 9, 21], [24, 15, 21], [30, 14, 26], [30, 16, 26],
+  [32, 12, 28], [32, 20, 28], [35, 11, 31], [35, 24, 31], [40, 7, 37], [40, 15, 35],
+  [40, 25, 35], [40, 33, 37], [42, 10, 38], [42, 32, 38], [45, 21, 39], [45, 24, 39],
+  [48, 13, 43], [48, 18, 42], [48, 30, 42], [48, 35, 43],
+];
 for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
   const counts = new Map();
   for (let index = 0; index < 1_000; index += 1) {
@@ -60,14 +68,18 @@ for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
     let c = { num: 1, root: 1 };
     let a2 = 0;
     let attempts = 0;
-    let otherRoot = 0;
-    while (a2 <= 0 || (pattern === 'pattern4' && (!Number.isInteger(Math.sqrt(a2)) || otherRoot <= 0))) {
+    if (pattern === 'pattern4') {
+      const [sideB, sideC, oppositeSide] = exactIntegerAmbiguousSides[Math.floor(random() * exactIntegerAmbiguousSides.length)];
+      b = { num: sideB, root: 1 };
+      c = { num: sideC, root: 1 };
+      a2 = oppositeSide ** 2;
+    }
+    while (pattern !== 'pattern4' && a2 <= 0) {
       assert.ok(attempts++ < 100, 'generator must not loop indefinitely');
       if ([60, 90, 120].includes(A)) {
         b = { num: 2 + Math.floor(random() * 8), root: 1 };
         c = { num: 2 + Math.floor(random() * 8), root: 1 };
         a2 = b.num ** 2 + c.num ** 2 - 2 * b.num * c.num * (A === 60 ? 0.5 : A === 120 ? -0.5 : 0);
-        otherRoot = 2 * b.num * Math.cos(A * Math.PI / 180) - c.num;
       } else if ([45, 135].includes(A)) {
         b = { num: 1 + Math.floor(random() * 4), root: 2 };
         c = { num: 2 + Math.floor(random() * 8), root: 1 };
