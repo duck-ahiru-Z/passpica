@@ -76,7 +76,6 @@ export default function BaseNConversionDrill() {
       let tex = "\\begin{array}{r|rr}\n";
       for (let i = 0; i < lines.length - 1; i++) {
         tex += `${lines[i].div} & ${lines[i].val} & \\cdots ${lines[i].rem} \\\\\n`;
-        tex += `\\cline{2-2}\n`;
       }
       tex += `  & ${lines[lines.length-1].val} & \\\\\n`;
       tex += "\\end{array}";
@@ -139,7 +138,6 @@ export default function BaseNConversionDrill() {
       let tex = "\\begin{array}{r|rr}\n";
       for (let i = 0; i < lines.length - 1; i++) {
         tex += `${lines[i].div} & ${lines[i].val} & \\cdots ${lines[i].rem} \\\\\n`;
-        tex += `\\cline{2-2}\n`;
       }
       tex += `  & ${lines[lines.length-1].val} & \\\\\n`;
       tex += "\\end{array}";

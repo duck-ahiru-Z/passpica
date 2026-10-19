@@ -87,5 +87,6 @@ for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `
 assert.ok(page.includes('generateBaseNProblem'), 'the UI must call the tested production generator');
 assert.ok(page.includes('ansVal.trim() === problem.a_val'), 'answers must be checked against the generated conversion result');
 assert.ok(page.includes('mulSteps.map(s =>'), 'fractional conversion explanation must show its repeated-multiplication steps');
+assert.ok(!page.includes('\\cline'), 'KaTeX explanations must not contain unsupported cline commands');
 
 console.log('Base conversion verified: 4 patterns × 1,000 mathematically checked questions; mixed 20,000 with exact balance and no adjacent repeats; answer and explanation wiring checked.');
