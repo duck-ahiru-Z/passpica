@@ -10,7 +10,7 @@ interface Step {
   precipitates: string[];
   remains: string[];
   precipitateColor: string;
-  precipitateColorHex: string;
+  precipitateColors: string[];
   reaction: string;
   explain: string;
 }
@@ -23,7 +23,7 @@ const STEPS: Step[] = [
     precipitates: [],
     remains: ['Ag+', 'Pb2+', 'Cu2+', 'Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
     precipitateColor: '-',
-    precipitateColorHex: '#ffffff',
+    precipitateColors: [],
     reaction: '-',
     explain: 'すべての金属イオン（銀、鉛、銅、鉄(III)、アルミニウム、亜鉛、カルシウム、ナトリウム）が均一に溶けている状態です。ここから順に試薬を加えて沈殿分離します。'
   },
@@ -34,7 +34,7 @@ const STEPS: Step[] = [
     precipitates: ['AgCl (白色)', 'PbCl2 (白色)'],
     remains: ['Cu2+', 'Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
     precipitateColor: '白色',
-    precipitateColorHex: '#f8fafc',
+    precipitateColors: ['#f8fafc', '#f8fafc'],
     reaction: 'Ag+ + Cl- ➔ AgCl↓ , Pb2+ + 2Cl- ➔ PbCl2↓',
     explain: '塩化物イオン(Cl-)と結合して難溶性の沈殿を作る銀イオン(Ag+)と鉛イオン(Pb2+)が、塩化物の白色沈殿として同時に沈殿します。★ポイント: 塩化鉛(PbCl2)は熱水に溶けて再電離する性質を持ち、この点で塩化銀(AgCl)と区別できます。'
   },
@@ -45,7 +45,7 @@ const STEPS: Step[] = [
     precipitates: ['CuS (黒色)'],
     remains: ['Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
     precipitateColor: '黒色',
-    precipitateColorHex: '#1e293b',
+    precipitateColors: ['#1e293b'],
     reaction: 'Cu2+ + S2- ➔ CuS↓',
     explain: '先に希塩酸を加えてAg+とPb2+を塩化物として分離した後の濾液に、酸性条件で硫化水素を通します。酸性下ではS2-濃度が低く保たれるため、この対象イオンの中では溶解度積の小さいCuSだけが沈殿します。Fe3+やZn2+などはこの段階では溶液中に残ります。'
   },
@@ -56,7 +56,7 @@ const STEPS: Step[] = [
     precipitates: ['Fe(OH)3 (赤褐色)', 'Al(OH)3 (白色ゲル状)'],
     remains: ['[Zn(NH3)4]2+ (溶解)', 'Ca2+', 'Na+'],
     precipitateColor: '赤褐色 ＆ 白色ゲル状',
-    precipitateColorHex: '#b45309',
+    precipitateColors: ['#b45309', '#f8fafc'],
     reaction: 'Fe3+ + 3OH- ➔ Fe(OH)3↓ , Al3+ + 3OH- ➔ Al(OH)3↓',
     explain: '煮沸してH2Sを追い出した後、硝酸で鉄をFe3+に酸化し、アンモニア水を過剰に加えます。塩基性（OH-）になり、鉄とアルミニウムが水酸化物の沈殿として落ちます。★ポイント: 亜鉛イオン(Zn2+)も一度は水酸化物Zn(OH)2を作りますが、アンモニア水を過剰に加えることで無色透明の錯イオン [Zn(NH3)4]2+ となり再溶解します。'
   },
@@ -67,7 +67,7 @@ const STEPS: Step[] = [
     precipitates: ['ZnS (白色)'],
     remains: ['Ca2+', 'Na+'],
     precipitateColor: '白色',
-    precipitateColorHex: '#f1f5f9',
+    precipitateColors: ['#f1f5f9'],
     reaction: 'Zn2+ + S2- ➔ ZnS↓',
     explain: 'アンモニアによって塩基性になった条件下では、S2-の電離度が大きくなりS2-濃度が十分に高くなります。これにより、酸性下では沈殿しなかった亜鉛イオン(Zn2+)が硫化物(ZnS)として沈殿します。このモデルで対象にしているのはZn2+です。硫化亜鉛(ZnS)は白色を呈するため、色も重要な確認点です。'
   },
@@ -78,7 +78,7 @@ const STEPS: Step[] = [
     precipitates: ['CaCO3 (白色)'],
     remains: ['Na+'],
     precipitateColor: '白色',
-    precipitateColorHex: '#f8fafc',
+    precipitateColors: ['#f8fafc'],
     reaction: 'Ca2+ + CO3 2- ➔ CaCO3↓',
     explain: 'この段階では、濾液に残っているカルシウムイオン(Ca2+)に炭酸イオン(CO3 2-)を加え、白色の炭酸カルシウム(CaCO3)として沈殿分離します。'
   },
@@ -89,7 +89,7 @@ const STEPS: Step[] = [
     precipitates: [],
     remains: [],
     precipitateColor: '黄色 (炎色反応)',
-    precipitateColorHex: '#eab308',
+    precipitateColors: [],
     reaction: 'Na ➔ 黄色発色',
     explain: '最後まで沈殿を作らず濾液中に残ったナトリウムイオン(Na+)は、白金線につけてガスバーナーの炎に入れることで、特有の強い黄色（炎色反応）を確認して特定します。'
   }
@@ -183,12 +183,11 @@ export default function MetalIonPage() {
               {/* 濾液内のイオン表記 */}
               <g>
                 {step.remains.map((ion, idx) => {
-                  // ランダムに散布するための固定座標
-                  const coords = [
-                    [45, 60], [65, 55], [85, 65], [105, 58], 
-                    [55, 75], [75, 78], [95, 76], [110, 85]
-                  ];
-                  const [x, y] = coords[idx] || [60, 60];
+                  const columns = Math.min(3, step.remains.length);
+                  const row = Math.floor(idx / columns);
+                  const column = idx % columns;
+                  const x = columns === 1 ? 80 : 48 + column * (64 / (columns - 1));
+                  const y = step.remains.length > 5 ? 60 + row * 17 : 67 + row * 23;
                   return (
                     <text key={ion} x={x} y={y} fill="#1e3a8a" fontSize="10" fontWeight="bold" textAnchor="middle">
                       {ion}
@@ -212,21 +211,29 @@ export default function MetalIonPage() {
               {step.precipitates.length > 0 && (
                 <g>
                   {/* 沈殿物の層 */}
-                  <rect 
-                    x="36" 
-                    y="92" 
-                    width="88" 
-                    height="12" 
-                    fill={step.precipitateColorHex} 
-                    stroke="#475569" 
-                    strokeWidth="1"
-                    className="transition-colors duration-300"
-                  />
+                  {step.precipitates.map((precipitate, idx) => {
+                    const count = step.precipitates.length;
+                    const segmentWidth = 88 / count;
+                    const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
+                    return (
+                      <rect
+                        key={`${precipitate}-${idx}`}
+                        x={36 + idx * segmentWidth}
+                        y="92"
+                        width={segmentWidth}
+                        height="12"
+                        fill={color}
+                        stroke="#475569"
+                        strokeWidth="1"
+                        className="transition-colors duration-300"
+                      />
+                    );
+                  })}
                   {/* 沈殿物のテキスト */}
                   <text 
                     x="80" 
                     y="101" 
-                    fill={step.precipitateColorHex === '#f8fafc' || step.precipitateColorHex === '#f1f5f9' ? '#334155' : '#ffffff'} 
+                    fill={step.precipitateColors.every((color) => color === '#f8fafc' || color === '#f1f5f9') ? '#334155' : '#ffffff'}
                     fontSize="8" 
                     fontWeight="bold" 
                     textAnchor="middle"

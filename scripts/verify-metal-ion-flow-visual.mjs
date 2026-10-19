@@ -18,4 +18,14 @@ if (!page.includes('step.remains.length === 0 ? (') || !page.includes('（イオ
   throw new Error('the empty-ion state for non-flame steps must remain available');
 }
 
-console.log('Metal-ion separation visual verified: final sodium flame drawing and accessible label match the yellow flame-reaction result.');
+if (!page.includes("precipitateColors: ['#b45309', '#f8fafc']")) {
+  throw new Error('iron and aluminum hydroxide precipitates must retain distinct brown and white colors');
+}
+if (!page.includes('step.precipitates.map((precipitate, idx) => {')) {
+  throw new Error('each precipitate must have a separately drawn segment');
+}
+if (!page.includes('const columns = Math.min(3, step.remains.length);')) {
+  throw new Error('remaining ions must use a responsive grid instead of overlapping fixed labels');
+}
+
+console.log('Metal-ion separation visual verified: flame reaction, distinct precipitate colors, and non-overlapping ion labels.');
