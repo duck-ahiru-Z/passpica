@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateLogarithmProblem, type LogarithmPattern } from '@/src/lib/logarithmDrill';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseRationalAnswer, rationalEquals } from '@/src/lib/rationalInput';
 
@@ -13,136 +13,11 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  qStr: string;
-  ansNum: number;
-  ansDen: number;
-  expLines: string[]; // Explanation lines to be rendered as block equations
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    if (p === 'pattern1') {
-      const primes = [2, 3, 5];
-      const pr = primes[Math.floor(Math.random() * primes.length)];
-      const a = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
-      const b = Math.floor(Math.random() * 3) + 2;
-      if (a === b) continue;
-      
-      const base = Math.pow(pr, a);
-      const arg = Math.pow(pr, b);
-      
-      let num = b;
-      let den = a;
-      const g = gcd(num, den);
-      num /= g; den /= g;
-      
-      const qStr = `\\log_{${base}} ${arg}`;
-      const expLines = [
-        `\\log_{${base}} ${arg} = \\frac{\\log_{${pr}} ${arg}}{\\log_{${pr}} ${base}}`,
-        `= \\frac{\\log_{${pr}} ${pr}^${b}}{\\log_{${pr}} ${pr}^${a}}`,
-        `= \\frac{${b}}{${a}}`
-      ];
-      if (g !== 1) expLines.push(`= \\frac{${num}}{${den}}`);
-      
-      return { pattern: p, qStr, ansNum: num, ansDen: den, expLines };
-    } 
-    else if (p === 'pattern2') {
-      const primes = [2, 3, 5];
-      const b1 = primes[Math.floor(Math.random() * primes.length)];
-      const k = Math.floor(Math.random() * 3) + 2; // 2, 3, 4
-      const a2 = Math.pow(b1, k);
-      const b2 = Math.floor(Math.random() * 6) + 2; // 2..7
-      if (b2 === b1 || b2 === a2) continue; // avoid trivial
-      
-      const qStr = `\\log_{${b1}} ${b2} \\cdot \\log_{${b2}} ${a2}`;
-      const expLines = [
-        `\\text{底の変換公式より、底を } ${b1} \\text{ にそろえると：}`,
-        `\\log_{${b1}} ${b2} \\cdot \\log_{${b2}} ${a2} = \\log_{${b1}} ${b2} \\cdot \\frac{\\log_{${b1}} ${a2}}{\\log_{${b1}} ${b2}}`,
-        `= \\log_{${b1}} ${a2}`,
-        `= \\log_{${b1}} ${b1}^${k} = ${k}`
-      ];
-      
-      return { pattern: p, qStr, ansNum: k, ansDen: 1, expLines };
-    }
-    else if (p === 'pattern3') {
-      const primes = [2, 3, 5];
-      const x = primes[Math.floor(Math.random() * primes.length)];
-      const i = Math.floor(Math.random() * 2) + 1; // 1, 2
-      const j = Math.floor(Math.random() * 2) + 1; // 1, 2
-      const k = i + j;
-      const a = Math.pow(x, i);
-      const b = Math.pow(x, j);
-      if (a === x || b === x) continue; // to make it non-trivial, wait if x=2, i=1, a=2. 1/log_2 x is just 1. It's fine but slightly trivial.
-      
-      const qStr = `\\frac{1}{\\log_{${a}} ${x}} + \\frac{1}{\\log_{${b}} ${x}}`;
-      const expLines = [
-        `\\text{底の変換公式の逆数の性質 } \\frac{1}{\\log_A B} = \\log_B A \\text{ より：}`,
-        `\\frac{1}{\\log_{${a}} ${x}} + \\frac{1}{\\log_{${b}} ${x}} = \\log_{${x}} ${a} + \\log_{${x}} ${b}`,
-        `= \\log_{${x}} (${a} \\times ${b})`,
-        `= \\log_{${x}} ${a * b}`,
-        `= \\log_{${x}} ${x}^${k} = ${k}`
-      ];
-      
-      return { pattern: p, qStr, ansNum: k, ansDen: 1, expLines };
-    }
-    else if (p === 'pattern4') {
-      const primes = [2, 3, 5];
-      const y = primes[Math.floor(Math.random() * primes.length)];
-      let k = Math.floor(Math.random() * 2) + 1; // 1, 2
-      if (y === 5) k = 1; // avoid 25^2 etc if z is large
-      const z = Math.floor(Math.random() * 4) + 2; // 2..5
-      if (y === z) continue;
-      
-      const x = Math.pow(y, k);
-      const qStr = `${x}^{\\log_{${y}} ${z}}`;
-      const ans = Math.pow(z, k);
-      
-      let expLines = [];
-      if (k === 1) {
-        expLines = [
-          `\\text{対数の定義式 } a^{\\log_a b} = b \\text{ をそのまま利用します。}`,
-          `${y}^{\\log_{${y}} ${z}} = ${z}`
-        ];
-      } else {
-        expLines = [
-          `\\text{まず底をそろえるために、} ${x} = ${y}^${k} \\text{ と変形します。}`,
-          `${x}^{\\log_{${y}} ${z}} = \\left(${y}^${k}\\right)^{\\log_{${y}} ${z}}`,
-          `= ${y}^{${k} \\log_{${y}} ${z}}`,
-          `\\text{対数の係数を真数の肩に乗せます。}`,
-          `= ${y}^{\\log_{${y}} ${z}^${k}} = ${y}^{\\log_{${y}} ${ans}}`,
-          `\\text{定義式 } a^{\\log_a b} = b \\text{ より：}`,
-          `= ${ans}`
-        ];
-      }
-      
-      return { pattern: p, qStr, ansNum: ans, ansDen: 1, expLines };
-    }
-  }
-}
+type Pattern = LogarithmPattern;
 
 export default function LogarithmDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState(() => generateLogarithmProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -150,7 +25,7 @@ export default function LogarithmDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
-    setProblem(generateProblem(pattern));
+    setProblem(generateLogarithmProblem(pattern));
     setAnsVal('');
     setHasChecked(false);
     setIsCorrect(false);
