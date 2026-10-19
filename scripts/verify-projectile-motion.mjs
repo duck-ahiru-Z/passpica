@@ -1,4 +1,6 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   calculateProjectileState,
   projectileGravity,
@@ -47,4 +49,8 @@ close(calculateProjectileState(30, 2).time, calculateProjectileState(30, 1).flig
 
 assert.equal(calculateProjectileState(0, 0.5).vy, -projectileGravity * calculateProjectileState(0, 0.5).time, 'horizontal launch vertical velocity');
 assert.ok(projectileInitialSpeed > 0 && projectileInitialHeight > 0);
+const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/projectile-visual/page.tsx'), 'utf8');
+assert.ok(visualPage.includes('Math.abs(vy) < 0.01 ? 30'), 'zero vertical speed should still show the downward gravity direction in the diagram');
+assert.ok(visualPage.includes('↓ 重力加速度 g = {projectileGravity} m/s²'), 'zero-speed state should label the acceleration separately from velocity');
+assert.ok(visualPage.includes('重力加速度は下向き'), 'the accessible diagram description should distinguish zero velocity from downward acceleration');
 console.log('Projectile motion verified: 16 launch angles × 101 timeline positions, launch/apex/landing conditions, and input bounds.');
