@@ -188,7 +188,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '数と式（式の値）',
     title: '対称式の値ドリル',
-    description: '基本対称式（和と積）を用いて、与えられた対称式の値をスピーディに計算する反復練習です。',
+    description: 'x²＋y²・x³＋y³・x²y＋xy²を個別練習し、実戦では3パターンを偏りなくランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/symmetric-polynomial-drill'
@@ -243,7 +243,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学C',
     field: 'ベクトル',
     title: 'ベクトル・交点位置ベクトルドリル',
-    description: '内分比から2直線の交点の位置ベクトルをメネラウスの定理等を用いて求める反復ドリル。',
+    description: 'メネラウスの定理と係数比較・連立方程式を個別に練習し、実戦では解法方針をランダムに選びます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/vector-drill'
@@ -276,7 +276,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学II',
     field: '図形と方程式',
     title: '図形と方程式・円の接線ドリル',
-    description: '円の外部の点から引いた2本の接線の方程式を正確に求めるための幾何学＆計算演習。',
+    description: '接点の座標を置く方法と中心からの距離を使う方法を個別練習し、実戦では2解法をランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/circle-tangent-drill'
@@ -288,7 +288,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '2次関数',
     title: '平方完成の特訓ドリル',
-    description: '2次関数の式を平方完成して、頂点の座標を正確に求める反復練習です。分数や文字係数にも対応。',
+    description: '整数・分数係数などの平方完成パターンを個別練習し、実戦では全形式をランダムに混ぜます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/completing-square-drill'
@@ -310,7 +310,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '2次関数',
     title: '判別式と共有点の個数ドリル',
-    description: '定数kを含む方程式の判別式を利用して、グラフとx軸の位置関係を調べる演習です。スライダーを使った視覚的理解が可能です。',
+    description: '判別式とグラフの位置関係を、定数の条件別に練習。スライダーで視覚的に確かめられます。',
     difficulty: '応用',
     type: '無限計算ドリル',
     link: '/learn/math/discriminant-drill'
@@ -321,7 +321,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '2次関数',
     title: '2次関数の最大・最小ドリル',
-    description: '定義域と軸の位置関係をグラフから視覚的に判断し、最大値・最小値を求める演習です。',
+    description: '軸が定義域の内外にある場合などを個別・ランダムに練習し、グラフから最大値・最小値を判断します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/quadratic-max-min-drill'
