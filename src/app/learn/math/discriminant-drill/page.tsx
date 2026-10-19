@@ -407,7 +407,7 @@ export default function DiscriminantDrillPage() {
                 <span>kを動かす:</span>
                 <input 
                   type="range" 
-                  min="-15" max="15" step="0.5" 
+                  min="-15" max="15" step="0.01"
                   value={kVal} 
                   onChange={e => setKVal(parseFloat(e.target.value))}
                   className="flex-1"
