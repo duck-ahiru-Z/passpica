@@ -49,7 +49,9 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     : selectedPattern;
 
   const angles = [30, 45, 60, 90, 120, 135, 150];
-  let A = angles[Math.floor(Math.random() * angles.length)];
+  let A = p_type === 'pattern4'
+    ? 60
+    : angles[Math.floor(Math.random() * angles.length)];
   
   if (p_type === 'pattern1') A = [60, 120][Math.floor(Math.random() * 2)];
   if (p_type === 'pattern2') A = [45, 135][Math.floor(Math.random() * 2)];
@@ -89,7 +91,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       a2 = b.num*b.num*b.root + c.num*c.num*c.root - 3 * b_coef * c_coef * cosA_sign;
     }
     
-    if (a2 > 0) break;
+    const pattern4OtherRoot = 2 * b.num * Math.cos(A * Math.PI / 180) - c.num;
+    if (a2 > 0 && (p_type !== 'pattern4' || (Number.isInteger(Math.sqrt(a2)) && Math.sqrt(a2) > 0 && Number.isInteger(pattern4OtherRoot) && pattern4OtherRoot > 0))) break;
   }
   
   const a = { num: 1, root: 1, den: 1 };
@@ -115,8 +118,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     // Solve quadratic for c: c^2 - (2b cos A) c + (b^2 - a^2) = 0
     let two_b_cosA = 0;
     if (A === 60 || A === 120 || A === 90) two_b_cosA = 2 * b.num * (A === 60 ? 0.5 : A === 120 ? -0.5 : 0);
-    else if (A === 45 || A === 135) two_b_cosA = 2 * b.num * (A === 45 ? 1 : -1);
-    else if (A === 30 || A === 150) two_b_cosA = 3 * b.num * (A === 30 ? 1 : -1);
+    else if (A === 45 || A === 135) two_b_cosA = b.num * Math.sqrt(b.root * 2) * (A === 45 ? 1 : -1);
+    else if (A === 30 || A === 150) two_b_cosA = b.num * Math.sqrt(b.root * 3) * (A === 30 ? 1 : -1);
     
     const c_orig = c.num;
     const c_other = two_b_cosA - c_orig;
