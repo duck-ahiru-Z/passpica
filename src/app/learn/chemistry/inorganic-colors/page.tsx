@@ -45,6 +45,18 @@ interface ReactionResult {
   description: string;       // 現象の説明文
 }
 
+function renderEmphasis(text: string) {
+  return text.split(/(\*\*.*?\*\*)/g).map((part, index) => (
+    part.startsWith('**') && part.endsWith('**')
+      ? <strong key={`${index}-${part}`}>{part.slice(2, -2)}</strong>
+      : part
+  ));
+}
+
+function stripEmphasisMarkers(text: string) {
+  return text.replace(/\*\*/g, '');
+}
+
 export default function InorganicColorsPage() {
   const [selectedIon, setSelectedIon] = useState<string>('Cu2+');
   const [selectedReagent, setSelectedReagent] = useState<string>('NaOH');
@@ -533,7 +545,7 @@ export default function InorganicColorsPage() {
             
             <div className="relative w-28 h-64">
               {/* 試験管枠および内部液のSVG */}
-              <svg viewBox="0 0 100 240" className="w-full h-full overflow-visible" role="img" aria-label={`${currentIon.name}と${currentReagent.name}。${reaction.description} 反応式：${reaction.formula}`}>
+              <svg viewBox="0 0 100 240" className="w-full h-full overflow-visible" role="img" aria-label={`${currentIon.name}と${currentReagent.name}。${stripEmphasisMarkers(reaction.description)} 反応式：${reaction.formula}`}>
                 {/* 液体層：下半分の液 */}
                 <path
                   d="M 20 80 L 20 200 A 30 30 0 0 0 80 200 L 80 80 Z"
@@ -617,7 +629,7 @@ export default function InorganicColorsPage() {
 
             <div className="text-[11px] leading-relaxed text-gray-600 space-y-2">
               <span className="font-bold text-slate-800 block">■ 現象解説:</span>
-              <p>{reaction.description}</p>
+              <p>{renderEmphasis(reaction.description)}</p>
             </div>
           </div>
 
@@ -637,7 +649,7 @@ export default function InorganicColorsPage() {
               </li>
               <li>
                 <strong className="text-slate-800">硫化物の沈殿色</strong>:<br />
-                金属硫化物はほとんどが**黒色**だが、<strong className="text-amber-700">ZnS（白色）</strong>、<strong className="text-yellow-600">CdS（黄色）</strong>、<strong className="text-pink-600">MnS（淡桃色/肉色）</strong>は極めて重要。
+                金属硫化物はほとんどが<strong>黒色</strong>だが、<strong className="text-amber-700">ZnS（白色）</strong>、<strong className="text-yellow-600">CdS（黄色）</strong>、<strong className="text-pink-600">MnS（淡桃色/肉色）</strong>は極めて重要。
               </li>
               <li>
                 <strong className="text-slate-800">液性による硫化水素沈殿の違い</strong>:<br />
