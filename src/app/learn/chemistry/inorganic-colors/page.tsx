@@ -417,6 +417,8 @@ export default function InorganicColorsPage() {
   };
 
   const reaction = getReactionResult();
+  const outlinePrecipitate = reaction.precipitateColor.includes('241, 245, 249')
+    || reaction.precipitateColor.includes('255, 255, 255');
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
@@ -560,16 +562,19 @@ export default function InorganicColorsPage() {
                     <path
                       d="M 21.5 175 C 30 185, 70 185, 78.5 175 L 78.5 200 A 30 30 0 0 1 21.5 200 Z"
                       fill={reaction.precipitateColor}
+                      stroke={outlinePrecipitate ? '#64748b' : undefined}
+                      strokeWidth={outlinePrecipitate ? 1.5 : undefined}
+                      strokeOpacity={outlinePrecipitate ? 0.65 : undefined}
                       className="transition-all duration-300"
                     />
                     {/* 沈殿物コロイド・サスペンションの点々 */}
-                    <circle cx="30" cy="150" r="1.5" fill={reaction.precipitateColor} opacity="0.8" />
-                    <circle cx="45" cy="160" r="2" fill={reaction.precipitateColor} opacity="0.7" />
-                    <circle cx="65" cy="145" r="1.5" fill={reaction.precipitateColor} opacity="0.8" />
-                    <circle cx="55" cy="170" r="1" fill={reaction.precipitateColor} opacity="0.9" />
-                    <circle cx="38" cy="135" r="2" fill={reaction.precipitateColor} opacity="0.6" />
-                    <circle cx="70" cy="165" r="1.8" fill={reaction.precipitateColor} opacity="0.75" />
-                    <circle cx="48" cy="120" r="1.2" fill={reaction.precipitateColor} opacity="0.5" />
+                    <circle cx="30" cy="150" r="1.5" fill={reaction.precipitateColor} opacity="0.8" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
+                    <circle cx="45" cy="160" r="2" fill={reaction.precipitateColor} opacity="0.7" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
+                    <circle cx="65" cy="145" r="1.5" fill={reaction.precipitateColor} opacity="0.8" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
+                    <circle cx="55" cy="170" r="1" fill={reaction.precipitateColor} opacity="0.9" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
+                    <circle cx="38" cy="135" r="2" fill={reaction.precipitateColor} opacity="0.6" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
+                    <circle cx="70" cy="165" r="1.8" fill={reaction.precipitateColor} opacity="0.75" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
+                    <circle cx="48" cy="120" r="1.2" fill={reaction.precipitateColor} opacity="0.5" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
                   </g>
                 )}
 

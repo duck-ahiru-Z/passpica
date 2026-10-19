@@ -15,6 +15,8 @@ for (const requirement of [
   "text.split(/(\\*\\*.*?\\*\\*)/g)",
   '{renderEmphasis(reaction.description)}',
   'stripEmphasisMarkers(reaction.description)',
+  'const outlinePrecipitate = reaction.precipitateColor.includes',
+  "stroke={outlinePrecipitate ? '#64748b' : undefined}",
   '<strong>黒色</strong>',
   "Zn²⁺ + S²⁻ → ZnS↓ (白色沈殿)",
   "2Ag⁺ + 2OH⁻ → Ag₂O↓ + H₂O (酸化銀・褐色沈殿)",
