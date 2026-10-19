@@ -1,8 +1,30 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { generateLimitProblem, limitPatterns } from '../src/lib/calculus3Limits.ts';
+import { sineRatioForNonzeroRadians } from '../src/lib/calculus3LimitVisual.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-limit-drill/page.tsx'), 'utf8');
+const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-limit-visual/page.tsx'), 'utf8');
+if (!visualPage.includes('xはラジアンで測ります') || !visualPage.includes('x（ラジアン）= ±')
+  || !visualPage.includes('aria-label="x（ラジアン）の大きさ"')
+  || !visualPage.includes('sineRatioForNonzeroRadians')) {
+  throw new Error('the sin(x)/x visual must state the radian convention visibly, accessibly, and in its production calculation');
+}
+const close = (actual, expected, tolerance = 1e-12) => Math.abs(actual - expected) <= tolerance;
+for (const x of [0.05, 0.1, 0.5, 1, 2.8]) {
+  const right = sineRatioForNonzeroRadians(x);
+  const left = sineRatioForNonzeroRadians(-x);
+  if (!close(right, left) || !close(right, Math.sin(x) / x)) throw new Error(`radian sine ratio mismatch at x=${x}`);
+}
+if (!(sineRatioForNonzeroRadians(0.05) < 1) || !(sineRatioForNonzeroRadians(0.05) > sineRatioForNonzeroRadians(0.1))) {
+  throw new Error('positive values near zero should approach the y=1 limit from below');
+}
+let rejectedZero = false;
+try { sineRatioForNonzeroRadians(0); } catch (error) { rejectedZero = error instanceof RangeError; }
+if (!rejectedZero) throw new Error('the visual calculation must preserve the hole at x=0 instead of defining the function there');
+let rejectedDegrees = false;
+try { sineRatioForNonzeroRadians(Infinity); } catch (error) { rejectedDegrees = error instanceof RangeError; }
+if (!rejectedDegrees) throw new Error('non-finite slider values must be rejected');
 if (!/type="radio"\s+name="limit-strategy"/.test(drillPage) || drillPage.includes('onClick={() => setStrategy(p)}')) {
   throw new Error('limit strategy must be a single-choice radio group');
 }
@@ -24,7 +46,6 @@ if (!drillPage.includes("isContinuity ? 'overflow-x-auto p-3 text-base sm:p-6 sm
 }
 
 const stableRandom = () => 0.37;
-const close = (actual, expected) => Math.abs(actual - expected) < 1e-12;
 const checks = {
   factor: problem => {
     const [, point] = problem.expression.match(/\\lim_\{x\\to (\d+)\}/);
