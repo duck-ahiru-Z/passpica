@@ -5,62 +5,22 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { createCircleTangentProblem, gcd3, type CircleTangentProblem } from '@/src/lib/circleTangent';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictInteger } from '@/src/lib/strictInteger';
-
-// --- ユーティリティ ---
-function gcd(x: number, y: number): number {
-  x = Math.abs(x); y = Math.abs(y);
-  while (y) {
-    const t = y; y = x % y; x = t;
-  }
-  return x;
-}
-
-function gcd3(x: number, y: number, z: number): number {
-  return gcd(gcd(x, y), z);
-}
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-interface CircleProblem {
-  s: number; t: number;
-  R2: number;
-  A1: number; B1: number; C1: number;
-  A2: number; B2: number; C2: number;
-  x1: number; y1: number;
-  x2: number; y2: number;
-}
 type StrategyMode = 'mix' | 'contact' | 'distance';
 const strategyPicker = new BalancedRandom<'contact' | 'distance'>(['contact', 'distance']);
-
-function createCircleProblem(): CircleProblem {
-  const basePoints = [[3, 4], [4, 3], [-3, 4], [4, -3], [3, -4], [-4, 3], [1, 2], [2, 1], [-1, 2], [2, -1], [1, -2], [-2, 1], [2, 3], [3, 2], [-2, 3], [3, -2], [2, -3], [-3, 2], [1, 3], [3, 1], [-1, 3], [3, -1], [1, -3], [-3, 1]];
-  const [x1, y1] = basePoints[Math.floor(Math.random() * basePoints.length)];
-  const R2 = x1*x1 + y1*y1;
-  const kChoices = [-2, -1, 1, 2];
-  const k = kChoices[Math.floor(Math.random() * kChoices.length)];
-  const s = x1 - k * y1, t = y1 + k * x1;
-  const normalizeLine = (a: number, b: number, c: number) => {
-    const g = gcd3(a, b, c); let na = a / g, nb = b / g, nc = c / g;
-    if (na < 0 || (na === 0 && nb < 0)) { na = -na; nb = -nb; nc = -nc; }
-    return [na, nb, nc];
-  };
-  const [A1, B1, C1] = normalizeLine(x1, y1, R2);
-  const s2_t2 = s*s - t*t, st2 = 2*s*t;
-  const X2_scaled = s2_t2 * x1 + st2 * y1, Y2_scaled = st2 * x1 - s2_t2 * y1;
-  const normFactor = s*s + t*t;
-  const [A2, B2, C2] = normalizeLine(X2_scaled, Y2_scaled, normFactor * R2);
-  return { s, t, R2, A1, B1, C1, A2, B2, C2, x1, y1, x2: X2_scaled / normFactor, y2: Y2_scaled / normFactor };
-}
 
 export default function CircleTangentDrillPage() {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
   const [strategy, setStrategy] = useClientGeneratedState<'contact' | 'distance'>(() => strategyPicker.next());
-  const [problem, setProblem] = useClientGeneratedState<CircleProblem>(() => createCircleProblem());
+  const [problem, setProblem] = useClientGeneratedState<CircleTangentProblem>(() => createCircleTangentProblem());
   
   // 入力状態
   const [L1_A, setL1_A] = useState('');
@@ -80,7 +40,7 @@ export default function CircleTangentDrillPage() {
 
   const generateProblem = (nextMode: StrategyMode = strategyMode) => {
     setStrategy(nextMode === 'mix' ? strategyPicker.next() : nextMode);
-    setProblem(createCircleProblem());
+    setProblem(createCircleTangentProblem());
 
     setL1_A(''); setL1_B(''); setL1_C('');
     setL2_A(''); setL2_B(''); setL2_C('');
@@ -330,7 +290,13 @@ export default function CircleTangentDrillPage() {
                </button>
              </div>
              {showGraph ? (
-               <canvas ref={canvasRef} width={500} height={300} className="w-full h-auto border border-gray-200 bg-gray-50" />
+               <canvas
+                 ref={canvasRef}
+                 width={500}
+                 height={300}
+                 aria-label={`中心O、半径√${problem.R2}の円と外部の点P(${problem.s},${problem.t})、接点T(${problem.x1.toFixed(2)},${problem.y1.toFixed(2)})とU(${problem.x2.toFixed(2)},${problem.y2.toFixed(2)})を示す図。二本の接線を描画しています。`}
+                 className="w-full h-auto border border-gray-200 bg-gray-50"
+               />
              ) : (
                <div className="h-48 flex items-center justify-center text-gray-400 bg-gray-50 border border-dashed border-gray-300">
                  グラフは非表示です
@@ -414,7 +380,7 @@ export default function CircleTangentDrillPage() {
                         中心は <MathEq math="(0, 0)" />、半径は <MathEq math={`R = \\sqrt{${problem.R2}}`} /> です。<br/><br/>
                         直線①と、中心 <MathEq math="(0,0)" /> との距離 <MathEq math="d" /> が、半径 <MathEq math={`\\sqrt{${problem.R2}}`} /> にピッタリ等しくなれば「接する」ことになります。<br/>
                         <div className="bg-white p-2 border my-1">
-                          距離 <MathEq math="d = \frac{|m(0) - (-1)(0) - \dots|}{\sqrt{m^2 + (-1)^2}}" /><br/>
+                          距離 <MathEq math="d = \\frac{|m(0) - (-1)(0) - \\dots|}{\\sqrt{m^2 + (-1)^2}}" /><br/>
                           <MathEq math={`\\frac{|- ${problem.s}m + ${problem.t}|}{\\sqrt{m^2 + 1}} = \\sqrt{${problem.R2}}`} />
                         </div>
                       </div>
