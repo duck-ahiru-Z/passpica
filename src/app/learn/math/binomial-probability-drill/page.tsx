@@ -4,100 +4,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
+import { atLeastOneSuccessProbability, generateBinomialProblem, type BinomialPattern, type BinomialProblem } from '@/src/lib/binomialProbability';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-function nCr(n: number, r: number): number {
-  if (r < 0 || r > n) return 0;
-  if (r === 0 || r === n) return 1;
-  let res = 1;
-  for (let i = 1; i <= r; i++) {
-    res = res * (n - i + 1) / i;
-  }
-  return res;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  n: number;
-  r: number;
-  p_num: number;
-  p_den: number;
-  ans_num: number;
-  ans_den: number;
-  req_wins?: number;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  if (p === 'pattern1') {
-    const n = Math.floor(Math.random() * 4) + 3; // 3 to 6
-    const r = Math.floor(Math.random() * (n - 1)) + 1; // 1 to n-1
-    const p_num = 1;
-    const p_den = 2;
-    const ans_num = nCr(n, r);
-    const ans_den = Math.pow(2, n);
-    const g = gcd(ans_num, ans_den);
-    return { pattern: p, n, r, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g };
-  } else if (p === 'pattern2') {
-    const probs = [{n:1, d:6}, {n:1, d:3}, {n:2, d:3}, {n:1, d:4}]; 
-    const prob = probs[Math.floor(Math.random() * probs.length)];
-    const n = Math.floor(Math.random() * 3) + 3; // 3 to 5
-    const r = Math.floor(Math.random() * (n - 1)) + 1;
-    const p_num = prob.n;
-    const p_den = prob.d;
-    const ans_num = nCr(n, r) * Math.pow(p_num, r) * Math.pow(p_den - p_num, n - r);
-    const ans_den = Math.pow(p_den, n);
-    const g = gcd(ans_num, ans_den);
-    return { pattern: p, n, r, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g };
-  } else if (p === 'pattern3') {
-    const probs = [{n:1, d:6}, {n:1, d:3}, {n:1, d:4}];
-    const prob = probs[Math.floor(Math.random() * probs.length)];
-    const n = Math.floor(Math.random() * 3) + 3; // 3 to 5
-    const p_num = prob.n;
-    const p_den = prob.d;
-    const fail_num = p_den - p_num;
-    const ans_num = Math.pow(p_den, n) - Math.pow(fail_num, n);
-    const ans_den = Math.pow(p_den, n);
-    const g = gcd(ans_num, ans_den);
-    return { pattern: p, n, r: 0, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g };
-  } else {
-    // pattern4: conditional
-    const req_wins = Math.floor(Math.random() * 2) + 3; // 3 or 4 wins to win match
-    let n = Math.floor(Math.random() * (req_wins)) + req_wins; // n=3,4,5
-    if (n === req_wins) n++; // ensure it's not a straight sweep for more interesting calculation
-    const r = req_wins; 
-    const p_num = 1;
-    const p_den = 2; // keep it simple 1/2 for matches
-    const ans_num = nCr(n - 1, r - 1);
-    const ans_den = Math.pow(2, n);
-    const g = gcd(ans_num, ans_den);
-    return { pattern: p, n, r, p_num, p_den, ans_num: ans_num/g, ans_den: ans_den/g, req_wins };
-  }
-}
+type Pattern = BinomialPattern;
+type ProblemData = BinomialProblem;
+const generateProblem = generateBinomialProblem;
 
 export default function BinomialProbabilityDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
@@ -180,17 +98,20 @@ export default function BinomialProbabilityDrill() {
     } else if (problem.pattern === 'pattern3') {
       ctx.fillText(`少なくとも 1 回成功する確率`, W/2, 20);
       
-      // Draw 100% bar and subtract failure
+      const successProbability = atLeastOneSuccessProbability(problem.p_num, problem.p_den, problem.n);
+      const failureProbability = 1 - successProbability;
       const barW = 200;
       const barH = 20;
       const barX = W/2 - barW/2;
       const barY = 80;
+      const successWidth = barW * successProbability;
+      const failureWidth = barW * failureProbability;
       
       ctx.fillStyle = '#3b82f6'; // Success part
-      ctx.fillRect(barX, barY, barW * 0.8, barH);
+      ctx.fillRect(barX, barY, successWidth, barH);
       
       ctx.fillStyle = '#ef4444'; // Fail part
-      ctx.fillRect(barX + barW * 0.8, barY, barW * 0.2, barH);
+      ctx.fillRect(barX + successWidth, barY, failureWidth, barH);
       
       ctx.strokeStyle = '#1e293b';
       ctx.strokeRect(barX, barY, barW, barH);
@@ -198,10 +119,9 @@ export default function BinomialProbabilityDrill() {
       ctx.fillStyle = '#1e293b';
       ctx.font = '12px sans-serif';
       ctx.fillText(`全事象 (確率 1)`, W/2, barY - 15);
-      
-      ctx.fillStyle = 'white';
-      ctx.fillText(`求める確率 (余事象を引く)`, barX + barW * 0.4, barY + barH/2);
-      ctx.fillText(`全部失敗`, barX + barW * 0.9, barY + barH/2);
+      ctx.textAlign = 'left';
+      ctx.fillText(`青：少なくとも1回当たる ${(successProbability * 100).toFixed(1)}%`, barX, barY + barH + 18);
+      ctx.fillText(`赤：全て外れる ${(failureProbability * 100).toFixed(1)}%`, barX, barY + barH + 36);
     }
   }, [problem]);
 
@@ -229,9 +149,14 @@ export default function BinomialProbabilityDrill() {
     setHasChecked(true);
   };
 
-  const eventName = problem.pattern === 'pattern2' 
-    ? (problem.p_num === 1 && problem.p_den === 6 ? '「1の目」' : problem.p_num === 1 && problem.p_den === 3 ? '「3の倍数の目」' : '「2以下の目」')
+  const eventName = problem.pattern === 'pattern2'
+    ? problem.event_label
     : (problem.pattern === 'pattern3' ? '「アタリ」' : '「表」');
+  const graphDescription = problem.pattern === 'pattern3'
+    ? `全${problem.n}回のうち少なくとも1回当たる確率を青、全て外れる確率を赤で表示。青は${(atLeastOneSuccessProbability(problem.p_num, problem.p_den, problem.n) * 100).toFixed(1)}パーセントです。`
+    : problem.pattern === 'pattern4'
+      ? `${problem.n}戦目で${problem.req_wins}勝目を挙げて優勝する場合を示す図。`
+      : `${problem.n}回のうちちょうど${problem.r}回成功する場合を示す図。`;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -349,8 +274,12 @@ export default function BinomialProbabilityDrill() {
                 ref={canvasRef} 
                 width={300} 
                 height={160} 
+                role="img"
+                aria-label={graphDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
-              />
+              >
+                {graphDescription}
+              </canvas>
             </div>
 
             {!hasChecked ? (
