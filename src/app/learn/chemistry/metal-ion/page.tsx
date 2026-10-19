@@ -178,7 +178,7 @@ export default function MetalIonPage() {
               <rect x="35" y="25" width="90" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
               
               {/* 上層：濾液 (残っているイオン) */}
-              <rect x="36" y="45" width="88" height="47" fill="#f0f9ff" opacity="0.8" />
+              <rect x="36" y="45" width="88" height="45" fill="#f0f9ff" opacity="0.8" />
               
               {/* 濾液内のイオン表記 */}
               <g>
@@ -187,7 +187,7 @@ export default function MetalIonPage() {
                   const row = Math.floor(idx / columns);
                   const column = idx % columns;
                   const x = columns === 1 ? 80 : columns === 2 ? 62 + column * 36 : 48 + column * 32;
-                  const y = step.remains.length > 4 ? 59 + row * 16 : step.remains.length > 2 ? 63 + row * 19 : 70 + row * 19;
+                  const y = step.remains.length > 4 ? 57 + row * 14 : step.remains.length > 2 ? 60 + row * 16 : 66 + row * 16;
                   return (
                     <text key={ion} x={x} y={y} fill="#1e3a8a" fontSize="10" fontWeight="bold" textAnchor="middle">
                       {ion}
@@ -213,10 +213,10 @@ export default function MetalIonPage() {
                   {/* 沈殿物の層 */}
                   {step.precipitates.map((precipitate, idx) => {
                     const count = step.precipitates.length;
-                    const segmentWidth = count === 2 ? 54 : 88 / count;
-                    const segmentX = count === 2 ? 36 + idx * 34 : 36;
-                    const segmentY = count === 2 && idx === 1 ? 85 : 92;
-                    const segmentHeight = count === 2 ? 19 : 12;
+                    const segmentWidth = count === 2 ? 44 : 88 / count;
+                    const segmentX = count === 2 ? 36 + idx * 44 : 36;
+                    const segmentY = count === 2 ? 82 : 90;
+                    const segmentHeight = count === 2 ? 8 : 14;
                     const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
                     return (
                       <rect
@@ -235,8 +235,8 @@ export default function MetalIonPage() {
                   {/* 沈殿物名は二色沈殿でも色境界をまたがないよう、層の上に表示 */}
                   {step.precipitates.map((precipitate, idx) => {
                     const count = step.precipitates.length;
-                    const x = count === 2 ? 63 + idx * 34 : 80;
-                    const y = count === 2 && idx === 1 ? 98 : 101;
+                    const x = count === 2 ? 58 + idx * 44 : 80;
+                    const y = 100;
                     const color = step.precipitateColors[idx] ?? step.precipitateColors[0] ?? '#f8fafc';
                     const textFill = color === '#f8fafc' || color === '#f1f5f9' ? '#334155' : '#ffffff';
                     return (
