@@ -55,6 +55,13 @@ for (const entry of learnEntries) {
   const file = routeFile(entry.link);
   if (!file || !fs.existsSync(file)) throw new Error(`Missing learning page for ${entry.slug}: ${entry.link}`);
 }
+const practiceLinks = [...learn.matchAll(/practiceLink:\s*'([^']+)'/g)].map(match => match[1]);
+for (const link of practiceLinks) {
+  const file = routeFile(link);
+  if (!link.endsWith('-drill') || !file || !fs.existsSync(file)) {
+    throw new Error(`Learning portal practice link must target an existing drill: ${link}`);
+  }
+}
 const organic3dPage = fs.readFileSync(routeFile(learnEntries.find(entry => entry.slug === 'organic-3d').link), 'utf8');
 if (!learn.includes("title: '有機・高分子3D分子モデルビューア（立体構造）'")
   || !organic3dPage.includes('有機・高分子3D分子モデルビューア（立体構造）')
@@ -156,4 +163,4 @@ const unlistedDrills = pages
   .filter(route => !linkedDrillRoutes.has(route));
 if (unlistedDrills.length > 0) throw new Error(`Math drill pages missing from the portal: ${unlistedDrills.join(', ')}`);
 
-console.log(`Learning coverage verified: ${drillEntries.length} linked drills, ${learnEntries.length} linked learning pages (${requiredVisuals.length} required visuals), ${patternPages.length} fixed-plus-mixed pattern drills across all subjects, ${mathPages.length} math learning pages audited.`);
+console.log(`Learning coverage verified: ${drillEntries.length} linked drills, ${practiceLinks.length} linked practice drills, ${learnEntries.length} linked learning pages (${requiredVisuals.length} required visuals), ${patternPages.length} fixed-plus-mixed pattern drills across all subjects, ${mathPages.length} math learning pages audited.`);
