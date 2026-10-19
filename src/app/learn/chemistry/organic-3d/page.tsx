@@ -253,7 +253,7 @@ const MOLECULES: Record<MoleculeId, MoleculeData> = {
       { u: 'C6', v: 'H6a', type: 'single' },
       { u: 'C6', v: 'H6b', type: 'single' }
     ],
-    description: 'C1とC4が同一方向を向いた配座です。頂点の緑色の水素同士（フラッグポール水素）が近接し、強い立体反発（ひずみ）を受けるため、椅子型に比べてエネルギー的に約 23 kJ/mol 不安定です。'
+    description: 'C1とC4が同一方向を向いた配座です。頂点の緑色の水素同士（フラッグポール水素）が近接し、強い立体反発（ひずみ）を受けるため、椅子型に比べて約 29 kJ/mol 高いエネルギーです。ねじれ舟型は舟型より安定で、椅子型より約 23 kJ/mol 高いエネルギーです。'
   },
   cis_butene: {
     id: 'cis_butene',
@@ -750,7 +750,7 @@ export default function Organic3DPage() {
               <div className="bg-green-50/50 border border-green-200 p-2.5 space-y-1.5 text-[10px] leading-normal">
                 <span className="font-bold text-green-800 block">💡 舟型のフラッグポール水素:</span>
                 <p className="text-green-700">
-                  頂点にある<strong className="text-emerald-700">緑色の2つの水素 (H_flagpole)</strong> は、お互いに非常に近い位置（フラッグポールポジション）で向き合っており、強い反発力を受けます。これが舟型が椅子型より不安定（約23kJ/mol）になる主原因です。
+                  頂点にある<strong className="text-emerald-700">緑色の2つの水素 (H_flagpole)</strong> は、お互いに非常に近い位置（フラッグポールポジション）で向き合っており、強い反発力を受けます。これが舟型が椅子型より不安定（約29kJ/mol）になる主原因です。
                 </p>
               </div>
             )}
