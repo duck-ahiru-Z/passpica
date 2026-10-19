@@ -264,7 +264,8 @@ const CONTENTS: LearningContent[] = [
     description: 'pHスライダーを動かし、フェノールフタレインなどの指示薬の色の変化と、中和点の特性を理解します。',
     difficulty: '基礎',
     type: '実験シミュレータ',
-    link: '/learn/chemistry/acid-base'
+    link: '/learn/chemistry/acid-base',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
   {
     slug: 'metal-ion',
