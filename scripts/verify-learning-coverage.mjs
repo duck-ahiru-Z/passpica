@@ -31,6 +31,20 @@ const requiredVisuals = [
 ];
 
 const drillEntries = readPortalEntries(drill);
+const practiceModeDescriptions = [
+  'calculus-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
+  'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
+  'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill',
+];
+for (const slug of practiceModeDescriptions) {
+  const slugIndex = drill.indexOf(`slug: '${slug}'`);
+  const cardStart = drill.lastIndexOf('  {', slugIndex);
+  const cardEnd = drill.indexOf('\n  },', slugIndex);
+  const description = drill.slice(cardStart, cardEnd);
+  if (!description.includes('個別') || !description.includes('ランダム')) {
+    throw new Error(`A drill with focused and mixed modes must explain both in its portal card: ${slug}`);
+  }
+}
 for (const filter of ['aria-label="科目で絞り込む"', 'aria-label="難易度で絞り込む"']) {
   if (!drill.includes(filter)) throw new Error(`Drill portal filter group must have an accessible name: ${filter}`);
 }

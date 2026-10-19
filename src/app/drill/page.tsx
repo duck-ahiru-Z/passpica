@@ -232,7 +232,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学II',
     field: '微積分（面積公式）',
     title: '微積分・面積公式（無限計算ドリル）',
-    description: '1/6公式、1/12公式など定積分のショートカット面積公式を無限に反復演習できるドリル。自動生成される問題とグラフ・詳細な解説付き。',
+    description: '1/6公式・1/12公式などの型を個別に反復し、実戦では面積問題をランダムに選んで練習します。グラフと詳しい解説付き。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus-drill'
@@ -343,7 +343,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '図形と計量（三角比）',
     title: '正弦定理と外接円ドリル',
-    description: '正弦定理を活用して、三角形の辺・角・外接円の半径を瞬時に求める反復練習です。',
+    description: '外接円の半径・辺・角・最大角判定を個別に練習し、実戦では4パターンをランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/sine-rule-drill'
@@ -354,7 +354,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '図形と計量（三角比）',
     title: '余弦定理ドリル',
-    description: '余弦定理を活用して、三角形の辺や角を瞬時に求める反復練習です。2次方程式を利用する応用パターンも収録。',
+    description: '辺の長さ・角度の逆算・2次方程式を使う型を個別に練習し、実戦では4パターンをランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/cosine-rule-drill'
@@ -365,7 +365,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '図形と計量（三角比）',
     title: '三角形の面積ドリル',
-    description: '面積公式やヘロンの公式を利用して、三角形の面積や辺の長さをスピーディに求める反復練習です。',
+    description: '正弦を使う面積・ヘロンの公式・面積からの逆算を個別に練習し、実戦では4パターンをランダムに混ぜます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/triangle-area-drill'
@@ -376,7 +376,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '図形と計量（三角比）',
     title: '内接円・傍接円の半径ドリル',
-    description: '三角形の面積公式などを利用して、内接円・外接円・傍接円の半径を求める総合演習です。',
+    description: '内接円・外接円・傍接円の4パターンを個別に練習し、実戦では全パターンをランダムに混ぜます。',
     difficulty: '応用',
     type: '無限計算ドリル',
     link: '/learn/math/inscribed-circle-drill'
@@ -409,7 +409,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学A',
     field: '整数の性質',
     title: 'ユークリッドの互除法',
-    description: '割り算の繰り返しで最大公約数を求める演習',
+    description: 'ユークリッドの互除法で最大公約数を求める基礎演習です。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/euclidean-algorithm-drill'
@@ -420,7 +420,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学A',
     field: '整数の性質',
     title: '1次不定方程式の特殊解',
-    description: 'ax+by=c の整数解を一つ見つける演習',
+    description: '係数や右辺の形を4パターンに分けて個別練習し、実戦では全パターンをランダムに混ぜて ax+by=c の整数解を探します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/linear-diophantine-drill'
@@ -438,7 +438,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: 'メネラウス・チェバの定理',
-    description: '三角形と直線の交点による線分比・面積比を求めるドリル。図形ルートのアニメーション付き。',
+    description: 'チェバ・メネラウス（内分/外分）・面積比への応用を個別に練習し、実戦では4パターンをランダムに混ぜます。図形ルートのアニメーション付き。',
     link: '/learn/math/menelaus-ceva-drill',
     subject: 'math',
     subjectJp: '数学A',
@@ -449,7 +449,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '解と係数の関係',
-    description: '2次方程式の和と積の対称性を利用して式の値を瞬時に導く演習ドリル。',
+    description: '解の2乗和・3乗和・分数対称式・解の差の2乗を個別に練習し、実戦では4パターンをランダムに混ぜます。',
     link: '/learn/math/roots-coefficients-drill',
     subject: 'math',
     subjectJp: '数学Ⅱ',
@@ -460,7 +460,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '点と直線の距離',
-    description: '公式を用いて点と直線の距離をスピーディに求めるドリル。ピタゴラス数を用いた逆算ロジック。',
+    description: '原点・一般の点・直線の式・距離からの逆算を個別に練習し、実戦では4パターンをランダムに混ぜます。',
     link: '/learn/math/point-line-distance-drill',
     subject: 'math',
     subjectJp: '数学Ⅱ',
@@ -471,7 +471,7 @@ const CONTENTS: LearningContent[] = [
   },
   {
     title: '三角関数の合成',
-    description: 'a sin θ + b cos θ を座標平面上の点のイメージと結びつけて素早く合成するドリル。',
+    description: '有名角・負の角・大きい係数・発展形を個別に練習し、実戦では4パターンをランダムに混ぜて a sin θ + b cos θ を合成します。',
     link: '/learn/math/trig-synthesis-drill',
     subject: 'math',
     subjectJp: '数学Ⅱ',
