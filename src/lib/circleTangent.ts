@@ -14,6 +14,8 @@ export interface CircleTangentProblem {
   y2: number;
 }
 
+export const slopeLineDistanceFormula = String.raw`d = \frac{|m(0) - (-1)(0) - \dots|}{\sqrt{m^2 + (-1)^2}}`;
+
 function gcd(x: number, y: number): number {
   x = Math.abs(x);
   y = Math.abs(y);

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
-import { createCircleTangentProblem, gcd3, type CircleTangentProblem } from '@/src/lib/circleTangent';
+import { createCircleTangentProblem, gcd3, slopeLineDistanceFormula, type CircleTangentProblem } from '@/src/lib/circleTangent';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictInteger } from '@/src/lib/strictInteger';
 
@@ -380,7 +380,7 @@ export default function CircleTangentDrillPage() {
                         中心は <MathEq math="(0, 0)" />、半径は <MathEq math={`R = \\sqrt{${problem.R2}}`} /> です。<br/><br/>
                         直線①と、中心 <MathEq math="(0,0)" /> との距離 <MathEq math="d" /> が、半径 <MathEq math={`\\sqrt{${problem.R2}}`} /> にピッタリ等しくなれば「接する」ことになります。<br/>
                         <div className="bg-white p-2 border my-1">
-                          距離 <MathEq math="d = \\frac{|m(0) - (-1)(0) - \\dots|}{\\sqrt{m^2 + (-1)^2}}" /><br/>
+                          距離 <MathEq math={slopeLineDistanceFormula} /><br/>
                           <MathEq math={`\\frac{|- ${problem.s}m + ${problem.t}|}{\\sqrt{m^2 + 1}} = \\sqrt{${problem.R2}}`} />
                         </div>
                       </div>

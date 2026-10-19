@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { createCircleTangentProblem } from '../src/lib/circleTangent.ts';
+import katex from 'katex';
+import { createCircleTangentProblem, slopeLineDistanceFormula } from '../src/lib/circleTangent.ts';
 
 let seed = 0x7f4a7c15;
 const random = () => {
@@ -43,6 +44,9 @@ assert.ok(page.includes('value="mix"'), 'mixed strategy mode must remain availab
 assert.ok(page.includes('value="contact"'), 'contact-point strategy must be individually selectable');
 assert.ok(page.includes('value="distance"'), 'center-distance strategy must be individually selectable');
 assert.ok(page.includes('aria-label={`中心O'), 'canvas must have a dynamic accessible description');
-assert.ok(page.includes('\\frac{|m(0)'), 'detailed distance solution must render LaTeX correctly');
+const distanceHtml = katex.renderToString(slopeLineDistanceFormula, { throwOnError: true });
+assert.match(distanceHtml, /<mfrac/, 'detailed distance formula must render a fraction, not raw command text');
+assert.match(distanceHtml, /<msqrt/, 'detailed distance formula must render the radical correctly');
+assert.ok(page.includes('math={slopeLineDistanceFormula}'), 'the UI must render the tested distance formula');
 
 console.log(`Circle tangent drill verified: 10,000 actual generated problems; both contacts lie on the circle, both lines pass through the external point and are tangent; visualization, strategy controls, and explanation checked.`);
