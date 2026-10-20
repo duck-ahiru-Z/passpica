@@ -20,6 +20,7 @@ for (const requirement of [
   '<strong>黒色</strong>',
   "Zn²⁺ + S²⁻ → ZnS↓ (白色沈殿)",
   "2Ag⁺ + 2OH⁻ → Ag₂O↓ + H₂O (酸化銀・褐色沈殿)",
+  '2Fe³⁺ + 3H₂S + 6OH⁻ → 2FeS↓ + S↓ + 6H₂O',
   "塩化鉛(II)の白色沈殿が生成します。**この沈殿は「熱水に溶ける」",
 ]) {
   if (!page.includes(requirement)) throw new Error(`Inorganic visual is missing an expected explanation or rendered-emphasis path: ${requirement}`);

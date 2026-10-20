@@ -150,8 +150,8 @@ export default function InorganicColorsPage() {
           return {
             liquidColor: 'rgba(248, 250, 252, 0.1)',
             precipitateColor: '#1e293b', // 黒色
-            formula: '2Fe³⁺ + H₂S + 2OH⁻ → 2Fe²⁺ + S↓ + 2H₂O; Fe²⁺ + S²⁻ → FeS↓',
-            description: '塩基性条件下では、まずFe³⁺がH₂SによりFe²⁺へ還元されて硫黄が生じ、続いてFe²⁺がS²⁻と反応して硫化鉄(II)の黒色沈殿を作ります。'
+            formula: '2Fe³⁺ + 3H₂S + 6OH⁻ → 2FeS↓ + S↓ + 6H₂O',
+            description: '塩基性条件下では、H₂SがFe³⁺をFe²⁺へ還元して単体硫黄を生じ、さらに生じたFe²⁺が硫化物イオンと反応します。全体として硫化鉄(II)の黒色沈殿2 molと単体硫黄1 molが生じる反応式です。'
           };
         }
       }
