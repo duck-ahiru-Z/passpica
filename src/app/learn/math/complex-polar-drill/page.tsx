@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { formatExactTrigComponent } from '@/src/lib/complexPolarExact';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -36,29 +36,6 @@ interface ProblemData {
   z2?: {r: number, th: string, thVal: number};
 
   expLines: string[];
-}
-
-function parseAngleStr(thVal: number): string {
-  const eps = 0.01;
-  const pi = Math.PI;
-  if (Math.abs(thVal - 0) < eps) return "0";
-  if (Math.abs(thVal - pi/6) < eps) return "pi/6";
-  if (Math.abs(thVal - pi/4) < eps) return "pi/4";
-  if (Math.abs(thVal - pi/3) < eps) return "pi/3";
-  if (Math.abs(thVal - pi/2) < eps) return "pi/2";
-  if (Math.abs(thVal - 2*pi/3) < eps) return "2pi/3";
-  if (Math.abs(thVal - 3*pi/4) < eps) return "3pi/4";
-  if (Math.abs(thVal - 5*pi/6) < eps) return "5pi/6";
-  if (Math.abs(thVal - pi) < eps) return "pi";
-  if (Math.abs(thVal - 7*pi/6) < eps) return "7pi/6";
-  if (Math.abs(thVal - 5*pi/4) < eps) return "5pi/4";
-  if (Math.abs(thVal - 4*pi/3) < eps) return "4pi/3";
-  if (Math.abs(thVal - 3*pi/2) < eps) return "3pi/2";
-  if (Math.abs(thVal - 5*pi/3) < eps) return "5pi/3";
-  if (Math.abs(thVal - 7*pi/4) < eps) return "7pi/4";
-  if (Math.abs(thVal - 11*pi/6) < eps) return "11pi/6";
-  if (Math.abs(thVal - 2*pi) < eps) return "2pi";
-  return "0";
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
@@ -130,7 +107,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let thVal = Math.atan2(finalY, finalX);
       if (thVal < 0) thVal += 2 * Math.PI;
       
-      const ansTheta = parseAngleStr(thVal);
+      const ansTheta = formatPolarAngle(thVal);
       let thDisplay = ansTheta.replace("pi", "\\pi");
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay.includes("/")) {
@@ -158,7 +135,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const a = axes[Math.floor(Math.random() * axes.length)];
       
       const qStr = `複素数 $z = ${a.s}$ を極形式 $r(\\cos\\theta + i\\sin\\theta)$ で表せ。`;
-      const ansTheta = parseAngleStr(a.th);
+      const ansTheta = formatPolarAngle(a.th);
       let thDisplay = ansTheta.replace("pi", "\\pi");
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay === "0") thDisplay = "0";
@@ -177,18 +154,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     else if (p === 'pattern4') {
       const isProduct = Math.random() > 0.5;
       // Generate two angles that sum/diff to famous angles
-      const angles = [
-        {val: Math.PI/6, s: "\\frac{\\pi}{6}"},
-        {val: Math.PI/4, s: "\\frac{\\pi}{4}"},
-        {val: Math.PI/3, s: "\\frac{\\pi}{3}"},
-        {val: Math.PI/2, s: "\\frac{\\pi}{2}"},
-        {val: 2*Math.PI/3, s: "\\frac{2\\pi}{3}"},
-        {val: 3*Math.PI/4, s: "\\frac{3\\pi}{4}"},
-        {val: 5*Math.PI/6, s: "\\frac{5\\pi}{6}"}
-      ];
-      
-      const a1 = angles[Math.floor(Math.random() * angles.length)];
-      const a2 = angles[Math.floor(Math.random() * angles.length)];
+      const anglePairs = getSupportedPolarAnglePairs(isProduct ? 'sum' : 'difference');
+      const [a1, a2] = anglePairs[Math.floor(Math.random() * anglePairs.length)];
       
       let r1 = Math.floor(Math.random() * 3) + 2; // 2..4
       let r2 = Math.floor(Math.random() * 3) + 2;
@@ -222,7 +189,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const zY = rRes * sinVal;
       
       // find a and b strings
-      const thStr = parseAngleStr(thRes);
+      const thStr = formatPolarAngle(thRes);
       // to determine exact string
       let ansA = "", ansB = "";
       
