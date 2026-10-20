@@ -201,7 +201,7 @@ export default function VectorDrillPage() {
 
       <section className="retro-box bg-gray-50 p-4 space-y-2">
         <label className="font-bold block">■ 交点の求め方・練習モード</label>
-        <select aria-label="ベクトルの解法モード" value={strategyMode} onChange={event => { const nextMode = event.target.value as StrategyMode; setStrategyMode(nextMode); generateProblem(nextMode); }} className="border p-2 bg-white">
+        <select aria-label="ベクトルの解法モード" value={strategyMode} onChange={event => { const nextMode = event.target.value as StrategyMode; setStrategyMode(nextMode); generateProblem(); }} className="border p-2 bg-white">
           <option value="mix">実戦練習：交点の解法を全方針ランダム</option>
           <option value="menelaus">基礎練習：メネラウスの定理だけ</option>
           <option value="coefficient">基礎練習：係数比較と連立方程式だけ</option>
