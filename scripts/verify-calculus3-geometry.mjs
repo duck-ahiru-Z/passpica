@@ -28,13 +28,19 @@ if (!drillPage.includes('<= 0.0005 + 1e-12') || !drillPage.includes('小数第3�
 const stableRandom = () => 0.37;
 const checks = {
   'between-curves': problem => {
-    const [, a] = problem.expression.match(/y=(\d+)x/);
-    const value = Number(a);
-    return Math.abs(problem.answer - value ** 3 / 6) < 1e-12 && problem.explanation.includes(`∫₀^${value}`);
+    const [, coefficient] = problem.expression.match(/y=(\d*)x/);
+    const value = Number(coefficient || 1);
+    const linearTerm = value === 1 ? 'x' : `${value}x`;
+    return Math.abs(problem.answer - value ** 3 / 6) < 1e-12
+      && problem.explanation.includes(`区間内では ${linearTerm} が上`)
+      && problem.explanation.includes(`∫₀^${value}(${linearTerm}−x²)dx`);
   },
   'x-axis-rotation': problem => {
-    const [, power] = problem.expression.match(/y=x\^\{(\d+)\}/);
-    return Math.abs(problem.answer - Math.PI / (2 * Number(power) + 1)) < 1e-12;
+    const [, exponent] = problem.expression.match(/y=x(?:\^\{(\d+)\})?/);
+    const power = Number(exponent || 1);
+    const integrand = power === 1 ? '(x)²' : `(x^${power})²`;
+    return Math.abs(problem.answer - Math.PI / (2 * power + 1)) < 1e-12
+      && problem.explanation.includes(`π∫₀¹${integrand}dx`);
   },
   'y-axis-rotation': problem => {
     const [, radius] = problem.expression.match(/0\\le x\\le(\d+)/);
@@ -60,6 +66,18 @@ for (const pattern of geometryPatterns) {
   for (let index = 0; index < 500; index += 1) {
     const problem = generateGeometryProblem(pattern, stableRandom);
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
+    if (pattern === 'between-curves' && problem.expression.includes('y=1x')) {
+      throw new Error('linear coefficient 1 should be omitted from the displayed curve equation');
+    }
+    if (pattern === 'between-curves' && problem.explanation.includes('1x')) {
+      throw new Error('linear coefficient 1 should be omitted from the area explanation');
+    }
+    if (pattern === 'x-axis-rotation' && problem.expression.includes('x^{1}')) {
+      throw new Error('power 1 should be omitted from the displayed curve equation');
+    }
+    if (pattern === 'x-axis-rotation' && problem.explanation.includes('x^1')) {
+      throw new Error('power 1 should be omitted from the disk-method explanation');
+    }
     variants.add(problem.expression);
   }
   if (variants.size !== 5) throw new Error(`${pattern} generated ${variants.size}/5 expected coefficient or interval variants`);

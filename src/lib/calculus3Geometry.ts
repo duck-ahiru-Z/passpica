@@ -34,20 +34,22 @@ const variants = {
 export function generateGeometryProblem(mode: GeometryMode, random = Math.random): GeometryProblem {
   const pattern = mode === 'mix' ? picker.next(random) : mode;
   const value = variants[pattern].next(random);
+  const linearTerm = value === 1 ? 'x' : `${value}x`;
+  const powerTerm = value === 1 ? 'x' : `x^{${value}}`;
   const problems: Record<GeometryPattern, GeometryProblem> = {
     'between-curves': {
       pattern,
       prompt: '2曲線に囲まれた部分の面積を求める。',
-      expression: `y=${value}x,\\quad y=x^2\\quad(0\\le x\\le${value})`,
+      expression: `y=${linearTerm},\\quad y=x^2\\quad(0\\le x\\le${value})`,
       answer: value ** 3 / 6,
-      explanation: `区間内では ${value}x が上、x² が下。∫₀^${value}(${value}x−x²)dx=${value ** 3}/6。`,
+      explanation: `区間内では ${linearTerm} が上、x² が下。∫₀^${value}(${linearTerm}−x²)dx=${value ** 3}/6。`,
     },
     'x-axis-rotation': {
       pattern,
       prompt: '曲線とx軸、x=0、x=1で囲まれた領域をx軸の周りに回転させた立体の体積を求める。',
-      expression: `y=x^{${value}}\\quad(0\\le x\\le1)`,
+      expression: `y=${powerTerm}\\quad(0\\le x\\le1)`,
       answer: Math.PI / (2 * value + 1),
-      explanation: `円板法で V=π∫₀¹(x^${value})²dx=π/${2 * value + 1}。`,
+      explanation: `円板法で V=π∫₀¹(${value === 1 ? 'x' : `x^${value}`})²dx=π/${2 * value + 1}。`,
     },
     'y-axis-rotation': {
       pattern,

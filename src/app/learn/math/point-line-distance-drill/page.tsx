@@ -4,8 +4,8 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { generatePointLineDistanceProblem, type PointLinePattern, type PointLineProblem } from '@/src/lib/pointLineDistance';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -22,20 +22,8 @@ function MathText({ text }: { text: string }) {
   );
 }
 
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  a: number;
-  b: number;
-  c: number;
-  px: number;
-  py: number;
-  ans1: number | string; // distance or k1
-  ans2?: number | string; // k2 for pattern 4
-  questionText: string;
-}
+type Pattern = PointLinePattern;
+type ProblemData = PointLineProblem;
 
 function formatSignedProduct(coefficient: number, value: number, first = false) {
   const product = coefficient * value;
@@ -50,110 +38,8 @@ function formatSignedConstant(value: number) {
   return ` ${value < 0 ? '−' : '+'} ${Math.abs(value)}`;
 }
 
-const triples = [
-  { a: 3, b: 4 }, { a: 4, b: 3 },
-  { a: 5, b: 12 }, { a: 12, b: 5 },
-  { a: 8, b: 15 }, { a: 15, b: 8 }
-];
-
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    const t = triples[Math.floor(Math.random() * triples.length)];
-    const a = t.a * (Math.random() > 0.5 ? 1 : -1);
-    const b = t.b * (Math.random() > 0.5 ? 1 : -1);
-    const dist = Math.sqrt(a*a + b*b);
-    let px = 0, py = 0, c = 0;
-    
-    if (p === 'pattern1') {
-      c = Math.floor(Math.random() * 50) - 25;
-      if (c === 0) continue;
-      let dStr = `${Math.abs(c)}/${dist}`;
-      if (c % dist === 0) dStr = `${Math.abs(c) / dist}`;
-      
-      const signC = c > 0 ? `+${c}` : `${c}`;
-      return { 
-        pattern: p, a, b, c, px: 0, py: 0, 
-        ans1: dStr, 
-        questionText: `原点 $(0,0)$ と 直線 $${a}x ${b>0?'+':''}${b}y ${signC} = 0$ の距離 $d$ を求めよ。`
-      };
-    } 
-    else if (p === 'pattern2') {
-      px = Math.floor(Math.random() * 10) - 5;
-      py = Math.floor(Math.random() * 10) - 5;
-      c = Math.floor(Math.random() * 50) - 25;
-      const num = Math.abs(a * px + b * py + c);
-      if (num === 0) continue; // point on line
-      
-      let dStr = `${num}/${dist}`;
-      if (num % dist === 0) dStr = `${num / dist}`;
-      
-      const signC = c > 0 ? `+${c}` : (c < 0 ? `${c}` : '');
-      return { 
-        pattern: p, a, b, c, px, py, 
-        ans1: dStr, 
-        questionText: `点 $(${px}, ${py})$ と 直線 $${a}x ${b>0?'+':''}${b}y ${signC} = 0$ の距離 $d$ を求めよ。`
-      };
-    }
-    else if (p === 'pattern3') {
-      // y = mx + n form
-      px = Math.floor(Math.random() * 10) - 5;
-      py = Math.floor(Math.random() * 10) - 5;
-      c = Math.floor(Math.random() * 30) - 15;
-      
-      // ax + by + c = 0 => by = -ax - c => y = (-a/b)x - c/b
-      // To make it look like a nice y = mx + n, let's just write the string
-      const num = Math.abs(a * px + b * py + c);
-      if (num === 0) continue;
-      
-      let dStr = `${num}/${dist}`;
-      if (num % dist === 0) dStr = `${num / dist}`;
-      
-      let mStr = "";
-      if (-a % b === 0) mStr = `${-a/b}`;
-      else if (b * -a > 0) mStr = `\\frac{${Math.abs(a)}}{${Math.abs(b)}}`;
-      else mStr = `-\\frac{${Math.abs(a)}}{${Math.abs(b)}}`;
-      if (mStr === "1") mStr = "";
-      if (mStr === "-1") mStr = "-";
-      
-      let nStr = "";
-      if (-c % b === 0) nStr = `${-c/b}`;
-      else if (b * -c > 0) nStr = `+\\frac{${Math.abs(c)}}{${Math.abs(b)}}`;
-      else nStr = `-\\frac{${Math.abs(c)}}{${Math.abs(b)}}`;
-      if (-c % b === 0 && -c/b > 0 && nStr[0] !== '+') nStr = "+" + nStr;
-      
-      return { 
-        pattern: p, a, b, c, px, py, 
-        ans1: dStr, 
-        questionText: `点 $(${px}, ${py})$ と 直線 $y = ${mStr}x ${nStr}$ の距離 $d$ を求めよ。`
-      };
-    }
-    else if (p === 'pattern4') {
-      // distance from (px, py) to ax+by+k=0 is distVal
-      px = Math.floor(Math.random() * 10) - 5;
-      py = Math.floor(Math.random() * 10) - 5;
-      const distVal = Math.floor(Math.random() * 4) + 1; // distance 1..4
-      // |a*px + b*py + k| / dist = distVal
-      // |a*px + b*py + k| = distVal * dist
-      const C_val = distVal * dist;
-      const base = a * px + b * py;
-      // base + k = C_val => k = C_val - base
-      // base + k = -C_val => k = -C_val - base
-      let k1 = C_val - base;
-      let k2 = -C_val - base;
-      // return smaller as ans1, larger as ans2
-      if (k1 > k2) { const t=k1; k1=k2; k2=t; }
-      
-      return { 
-        pattern: p, a, b, c: k1, px, py, // c is arbitrary here, we'll just store k1 for drawing if needed
-        ans1: k1.toString(), ans2: k2.toString(),
-        questionText: `点 $(${px}, ${py})$ と 直線 $${a}x ${b>0?'+':''}${b}y + k = 0$ の距離が $${distVal}$ のとき、定数 $k$ の値を求めよ。（カンマ区切りで2つ入力）`
-      };
-    }
-  }
+  return generatePointLineDistanceProblem(selectedPattern);
 }
 
 export default function PointLineDistanceDrill() {

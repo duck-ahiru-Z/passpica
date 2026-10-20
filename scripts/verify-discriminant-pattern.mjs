@@ -1,4 +1,5 @@
 import { randomOrderedDistinctPair } from '../src/lib/math/randomOrderedDistinctPair.ts';
+import fs from 'node:fs';
 
 let state = 0x5eed1234;
 const coveredPairs = new Set();
@@ -26,6 +27,11 @@ for (let index = 0; index < 10000; index += 1) {
 
 if (coveredPairs.size !== 36) {
   throw new Error(`expected all 36 possible boundary pairs, observed ${coveredPairs.size}`);
+}
+
+const drillPage = fs.readFileSync('src/app/learn/math/discriminant-drill/page.tsx', 'utf8');
+if (!drillPage.includes('min="-15" max="15" step="0.01"')) {
+  throw new Error('the graph slider must support precise fractional tangency values');
 }
 
 console.log(`Discriminant pattern verified: 10,000 valid outputs covering all ${coveredPairs.size} boundary pairs, with matching no-root intervals.`);

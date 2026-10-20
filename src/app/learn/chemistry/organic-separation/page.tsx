@@ -229,10 +229,10 @@ export default function OrganicSeparationPage() {
               スルホン酸 ＞ カルボン酸 ＞ 炭酸 ＞ フェノール
             </div>
 
-            <p className="text-gray-600 text-[11px]">
-              - **強塩基(NaOH)** を加えると、安息香酸とフェノールの**両方**が塩を作って水に溶けます。<br/>
-              - **弱塩基(NaHCO3)** を加えると、炭酸より強い酸である安息香酸**のみ**が塩を作り、フェノールは塩を作らず遊離します。この中和選択性を利用して二者を分離します。
-            </p>
+            <ul className="list-disc pl-5 text-gray-600 text-[11px] space-y-2">
+              <li><strong>強塩基（NaOH）</strong>を加えると、安息香酸とフェノールの<strong>両方</strong>が塩を作って水層へ移動します。</li>
+              <li><strong>弱塩基（NaHCO₃）</strong>を加えると、炭酸より強い酸である安息香酸<strong>のみ</strong>が塩を作り、フェノールはエーテル層に残ります。この中和選択性を利用して二者を分離します。</li>
+            </ul>
           </div>
 
         </div>

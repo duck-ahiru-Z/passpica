@@ -76,6 +76,7 @@ export function generateQuadraticInequalityProblem(
       const value1 = root1.num / root1.den;
       const value2 = root2.num / root2.den;
       if (value1 === value2) continue;
+      if (pattern === 'pattern3' && (root1.den === 1 || root2.den === 1)) continue;
 
       roots = value1 < value2 ? [root1, root2] : [root2, root1];
       a = p * r;

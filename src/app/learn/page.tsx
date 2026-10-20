@@ -27,7 +27,8 @@ const CONTENTS: LearningContent[] = [
     description: '角度θの変化に応じて、sin・cos・tan の長さが円の上でリアルタイムに伸び縮みする動的グラフ。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/math/trigonometry'
+    link: '/learn/math/trigonometry',
+    practiceLink: '/learn/math/trig-identity-drill'
   },
   {
     slug: 'trigonometry-graph',
@@ -263,7 +264,8 @@ const CONTENTS: LearningContent[] = [
     description: 'pHスライダーを動かし、フェノールフタレインなどの指示薬の色の変化と、中和点の特性を理解します。',
     difficulty: '基礎',
     type: '実験シミュレータ',
-    link: '/learn/chemistry/acid-base'
+    link: '/learn/chemistry/acid-base',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
   {
     slug: 'metal-ion',

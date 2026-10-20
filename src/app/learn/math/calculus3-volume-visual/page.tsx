@@ -52,7 +52,7 @@ export default function Calculus3VolumeVisualPage() {
       <section className="retro-box bg-white p-4 space-y-4">
         <p className="text-slate-600 leading-relaxed">曲線 y=x² と x軸にはさまれた領域を x軸のまわりに回転します。左の領域が右の立体になり、位置 x の断面は半径 x² の円板です。</p>
         <div className="border border-slate-300 bg-slate-50 p-2 overflow-x-auto">
-          <svg viewBox={`0 0 ${W} ${H}`} className="block w-full min-w-[600px] h-auto" role="img" aria-label={`y=x²をx軸の周りに回転した立体の模式図。区間0から${upper.toFixed(2)}、断面円板数${sliceCount}。正確な体積は${exact.toFixed(4)}、右端円板和は${rightSum.toFixed(4)}。`}>
+          <svg viewBox={`0 0 ${W} ${H}`} className="block w-full min-w-[600px] h-auto" role="img" aria-label={`y=x²をx軸の周りに回転した立体の模式図。区間0から${upper.toFixed(2)}、右端円板和の分割数${sliceCount}。正確な体積は${exact.toFixed(4)}、右端円板和は${rightSum.toFixed(4)}。`}>
             <line x1="34" y1={leftY(0)} x2="326" y2={leftY(0)} stroke="#64748b" />
             <line x1={leftX(0)} y1="36" x2={leftX(0)} y2="286" stroke="#64748b" />
             <path d={regionPath} fill="#bfdbfe" />

@@ -15,7 +15,7 @@ const questions: Record<Math2Area, Math2Question[]> = {
     { area: 'calculus', prompt: '曲線 y=x と y=x² に囲まれた面積を求める前に確認することは？', answer: '交点と上下関係', options: ['交点と上下関係', '導関数の最大値だけ', '不定積分の定数', '接線の傾き'], explanation: '交点で積分区間を決め、区間内で上の関数−下の関数を積分する。' },
   ],
   trig: [
-    { area: 'trig', prompt: 'sin 2x を sin x、cos x で表すときに使う公式は？', answer: '二倍角公式', options: ['二倍角公式', '加法定理だけ', '半角公式', '正弦定理'], explanation: 'sin 2x=2 sin x cos x。' },
+    { area: 'trig', prompt: 'sin 2x を sin x、cos x で表すときに使う公式は？', answer: '二倍角公式', options: ['二倍角公式', '余弦定理', '半角公式', '正弦定理'], explanation: '二倍角公式 sin 2x=2 sin x cos x を使う。加法定理からも導けるが、この形に直接対応する公式は二倍角公式。' },
     { area: 'trig', prompt: 'sin x+cos x の最大値を求めるときの基本方針は？', answer: '三角関数の合成', options: ['三角関数の合成', '相互関係で cos x を消去', '二倍角で積にする', '正弦定理'], explanation: '√2 sin(x+π/4) と合成すると最大値は √2。' },
     { area: 'trig', prompt: '0≤x<2π で 2sin x=1 を解くとき、解の範囲を絞るのに見るものは？', answer: '単位円で sin の符号と値を確認', options: ['単位円で sin の符号と値を確認', 'cos の加法定理', '三角形の余弦定理', '周期を無視して逆関数だけ使う'], explanation: 'sin x=1/2 となる単位円上の2点から x=π/6、5π/6。' },
     { area: 'trig', prompt: 'tan x=√3、0<x<π/2 の解を求めるときの基本方針は？', answer: '基本角と tan の値を対応させる', options: ['基本角と tan の値を対応させる', '正弦定理', '二倍角で sin を消す', '周期を無視する'], explanation: 'tan(π/3)=√3 で範囲内なので x=π/3。' },

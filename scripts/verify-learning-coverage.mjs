@@ -31,6 +31,21 @@ const requiredVisuals = [
 ];
 
 const drillEntries = readPortalEntries(drill);
+const practiceModeDescriptions = [
+  'calculus-drill', 'symmetric-polynomial-drill', 'vector-drill', 'circle-tangent-drill',
+  'completing-square-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
+  'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
+  'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill',
+];
+for (const slug of practiceModeDescriptions) {
+  const slugIndex = drill.indexOf(`slug: '${slug}'`);
+  const cardStart = drill.lastIndexOf('  {', slugIndex);
+  const cardEnd = drill.indexOf('\n  },', slugIndex);
+  const description = drill.slice(cardStart, cardEnd);
+  if (!description.includes('個別') || !description.includes('ランダム')) {
+    throw new Error(`A drill with focused and mixed modes must explain both in its portal card: ${slug}`);
+  }
+}
 for (const filter of ['aria-label="科目で絞り込む"', 'aria-label="難易度で絞り込む"']) {
   if (!drill.includes(filter)) throw new Error(`Drill portal filter group must have an accessible name: ${filter}`);
 }
@@ -54,6 +69,13 @@ for (const slug of requiredVisuals) {
 for (const entry of learnEntries) {
   const file = routeFile(entry.link);
   if (!file || !fs.existsSync(file)) throw new Error(`Missing learning page for ${entry.slug}: ${entry.link}`);
+}
+const practiceLinks = [...learn.matchAll(/practiceLink:\s*'([^']+)'/g)].map(match => match[1]);
+for (const link of practiceLinks) {
+  const file = routeFile(link);
+  if (!link.endsWith('-drill') || !file || !fs.existsSync(file)) {
+    throw new Error(`Learning portal practice link must target an existing drill: ${link}`);
+  }
 }
 const organic3dPage = fs.readFileSync(routeFile(learnEntries.find(entry => entry.slug === 'organic-3d').link), 'utf8');
 if (!learn.includes("title: '有機・高分子3D分子モデルビューア（立体構造）'")
@@ -156,4 +178,4 @@ const unlistedDrills = pages
   .filter(route => !linkedDrillRoutes.has(route));
 if (unlistedDrills.length > 0) throw new Error(`Math drill pages missing from the portal: ${unlistedDrills.join(', ')}`);
 
-console.log(`Learning coverage verified: ${drillEntries.length} linked drills, ${learnEntries.length} linked learning pages (${requiredVisuals.length} required visuals), ${patternPages.length} fixed-plus-mixed pattern drills across all subjects, ${mathPages.length} math learning pages audited.`);
+console.log(`Learning coverage verified: ${drillEntries.length} linked drills, ${practiceLinks.length} linked practice drills, ${learnEntries.length} linked learning pages (${requiredVisuals.length} required visuals), ${patternPages.length} fixed-plus-mixed pattern drills across all subjects, ${mathPages.length} math learning pages audited.`);

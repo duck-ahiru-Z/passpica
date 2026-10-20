@@ -20,6 +20,9 @@ function verifyBank(areas, generate, name) {
       if (question.area !== area || question.options.length !== 4 || new Set(question.options).size !== 4 || !question.options.includes(question.answer) || !question.explanation.trim()) {
         throw new Error(`invalid question or answer key in ${name}/${area}: ${JSON.stringify(question)}`);
       }
+      if (name === 'Math II' && question.prompt.startsWith('sin 2x を sin x、cos x で表す') && question.options.includes('加法定理だけ')) {
+        throw new Error('a mathematically valid route to the answer must not be marked as a distractor');
+      }
       prompts.add(question.prompt);
     }
     if (prompts.size !== 5) throw new Error(`${name}/${area} generated ${prompts.size}/5 expected variants`);

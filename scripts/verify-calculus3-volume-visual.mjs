@@ -9,6 +9,9 @@ if (!page.includes('y=x²') || !page.includes('断面積 A(x)') || !page.include
 if (!page.includes('aria-label={`y=x²をx軸の周りに回転') || !page.includes('aria-label="回転区間の上端"') || !page.includes('aria-label="円板の分割数"')) {
   throw new Error('volume visual must provide accessible descriptions for the figure and controls');
 }
+if (!page.includes('右端円板和の分割数${sliceCount}') || page.includes('断面円板数${sliceCount}')) {
+  throw new Error('the figure description must identify n as the numerical approximation partition count, not the number of drawn cross-sections');
+}
 
 const close = (actual, expected, tolerance = 1e-10) => Math.abs(actual - expected) <= tolerance;
 for (const x of [0, 0.25, 0.5, 1, 1.5, 2]) {

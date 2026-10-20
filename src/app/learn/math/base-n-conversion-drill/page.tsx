@@ -4,81 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
+import { generateBaseNProblem, type BaseNPattern } from '@/src/lib/baseNConversion';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  n: number;
-  m?: number;
-  q_val: number | string; // The number shown in the question
-  a_val: string; // The correct answer (string to handle bases like '101')
-  dec_val: number; // The decimal value internally
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    if (p === 'pattern1') {
-      // 10進数 -> n進数
-      const dec = Math.floor(Math.random() * 191) + 10; // 10 - 200
-      const n = Math.floor(Math.random() * 8) + 2; // 2 - 9
-      return { pattern: p, n, q_val: dec, a_val: dec.toString(n), dec_val: dec };
-    } 
-    else if (p === 'pattern2') {
-      // n進数 -> 10進数
-      const n = Math.floor(Math.random() * 8) + 2; // 2 - 9
-      // 桁数 3〜4
-      const len = Math.floor(Math.random() * 2) + 3;
-      let dec = 0;
-      let n_str = '';
-      for (let i = 0; i < len; i++) {
-        const maxDig = i === 0 ? n - 1 : n;
-        const minDig = i === 0 ? 1 : 0;
-        const d = Math.floor(Math.random() * (maxDig - minDig + 1)) + minDig;
-        n_str += d.toString();
-      }
-      dec = parseInt(n_str, n);
-      return { pattern: p, n, q_val: n_str, a_val: dec.toString(), dec_val: dec };
-    }
-    else if (p === 'pattern3') {
-      // n進数 -> m進数
-      const n = Math.floor(Math.random() * 8) + 2;
-      const m = Math.floor(Math.random() * 8) + 2;
-      if (n === m) continue;
-      const dec = Math.floor(Math.random() * 40) + 10; // 10 - 50 (小さめ)
-      return { pattern: p, n, m, q_val: dec.toString(n), a_val: dec.toString(m), dec_val: dec };
-    }
-    else if (p === 'pattern4') {
-      // 10進数の小数 -> n進数
-      const allowedN = [2, 4, 5, 8];
-      const n = allowedN[Math.floor(Math.random() * allowedN.length)];
-      // 2 digits max in base n for simplicity
-      const d1 = Math.floor(Math.random() * n);
-      let d2 = Math.floor(Math.random() * n);
-      if (d1 === 0 && d2 === 0) continue;
-      if (d2 === 0) d2 = 1; // force 2 digits or handle
-      
-      const val = d1 / n + d2 / (n * n);
-      let a_str = `0.${d1}${d2}`;
-      // Clean up trailing zeros
-      if (d2 === 0) a_str = `0.${d1}`;
-      
-      return { pattern: p, n, q_val: val, a_val: a_str, dec_val: val };
-    }
-  }
-}
+type Pattern = BaseNPattern;
+const generateProblem = generateBaseNProblem;
 
 export default function BaseNConversionDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
@@ -141,7 +76,6 @@ export default function BaseNConversionDrill() {
       let tex = "\\begin{array}{r|rr}\n";
       for (let i = 0; i < lines.length - 1; i++) {
         tex += `${lines[i].div} & ${lines[i].val} & \\cdots ${lines[i].rem} \\\\\n`;
-        tex += `\\cline{2-2}\n`;
       }
       tex += `  & ${lines[lines.length-1].val} & \\\\\n`;
       tex += "\\end{array}";
@@ -204,7 +138,6 @@ export default function BaseNConversionDrill() {
       let tex = "\\begin{array}{r|rr}\n";
       for (let i = 0; i < lines.length - 1; i++) {
         tex += `${lines[i].div} & ${lines[i].val} & \\cdots ${lines[i].rem} \\\\\n`;
-        tex += `\\cline{2-2}\n`;
       }
       tex += `  & ${lines[lines.length-1].val} & \\\\\n`;
       tex += "\\end{array}";

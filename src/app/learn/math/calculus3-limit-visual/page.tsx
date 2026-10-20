@@ -2,13 +2,10 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
+import { sineRatioForNonzeroRadians } from '@/src/lib/calculus3LimitVisual';
 
 const WIDTH = 620;
 const HEIGHT = 300;
-
-function ratio(x: number) {
-  return x === 0 ? 1 : Math.sin(x) / x;
-}
 
 export default function Calculus3LimitVisualPage() {
   const [x, setX] = useState(0.8);
@@ -19,12 +16,12 @@ export default function Calculus3LimitVisualPage() {
     const points = Array.from({ length: 161 }, (_, index) => -3.2 + index * 0.04).filter(value => Math.abs(value) > 1e-9);
     const left = points.filter(value => value < 0);
     const right = points.filter(value => value > 0);
-    const pathFor = (side: number[]) => side.map((value, index) => `${index === 0 ? 'M' : 'L'} ${sx(value).toFixed(1)} ${sy(ratio(value)).toFixed(1)}`).join(' ');
+    const pathFor = (side: number[]) => side.map((value, index) => `${index === 0 ? 'M' : 'L'} ${sx(value).toFixed(1)} ${sy(sineRatioForNonzeroRadians(value)).toFixed(1)}`).join(' ');
     return `${pathFor(left)} ${pathFor(right)}`;
   }, []);
 
-  const current = ratio(x);
-  const mirrored = ratio(-x);
+  const current = sineRatioForNonzeroRadians(x);
+  const mirrored = sineRatioForNonzeroRadians(-x);
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
@@ -39,7 +36,7 @@ export default function Calculus3LimitVisualPage() {
       <section className="retro-box bg-white p-4 space-y-4">
         <div>
           <h2 className="font-bold text-base">xを0へ近づけると、値はどこへ近づく？</h2>
-          <p className="text-slate-600 mt-1 leading-relaxed">スライダーを動かして、左右から近づく点と y = 1 の関係を観察します。x = 0 では式を直接割れませんが、極限値は読み取れます。</p>
+          <p className="text-slate-600 mt-1 leading-relaxed">xはラジアンで測ります。スライダーを動かして、左右から近づく点と y = 1 の関係を観察します。x = 0 では式を直接割れませんが、極限値は読み取れます。</p>
         </div>
         <div className="border border-slate-300 bg-slate-50 p-2">
           <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="block w-full h-auto" role="img" aria-label="sin x を x で割った関数のグラフ。x=0では関数は定義されず、極限値1に白抜きの点があります。">
@@ -59,8 +56,8 @@ export default function Calculus3LimitVisualPage() {
         </div>
 
         <label className="block space-y-2">
-          <span className="font-bold">x = ±{x.toFixed(2)} に近づける</span>
-          <input aria-label="xの大きさ" type="range" min="0.05" max="2.8" step="0.05" value={x} onChange={(event) => setX(Number(event.target.value))} className="w-full accent-blue-600" />
+          <span className="font-bold">x（ラジアン）= ±{x.toFixed(2)} に近づける</span>
+          <input aria-label="x（ラジアン）の大きさ" type="range" min="0.05" max="2.8" step="0.05" value={x} onChange={(event) => setX(Number(event.target.value))} className="w-full accent-blue-600" />
         </label>
 
         <div className="grid sm:grid-cols-3 gap-2">

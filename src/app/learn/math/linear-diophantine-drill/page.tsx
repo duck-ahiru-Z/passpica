@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateLinearDiophantineProblem, type LinearDiophantinePattern, type LinearDiophantineProblem } from '@/src/lib/linearDiophantine';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictInteger } from '@/src/lib/strictInteger';
 
@@ -13,86 +13,11 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-function extGCD(a: number, b: number): { g: number, x: number, y: number } {
-  let x0 = 1, y0 = 0, x1 = 0, y1 = 1;
-  let r0 = a, r1 = b;
-  while (r1 !== 0) {
-    const q = Math.floor(r0 / r1);
-    const r2 = r0 % r1;
-    const x2 = x0 - q * x1;
-    const y2 = y0 - q * y1;
-    r0 = r1; r1 = r2;
-    x0 = x1; x1 = x2;
-    y0 = y1; y1 = y2;
-  }
-  return { g: r0, x: x0, y: y0 };
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  A: number;
-  B: number;
-  C: number;
-  x0: number; // A reference solution
-  y0: number; // A reference solution
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    let a = 0, b = 0, c = 1;
-    if (p === 'pattern1') {
-      a = Math.floor(Math.random() * 8) + 2; // 2-9
-      b = Math.floor(Math.random() * 8) + 2; // 2-9
-    } else if (p === 'pattern2') {
-      a = Math.floor(Math.random() * 89) + 11; // 11-99
-      b = Math.floor(Math.random() * 89) + 11; // 11-99
-    } else if (p === 'pattern3') {
-      a = Math.floor(Math.random() * 20) + 5; 
-      b = Math.floor(Math.random() * 20) + 5;
-      c = Math.floor(Math.random() * 5) + 2; // 2-6
-    } else if (p === 'pattern4') {
-      a = Math.floor(Math.random() * 20) + 5;
-      b = -(Math.floor(Math.random() * 20) + 5); // negative B
-    }
-
-    if (gcd(a, b) === 1) {
-      // Find a solution
-      let { x, y } = extGCD(Math.abs(a), Math.abs(b));
-      
-      // adjust signs
-      if (a < 0) x = -x;
-      if (b < 0) y = -y;
-      
-      // scale for C
-      x *= c;
-      y *= c;
-
-      return { pattern: p, A: a, B: b, C: c, x0: x, y0: y };
-    }
-  }
-}
+type Pattern = LinearDiophantinePattern;
 
 export default function LinearDiophantineDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<LinearDiophantineProblem>(() => generateLinearDiophantineProblem('mix'));
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
@@ -197,7 +122,7 @@ export default function LinearDiophantineDrill() {
   }, [drawGraph]);
 
   const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+    setProblem(generateLinearDiophantineProblem(selectedPattern));
     setAnsX('');
     setAnsY('');
     setHasChecked(false);
@@ -258,9 +183,10 @@ export default function LinearDiophantineDrill() {
               <h2 className="text-sm font-bold">
                 ■ 問題
               </h2>
-              <select 
+              <select
+                aria-label="一次不定方程式のパターン選択"
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateLinearDiophantineProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -333,6 +259,7 @@ export default function LinearDiophantineDrill() {
                 ref={canvasRef} 
                 width={360} 
                 height={200} 
+                aria-label={`格子点を示す直線 ${problem.A}x ${problem.B > 0 ? '+' : ''}${problem.B}y = ${problem.C}。既知の解(${problem.x0},${problem.y0})から(B,-A)=(${problem.B},${-problem.A})ずつ移動した整数解を描いています。`}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>

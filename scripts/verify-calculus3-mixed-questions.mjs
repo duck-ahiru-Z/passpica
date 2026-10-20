@@ -7,8 +7,11 @@ const areas = ['limit', 'differentiation', 'curve-analysis', 'integral', 'geomet
 const patternCounts = { limit: 7, differentiation: 7, 'curve-analysis': 6, integral: 5, geometry: 5, 'differential-equation': 4 };
 const areaLabels = { limit: '極限', differentiation: '微分法', 'curve-analysis': '曲線分析', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式' };
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-mixed-drill/page.tsx'), 'utf8');
-for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}']) {
+for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}', 'acceptedAnswers.includes(answer)', 'question.alternativeExplanations?.[answer]']) {
   if (!drillPage.includes(requirement)) throw new Error(`Math III mixed drill is missing expected UI behavior: ${requirement}`);
+}
+if (!drillPage.includes("mode === 'all' ? '解法選択' : '方針を選択'")) {
+  throw new Error('the mixed practice mode must clearly label its strategy-selection task');
 }
 if (drillPage.includes('aria-pressed=') || drillPage.includes('question.options.map(option => <button')) {
   throw new Error('single-choice method selection must be exposed as a radio group');
@@ -20,6 +23,9 @@ const validateQuestion = question => {
   if (!question.prompt.trim() || !question.explanation.trim() || !question.expression.trim()) throw new Error(`question content must not be empty: ${question.pattern}`);
   if (question.options.length !== patternCounts[question.area] || new Set(question.options).size !== question.options.length) throw new Error(`unexpected unique options for ${question.pattern}`);
   if (question.options.filter(option => option === question.answer).length !== 1) throw new Error(`answer must occur exactly once for ${question.pattern}`);
+  for (const answer of question.acceptedAnswers ?? [question.answer]) {
+    if (!question.options.includes(answer)) throw new Error(`accepted method is missing from the options for ${question.pattern}: ${answer}`);
+  }
   if (question.pattern === 'geometry:x-axis-rotation' && !question.prompt.includes('xで積分')) throw new Error('x-axis disk-method prompts must specify integration with respect to x');
   if (question.pattern === 'geometry:y-axis-rotation' && !question.prompt.includes('yで積分')) throw new Error('y-axis washer-method prompts must specify integration with respect to y');
   if (question.pattern === 'geometry:shell-method' && !question.prompt.includes('xで積分')) throw new Error('shell-method prompts must specify integration with respect to x');
@@ -37,6 +43,23 @@ for (let index = 0; index < allQuestions.length; index += areas.length) {
 }
 for (const area of areas) {
   if (allPatterns.get(area).size !== patternCounts[area]) throw new Error(`${area} exposes ${allPatterns.get(area).size}/${patternCounts[area]} lower-level patterns in the full-range picker`);
+}
+
+const geometryPicker = createCalculus3MixedQuestionPicker();
+const geometryQuestions = Array.from({ length: 500 }, () => geometryPicker.next('geometry'));
+const washerQuestion = geometryQuestions.find(question => question.pattern === 'geometry:y-axis-rotation');
+const shellQuestion = geometryQuestions.find(question => question.pattern === 'geometry:shell-method');
+if (!washerQuestion || !shellQuestion) throw new Error('geometry mode must generate both y-axis rotation patterns');
+for (const question of [washerQuestion, shellQuestion]) {
+  const expectedMethods = question.pattern === 'geometry:y-axis-rotation'
+    ? ['y軸回転体の体積（円環法）', 'y軸回転体の体積（円筒殻法）']
+    : ['y軸回転体の体積（円筒殻法）', 'y軸回転体の体積（円環法）'];
+  if (JSON.stringify(question.acceptedAnswers) !== JSON.stringify(expectedMethods)) {
+    throw new Error(`${question.pattern} must accept both equivalent methods: ${JSON.stringify(question.acceptedAnswers)}`);
+  }
+  if (expectedMethods.slice(1).some(method => !question.alternativeExplanations?.[method]?.trim())) {
+    throw new Error(`${question.pattern} must explain each valid alternate method`);
+  }
 }
 
 for (const area of areas) {
