@@ -3,7 +3,7 @@ import { mechanicalEnergyGravity } from './mechanicalEnergy.ts';
 
 export type MotionPattern = 'speed' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring';
 export type MotionMode = MotionPattern | 'mix';
-export type MotionProblem = { pattern: MotionPattern; question: string; answer: number; unit: string; explanation: string };
+export type MotionProblem = { pattern: MotionPattern; question: string; answer: number; unit: string; explanation: string; alternativeExplanations?: Partial<Record<MotionPattern, string>> };
 
 export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring'];
 export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの力' };
@@ -53,6 +53,14 @@ const variants = {
 const displayNumber = (value: number) => Number(value.toFixed(6)).toString();
 export const formatMotionAnswer = displayNumber;
 
+export function isMotionMethodValid(problem: MotionProblem, method: MotionPattern | ''): boolean {
+  return method === problem.pattern || Boolean(method && problem.alternativeExplanations?.[method]);
+}
+
+export function getMotionExplanation(problem: MotionProblem, method: MotionPattern | ''): string {
+  return (method && problem.alternativeExplanations?.[method]) || problem.explanation;
+}
+
 function angleCosine(angle: number): number {
   if (angle === 0) return 1;
   if (angle === 60) return 0.5;
@@ -94,7 +102,7 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
     }
     case 'energyConservation': {
       const value = variants.energyConservation.next(random); const answer = Math.sqrt(2 * value.gravity * value.height);
-      return { pattern, question: `質量 ${value.mass} kg の物体を高さ ${value.height} m から静かに落とす。空気抵抗を無視し、g=${value.gravity} m/s² とする。地面直前の速さは？`, answer, unit: 'm/s', explanation: `力学的エネルギー保存より mgh=(1/2)mv²。質量 m が消え、v=√(2gh)=√(2×${value.gravity}×${value.height})=${displayNumber(answer)} m/s。` };
+      return { pattern, question: `質量 ${value.mass} kg の物体を高さ ${value.height} m から静かに落とす。空気抵抗を無視し、g=${value.gravity} m/s² とする。地面直前の速さは？`, answer, unit: 'm/s', explanation: `力学的エネルギー保存より mgh=(1/2)mv²。質量 m が消え、v=√(2gh)=√(2×${value.gravity}×${value.height})=${displayNumber(answer)} m/s。`, alternativeExplanations: { freefall: `自由落下の運動公式 v²=v₀²+2gh を使う。静かに落とすので v₀=0、したがって v=√(2×${value.gravity}×${value.height})=${displayNumber(answer)} m/s。` } };
     }
     case 'spring': {
       const value = variants.spring.next(random); const answer = value.constant * value.extension;

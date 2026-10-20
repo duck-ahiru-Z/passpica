@@ -26,6 +26,15 @@ if (!drillPage.includes('<= 0.0005 + 1e-12') || !drillPage.includes('小数第3�
 }
 
 const stableRandom = () => 0.37;
+const reducedFraction = (numerator, denominator) => {
+  let left = Math.abs(numerator);
+  let right = Math.abs(denominator);
+  while (right !== 0) [left, right] = [right, left % right];
+  const divisor = left || 1;
+  const reducedNumerator = numerator / divisor;
+  const reducedDenominator = denominator / divisor;
+  return reducedDenominator === 1 ? String(reducedNumerator) : `${reducedNumerator}/${reducedDenominator}`;
+};
 const checks = {
   'between-curves': problem => {
     const [, coefficient] = problem.expression.match(/y=(\d*)x/);
@@ -33,7 +42,7 @@ const checks = {
     const linearTerm = value === 1 ? 'x' : `${value}x`;
     return Math.abs(problem.answer - value ** 3 / 6) < 1e-12
       && problem.explanation.includes(`区間内では ${linearTerm} が上`)
-      && problem.explanation.includes(`∫₀^${value}(${linearTerm}−x²)dx`);
+      && problem.explanation.includes(`∫₀^${value}(${linearTerm}−x²)dx=${reducedFraction(value ** 3, 6)}。`);
   },
   'x-axis-rotation': problem => {
     const [, exponent] = problem.expression.match(/y=x(?:\^\{(\d+)\})?/);

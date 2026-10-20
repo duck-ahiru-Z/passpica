@@ -32,6 +32,16 @@ const variants = {
   'curve-length': new BalancedRandom([1, 2, 3, 4, 5]),
 };
 
+function formatReducedFraction(numerator: number, denominator: number): string {
+  let left = Math.abs(numerator);
+  let right = Math.abs(denominator);
+  while (right !== 0) [left, right] = [right, left % right];
+  const divisor = left || 1;
+  const reducedNumerator = numerator / divisor;
+  const reducedDenominator = denominator / divisor;
+  return reducedDenominator === 1 ? String(reducedNumerator) : `${reducedNumerator}/${reducedDenominator}`;
+}
+
 export function generateGeometryProblem(mode: GeometryMode, random = Math.random): GeometryProblem {
   const pattern = mode === 'mix' ? picker.next(random) : mode;
   const value = variants[pattern].next(random);
@@ -44,7 +54,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       expression: `y=${linearTerm},\\quad y=x^2\\quad(0\\le x\\le${value})`,
       accessibleExpression: `y イコール ${linearTerm === 'x' ? 'x' : `${value} x`}、y イコール x の 2 乗、x は 0 以上 ${value} 以下`,
       answer: value ** 3 / 6,
-      explanation: `区間内では ${linearTerm} が上、x² が下。∫₀^${value}(${linearTerm}−x²)dx=${value ** 3}/6。`,
+      explanation: `区間内では ${linearTerm} が上、x² が下。∫₀^${value}(${linearTerm}−x²)dx=${formatReducedFraction(value ** 3, 6)}。`,
     },
     'x-axis-rotation': {
       pattern,

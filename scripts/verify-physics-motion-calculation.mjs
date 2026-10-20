@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { formatMotionAnswer, generateMotionProblem, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
+import { formatMotionAnswer, generateMotionProblem, getMotionExplanation, isMotionMethodValid, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes('onClick={() => setMethod(pattern)}')) {
@@ -67,6 +67,9 @@ if (formatMotionAnswer(30.000000000000007) !== '30' || formatMotionAnswer(2.4492
 if (!drillPage.includes('Number(formatMotionAnswer(problem.answer))') || !drillPage.includes('小数第6位まで')) {
   throw new Error('rounded displayed answers must be accepted at the stated input precision');
 }
+if (!drillPage.includes('isMotionMethodValid(problem, method)') || !drillPage.includes('getMotionExplanation(problem, method)')) {
+  throw new Error('accepted alternative mechanics methods must be graded and explained with their own derivation');
+}
 
 for (const pattern of motionPatterns) {
   const questions = new Set();
@@ -76,6 +79,13 @@ for (const pattern of motionPatterns) {
     questions.add(problem.question);
   }
   if (questions.size !== 5) throw new Error(`${pattern} generated ${questions.size}/5 expected variants`);
+}
+
+const energyProblem = generateMotionProblem('energyConservation', stableRandom);
+if (!isMotionMethodValid(energyProblem, 'freefall')
+  || !getMotionExplanation(energyProblem, 'freefall').includes('v²=v₀²+2gh')
+  || isMotionMethodValid(energyProblem, 'work')) {
+  throw new Error('height-based drop problems must accept the equivalent free-fall kinematics method and show its derivation');
 }
 
 const mixed = Array.from({ length: 900 }, () => generateMotionProblem('mix', stableRandom).pattern);
