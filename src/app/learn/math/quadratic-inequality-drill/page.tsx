@@ -242,11 +242,11 @@ export default function QuadraticInequalityDrillPage() {
   })();
   const graphDescription = `${problem.eq} のグラフ。${problem.a > 0 ? '下に凸' : '上に凸'}の放物線で、x軸との交点は ${rootsLabel.join(' と ')}。${hasChecked ? `色付き部分が不等式を満たす範囲で、解は ${solutionLabel}。` : '解答後に不等式を満たす範囲が色付きで表示されます。'}`;
 
-  const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void) => (
+  const renderInputBox = (numState: string, setNum: (s:string)=>void, denState: string, setDen: (s:string)=>void, side: '左側の境界値' | '右側の境界値' | '境界値') => (
     <div className="flex flex-col items-center justify-center inline-flex align-middle">
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => { setNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+      <input type="text" aria-label={`${side}の分子`} className="w-10 border border-gray-400 p-1 text-center font-bold" value={numState} onChange={e => { setNum(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
       <div className="w-full border-b-2 border-slate-800 my-0.5"></div>
-      <input type="text" className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => { setDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
+      <input type="text" aria-label={`${side}の分母`} className="w-10 border border-gray-400 p-1 text-center font-bold bg-gray-50" value={denState} onChange={e => { setDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
     </div>
   );
 
@@ -323,7 +323,7 @@ export default function QuadraticInequalityDrillPage() {
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
                   <input type="radio" name="ansType" checked={userAnsType === 6} onChange={() => { setUserAnsType(6); setHasChecked(false); setIsCorrect(false); }} />
-                  <MathEq math="x \neq A \text{ のすべての実数}" />
+                  <><MathEq math="x \neq A" /> のすべての実数</>
                 </label>
                 <label className="flex items-center gap-2 border p-2 cursor-pointer hover:bg-blue-50">
                   <input type="radio" name="ansType" checked={userAnsType === 7} onChange={() => { setUserAnsType(7); setHasChecked(false); setIsCorrect(false); }} />
@@ -336,12 +336,12 @@ export default function QuadraticInequalityDrillPage() {
               </div>
 
               <div className="flex items-center justify-center h-16 text-lg font-bold">
-                {userAnsType === 1 && <>{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="mx-2"><MathEq math="< x <" /></span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den)}</>}
-                {userAnsType === 3 && <>{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="mx-2"><MathEq math="\le x \le" /></span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den)}</>}
-                {userAnsType === 2 && <>x <span className="mx-2"><MathEq math="<" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="mx-2">,</span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den)} <span className="mx-2"><MathEq math="<" /></span> x</>}
-                {userAnsType === 4 && <>x <span className="mx-2"><MathEq math="\le" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="mx-2">,</span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den)} <span className="mx-2"><MathEq math="\le" /></span> x</>}
-                {userAnsType === 5 && <>x <span className="mx-2"><MathEq math="=" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)}</>}
-                {userAnsType === 6 && <>x <span className="mx-2"><MathEq math="\neq" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den)} <span className="ml-2 text-sm font-normal">のすべての実数</span></>}
+                {userAnsType === 1 && <>{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den, '左側の境界値')} <span className="mx-2"><MathEq math="< x <" /></span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den, '右側の境界値')}</>}
+                {userAnsType === 3 && <>{renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den, '左側の境界値')} <span className="mx-2"><MathEq math="\le x \le" /></span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den, '右側の境界値')}</>}
+                {userAnsType === 2 && <>x <span className="mx-2"><MathEq math="<" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den, '左側の境界値')} <span className="mx-2">,</span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den, '右側の境界値')} <span className="mx-2"><MathEq math="<" /></span> x</>}
+                {userAnsType === 4 && <>x <span className="mx-2"><MathEq math="\le" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den, '左側の境界値')} <span className="mx-2">,</span> {renderInputBox(ans2Num, setAns2Num, ans2Den, setAns2Den, '右側の境界値')} <span className="mx-2"><MathEq math="\le" /></span> x</>}
+                {userAnsType === 5 && <>x <span className="mx-2"><MathEq math="=" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den, '境界値')}</>}
+                {userAnsType === 6 && <>x <span className="mx-2"><MathEq math="\neq" /></span> {renderInputBox(ans1Num, setAns1Num, ans1Den, setAns1Den, '境界値')} <span className="ml-2 text-sm font-normal">のすべての実数</span></>}
                 {userAnsType === 7 && <span className="text-blue-600">すべての実数</span>}
                 {userAnsType === 8 && <span className="text-red-600">解なし</span>}
               </div>
@@ -417,7 +417,7 @@ export default function QuadraticInequalityDrillPage() {
                   <div className="bg-gray-50 p-2 border">
                     <p>因数分解すると、左辺は <MathEq math={`= 0`} /> のとき、<MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}, \\quad ${problem.roots[1].den === 1 ? problem.roots[1].num : `\\frac{${problem.roots[1].num}}{${problem.roots[1].den}}`}`} /> となります。</p>
                     <p>{problem.a < 0 ? '変形後の式' : '左辺'}のグラフは、下に凸の放物線になります。</p>
-                    <p className="mt-2">今回は <MathEq math={inequalityRegion.boundary} /> 条件なので、x軸より「{inequalityRegion.side}」の部分を探します。</p>
+                    <p className="mt-2">今回は {inequalityRegion.boundary} 条件なので、x軸より「{inequalityRegion.side}」の部分を探します。</p>
                     <p>グラフの色付き部分に対応する $x$ の範囲が答えです。</p>
                   </div>
                 )}
@@ -426,7 +426,7 @@ export default function QuadraticInequalityDrillPage() {
                   <div className="bg-gray-50 p-2 border">
                     <p>{problem.a < 0 ? '変形後の左辺' : '左辺'}は完全平方式 <MathEq math={`${Math.abs(problem.a) === 1 ? '' : Math.abs(problem.a)}\\left(x ${problem.roots[0].num < 0 ? '+' : '-'} ${Math.abs(problem.roots[0].num)}\\right)^2`} /> になります。</p>
                     <p>判別式 <MathEq math="D=0" /> であり、放物線は x軸と <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> で接します。</p>
-                    <p className="mt-2">{problem.a < 0 ? '変形後のグラフから' : 'グラフから'}、<MathEq math={inequalityRegion.boundary} /> 条件を満たす $x$ を探します。</p>
+                    <p className="mt-2">{problem.a < 0 ? '変形後のグラフから' : 'グラフから'}、{inequalityRegion.boundary} 条件を満たす <MathEq math="x" /> を探します。</p>
                     <ul className="list-disc pl-4 mt-1">
                       {problem.ansType === 5 && <li>接点のみが条件を満たすため、答えは <MathEq math={`x = ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> となります。</li>}
                       {problem.ansType === 6 && <li>接点以外はすべて条件を満たすため、答えは <MathEq math={`x \\neq ${problem.roots[0].den === 1 ? problem.roots[0].num : `\\frac{${problem.roots[0].num}}{${problem.roots[0].den}}`}`} /> のすべての実数です。</li>}
