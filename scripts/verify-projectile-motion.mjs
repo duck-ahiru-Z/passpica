@@ -51,6 +51,7 @@ assert.equal(calculateProjectileState(0, 0.5).vy, -projectileGravity * calculate
 assert.ok(projectileInitialSpeed > 0 && projectileInitialHeight > 0);
 const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/projectile-visual/page.tsx'), 'utf8');
 assert.ok(visualPage.includes('Math.abs(vy) >= 0.01 ? <line') && visualPage.includes('sy(displayedY) + 30'), 'zero vertical speed should hide the velocity arrow and show a separate downward gravity arrow');
+assert.ok(visualPage.includes('Math.min(48, Math.max(18, Math.abs(vy) * 2.5))') && visualPage.includes('Math.sign(vy) * verticalVelocityArrowLength'), 'nonzero vertical velocity arrows should remain visible and follow the velocity sign');
 assert.ok(visualPage.includes("Math.abs(vy) < 0.01 ? '—'"), 'zero velocity should not be labeled with a false up/down direction');
 assert.ok(visualPage.includes('id="vertical-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z"'), 'vertical-vector arrowhead should point along its line after automatic rotation');
 assert.ok(visualPage.includes('↓ 重力加速度 g = {projectileGravity} m/s²'), 'zero-speed state should label the acceleration separately from velocity');
