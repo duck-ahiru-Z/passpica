@@ -3,7 +3,7 @@ import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
 export type IntegralPattern = 'substitution' | 'parts' | 'rational' | 'trig' | 'radical';
 export type IntegralMode = IntegralPattern | 'mix';
-export type IntegralProblem = { pattern: IntegralPattern; expression: string; answer: number; hint: string; explanation: string };
+export type IntegralProblem = { pattern: IntegralPattern; expression: string; answer: number; hint: string; explanation: string; alternativeStrategies?: Partial<Record<IntegralPattern, string>> };
 
 export const integralPatterns: readonly IntegralPattern[] = ['substitution', 'parts', 'rational', 'trig', 'radical'];
 export const integralLabels: Record<IntegralPattern, string> = {
@@ -13,6 +13,14 @@ export const integralLabels: Record<IntegralPattern, string> = {
 
 export function isIntegralAnswerCorrect(input: string, expected: number): boolean {
   return isNumericAnswerCorrect(input, expected, 3);
+}
+
+export function isIntegralStrategyValid(problem: IntegralProblem, strategy: IntegralPattern | ''): boolean {
+  return strategy === problem.pattern || Boolean(strategy && problem.alternativeStrategies?.[strategy]);
+}
+
+export function getIntegralExplanation(problem: IntegralProblem, strategy: IntegralPattern | ''): string {
+  return (strategy && problem.alternativeStrategies?.[strategy]) || problem.explanation;
 }
 
 const picker = new BalancedRandom(integralPatterns);
@@ -49,7 +57,8 @@ export function generateIntegralProblem(mode: IntegralMode, random = Math.random
     substitution: { pattern, expression: `\\int_0^1 2x(x^2+1)^{${power}}\\,dx`, answer: (2 ** (power + 1) - 1) / (power + 1), hint: '内側の式を u と置く', explanation: `u=x²+1 と置くと区間は1から2。積分値は (2^${power + 1}−1)/${power + 1}。` },
     parts: { pattern, expression: `\\int_0^1 x e^{${rate === 1 ? 'x' : `${rate}x`}}\\,dx`, answer: (Math.exp(rate) * (rate - 1) + 1) / rate ** 2, hint: '多項式 × 指数関数', explanation: partsExplanation },
     rational: { pattern, expression: `\\int_0^1 \\frac{${rationalNumeratorX}x+${rationalNumeratorConstant}}{(x+1)(x+2)}\\,dx`, answer: partialA * Math.log(2) + partialB * Math.log(1.5), hint: '分母を一次式の積に分ける', explanation: `部分分数分解すると ${partialA}/(x+1)+${partialB}/(x+2)。積分値は ${logTerm(partialA, '2')} + ${logTerm(partialB, '(3/2)')}。` },
-    trig: { pattern, expression: `\\int_0^{\\pi/2} \\sin^{${oddPower}} x\\,dx`, answer: trigIntegral, hint: 'sin x を1つ残して cos x に置換し、残りを整理', explanation: trigExplanation },
+    trig: { pattern, expression: `\\int_0^{\\pi/2} \\sin^{${oddPower}} x\\,dx`, answer: trigIntegral, hint: 'sin x を1つ残して cos x に置換し、残りを整理', explanation: trigExplanation,
+      alternativeStrategies: { substitution: `u=cos x と置くと、sin^${oddPower}x dx=−(1−u²)^${(oddPower - 1) / 2}du。区間は x=0 で u=1、x=π/2 で u=0 なので、積分は ∫₀¹(1−u²)^${(oddPower - 1) / 2}du=${trigIntegral.toFixed(3)}。` } },
     radical: {
       pattern,
       expression: `\\int_0^{${radicalUpper}} \\sqrt{${radius}^2-x^2}\\,dx`,

@@ -1,13 +1,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateIntegralProblem, integralPatterns, isIntegralAnswerCorrect } from '../src/lib/calculus3Integrals.ts';
+import { generateIntegralProblem, getIntegralExplanation, integralPatterns, isIntegralAnswerCorrect, isIntegralStrategyValid } from '../src/lib/calculus3Integrals.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-integral-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="integral-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
   throw new Error('integral strategy must be a single-choice radio group');
 }
-if (!/const isCorrect = strategy === problem\.pattern && isIntegralAnswerCorrect\(answer, problem\.answer\)/.test(drillPage)) {
-  throw new Error('integral answers must require both the correct strategy and numeric value');
+if (!/const isCorrect = isIntegralStrategyValid\(problem, strategy\) && isIntegralAnswerCorrect\(answer, problem\.answer\)/.test(drillPage)) {
+  throw new Error('integral answers must accept valid alternate strategies and require the correct numeric value');
 }
 if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
   throw new Error('integral feedback must announce the result and distinguish strategy from value errors');
@@ -81,6 +81,13 @@ if (!isIntegralAnswerCorrect(String(Math.E - 1), Math.E - 1)) throw new Error('f
 if (!isIntegralAnswerCorrect('1.718281', Math.E - 1)) throw new Error('more precise integral answers should be accepted');
 if (isIntegralAnswerCorrect('1.71', Math.E - 1)) throw new Error('answers rounded more coarsely than the display should not be accepted');
 if (isIntegralAnswerCorrect('', 1) || isIntegralAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
+const trigProblem = generateIntegralProblem('trig', () => 0);
+if (!isIntegralStrategyValid(trigProblem, 'trig') || !isIntegralStrategyValid(trigProblem, 'substitution')) {
+  throw new Error('odd-powered sine integrals must accept both the trigonometric-integral method and u=cos x substitution');
+}
+if (isIntegralStrategyValid(trigProblem, 'parts') || !getIntegralExplanation(trigProblem, 'substitution').includes('u=cos x')) {
+  throw new Error('only valid alternative methods should pass, and each accepted method must have its own explanation');
+}
 for (const pattern of integralPatterns) {
   const seen = new Set();
   for (let index = 0; index < 500; index += 1) {

@@ -62,6 +62,15 @@ for (const question of [washerQuestion, shellQuestion]) {
   }
 }
 
+const integralPicker = createCalculus3MixedQuestionPicker();
+const trigIntegral = Array.from({ length: 500 }, () => integralPicker.next('integral')).find(question => question.pattern === 'integral:trig');
+if (!trigIntegral
+  || JSON.stringify(trigIntegral.acceptedAnswers) !== JSON.stringify(['三角関数の積分', '置換積分'])
+  || trigIntegral.acceptedAnswers.some(method => !trigIntegral.options.includes(method))
+  || !trigIntegral.alternativeExplanations?.['置換積分']?.includes('u=cos x')) {
+  throw new Error('Math III full-range mixed practice must accept and explain substitution as a valid method for odd-powered sine integrals');
+}
+
 for (const area of areas) {
   const picker = createCalculus3MixedQuestionPicker();
   const questions = Array.from({ length: 500 }, () => picker.next(area));

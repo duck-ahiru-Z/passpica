@@ -5,7 +5,7 @@ import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { generateIntegralProblem, integralLabels, integralPatterns, isIntegralAnswerCorrect, type IntegralMode, type IntegralPattern, type IntegralProblem } from '@/src/lib/calculus3Integrals';
+import { generateIntegralProblem, getIntegralExplanation, integralLabels, integralPatterns, isIntegralAnswerCorrect, isIntegralStrategyValid, type IntegralMode, type IntegralPattern, type IntegralProblem } from '@/src/lib/calculus3Integrals';
 
 type Pattern = IntegralPattern;
 type Mode = IntegralMode;
@@ -28,8 +28,8 @@ export default function Calculus3IntegralDrillPage() {
     setChecked(false);
   };
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const isCorrect = strategy === problem.pattern && isIntegralAnswerCorrect(answer, problem.answer);
-  const strategyIsCorrect = strategy === problem.pattern;
+  const isCorrect = isIntegralStrategyValid(problem, strategy) && isIntegralAnswerCorrect(answer, problem.answer);
+  const strategyIsCorrect = isIntegralStrategyValid(problem, strategy);
   const valueIsCorrect = isIntegralAnswerCorrect(answer, problem.answer);
 
   return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -54,7 +54,7 @@ export default function Calculus3IntegralDrillPage() {
       )}
       <input aria-label="積分値" value={answer} onChange={e => { setAnswer(e.target.value); setChecked(false); }} placeholder="積分値" className="retro-input mx-auto block w-40 text-center" />
       <div className="flex justify-center gap-3"><button onClick={() => setChecked(true)} disabled={!strategy || answer.trim() === ''} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed">解答する</button><button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button></div>
-      {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{isCorrect ? '正解！' : <>不正解。{!strategyIsCorrect && <>解法は「{integralLabels[problem.pattern]}」です。 </>}{!valueIsCorrect && <>積分値は約 {problem.answer.toFixed(3)} です。</>}</>}<div className="mt-2 font-normal text-slate-700"><span className="font-semibold">{problem.hint}</span>：{problem.explanation}</div></div>}
+      {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{isCorrect ? '正解！' : <>不正解。{!strategyIsCorrect && <>解法は「{integralLabels[problem.pattern]}」です。 </>}{!valueIsCorrect && <>積分値は約 {problem.answer.toFixed(3)} です。</>}</>}<div className="mt-2 font-normal text-slate-700"><span className="font-semibold">{strategy === 'substitution' && problem.alternativeStrategies?.substitution ? '置換積分' : problem.hint}</span>：{getIntegralExplanation(problem, strategy)}</div></div>}
     </section>
   </main>;
 }
