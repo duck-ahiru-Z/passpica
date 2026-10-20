@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { parseRationalParts, rationalEquals } from '@/src/lib/rationalInput';
+import { calculateVectorIntersectionWeights } from '@/src/lib/vectorIntersection';
 
 // --- ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -22,15 +22,14 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-// 互いに素なペアを生成
-function generateCoprimePair(max: number = 5): [number, number] {
-  let m = 0, n = 0;
-  while (true) {
-    m = Math.floor(Math.random() * max) + 1;
-    n = Math.floor(Math.random() * max) + 1;
-    if (gcd(m, n) === 1) break;
+function generateCoprimePair(max = 5): [number, number] {
+  const pairs: [number, number][] = [];
+  for (let m = 1; m <= max; m += 1) {
+    for (let n = 1; n <= max; n += 1) {
+      if (gcd(m, n) === 1) pairs.push([m, n]);
+    }
   }
-  return [m, n];
+  return pairs[Math.floor(Math.random() * pairs.length)];
 }
 
 interface VectorProblem {
@@ -40,11 +39,9 @@ interface VectorProblem {
   yNum: number; yDen: number;
 }
 type StrategyMode = 'mix' | 'menelaus' | 'coefficient';
-const strategyPicker = new BalancedRandom<'menelaus' | 'coefficient'>(['menelaus', 'coefficient']);
 
 export default function VectorDrillPage() {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
-  const [strategy, setStrategy] = useState<'menelaus' | 'coefficient'>('menelaus');
   const [selectedStrategy, setSelectedStrategy] = useState<'menelaus' | 'coefficient' | ''>('');
   const [problem, setProblem] = useState<VectorProblem | null>(null);
   
@@ -62,25 +59,17 @@ export default function VectorDrillPage() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const generateProblem = (nextMode: StrategyMode = strategyMode) => {
-    setStrategy(nextMode === 'mix' ? strategyPicker.next() : nextMode);
+  const generateProblem = () => {
     // 1〜5程度のシンプルな比を生成
     const [m, n] = generateCoprimePair(5);
     const [s, t] = generateCoprimePair(5);
 
-    // x = (t*m) / (s*n + t*m + t*n)
-    // y = (n*s) / (s*n + t*m + t*n)
-    const den = s * n + t * m + t * n;
-    const numX = t * m;
-    const numY = n * s;
-
-    const gX = gcd(numX, den);
-    const gY = gcd(numY, den);
+    const weights = calculateVectorIntersectionWeights(m, n, s, t);
 
     setProblem({
       m, n, s, t,
-      xNum: numX / gX, xDen: den / gX,
-      yNum: numY / gY, yDen: den / gY
+      xNum: weights.x.numerator, xDen: weights.x.denominator,
+      yNum: weights.y.numerator, yDen: weights.y.denominator
     });
 
     setSelectedStrategy('');
@@ -95,7 +84,6 @@ export default function VectorDrillPage() {
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     generateProblem();
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Initial question generation runs once after hydration; subsequent generation is user-triggered.
   }, []);
 
   // グラフ描画
@@ -182,14 +170,11 @@ export default function VectorDrillPage() {
     const answerIsCorrect =
       rationalEquals(userX, { numerator: problem.xNum, denominator: problem.xDen }) &&
       rationalEquals(userY, { numerator: problem.yNum, denominator: problem.yDen });
-    const strategyIsCorrect = strategyMode !== 'mix' || selectedStrategy === strategy;
-
-    if (answerIsCorrect && strategyIsCorrect) {
+    if (answerIsCorrect) {
       setIsCorrect(true);
-      setFeedbackMsg('大正解！完璧です。');
-    } else if (answerIsCorrect) {
-      setIsCorrect(false);
-      setFeedbackMsg(`答えは合っていますが、今回の方針は「${strategy === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}」です。`);
+      setFeedbackMsg(strategyMode === 'mix'
+        ? `大正解！選んだ「${selectedStrategy === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}」の方針で答えが合っています。どちらの解法も使える問題です。`
+        : '大正解！完璧です。');
     } else {
       setIsCorrect(false);
       setFeedbackMsg('不正解です。式を見直して再挑戦するか、「正解と解説を見る」を押してください。');
@@ -221,7 +206,7 @@ export default function VectorDrillPage() {
           <option value="menelaus">基礎練習：メネラウスの定理だけ</option>
           <option value="coefficient">基礎練習：係数比較と連立方程式だけ</option>
         </select>
-        <p className="text-gray-600">{strategyMode === 'mix' ? '問題の形から解法を選び、選んだ方針で解きましょう。' : <>指定された方針：<span className="font-bold text-blue-700">{strategyMode === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}</span></>}</p>
+        <p className="text-gray-600">{strategyMode === 'mix' ? '同じ交点問題を2つの解法で考えます。使う方針を自分で選びましょう。メネラウスの定理・係数比較のどちらも有効です。' : <>指定された方針：<span className="font-bold text-blue-700">{strategyMode === 'menelaus' ? 'メネラウスの定理' : '係数比較と連立方程式'}</span></>}</p>
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

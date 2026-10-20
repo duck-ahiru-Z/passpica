@@ -243,7 +243,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学C',
     field: 'ベクトル',
     title: 'ベクトル・交点位置ベクトルドリル',
-    description: 'メネラウスの定理と係数比較・連立方程式を個別に練習し、実戦では解法方針をランダムに選びます。',
+    description: 'メネラウスの定理・係数比較を個別練習し、実戦ではどちらも使える交点問題で自分の解法を選びます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/vector-drill'
