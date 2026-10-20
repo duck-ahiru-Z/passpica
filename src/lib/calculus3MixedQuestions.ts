@@ -16,6 +16,8 @@ export type Calculus3Question = {
   expressionFormat: 'math' | 'text';
   options: string[];
   answer: string;
+  acceptedAnswers?: string[];
+  alternativeExplanations?: Record<string, string>;
   explanation: string;
 };
 export type Calculus3MixedMode = 'all' | Calculus3Area;
@@ -94,7 +96,10 @@ function createQuestion(area: Calculus3Area, random: () => number): Calculus3Que
       return {
         area, areaLabel: areaLabels[area], pattern: `${area}:${problem.pattern}`,
         prompt, expression: problem.expression,
-        expressionFormat: 'math', options: [...areaOptions[area]], answer: geometryLabels[problem.pattern], explanation: problem.explanation,
+        expressionFormat: 'math', options: [...areaOptions[area]], answer: geometryLabels[problem.pattern],
+        acceptedAnswers: [geometryLabels[problem.pattern], ...Object.keys(problem.alternativeExplanations ?? {}).map(pattern => geometryLabels[pattern as keyof typeof geometryLabels])],
+        alternativeExplanations: Object.fromEntries(Object.entries(problem.alternativeExplanations ?? {}).map(([pattern, explanation]) => [geometryLabels[pattern as keyof typeof geometryLabels], explanation])),
+        explanation: problem.explanation,
       };
     }
     case 'differential-equation': {
