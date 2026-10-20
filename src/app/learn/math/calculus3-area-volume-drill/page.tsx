@@ -31,7 +31,7 @@ export default function Calculus3AreaVolumeDrillPage() {
             {geometryPatterns.map(pattern => <option key={pattern} value={pattern}>基礎練習：{geometryLabels[pattern]}だけ</option>)}
           </select>
         </div>
-        <div className="bg-white border p-8 text-center text-2xl"><p className="mb-4 text-base font-semibold">{problem.prompt}</p><MathEq math={problem.expression} /></div>
+        <div className="bg-white border p-8 text-center text-2xl"><p className="mb-4 text-base font-semibold">{problem.prompt}</p><span aria-hidden="true"><MathEq math={problem.expression} /></span><span className="sr-only">{problem.accessibleExpression}</span></div>
         {mode === 'mix' ? (
           <fieldset className="space-y-2">
             <legend className="w-full text-center font-bold">実戦練習：最初の方針を一つ選び、答えを小数第3位まで入力しなさい（許容誤差 ±0.0005）。</legend>

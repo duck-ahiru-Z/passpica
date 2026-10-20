@@ -38,8 +38,11 @@ export function generateDifferentiationProblem(mode: DifferentiationMode, random
   const implicitXTerm = implicitA === 1 ? 'x' : `${implicitA}x`;
   const inverseA = pattern === 'inverse' ? variants.inverse.next(random) : 1;
   const higherA = pattern === 'higher' ? variants.higher.next(random) : 1;
+  const chainInner = chain.a === 1 ? 'x²+1' : `${chain.a}x²+1`;
+  const chainPower = chain.n - 1;
+  const chainPowerSuffix = chainPower === 1 ? '' : `^${chainPower}`;
   const all: Record<DifferentiationPattern, DifferentiationProblem> = {
-    chain: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{x=1},\\quad y=(${chain.a}x^2+1)^{${chain.n}}`, answer: 2 * chain.a * chain.n * (chain.a + 1) ** (chain.n - 1), explanation: `連鎖律より y′=2·${chain.a}·${chain.n}x(${chain.a}x²+1)^${chain.n - 1}。x=1で ${2 * chain.a * chain.n * (chain.a + 1) ** (chain.n - 1)}。` },
+    chain: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{x=1},\\quad y=(${chain.a === 1 ? '' : chain.a}x^2+1)^{${chain.n}}`, answer: 2 * chain.a * chain.n * (chain.a + 1) ** (chain.n - 1), explanation: `連鎖律より y′=${2 * chain.a * chain.n}x(${chainInner})${chainPowerSuffix}。x=1で ${2 * chain.a * chain.n * (chain.a + 1) ** (chain.n - 1)}。` },
     product: {
       pattern,
       expression: `\\left.\\frac{dy}{dx}\\right|_{x=\\pi/2},\\quad y=x^{${productPower}}\\sin x`,

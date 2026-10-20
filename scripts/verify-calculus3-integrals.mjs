@@ -15,6 +15,9 @@ if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includ
 if (!drillPage.includes('実戦練習：積分法 全パターンランダム') || !drillPage.includes('基礎練習：{integralLabels[p]}だけ')) {
   throw new Error('the learner must be able to choose either mixed strategy practice or one fixed integration pattern');
 }
+if (!drillPage.includes('小数第3位まで入力しなさい（許容誤差 ±0.0005）')) {
+  throw new Error('integral answer precision guidance must match the accepted rounding tolerance');
+}
 if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? (") || !drillPage.includes('基礎練習：{integralLabels[mode]}に固定して繰り返します。')) {
   throw new Error('fixed-pattern practice must lock the target method while mixed practice asks the learner to choose it');
 }

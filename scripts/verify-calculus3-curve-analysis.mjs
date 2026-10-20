@@ -25,7 +25,6 @@ if (!isCurveAnswerCorrect('-0.333333', -1 / 3)) throw new Error('more precise nu
 if (!isCurveAnswerCorrect(String(-1 / 3), -1 / 3)) throw new Error('full precision numeric answers should be accepted');
 if (isCurveAnswerCorrect('-0.334', -1 / 3)) throw new Error('values outside the displayed three-decimal tolerance should be rejected');
 if (isCurveAnswerCorrect('', 1) || isCurveAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
-if (isCurveAnswerCorrect('', 1) || isCurveAnswerCorrect('Infinity', 1)) throw new Error('empty and non-finite answers should be rejected');
 const checks = {
   increase: problem => {
     const [, coefficient] = problem.expression.match(/x\^3-(\d+)x/);

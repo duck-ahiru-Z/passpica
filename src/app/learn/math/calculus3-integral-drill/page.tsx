@@ -46,7 +46,7 @@ export default function Calculus3IntegralDrillPage() {
       <div className="bg-white border p-8 text-center text-2xl"><MathEq math={problem.expression} block /></div>
       {mode === 'mix' ? (
         <fieldset className="space-y-2">
-          <legend className="w-full text-center font-bold">実戦練習：最初に使う解法を一つ選び、積分値を小数で入力しなさい。</legend>
+          <legend className="w-full text-center font-bold">実戦練習：最初に使う解法を一つ選び、積分値を小数第3位まで入力しなさい（許容誤差 ±0.0005）。</legend>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">{integralPatterns.map(p => <label key={p} className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${strategy === p ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}><input type="radio" name="integral-strategy" value={p} checked={strategy === p} onChange={() => { setStrategy(p); setChecked(false); }} className="accent-blue-600" />{integralLabels[p]}</label>)}</div>
         </fieldset>
       ) : (

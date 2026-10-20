@@ -23,9 +23,14 @@ const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
 const checks = {
   chain: problem => {
-    const [, a, n] = problem.expression.match(/y=\((\d+)x\^2\+1\)\^\{(\d+)\}/);
-    const expected = 2 * Number(a) * Number(n) * (Number(a) + 1) ** (Number(n) - 1);
-    return close(problem.answer, expected) && problem.explanation.includes(String(expected));
+    const [, coefficient, exponent] = problem.expression.match(/y=\((?:(\d+)x\^2|x\^2)\+1\)\^\{(\d+)\}/);
+    const a = Number(coefficient ?? 1);
+    const n = Number(exponent);
+    const expected = 2 * a * n * (a + 1) ** (n - 1);
+    return close(problem.answer, expected)
+      && problem.explanation.includes(String(expected))
+      && !problem.expression.includes('1x')
+      && !problem.explanation.includes('^1');
   },
   product: problem => {
     const [, power] = problem.expression.match(/y=x\^\{(\d+)\}\\sin/);

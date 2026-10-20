@@ -6,6 +6,7 @@ export type GeometryProblem = {
   pattern: GeometryPattern;
   prompt: string;
   expression: string;
+  accessibleExpression: string;
   answer: number;
   explanation: string;
   alternativeExplanations?: Partial<Record<GeometryPattern, string>>;
@@ -41,6 +42,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       pattern,
       prompt: '2曲線に囲まれた部分の面積を求める。',
       expression: `y=${linearTerm},\\quad y=x^2\\quad(0\\le x\\le${value})`,
+      accessibleExpression: `y イコール ${linearTerm === 'x' ? 'x' : `${value} x`}、y イコール x の 2 乗、x は 0 以上 ${value} 以下`,
       answer: value ** 3 / 6,
       explanation: `区間内では ${linearTerm} が上、x² が下。∫₀^${value}(${linearTerm}−x²)dx=${value ** 3}/6。`,
     },
@@ -48,6 +50,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       pattern,
       prompt: '曲線とx軸、x=0、x=1で囲まれた領域をx軸の周りに回転させた立体の体積を求める。',
       expression: `y=${powerTerm}\\quad(0\\le x\\le1)`,
+      accessibleExpression: `y イコール x の ${value} 乗、x は 0 以上 1 以下`,
       answer: Math.PI / (2 * value + 1),
       explanation: `円板法で V=π∫₀¹(${value === 1 ? 'x' : `x^${value}`})²dx=π/${2 * value + 1}。`,
     },
@@ -55,6 +58,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       pattern,
       prompt: `曲線とx軸、x=0およびx=${value}で囲まれた領域をy軸の周りに回転させた立体の体積を求める。`,
       expression: `y=\\sqrt{x}\\quad(0\\le x\\le${value})`,
+      accessibleExpression: `y イコール x の平方根、x は 0 以上 ${value} 以下`,
       answer: (4 * Math.PI * value ** 2.5) / 5,
       explanation: `高さ y の断面は内半径 y²、外半径 ${value} の円環。V=π∫₀^√${value}(${value}²−y⁴)dy=4π×${value}^(5/2)/5。`,
       alternativeExplanations: {
@@ -65,6 +69,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       pattern,
       prompt: `領域 y=x, x軸, x=0, x=${value} に囲まれた部分を y軸の周りに回転させた体積を求める。`,
       expression: `y=x\\quad(0\\le x\\le${value})`,
+      accessibleExpression: `y イコール x、x は 0 以上 ${value} 以下`,
       answer: (2 * Math.PI * value ** 3) / 3,
       explanation: `高さ x、半径 x の円筒殻で考える。V=2π∫₀^${value} x·x dx=2π×${value}³/3。`,
       alternativeExplanations: {
@@ -75,6 +80,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       pattern,
       prompt: 'この区間における曲線の長さを求める。',
       expression: `y=\\frac{2}{3}x^{3/2}\\quad(0\\le x\\le${value})`,
+      accessibleExpression: `y イコール 3 分の 2 x の 2 分の 3 乗、x は 0 以上 ${value} 以下`,
       answer: (2 / 3) * ((value + 1) ** 1.5 - 1),
       explanation: `y′=√x なので L=∫₀^${value}√(1+x)dx=(2/3)((${value + 1})^(3/2)−1)。`,
     },
