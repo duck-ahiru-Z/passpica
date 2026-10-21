@@ -6,6 +6,16 @@ import { generateFlameReactionProblem } from '../src/lib/flameReactionDrill.ts';
 
 assert.equal(inorganicPatterns.length, 14);
 const visual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors/page.tsx'), 'utf8');
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors-drill/page.tsx'), 'utf8');
+const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8')).scripts;
+assert.ok(packageScripts['test:inorganic-reaction-drill']?.includes('verify-inorganic-reaction-drill.mjs'), 'the inorganic fixed/mixed verifier must have a dedicated npm script');
+assert.ok(drillPage.includes('<option value="mix">実戦練習：無機イオン反応 全パターンランダム</option>'), 'the drill UI must offer mixed strategy practice');
+assert.match(drillPage, /inorganicPatterns\.map\(pattern => <option/, 'the drill UI must offer every fixed condition pattern');
+assert.match(drillPage, /name="inorganic-outcome"/, 'reaction outcomes must use a single-choice radio group');
+assert.match(drillPage, /disabled={!answer}/, 'answer submission must remain disabled until an outcome is selected');
+assert.match(drillPage, /role="status" aria-live="polite"/, 'grading feedback must be announced accessibly');
+assert.match(drillPage, /href="\/learn\/chemistry\/inorganic-colors"/, 'the drill must connect to the reaction visual');
+assert.ok(visual.includes('href="/learn/chemistry/inorganic-colors-drill"'), 'the reaction visual must connect back to focused and mixed practice');
 const visualReactionEvidence = {
   'cu-ammonia-small': 'Cu²⁺ + 2OH⁻ → Cu(OH)₂↓ (青白色沈殿)',
   'cu-ammonia-excess': 'Cu(OH)₂ + 4NH₃ → [Cu(NH₃)₄]²⁺ + 2OH⁻ (深青色溶液)',
