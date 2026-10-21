@@ -108,7 +108,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（回転体の体積）',
     title: '回転体の体積・断面円板ビジュアル',
-    description: 'y=x²の領域をx軸回転し、断面円板の半径・面積と右端円板和、正確な体積の差をスライダーで比較します。',
+    description: 'y=x²の領域をx軸回転し、断面円板の半径・面積と右端円板和、正確な体積の差をスライダーで比較します。同じ条件の個別問題にも挑戦できます。',
     difficulty: '標準',
     type: 'ビジュアル図解',
     link: '/learn/math/calculus3-volume-visual',
@@ -197,7 +197,8 @@ const CONTENTS: LearningContent[] = [
     description: '金属イオンの水溶液に各種試薬（過剰添加を含む）を加えた際の、沈殿生成や錯イオン形成に伴う試験管内の色変化を再現します。',
     difficulty: '基礎',
     type: '実験シミュレータ',
-    link: '/learn/chemistry/inorganic-colors'
+    link: '/learn/chemistry/inorganic-colors',
+    practiceLink: '/learn/chemistry/inorganic-colors-drill'
   },
   {
     slug: 'reaction-safety',
@@ -231,7 +232,8 @@ const CONTENTS: LearningContent[] = [
     description: '試薬をバーナーへ投入して、炎色の変化を視覚的に観察。有名なゴロ合わせと要点の解説メモ。',
     difficulty: '基礎',
     type: '実験シミュレータ',
-    link: '/learn/chemistry/flame-reaction'
+    link: '/learn/chemistry/flame-reaction',
+    practiceLink: '/learn/chemistry/flame-reaction-drill'
   },
   {
     slug: 'gas-collection',
@@ -242,7 +244,8 @@ const CONTENTS: LearningContent[] = [
     description: '水上置換・上方置換・下方置換の集気ビンの向きや発生装置の形を、気体ごとの特性と共に対比学習します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/gas-collection'
+    link: '/learn/chemistry/gas-collection',
+    practiceLink: '/learn/chemistry/gas-collection-drill'
   },
   {
     slug: 'crystal-lattice',
@@ -253,7 +256,8 @@ const CONTENTS: LearningContent[] = [
     description: '体心立方格子・面心立方格子の原子の配置と、格子定数a・原子半径rの関係式を断面図から視覚的に理解します。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/crystal-lattice'
+    link: '/learn/chemistry/crystal-lattice',
+    practiceLink: '/learn/chemistry/crystal-lattice-drill'
   },
   {
     slug: 'acid-base',
@@ -265,7 +269,18 @@ const CONTENTS: LearningContent[] = [
     difficulty: '基礎',
     type: '実験シミュレータ',
     link: '/learn/chemistry/acid-base',
-    practiceLink: '/learn/chemistry/mole-calculation-drill'
+    practiceLink: '/learn/chemistry/titration-drill'
+  },
+  {
+    slug: 'titration-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基（中和滴定）',
+    title: '中和滴定・濃度計算ドリル',
+    description: '酸・塩基の価数と反応係数比を個別練習し、実戦モードでは全パターンを混ぜて酸の濃度を求めます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/titration-drill'
   },
   {
     slug: 'metal-ion',
@@ -276,7 +291,8 @@ const CONTENTS: LearningContent[] = [
     description: '金属イオンを含む混合水溶液に各試薬を加えた際の、沈殿物の析出フローと沈殿色をシミュレートします。',
     difficulty: '標準',
     type: '系統分析',
-    link: '/learn/chemistry/metal-ion'
+    link: '/learn/chemistry/metal-ion',
+    practiceLink: '/learn/chemistry/metal-ion-drill'
   },
   {
     slug: 'organic-separation',
@@ -287,7 +303,8 @@ const CONTENTS: LearningContent[] = [
     description: 'アニリン・安息香酸・フェノール等の混合物を、分液漏斗での水層・エーテル層への移動変化で視覚化します。',
     difficulty: '標準',
     type: '系統分析',
-    link: '/learn/chemistry/organic-separation'
+    link: '/learn/chemistry/organic-separation',
+    practiceLink: '/learn/chemistry/organic-separation-drill'
   },
   {
     slug: 'industrial-process',
@@ -298,7 +315,8 @@ const CONTENTS: LearningContent[] = [
     description: '接触法・オストワルト法・アンモニアソーダ法の製造ラインの流れと、必要な化学反応式・触媒を整理します。',
     difficulty: '標準',
     type: '製法フロー',
-    link: '/learn/chemistry/industrial-process'
+    link: '/learn/chemistry/industrial-process',
+    practiceLink: '/learn/chemistry/industrial-process-drill'
   },
   {
     slug: 'phase-diagram',
@@ -309,7 +327,8 @@ const CONTENTS: LearningContent[] = [
     description: '温度・圧力の変化による気体・液体・固体の状態境界グラフ。三重点や超臨界流体などの重要ワード解説。',
     difficulty: '応用',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/phase-diagram'
+    link: '/learn/chemistry/phase-diagram',
+    practiceLink: '/learn/chemistry/phase-diagram-drill'
   },
   // 物理
   {
@@ -321,7 +340,8 @@ const CONTENTS: LearningContent[] = [
     description: 'RLC直列回路のパラメータを変更し、電圧と電流の位相の「遅れ・進み」を回転ベクトル図（フェーザ）と合成波形グラフで動的に検証します。',
     difficulty: '応用',
     type: '実験シミュレータ',
-    link: '/learn/physics/ac-circuit'
+    link: '/learn/physics/ac-circuit',
+    practiceLink: '/learn/physics/ac-circuit-drill'
   },
   // 情報
   {
@@ -334,6 +354,18 @@ const CONTENTS: LearningContent[] = [
     difficulty: '応用',
     type: '実験シミュレータ',
     link: '/learn/information/pseudo-lang'
+  },
+  {
+    slug: 'number-representation-visual',
+    subject: 'information',
+    subjectJp: '情報I',
+    field: '2進数・デジタル表現',
+    title: '2進数と2の補数ビジュアル',
+    description: '8ビットを一つずつ切り替え、符号なしと2の補数で値や各ビットの重みがどう変わるかを体験できます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/information/number-representation-visual',
+    practiceLink: '/learn/information/number-representation-drill'
   }
 ];
 

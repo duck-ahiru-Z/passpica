@@ -13,7 +13,7 @@ export default function Math2MixedDrillPage() {
   const next = (selectedMode: Math2Mode = mode) => { setQuestion(generateMath2Question(selectedMode)); setAnswer(''); setChecked(false); };
   if (!question) return <main className="max-w-4xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const correct = answer === question.answer;
-  return <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
+  return <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
     <div className="border-b border-gray-300 pb-2"><h1 className="text-xl md:text-2xl font-bold text-slate-900">数学II 総合・解法選択ランダムドリル</h1><p className="text-gray-500 mt-1">微積分・三角関数・指数対数・図形と方程式の多様な問題から、解法を見分ける練習です。分野別の基礎練習も選べます。</p></div>
     <section className="retro-box bg-gray-50 p-4 space-y-3"><label htmlFor="math2-mode" className="font-bold block">■ 演習モード</label><select id="math2-mode" value={mode} onChange={event => { const selectedMode = event.target.value as Math2Mode; setMode(selectedMode); next(selectedMode); }} className="border p-2 bg-white"><option value="all">実戦練習：数学II 全体ランダム</option>{math2Areas.map(area => <option key={area} value={area}>基礎練習：{math2Labels[area]}だけ</option>)}</select></section>

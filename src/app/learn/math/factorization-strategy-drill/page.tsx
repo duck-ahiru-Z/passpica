@@ -27,7 +27,7 @@ export default function FactorizationStrategyDrillPage() {
 
   if (!question) return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
-  return <main className="max-w-3xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
+  return <main className="max-w-3xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
     <Link href="/drill" className="text-blue-700 hover:underline">← 無限演習ポータルへ戻る</Link>
     <header className="border-b border-slate-300 pb-3"><div className="text-slate-500">数学I / 数と式 / 因数分解</div><h1 className="text-xl md:text-2xl font-bold">因数分解・解法選択ドリル</h1><p className="mt-2 text-slate-600">苦手な型を固定して練習し、慣れたら式の形から解法を選ぶ全パターンランダムへ。</p></header>
     <section className="retro-box bg-slate-50 p-4 space-y-3"><label htmlFor="factorization-mode" className="font-bold block">演習モード</label><select id="factorization-mode" value={mode} onChange={event => { const selected = event.target.value as FactorizationMode; setMode(selected); next(selected); }} className="border p-2 bg-white w-full"><option value="mix">実戦練習：因数分解 全パターンランダム</option>{factorizationPatterns.map(pattern => <option key={pattern} value={pattern}>基礎練習：{labels[pattern]}だけ</option>)}</select></section>

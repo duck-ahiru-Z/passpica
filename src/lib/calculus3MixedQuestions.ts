@@ -1,7 +1,7 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { generateLimitProblem, limitLabels } from './calculus3Limits.ts';
 import { generateDifferentiationProblem, differentiationLabels } from './calculus3Differentiation.ts';
-import { createIntegralProblemPicker, integralLabels } from './calculus3Integrals.ts';
+import { createIntegralProblemPicker, getIntegralExplanation, integralLabels } from './calculus3Integrals.ts';
 import { generateGeometryProblem, geometryLabels } from './calculus3Geometry.ts';
 import { generateDifferentialEquationProblem, differentialEquationLabels } from './calculus3DifferentialEquations.ts';
 import { generateCurveProblem, curveLabels } from './calculus3CurveAnalysis.ts';
@@ -74,7 +74,13 @@ function createQuestion(area: Calculus3Area, random: () => number): Calculus3Que
       return {
         area, areaLabel: areaLabels[area], pattern: `${area}:${problem.pattern}`,
         prompt: '次の積分を計算するとき、最初に使う方法は？', expression: problem.expression,
-        expressionFormat: 'math', options: [...areaOptions[area]], answer: integralLabels[problem.pattern], explanation: `${problem.hint}。${problem.explanation}`,
+        expressionFormat: 'math', options: [...areaOptions[area]], answer: integralLabels[problem.pattern],
+        acceptedAnswers: [integralLabels[problem.pattern], ...Object.keys(problem.alternativeStrategies ?? {}).map(pattern => integralLabels[pattern as keyof typeof integralLabels])],
+        alternativeExplanations: Object.fromEntries(Object.keys(problem.alternativeStrategies ?? {}).map(pattern => {
+          const label = integralLabels[pattern as keyof typeof integralLabels];
+          return [label, `${label}。${getIntegralExplanation(problem, pattern as keyof typeof integralLabels)}`];
+        })),
+        explanation: `${problem.hint}。${problem.explanation}`,
       };
     }
     case 'curve-analysis': {

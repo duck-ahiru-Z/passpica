@@ -121,10 +121,109 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '物質量・反応計算',
     title: '化学 物質量・反応計算ドリル',
-    description: '物質量・モル濃度・希釈・気体・反応量比・pH・収率を個別練習と全パターンランダムで反復します。',
+    description: '物質量・モル濃度・希釈・気体・反応量比・制限試薬・pH・収率を個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
+    slug: 'titration-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基・中和滴定',
+    title: '化学 中和滴定・濃度計算ドリル',
+    description: '一価・二価の酸塩基や反応係数比を個別練習し、全パターンの混合問題で中和点から濃度を求めます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/titration-drill'
+  },
+  {
+    slug: 'phase-diagram-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質の状態（状態図）',
+    title: '化学 状態図・相変化の判断ドリル',
+    description: '水・CO₂の融解曲線、三重点、臨界点、1気圧での挙動を個別練習し、実戦では全8パターンを混ぜて判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/phase-diagram-drill'
+  },
+  {
+    slug: 'inorganic-colors-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '無機化学（イオン反応・沈殿）',
+    title: '化学 無機イオン反応・色の判定ドリル',
+    description: '少量・過剰や酸性・塩基性で変わる沈殿・錯イオン・酸化還元を個別練習し、全14パターンを混ぜて判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/inorganic-colors-drill'
+  },
+  {
+    slug: 'organic-separation-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '有機化学（芳香族の分離）',
+    title: '化学 有機化合物の分離・判断ドリル',
+    description: 'アニリン・安息香酸・フェノールの抽出を個別練習し、実戦では酸・塩基の強さから水層へ移る物質を判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/organic-separation-drill'
+  },
+  {
+    slug: 'industrial-process-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '無機工業化学（製法）',
+    title: '化学 工業的製法・工程判断ドリル',
+    description: '接触法・オストワルト法・ソルベー法を工程別に練習し、実戦では反応・中間体・循環を全11パターンから判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/industrial-process-drill'
+  },
+  {
+    slug: 'metal-ion-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '無機化学（金属イオン）',
+    title: '化学 金属イオン系統分析ドリル',
+    description: '塩化物・硫化物・水酸化物・炭酸塩の段階と炎色確認を個別練習し、実戦では全6段階を混ぜて判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/metal-ion-drill'
+  },
+  {
+    slug: 'flame-reaction-drill',
+    subject: 'chemistry',
+    subjectJp: '化学基礎',
+    field: '無機化学（元素の確認）',
+    title: '化学 炎色反応・元素識別ドリル',
+    description: 'Li・Na・K・Cu・Ca・Baの炎色を元素ごとに個別練習し、実戦モードでは6元素をバランスよく混ぜて識別します。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/flame-reaction-drill'
+  },
+  {
+    slug: 'gas-collection-drill',
+    subject: 'chemistry',
+    subjectJp: '化学基礎',
+    field: '無機化学（気体の性質）',
+    title: '化学 気体の捕集法・判断ドリル',
+    description: '水上・上方・下方置換法を個別練習し、実戦モードでは水溶性と密度から捕集法を選びます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/gas-collection-drill'
+  },
+  {
+    slug: 'crystal-lattice-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質の構造（結晶格子）',
+    title: '化学 結晶格子・計算ドリル',
+    description: 'BCC・FCCの原子数・配位数・充填率・半径と格子定数・密度を個別練習し、実戦では全6パターンから方法を選びます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/crystal-lattice-drill'
   },
   {
     slug: 'motion-calculation-drill',
@@ -132,10 +231,32 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '力学・計算',
     title: '物理 力学・計算ドリル',
-    description: '平均の速さ・加速度・自由落下・仕事・運動量・運動エネルギー・ばねを個別練習と全パターンランダムで反復します。',
+    description: '平均の速さ・加速度・自由落下・仕事・運動量・エネルギー・ばねに加え、投射速度の分解・最高点・飛行時間・到達距離も個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'ac-circuit-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '電磁気（交流回路）',
+    title: '物理 交流回路・計算ドリル',
+    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数を個別練習し、実戦では全5パターンから方法を選びます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/physics/ac-circuit-drill'
+  },
+  {
+    slug: 'number-representation-drill',
+    subject: 'information',
+    subjectJp: '情報I',
+    field: '2進数・デジタル表現',
+    title: '情報I 2進数・2の補数ドリル',
+    description: '符号なし・2の補数・ビットの重み・10進数からの変換を個別練習し、実戦では全4パターンから見分けます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/information/number-representation-drill'
   },
   {
     slug: 'calculation-drill',
@@ -305,6 +426,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/math/quadratic-inequality-drill'
   },
   {
+    slug: 'quadratic-equation-drill',
+    subject: 'math',
+    subjectJp: '数学I',
+    field: '2次関数（2次方程式）',
+    title: '二次方程式・解法選択ドリル',
+    description: '因数分解・平方根・平方完成・解の公式を個別練習し、実戦では4解法をバランスよくランダムに混ぜます。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/math/quadratic-equation-drill'
+  },
+  {
     slug: 'discriminant-drill',
     subject: 'math',
     subjectJp: '数学I',
@@ -409,7 +541,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学A',
     field: '整数の性質',
     title: 'ユークリッドの互除法',
-    description: 'ユークリッドの互除法で最大公約数を求める基礎演習です。',
+    description: '2桁の基本・3桁と2桁・互いに素・4桁を含む4パターンを個別練習し、実戦では全パターンをバランスよく混ぜます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/euclidean-algorithm-drill'
@@ -586,7 +718,8 @@ export default function DrillPortalPage() {
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
 
   const filteredContents = CONTENTS.filter(c => {
-    const matchSubject = selectedSubject === 'all' || c.subject === selectedSubject;
+    const matchSubject = selectedSubject === 'all'
+      || (selectedSubject === 'math3' ? c.subject === 'math' && c.subjectJp === '数学III' : c.subject === selectedSubject);
     const matchDifficulty = selectedDifficulty === 'all' || c.difficulty === selectedDifficulty;
     return matchSubject && matchDifficulty;
   });
@@ -620,6 +753,7 @@ export default function DrillPortalPage() {
             {[
               { id: 'all', name: 'すべての科目' },
               { id: 'math', name: '数学' },
+              { id: 'math3', name: '数学III' },
               { id: 'chemistry', name: '化学' },
               { id: 'physics', name: '物理' },
               { id: 'information', name: '情報I' }

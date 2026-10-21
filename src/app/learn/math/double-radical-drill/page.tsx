@@ -71,7 +71,7 @@ export default function DoubleRadicalDrillPage() {
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
+    <div className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-sm">
       
       {/* ページタイトルとナビゲーション */}
       <div className="mb-6">
@@ -99,7 +99,7 @@ export default function DoubleRadicalDrillPage() {
                 aria-label="二重根号の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as DoubleRadicalMode; setSelectedPattern(pattern); handleNext(pattern); }}
-                className="border p-1 text-xs"
+                className="border p-1 text-sm"
               >
                 <option value="mix">実戦練習：二重根号 全パターンランダム</option>
                 <option value="pattern1">基礎練習：基本の和だけ</option>
@@ -176,9 +176,9 @@ export default function DoubleRadicalDrillPage() {
                 )}
               </div>
               {validationError && <p id="radical-answer-error" role="alert" className="text-center text-red-700 font-semibold">{validationError}</p>}
-              <div className="text-[10px] text-gray-500 text-center">
+              <div className="text-xs text-gray-500 text-center">
                 ※ 引き算の場合、必ず大きい数字を左側（大）に入力してください。<br/>
-                ※ 答えが整数になる場合もルートのまま（例：\(\sqrt{4}\)）入力してください。<br/>
+                ※ 根号の中身を入力してください（例：√4 の場合は「4」）。<br/>
               </div>
             </div>
 
@@ -213,7 +213,7 @@ export default function DoubleRadicalDrillPage() {
                 ■ 解説・解法プロセス
               </h2>
               {hasChecked && (
-                <div className="flex gap-1 text-[10px]">
+                <div className="flex gap-1 text-xs">
                   <button type="button" aria-pressed={detailLevel === 'brief'} onClick={() => setDetailLevel('brief')} className={`px-2 py-1 border ${detailLevel === 'brief' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>略解</button>
                   <button type="button" aria-pressed={detailLevel === 'normal'} onClick={() => setDetailLevel('normal')} className={`px-2 py-1 border ${detailLevel === 'normal' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>標準</button>
                   <button type="button" aria-pressed={detailLevel === 'detailed'} onClick={() => setDetailLevel('detailed')} className={`px-2 py-1 border ${detailLevel === 'detailed' ? 'bg-yellow-400 font-bold border-yellow-500' : 'bg-white border-yellow-300'}`}>丁寧</button>
@@ -226,7 +226,7 @@ export default function DoubleRadicalDrillPage() {
                 解答するとここに解説が表示されます。
               </div>
             ) : (
-              <div className="space-y-4 text-xs leading-relaxed">
+              <div className="space-y-4 text-sm leading-relaxed">
                 <div className="bg-white p-3 border text-center font-bold text-lg mb-4 text-emerald-700 shadow-sm">
                   {problem.pattern === 'pattern4' ? (
                     <MathEq math={`${problem.eq} = \\frac{\\sqrt{${problem.a}} ${problem.sign} \\sqrt{${problem.b}}}{\\sqrt{2}}`} />

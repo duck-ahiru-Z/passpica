@@ -1,4 +1,4 @@
-export const examBinarySearch = `# 共通テスト試作問題風 二分探索プログラム
+export const examBinarySearch = `# 二分探索のオリジナル例
 Data = [3,18,29,33,48,52,62,77,89,97]
 kazu = 要素数(Data)
 表示する("探したい数字(例:52)の添字を検索します")

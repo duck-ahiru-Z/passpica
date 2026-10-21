@@ -40,6 +40,8 @@ const variants = {
   compression: new BalancedRandom([
     { original: 12, compressed: 3 }, { original: 10, compressed: 4 }, { original: 25, compressed: 10 },
     { original: 16, compressed: 12 }, { original: 64, compressed: 48 },
+    // Include the no-change boundary and a case where compression expands data.
+    { original: 10, compressed: 10 }, { original: 10, compressed: 12 },
   ]),
   complement: new BalancedRandom(['11111101', '11111011', '00001101', '10000000', '01111111']),
 };

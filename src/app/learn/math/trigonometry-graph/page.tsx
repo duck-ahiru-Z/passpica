@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { getTrigonometryProbeStatus } from '@/src/lib/trigonometryGraphProbe';
 
 type TrigonometricFunc = 'sin' | 'cos' | 'tan';
 
@@ -191,15 +192,21 @@ export default function TrigonometryGraphPage() {
     if (d > 0) termD = ` + ${d}`;
     else if (d < 0) termD = ` - ${Math.abs(d)}`;
 
+    if (a === 0) return `y = ${d}`;
     return `y = ${termA}${mainTerm}${termD}`;
   };
 
   // プローブの座標値
   const probeYBase = evalBase(probeX);
   const probeYTrans = evalTrans(probeX);
+  const probeBaseStatus = getTrigonometryProbeStatus(func, probeX, probeYBase, maxMathY);
+  const probeTransInput = b * (probeX - c);
+  const probeTransStatus = getTrigonometryProbeStatus(func, probeTransInput, probeYTrans, maxMathY);
+  const probeStatusText = (status: 'visible' | 'out-of-range' | 'undefined') =>
+    status === 'undefined' ? '未定義（漸近線上）' : status === 'out-of-range' ? '表示範囲外' : null;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ページヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -210,7 +217,7 @@ export default function TrigonometryGraphPage() {
           三角関数の平行移動・拡大縮小シミュレーター
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          式 y = a sin(b(θ - c)) + d の各係数 a, b, c, d を操作し、波の振幅・周期・位置がどのように変形するかを学びます。
+          式 y = a {func}(b(θ - c)) + d の係数 a, b, c, d を操作し、縦横の拡大縮小・周期・位置の変化を学びます。sin・cosの振幅と、tanの縦方向の倍率・漸近線の移動を比べられます。
         </p>
       </div>
 
@@ -454,7 +461,7 @@ export default function TrigonometryGraphPage() {
             {/* パラメータ a (縦拡大) */}
             <div className="space-y-1 border-t border-gray-200 pt-2.5">
               <div className="flex justify-between items-center text-slate-700 font-bold">
-                <span>a : 縦の倍率 (振幅)</span>
+                <span>a : {func === 'tan' ? '縦方向の倍率' : '縦の倍率 (振幅)'}</span>
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
@@ -611,13 +618,13 @@ export default function TrigonometryGraphPage() {
                 <tbody>
                   <tr className="border-b border-dashed border-emerald-100 text-gray-500">
                     <td className="py-1">基準 {func}</td>
-                    <td className="py-1 text-right">{Math.abs(probeYBase) > 99 ? '未定義' : probeYBase.toFixed(4)}</td>
-                    <td className="py-1 text-right">({probeX}°, {Math.abs(probeYBase) > 99 ? '未定義' : probeYBase.toFixed(2)})</td>
+                    <td className="py-1 text-right">{probeStatusText(probeBaseStatus) ?? probeYBase.toFixed(4)}</td>
+                    <td className="py-1 text-right">({probeX}°, {probeStatusText(probeBaseStatus) ?? probeYBase.toFixed(2)})</td>
                   </tr>
                   <tr className="text-blue-900 font-bold">
                     <td className="py-1.5">変形後</td>
-                    <td className="py-1.5 text-right">{Math.abs(probeYTrans) > maxMathY ? '範囲外/未定義' : probeYTrans.toFixed(4)}</td>
-                    <td className="py-1.5 text-right">({probeX}°, {Math.abs(probeYTrans) > maxMathY ? '範囲外' : probeYTrans.toFixed(2)})</td>
+                    <td className="py-1.5 text-right">{probeStatusText(probeTransStatus) ?? probeYTrans.toFixed(4)}</td>
+                    <td className="py-1.5 text-right">({probeX}°, {probeStatusText(probeTransStatus) ?? probeYTrans.toFixed(2)})</td>
                   </tr>
                 </tbody>
               </table>

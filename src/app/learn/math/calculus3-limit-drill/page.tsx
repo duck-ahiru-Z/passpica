@@ -23,8 +23,11 @@ export default function Calculus3LimitDrillPage() {
   const isContinuity = problem.pattern === 'continuity';
   const answerLabel = isContinuity ? '連続となる定数 k' : '極限値';
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
-      <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
+    <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-sm">
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
+        <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
+        <Link href="/learn/math/calculus3-limit-visual" className="text-blue-600 hover:underline">極限の直感ビジュアルへ →</Link>
+      </div>
       <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">数学III 極限・解法選択ドリル</h1>
       <p className="text-gray-500 mb-6">式の形から方針を選び、極限値や連続条件を求める練習です。基礎練習は方針を固定し、実戦練習は全パターンランダムです。</p>
       <section className="retro-box space-y-5">

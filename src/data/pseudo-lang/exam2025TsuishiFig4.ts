@@ -7,7 +7,8 @@ Keiryou = [400, 500, 300, 600, 450]
 Shurui = [1, 2, 1, 2, 1]
 ninzu = 5 # ※元は40ですがテスト用に5に変更
 
-kanen = 0, funen = 0
+kanen = 0
+funen = 0
 iを1から ninzu まで1ずつ増やしながら繰り返す:
 ｜  もし Iremono[i] == 1 ならば:
 ｜  ｜  gomi = Keiryou[i] - 350

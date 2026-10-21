@@ -2,6 +2,7 @@ import { sampleBasic } from './sampleBasic';
 import { sampleIf } from './sampleIf';
 import { sampleLoop } from './sampleLoop';
 import { examBinarySearch } from './examBinarySearch';
+import { examPrototypeCoin } from './examPrototypeCoin';
 import { exam2025HonshiFig4 } from './exam2025HonshiFig4';
 import { exam2025HonshiFig5 } from './exam2025HonshiFig5';
 import { exam2025TsuishiFig2 } from './exam2025TsuishiFig2';
@@ -18,6 +19,7 @@ export const TEMPLATES: Record<string, TemplateValue> = {
   "sample_if": { code: sampleIf, isOneBased: false },
   "sample_loop": { code: sampleLoop, isOneBased: false },
   "exam_binary_search": { code: examBinarySearch, isOneBased: false },
+  "exam_prototype_coin": { code: examPrototypeCoin, isOneBased: false },
   "exam_2025_honshi_fig4": exam2025HonshiFig4,
   "exam_2025_honshi_fig5": exam2025HonshiFig5,
   "exam_2025_tsuishi_fig2": exam2025TsuishiFig2,
@@ -29,7 +31,8 @@ export const TEMPLATES: Record<string, TemplateValue> = {
 };
 
 export const TEMPLATE_OPTIONS = [
-  { value: "exam_binary_search", label: "試作問題（二分探索）" },
+  { value: "exam_prototype_coin", label: "試作問題（硬貨交換）" },
+  { value: "exam_binary_search", label: "二分探索（オリジナル例）" },
   { value: "exam_2025_honshi_fig4", label: "2025年 本試験（図4）" },
   { value: "exam_2025_honshi_fig5", label: "2025年 本試験（図5）" },
   { value: "exam_2025_tsuishi_fig2", label: "2025年 追試験（図2）" },
@@ -37,7 +40,7 @@ export const TEMPLATE_OPTIONS = [
   { value: "exam_2025_tsuishi_fig5", label: "2025年 追試験（図5）" },
   { value: "exam_2025_tsuishi_fig6", label: "2025年 追試験（図6）" },
   { value: "exam_2026_honshi", label: "2026年 本試験（待ち時間計算）" },
-  { value: "exam_2026_tsuishi", label: "2026年 追試験（クイズ選定・縮小例）" },
+  { value: "exam_2026_tsuishi", label: "2026年 追試験（第3問・学習用データ）" },
   { value: "sample_basic", label: "基本構文と代入" },
   { value: "sample_if", label: "条件分岐（if文）" },
   { value: "sample_loop", label: "配列と繰り返し（for文）" },

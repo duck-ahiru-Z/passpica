@@ -26,7 +26,7 @@ export default function FlameReactionPage() {
   const [selectedMetal, setSelectedMetal] = useState<MetalSalt | null>(null);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ページヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -81,7 +81,7 @@ export default function FlameReactionPage() {
 
           {/* 操作バー */}
           <div className="w-full border-t border-gray-200 pt-4 text-center">
-            <span className="text-xs font-bold block mb-2 text-slate-700">
+            <span className="font-bold block mb-2 text-slate-700">
               {selectedMetal ? `現在、${selectedMetal.jpName} (${selectedMetal.formula}) の${selectedMetal.colorName}の炎色反応を観察中` : '下の試薬瓶をクリックすると炎に投入されます。'}
             </span>
             {selectedMetal && (
@@ -114,7 +114,7 @@ export default function FlameReactionPage() {
                   onClick={() => setSelectedMetal(m)}
                   className={`border border-gray-400 p-2 text-center text-xs font-bold transition-all bg-slate-50 hover:bg-slate-100 ${selectedMetal?.formula === m.formula ? 'bg-amber-100 border-amber-600' : ''}`}
                 >
-                  <div className="text-[10px] text-slate-500 font-mono">{m.formula}</div>
+                  <div className="text-xs text-slate-500 font-mono">{m.formula}</div>
                   <div className="text-xs text-slate-800 mt-0.5">{m.jpName}</div>
                 </button>
               ))}
@@ -130,21 +130,21 @@ export default function FlameReactionPage() {
             {selectedMetal ? (
               <div className="space-y-2.5">
                 <div className="border border-gray-300 bg-white p-2 text-center">
-                  <span className="text-[10px] text-gray-400 block font-mono">対象語呂部分</span>
+                <span className="text-xs text-gray-500 block font-mono">対象語呂部分</span>
                   <span className="font-bold text-slate-800 text-sm">{selectedMetal.mnemonic}</span>
                 </div>
                 <div>
-                  <span className="font-bold text-slate-700 block text-[11px]">【元素解説】</span>
-                  <p className="text-gray-600 text-[11px] leading-relaxed mt-0.5">{selectedMetal.explain}</p>
+                  <span className="font-bold text-slate-700 block text-xs">【元素解説】</span>
+                  <p className="text-gray-600 text-xs leading-relaxed mt-0.5">{selectedMetal.explain}</p>
                 </div>
               </div>
             ) : (
-              <p className="text-gray-500 text-[11px] leading-relaxed">
+              <p className="text-gray-600 text-xs leading-relaxed">
                 試薬を選択すると、その金属塩に対応した炎色反応の語呂合わせフレーズと、基本情報がここに表示されます。
               </p>
             )}
 
-            <div className="border-t border-gray-200 pt-2 text-[10px] text-gray-400 leading-normal">
+            <div className="border-t border-gray-200 pt-2 text-xs text-gray-600 leading-relaxed">
               <strong>全体の語呂合わせ：</strong><br/>
               リアカー無き（Li:赤 / Na:黄）Kの村（K:紫）動力（Cu:緑）借りるとう（Ca:橙）馬力（Ba:緑）
             </div>

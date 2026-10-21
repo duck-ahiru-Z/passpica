@@ -3,6 +3,60 @@ function gcd(a: number, b: number): number {
   return Math.abs(a);
 }
 
+/** Familiar angles available to the product/quotient drill. */
+export const polarAngleChoices = [
+  { val: Math.PI / 6, s: "\\frac{\\pi}{6}" },
+  { val: Math.PI / 4, s: "\\frac{\\pi}{4}" },
+  { val: Math.PI / 3, s: "\\frac{\\pi}{3}" },
+  { val: Math.PI / 2, s: "\\frac{\\pi}{2}" },
+  { val: 2 * Math.PI / 3, s: "\\frac{2\\pi}{3}" },
+  { val: 3 * Math.PI / 4, s: "\\frac{3\\pi}{4}" },
+  { val: 5 * Math.PI / 6, s: "\\frac{5\\pi}{6}" },
+] as const;
+
+export const supportedPolarAngleLabels = [
+  { val: 0, label: '0' },
+  { val: Math.PI / 6, label: 'pi/6' },
+  { val: Math.PI / 4, label: 'pi/4' },
+  { val: Math.PI / 3, label: 'pi/3' },
+  { val: Math.PI / 2, label: 'pi/2' },
+  { val: 2 * Math.PI / 3, label: '2pi/3' },
+  { val: 3 * Math.PI / 4, label: '3pi/4' },
+  { val: 5 * Math.PI / 6, label: '5pi/6' },
+  { val: Math.PI, label: 'pi' },
+  { val: 7 * Math.PI / 6, label: '7pi/6' },
+  { val: 5 * Math.PI / 4, label: '5pi/4' },
+  { val: 4 * Math.PI / 3, label: '4pi/3' },
+  { val: 3 * Math.PI / 2, label: '3pi/2' },
+  { val: 5 * Math.PI / 3, label: '5pi/3' },
+  { val: 7 * Math.PI / 4, label: '7pi/4' },
+  { val: 11 * Math.PI / 6, label: '11pi/6' },
+  { val: 2 * Math.PI, label: '2pi' },
+] as const;
+
+export function formatPolarAngle(angle: number): string {
+  const match = supportedPolarAngleLabels.find(({ val }) => Math.abs(angle - val) < 0.01);
+  if (!match) throw new RangeError(`Unsupported polar angle: ${angle}`);
+  return match.label;
+}
+
+export function getSupportedPolarAnglePairs(operation: 'sum' | 'difference') {
+  return polarAngleChoices.flatMap(first => polarAngleChoices
+    .filter(second => {
+      const raw = operation === 'sum' ? first.val + second.val : first.val - second.val;
+      const result = ((raw % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      try {
+        formatPolarAngle(result);
+        formatExactTrigComponent(12, Math.cos(result));
+        formatExactTrigComponent(12, Math.sin(result));
+        return true;
+      } catch {
+        return false;
+      }
+    })
+    .map(second => [first, second] as const));
+}
+
 /** Format r·cos(θ) or r·sin(θ) for the exact special angles used in the drill. */
 export function formatExactTrigComponent(radius: number, trigValue: number): string {
   const sign = trigValue < 0 ? '-' : '';

@@ -41,6 +41,7 @@ const REAGENTS: Reagent[] = [
 interface ReactionResult {
   liquidColor: string;       // 反応後の上澄み液の色 (CSS color)
   precipitateColor: string;  // 沈殿物の色 (CSS color, ""の場合は沈殿なし)
+  precipitateStyle?: 'colloid'; // 液中に分散したコロイドは底に堆積させない
   formula: string;           // 化学反応式
   description: string;       // 現象の説明文
 }
@@ -142,16 +143,17 @@ export default function InorganicColorsPage() {
           return {
             liquidColor: 'rgba(187, 247, 208, 0.35)', // Fe2+ の淡緑色
             precipitateColor: 'rgba(254, 240, 138, 0.65)', // 黄白色（コロイド状の単体イオウ）
-            formula: '2Fe³⁺ + H₂S → 2Fe²⁺ + S↓ + 2H⁺ (イオウの白濁 ＋ Fe²⁺の淡緑色)',
-            description: '酸性条件下で硫化水素を通じると、Fe³⁺が還元されて淡緑色のFe²⁺になり、同時にH₂Sが酸化されて単体の硫黄（S）の黄白色のコロイド沈殿（白濁）が生じます。'
+            precipitateStyle: 'colloid',
+            formula: '2Fe³⁺ + H₂S → 2Fe²⁺ + S（コロイド） + 2H⁺ (黄白色の白濁 ＋ Fe²⁺の淡緑色)',
+            description: '酸性条件下で硫化水素を通じると、Fe³⁺が還元されて淡緑色のFe²⁺になり、同時にH₂Sが酸化されて単体硫黄の微粒子が液中に分散し、黄白色に白濁します。'
           };
         } else {
           // 塩基性ではFeS（黒色）が沈殿
           return {
             liquidColor: 'rgba(248, 250, 252, 0.1)',
             precipitateColor: '#1e293b', // 黒色
-            formula: '2Fe³⁺ + H₂S + 2OH⁻ → 2Fe²⁺ + S↓ + 2H₂O; Fe²⁺ + S²⁻ → FeS↓',
-            description: '塩基性条件下では、まずFe³⁺がH₂SによりFe²⁺へ還元されて硫黄が生じ、続いてFe²⁺がS²⁻と反応して硫化鉄(II)の黒色沈殿を作ります。'
+            formula: '2Fe³⁺ + 3H₂S + 6OH⁻ → 2FeS↓ + S↓ + 6H₂O',
+            description: '塩基性条件下では、H₂SがFe³⁺をFe²⁺へ還元して単体硫黄を生じ、さらに生じたFe²⁺が硫化物イオンと反応します。全体として硫化鉄(II)の黒色沈殿2 molと単体硫黄1 molが生じる反応式です。'
           };
         }
       }
@@ -558,15 +560,16 @@ export default function InorganicColorsPage() {
                 {/* 沈殿物レイヤー（ある場合） */}
                 {reaction.precipitateColor && (
                   <g>
-                    {/* ビーカー底部の堆積沈殿 */}
-                    <path
-                      d="M 21.5 175 C 30 185, 70 185, 78.5 175 L 78.5 200 A 30 30 0 0 1 21.5 200 Z"
-                      fill={reaction.precipitateColor}
-                      stroke={outlinePrecipitate ? '#64748b' : undefined}
-                      strokeWidth={outlinePrecipitate ? 1.5 : undefined}
-                      strokeOpacity={outlinePrecipitate ? 0.65 : undefined}
-                      className="transition-all duration-300"
-                    />
+                    {reaction.precipitateStyle !== 'colloid' && (
+                      <path
+                        d="M 21.5 175 C 30 185, 70 185, 78.5 175 L 78.5 200 A 30 30 0 0 1 21.5 200 Z"
+                        fill={reaction.precipitateColor}
+                        stroke={outlinePrecipitate ? '#64748b' : undefined}
+                        strokeWidth={outlinePrecipitate ? 1.5 : undefined}
+                        strokeOpacity={outlinePrecipitate ? 0.65 : undefined}
+                        className="transition-all duration-300"
+                      />
+                    )}
                     {/* 沈殿物コロイド・サスペンションの点々 */}
                     <circle cx="30" cy="150" r="1.5" fill={reaction.precipitateColor} opacity="0.8" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
                     <circle cx="45" cy="160" r="2" fill={reaction.precipitateColor} opacity="0.7" stroke={outlinePrecipitate ? '#64748b' : undefined} strokeWidth={outlinePrecipitate ? 0.6 : undefined} />
@@ -595,7 +598,7 @@ export default function InorganicColorsPage() {
                   <g transform="translate(5, 205)">
                     <rect x="0" y="0" width="90" height="24" rx="3" fill="#0f172a" opacity="0.85" />
                     <text x="45" y="15" fill="#ffffff" fontSize="9" textAnchor="middle" fontWeight="bold">
-                      沈殿あり
+                      {reaction.precipitateStyle === 'colloid' ? '白濁（コロイド）' : '沈殿あり'}
                     </text>
                   </g>
                 ) : (

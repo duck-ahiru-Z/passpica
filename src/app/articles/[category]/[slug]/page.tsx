@@ -1,10 +1,37 @@
 import { getArticleData } from '../../../../lib/markdown';
+import type { Metadata } from 'next';
+
+type ArticleRouteProps = {
+  params: Promise<{ category: string; slug: string }>;
+};
+
+export async function generateMetadata({ params }: ArticleRouteProps): Promise<Metadata> {
+  const { category, slug } = await params;
+  const article = await getArticleData(category, slug);
+  const description = article.description || `${article.title}。大学受験の学習に役立つ解説記事です。`;
+  const url = `/articles/${category}/${slug}`;
+
+  return {
+    title: article.title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      title: article.title,
+      description,
+      url,
+      publishedTime: article.date === '日付未定' ? undefined : new Date(article.date).toISOString(),
+      authors: [article.author],
+      ...(article.thumbnail ? { images: [article.thumbnail] } : {}),
+    },
+  };
+}
 
 // params の型を Promise に変更します
 export default async function ArticlePage({
   params,
 }: {
-  params: Promise<{ category: string; slug: string }>; // ← ここが変更点
+  params: Promise<{ category: string; slug: string }>;
 }) {
   // ① まず await で params の箱を開けて、中身を取り出す（最新Next.jsのルール！）
   const resolvedParams = await params;

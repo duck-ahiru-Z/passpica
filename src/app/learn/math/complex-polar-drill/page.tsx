@@ -6,15 +6,15 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { formatExactTrigComponent } from '@/src/lib/complexPolarExact';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4-product' | 'pattern4-quotient';
+const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4-product', 'pattern4-quotient']);
 
 interface ProblemData {
   pattern: Pattern;
@@ -36,29 +36,6 @@ interface ProblemData {
   z2?: {r: number, th: string, thVal: number};
 
   expLines: string[];
-}
-
-function parseAngleStr(thVal: number): string {
-  const eps = 0.01;
-  const pi = Math.PI;
-  if (Math.abs(thVal - 0) < eps) return "0";
-  if (Math.abs(thVal - pi/6) < eps) return "pi/6";
-  if (Math.abs(thVal - pi/4) < eps) return "pi/4";
-  if (Math.abs(thVal - pi/3) < eps) return "pi/3";
-  if (Math.abs(thVal - pi/2) < eps) return "pi/2";
-  if (Math.abs(thVal - 2*pi/3) < eps) return "2pi/3";
-  if (Math.abs(thVal - 3*pi/4) < eps) return "3pi/4";
-  if (Math.abs(thVal - 5*pi/6) < eps) return "5pi/6";
-  if (Math.abs(thVal - pi) < eps) return "pi";
-  if (Math.abs(thVal - 7*pi/6) < eps) return "7pi/6";
-  if (Math.abs(thVal - 5*pi/4) < eps) return "5pi/4";
-  if (Math.abs(thVal - 4*pi/3) < eps) return "4pi/3";
-  if (Math.abs(thVal - 3*pi/2) < eps) return "3pi/2";
-  if (Math.abs(thVal - 5*pi/3) < eps) return "5pi/3";
-  if (Math.abs(thVal - 7*pi/4) < eps) return "7pi/4";
-  if (Math.abs(thVal - 11*pi/6) < eps) return "11pi/6";
-  if (Math.abs(thVal - 2*pi) < eps) return "2pi";
-  return "0";
 }
 
 function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
@@ -130,7 +107,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let thVal = Math.atan2(finalY, finalX);
       if (thVal < 0) thVal += 2 * Math.PI;
       
-      const ansTheta = parseAngleStr(thVal);
+      const ansTheta = formatPolarAngle(thVal);
       let thDisplay = ansTheta.replace("pi", "\\pi");
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay.includes("/")) {
@@ -158,7 +135,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const a = axes[Math.floor(Math.random() * axes.length)];
       
       const qStr = `複素数 $z = ${a.s}$ を極形式 $r(\\cos\\theta + i\\sin\\theta)$ で表せ。`;
-      const ansTheta = parseAngleStr(a.th);
+      const ansTheta = formatPolarAngle(a.th);
       let thDisplay = ansTheta.replace("pi", "\\pi");
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay === "0") thDisplay = "0";
@@ -174,21 +151,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       return { pattern: p, qStr, ansR: rVal.toString(), ansTheta, zX: a.x, zY: a.y, rVal, thetaVal: a.th, expLines };
     }
-    else if (p === 'pattern4') {
-      const isProduct = Math.random() > 0.5;
+    else if (p === 'pattern4-product' || p === 'pattern4-quotient') {
+      const isProduct = p === 'pattern4-product';
       // Generate two angles that sum/diff to famous angles
-      const angles = [
-        {val: Math.PI/6, s: "\\frac{\\pi}{6}"},
-        {val: Math.PI/4, s: "\\frac{\\pi}{4}"},
-        {val: Math.PI/3, s: "\\frac{\\pi}{3}"},
-        {val: Math.PI/2, s: "\\frac{\\pi}{2}"},
-        {val: 2*Math.PI/3, s: "\\frac{2\\pi}{3}"},
-        {val: 3*Math.PI/4, s: "\\frac{3\\pi}{4}"},
-        {val: 5*Math.PI/6, s: "\\frac{5\\pi}{6}"}
-      ];
-      
-      const a1 = angles[Math.floor(Math.random() * angles.length)];
-      const a2 = angles[Math.floor(Math.random() * angles.length)];
+      const anglePairs = getSupportedPolarAnglePairs(isProduct ? 'sum' : 'difference');
+      const [a1, a2] = anglePairs[Math.floor(Math.random() * anglePairs.length)];
       
       let r1 = Math.floor(Math.random() * 3) + 2; // 2..4
       let r2 = Math.floor(Math.random() * 3) + 2;
@@ -222,7 +189,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const zY = rRes * sinVal;
       
       // find a and b strings
-      const thStr = parseAngleStr(thRes);
+      const thStr = formatPolarAngle(thRes);
       // to determine exact string
       let ansA = "", ansB = "";
       
@@ -317,7 +284,7 @@ export default function ComplexPolarDrill() {
     if (!problem) return;
     
     let isOk = false;
-    if (problem.pattern === 'pattern4') {
+    if (problem.pattern.startsWith('pattern4-')) {
       const uA = cleanAns(ansA);
       const pA = cleanAns(problem.ansA!);
       const uB = cleanAns(ansB);
@@ -349,7 +316,7 @@ export default function ComplexPolarDrill() {
     ctx.clearRect(0, 0, W, H);
 
     let maxR = problem.rVal;
-    if (problem.pattern === 'pattern4') {
+    if (problem.pattern.startsWith('pattern4-')) {
       maxR = Math.max(maxR, problem.z1!.r, problem.z2!.r);
     }
     maxR = Math.max(maxR, 2) * 1.2;
@@ -398,7 +365,7 @@ export default function ComplexPolarDrill() {
       ctx.stroke();
     };
 
-    if (problem.pattern === 'pattern4') {
+    if (problem.pattern.startsWith('pattern4-')) {
       const z1x = problem.z1!.r * Math.cos(problem.z1!.thVal);
       const z1y = problem.z1!.r * Math.sin(problem.z1!.thVal);
       const z2x = problem.z2!.r * Math.cos(problem.z2!.thVal);
@@ -460,6 +427,7 @@ export default function ComplexPolarDrill() {
         <p className="text-gray-500">
           複素数平面上の位置（絶対値と偏角）を直感的に把握し、極形式への変換や積・商の計算をマスターします。
         </p>
+        <Link href="/learn/math/unit-circle-complex" className="retro-btn-classic inline-flex mt-3">複素数の回転・伸縮をビジュアルで確認 →</Link>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -482,11 +450,12 @@ export default function ComplexPolarDrill() {
                 }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (第1象限・基本)</option>
-                <option value="pattern2">パターン2 (第2〜第4象限)</option>
-                <option value="pattern3">パターン3 (純虚数・実数)</option>
-                <option value="pattern4">パターン4 (極形式の積・商)</option>
+                <option value="mix">実戦練習：複素数平面 全パターンランダム</option>
+                <option value="pattern1">基礎練習：第1象限の極形式変換だけ</option>
+                <option value="pattern2">基礎練習：第2〜第4象限の極形式変換だけ</option>
+                <option value="pattern3">基礎練習：純虚数・実数の極形式変換だけ</option>
+                <option value="pattern4-product">基礎練習：極形式の積だけ</option>
+                <option value="pattern4-quotient">基礎練習：極形式の商だけ</option>
               </select>
             </div>
 
@@ -499,7 +468,7 @@ export default function ComplexPolarDrill() {
             </div>
             
             <div className="space-y-4">
-              {problem.pattern === 'pattern4' ? (
+              {problem.pattern.startsWith('pattern4-') ? (
                 <div className="flex flex-col items-center justify-center gap-2 font-bold border-t pt-4">
                   <span className="text-sm text-gray-500 mb-2">結果を <MathEq math="a+bi" /> の形で入力</span>
                   <div className="flex items-center gap-2 text-xl">
