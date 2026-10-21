@@ -154,6 +154,12 @@ export default function FlameReactionPage() {
 
       </div>
 
+      <section className="retro-box space-y-2">
+        <h2 className="font-bold">色を見分けられたら問題で確認</h2>
+        <p className="text-slate-600">6種類の金属の炎色反応を、元素ごとの基礎練習と全元素ランダムで反復できます。</p>
+        <Link href="/learn/chemistry/flame-reaction-drill" className="retro-btn-classic inline-flex">炎色反応の識別ドリルへ →</Link>
+      </section>
+
     </div>
   );
 }
