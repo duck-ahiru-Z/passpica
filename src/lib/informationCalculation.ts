@@ -6,6 +6,20 @@ export type InformationProblem = { pattern: InformationPattern; question: string
 
 export const informationPatterns: readonly InformationPattern[] = ['binary', 'data', 'transfer', 'logic', 'sampling', 'compression', 'complement'];
 export const informationLabels: Record<InformationPattern, string> = { binary: '2進数変換', data: 'データ量', transfer: '通信時間', logic: '論理演算', sampling: '標本化', compression: '圧縮率', complement: '補数表現' };
+const numericPatterns = new Set<InformationPattern>(['data', 'transfer', 'sampling', 'compression']);
+
+export function isInformationAnswerCorrect(pattern: InformationPattern, input: string, expected: string): boolean {
+  const answer = input.trim();
+  if (answer === '') return false;
+  if (!numericPatterns.has(pattern)) return answer.toLowerCase() === expected.toLowerCase();
+
+  // Accept either plain digits or correctly grouped thousands; do not silently
+  // erase malformed punctuation such as "2,,764,800".
+  if (!/^[+-]?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?|\.\d+)$/.test(answer)) return false;
+  const value = Number(answer.replaceAll(',', ''));
+  const target = Number(expected);
+  return Number.isFinite(value) && Number.isFinite(target) && value === target;
+}
 
 function binaryAddends(value: number): string {
   const addends: number[] = [];
