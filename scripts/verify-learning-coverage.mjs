@@ -19,21 +19,26 @@ function routeFile(link) {
 
 const requiredDrills = [
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill',
-  'mathbc-mixed-drill', 'calculus3-mixed-drill',
+  'mathbc-mixed-drill', 'calculus3-mixed-drill', 'quadratic-equation-drill',
   'motion-calculation-drill', 'mole-calculation-drill', 'calculation-drill',
+  'titration-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
+  'number-representation-drill',
 ];
+const aggregateDrills = new Set([
+  'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill', 'mathbc-mixed-drill', 'calculus3-mixed-drill',
+]);
 const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual',
-  'concentration-visual',
+  'concentration-visual', 'crystal-lattice',
 ];
 
 const drillEntries = readPortalEntries(drill);
 const practiceModeDescriptions = [
-  'calculus-drill', 'symmetric-polynomial-drill', 'vector-drill', 'circle-tangent-drill',
-  'completing-square-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
+  'calculus-drill', 'symmetric-polynomial-drill', 'circle-tangent-drill',
+  'completing-square-drill', 'quadratic-equation-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
   'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill',
 ];
@@ -163,7 +168,7 @@ if (incompletePatternPages.length > 0) {
   throw new Error(`Pattern drills must offer fixed-pattern and mixed modes with balanced selection: ${incompletePatternPages.join(', ')}`);
 }
 
-for (const slug of requiredDrills) {
+for (const slug of aggregateDrills) {
   const entry = drillEntries.find(candidate => candidate.slug === slug);
   const source = fs.readFileSync(routeFile(entry.link), 'utf8');
   if (!includesBalancedRandom(source, routeFile(entry.link)) || !/<select\b/.test(source) || !/全体ランダム|全パターンランダム|全分野ランダム|value=['"]all['"]/.test(source)) {

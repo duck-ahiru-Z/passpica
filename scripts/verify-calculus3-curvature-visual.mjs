@@ -10,11 +10,15 @@ import {
 } from '../src/lib/calculus3CurvatureVisual.ts';
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-curvature-visual/page.tsx'), 'utf8');
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-curve-analysis-drill/page.tsx'), 'utf8');
 if (!page.includes('aria-label="xの位置"') || !page.includes('role="img"') || !page.includes('curvatureSecondDerivative(x)')) {
   throw new Error('curvature visual must expose its slider and graph accessibly and derive concavity from f′′');
 }
 if (!page.includes('curvatureExtrema.map') || !page.includes('curvatureInflectionPoints.map') || !page.includes('curvatureFirstDerivative(x).toFixed(3)')) {
   throw new Error('graph markers and displayed derivative values must use the tested calculus model');
+}
+if (!page.includes('/learn/math/calculus3-curve-analysis-drill') || !drillPage.includes('/learn/math/calculus3-curvature-visual')) {
+  throw new Error('curvature visual and curve-analysis practice must link to each other');
 }
 
 const close = (actual, expected, tolerance = 1e-10) => Math.abs(actual - expected) <= tolerance;

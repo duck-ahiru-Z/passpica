@@ -1,10 +1,14 @@
 import { createCalculus3MixedQuestionPicker } from '../src/lib/calculus3MixedQuestions.ts';
+import { integralPatterns } from '../src/lib/calculus3Integrals.ts';
+import { geometryPatterns } from '../src/lib/calculus3Geometry.ts';
+import { curvePatterns } from '../src/lib/calculus3CurveAnalysis.ts';
+import { differentiationPatterns } from '../src/lib/calculus3Differentiation.ts';
 import katex from 'katex';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const areas = ['limit', 'differentiation', 'curve-analysis', 'integral', 'geometry', 'differential-equation'];
-const patternCounts = { limit: 7, differentiation: 7, 'curve-analysis': 6, integral: 5, geometry: 5, 'differential-equation': 4 };
+const patternCounts = { limit: 7, differentiation: differentiationPatterns.length, 'curve-analysis': curvePatterns.length, integral: integralPatterns.length, geometry: geometryPatterns.length, 'differential-equation': 4 };
 const areaLabels = { limit: '極限', differentiation: '微分法', 'curve-analysis': '曲線分析', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式' };
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-mixed-drill/page.tsx'), 'utf8');
 for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}', 'acceptedAnswers.includes(answer)', 'question.alternativeExplanations?.[answer]']) {
@@ -62,6 +66,15 @@ for (const question of [washerQuestion, shellQuestion]) {
   }
 }
 
+const integralPicker = createCalculus3MixedQuestionPicker();
+const trigIntegral = Array.from({ length: 500 }, () => integralPicker.next('integral')).find(question => question.pattern === 'integral:trig');
+if (!trigIntegral
+  || JSON.stringify(trigIntegral.acceptedAnswers) !== JSON.stringify(['三角関数の積分', '置換積分'])
+  || trigIntegral.acceptedAnswers.some(method => !trigIntegral.options.includes(method))
+  || !trigIntegral.alternativeExplanations?.['置換積分']?.includes('u=cos x')) {
+  throw new Error('Math III full-range mixed practice must accept and explain substitution as a valid method for odd-powered sine integrals');
+}
+
 for (const area of areas) {
   const picker = createCalculus3MixedQuestionPicker();
   const questions = Array.from({ length: 500 }, () => picker.next(area));
@@ -95,4 +108,5 @@ for (let seed = 1; seed <= 20; seed += 1) {
   }
 }
 
-console.log('Calculus III mixed practice verified: all 34 lower-level strategy patterns, varied generated questions, six-area balance across 10,000 seeded questions, KaTeX rendering, single-choice UI, and balanced answer positions.');
+const totalPatterns = Object.values(patternCounts).reduce((sum, count) => sum + count, 0);
+console.log(`Calculus III mixed practice verified: all ${totalPatterns} lower-level strategy patterns, varied generated questions, six-area balance across 10,000 seeded questions, KaTeX rendering, single-choice UI, and balanced answer positions.`);

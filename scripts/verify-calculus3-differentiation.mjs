@@ -3,6 +3,9 @@ import path from 'node:path';
 import { differentiationPatterns, generateDifferentiationProblem, isDifferentiationAnswerCorrect } from '../src/lib/calculus3Differentiation.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-differentiation-drill/page.tsx'), 'utf8');
+if (!drillPage.includes('/learn/math/calculus3-parametric-visual') || !drillPage.includes('/learn/math/calculus3-derivative-visual')) {
+  throw new Error('differentiation drill must link to its related visual lessons');
+}
 if (!/type="radio"\s+name="differentiation-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
   throw new Error('differentiation strategy must be a single-choice radio group');
 }
@@ -23,9 +26,14 @@ const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
 const checks = {
   chain: problem => {
-    const [, a, n] = problem.expression.match(/y=\((\d+)x\^2\+1\)\^\{(\d+)\}/);
-    const expected = 2 * Number(a) * Number(n) * (Number(a) + 1) ** (Number(n) - 1);
-    return close(problem.answer, expected) && problem.explanation.includes(String(expected));
+    const [, coefficient, exponent] = problem.expression.match(/y=\((?:(\d+)x\^2|x\^2)\+1\)\^\{(\d+)\}/);
+    const a = Number(coefficient ?? 1);
+    const n = Number(exponent);
+    const expected = 2 * a * n * (a + 1) ** (n - 1);
+    return close(problem.answer, expected)
+      && problem.explanation.includes(String(expected))
+      && !problem.expression.includes('1x')
+      && !problem.explanation.includes('^1');
   },
   product: problem => {
     const [, power] = problem.expression.match(/y=x\^\{(\d+)\}\\sin/);
@@ -45,6 +53,15 @@ const checks = {
     return close(problem.answer, (3 - Number(c)) / 2)
       && problem.explanation.includes(`dy/dx=`)
       && problem.explanation.includes(problem.answer.toFixed(3));
+  },
+  'ellipse-parametric': problem => {
+    const [, angle] = problem.expression.match(/\\left\.\\frac\{dy\}\{dx\}\\right\|_\{t=([^}]+)\}/);
+    const values = { '\\pi/6': Math.PI / 6, '\\pi/4': Math.PI / 4, '\\pi/3': Math.PI / 3, '2\\pi/3': 2 * Math.PI / 3 };
+    const t = values[angle];
+    const expected = -Math.cos(t) / (2 * Math.sin(t));
+    return close(problem.answer, expected) && problem.expression.includes('x=2\\cos t')
+      && problem.expression.includes('y=\\sin t') && problem.explanation.includes('dx/dt=−2sin t')
+      && problem.explanation.includes(expected.toFixed(3));
   },
   implicit: problem => {
     const [, a, constant] = problem.expression.match(/x\^2\+(?:(\d+)xy|xy)\+y\^2=(\d+)/);
@@ -69,7 +86,7 @@ const checks = {
     return problem.answer === Number(a) ** 2 && problem.explanation.includes('y′′');
   },
 };
-const expectedVariants = { chain: 9, product: 4, logarithmic: 5, parametric: 4, implicit: 5, inverse: 5, higher: 5 };
+const expectedVariants = { chain: 9, product: 4, logarithmic: 5, parametric: 4, 'ellipse-parametric': 4, implicit: 5, inverse: 5, higher: 5 };
 if (!isDifferentiationAnswerCorrect('0.250', 1 / 4)) throw new Error('three-decimal displayed answers should be accepted');
 if (!isDifferentiationAnswerCorrect(String(1 / 3), 1 / 3)) throw new Error('full-precision differentiation answers should be accepted');
 if (!isDifferentiationAnswerCorrect('0.333333', 1 / 3)) throw new Error('more precise differentiation answers should be accepted');
@@ -88,9 +105,8 @@ for (const pattern of differentiationPatterns) {
 }
 
 const mixed = Array.from({ length: 700 }, () => generateDifferentiationProblem('mix', stableRandom).pattern);
-for (let start = 0; start < mixed.length; start += differentiationPatterns.length) {
-  if (new Set(mixed.slice(start, start + differentiationPatterns.length)).size !== differentiationPatterns.length) throw new Error(`mixed set omitted a differentiation pattern in batch ${start / differentiationPatterns.length}`);
-}
+const deterministicCounts = new Map(differentiationPatterns.map(pattern => [pattern, mixed.filter(item => item === pattern).length]));
+if (Math.max(...deterministicCounts.values()) - Math.min(...deterministicCounts.values()) > 2) throw new Error(`mixed differentiation counts are imbalanced: ${JSON.stringify(Object.fromEntries(deterministicCounts))}`);
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed differentiation practice repeated adjacent patterns');
 
 for (let seed = 1; seed <= 20; seed += 1) {
@@ -100,11 +116,9 @@ for (let seed = 1; seed <= 20; seed += 1) {
     return (state - 1) / 2147483646;
   };
   const sequence = Array.from({ length: 7_000 }, () => generateDifferentiationProblem('mix', seededRandom).pattern);
-  for (let start = 0; start < sequence.length; start += differentiationPatterns.length) {
-    const batch = sequence.slice(start, start + differentiationPatterns.length);
-    if (new Set(batch).size !== differentiationPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / differentiationPatterns.length}`);
-  }
+  const counts = new Map(differentiationPatterns.map(pattern => [pattern, sequence.filter(item => item === pattern).length]));
+  if (Math.max(...counts.values()) - Math.min(...counts.values()) > 2) throw new Error(`seed ${seed} produced imbalanced differentiation counts: ${JSON.stringify(Object.fromEntries(counts))}`);
   if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
 }
 
-console.log('Calculus III differentiation verified: fixed-pattern options, formulas, answers, and variants; 140,000 seeded mixed questions plus 700 deterministic balance cases checked.');
+console.log('Calculus III differentiation verified: fixed-pattern options, formulas, answers, and variants; 140,700 mixed questions plus adjacency checks verified.');

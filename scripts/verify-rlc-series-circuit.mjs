@@ -27,6 +27,9 @@ const inductive = calculateRlcSeriesState({
   voltagePeak: 50,
 });
 assert.ok(inductive.netReactance > 0 && inductive.voltageLeadAngleDegrees > 0);
+// At the voltage peak (ωt = π/2), positive φ means current lags voltage.
+const inductiveCurrentAtVoltagePeak = inductive.currentPeak * Math.sin(Math.PI / 2 - inductive.voltageLeadAngleRadians);
+assert.ok(inductiveCurrentAtVoltagePeak < inductive.currentPeak);
 
 const capacitive = calculateRlcSeriesState({
   resistance: 100,
@@ -36,6 +39,10 @@ const capacitive = calculateRlcSeriesState({
   voltagePeak: 50,
 });
 assert.ok(capacitive.netReactance < 0 && capacitive.voltageLeadAngleDegrees < 0);
+// Negative φ means current leads voltage, so it is already past its peak.
+const capacitiveCurrentAtVoltagePeak = capacitive.currentPeak * Math.sin(Math.PI / 2 - capacitive.voltageLeadAngleRadians);
+assert.ok(capacitiveCurrentAtVoltagePeak < capacitive.currentPeak);
+assert.ok(capacitiveCurrentAtVoltagePeak > 0);
 
 for (const frequency of [10, 15, 25, 50, 90, 120]) {
   const state = calculateRlcSeriesState({ ...resonant, frequency });

@@ -45,7 +45,7 @@ export default function CrystalLatticePage() {
   const info = LATTICES[selectedType];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -130,7 +130,7 @@ export default function CrystalLatticePage() {
               </svg>
             </div>
             
-            <div className="text-[10px] text-gray-500 text-center">
+            <div className="text-xs text-gray-500 text-center">
               {selectedType === 'bcc' ? '頂点×8 (1/8個分) ＋ 中心×1 (1個分)' : '頂点×8 (1/8個分) ＋ 各面の中央×6 (1/2個分)'}
             </div>
           </div>
@@ -177,7 +177,7 @@ export default function CrystalLatticePage() {
               </svg>
             </div>
 
-            <div className="text-[10px] text-red-600 text-center font-bold">
+            <div className="text-xs text-red-600 text-center font-bold">
               対角線上で原子が接触 ➔ {info.contactFormula}
             </div>
           </div>
@@ -193,7 +193,7 @@ export default function CrystalLatticePage() {
               ■ 結晶格子の諸元・定数
             </h3>
 
-            <table className="classic-table text-[10px]">
+            <table className="classic-table text-xs">
               <tbody>
                 <tr>
                   <td className="bg-gray-50 font-bold w-28">単位格子中の原子数</td>
@@ -227,10 +227,10 @@ export default function CrystalLatticePage() {
             <p className="font-semibold text-slate-800">
               {info.contactFormulaExplain}
             </p>
-            <p className="text-gray-600 text-[11px]">
+            <p className="text-gray-600 text-xs">
               {info.explain}
             </p>
-            <p className="text-[10px] text-gray-500">
+            <p className="text-xs text-gray-500">
               ※六方最密構造 (HCP) は、立方体ではなく正六角柱を基準とし、配位数は面心と同じ12、充填率も同じく約74%です。
             </p>
           </div>

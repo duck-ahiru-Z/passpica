@@ -19,6 +19,8 @@ const page = await readFile(new URL('../src/app/learn/chemistry/reaction-safety/
 assert.match(page, /C₆H₇O₂\(ONO₂\)₃/);
 assert.match(page, /ΔH = −\{reactionHeat\} kJ/);
 assert.match(page, /硝酸エステル基/);
+assert.match(page, /過酸化物・超酸化物の危険な皮膜/);
+assert.match(page, /自分で開封・切断・操作せず、教員・安全担当者に知らせます/);
 assert.doesNotMatch(page, /濃硝酸と濃硫酸|アルコール・エーテル混合溶媒|音速レベル/);
 
 console.log('Reaction safety checks passed: composition, nitrogen percentage, graph bounds, and safe copy.');

@@ -17,7 +17,12 @@ export class BalancedRandom<T> {
     if (this.remaining.length === 0) {
       this.remaining = [...this.items];
       for (let i = this.remaining.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(random() * (i + 1));
+        // Clamp injected random sources too; a value of exactly 1 must not
+        // create an undefined slot in the shuffled batch.
+        const sample = random();
+        const j = Number.isFinite(sample)
+          ? Math.min(i, Math.max(0, Math.floor(sample * (i + 1))))
+          : 0;
         [this.remaining[i], this.remaining[j]] = [this.remaining[j], this.remaining[i]];
       }
       // Avoid an avoidable boundary repeat when a new batch starts.

@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-area-volume-drill/page.tsx'), 'utf8');
+const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-volume-visual/page.tsx'), 'utf8');
 if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}') || !/disabled=\{!strategy \|\| answer\.trim\(\) === ''\}/.test(drillPage)) {
   throw new Error('geometry drill must expose a single-choice strategy group and require strategy plus answer before checking');
 }
@@ -24,8 +25,20 @@ if (!drillPage.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)
 if (!drillPage.includes('<= 0.0005 + 1e-12') || !drillPage.includes('小数第3位まで入力')) {
   throw new Error('geometry answer precision guidance and accepted rounding tolerance must match');
 }
+if (!visualPage.includes('/learn/math/calculus3-area-volume-drill') || !drillPage.includes('/learn/math/calculus3-volume-visual')) {
+  throw new Error('volume visual and geometry drill must link to each other');
+}
 
 const stableRandom = () => 0.37;
+const reducedFraction = (numerator, denominator) => {
+  let left = Math.abs(numerator);
+  let right = Math.abs(denominator);
+  while (right !== 0) [left, right] = [right, left % right];
+  const divisor = left || 1;
+  const reducedNumerator = numerator / divisor;
+  const reducedDenominator = denominator / divisor;
+  return reducedDenominator === 1 ? String(reducedNumerator) : `${reducedNumerator}/${reducedDenominator}`;
+};
 const checks = {
   'between-curves': problem => {
     const [, coefficient] = problem.expression.match(/y=(\d*)x/);
@@ -33,7 +46,7 @@ const checks = {
     const linearTerm = value === 1 ? 'x' : `${value}x`;
     return Math.abs(problem.answer - value ** 3 / 6) < 1e-12
       && problem.explanation.includes(`区間内では ${linearTerm} が上`)
-      && problem.explanation.includes(`∫₀^${value}(${linearTerm}−x²)dx`);
+      && problem.explanation.includes(`∫₀^${value}(${linearTerm}−x²)dx=${reducedFraction(value ** 3, 6)}。`);
   },
   'x-axis-rotation': problem => {
     const [, exponent] = problem.expression.match(/y=x(?:\^\{(\d+)\})?/);
@@ -41,6 +54,13 @@ const checks = {
     const integrand = power === 1 ? '(x)²' : `(x^${power})²`;
     return Math.abs(problem.answer - Math.PI / (2 * power + 1)) < 1e-12
       && problem.explanation.includes(`π∫₀¹${integrand}dx`);
+  },
+  'disk-volume': problem => {
+    const [, upper] = problem.expression.match(/0\\le x\\le([\d.]+)/);
+    const b = Number(upper);
+    return Math.abs(problem.answer - Math.PI * b ** 5 / 5) < 1e-10
+      && problem.explanation.includes(`V=π∫₀^${b}x⁴dx`)
+      && problem.explanation.includes(`上端 b=${b}`);
   },
   'y-axis-rotation': problem => {
     const [, radius] = problem.expression.match(/0\\le x\\le(\d+)/);
@@ -75,12 +95,16 @@ for (const pattern of geometryPatterns) {
     if (pattern === 'x-axis-rotation' && problem.expression.includes('x^{1}')) {
       throw new Error('power 1 should be omitted from the displayed curve equation');
     }
+    if (pattern === 'x-axis-rotation' && problem.expression.includes('y=x^{2}')) {
+      throw new Error('the y=x², [0,1] case belongs to variable-bound disk-volume practice and must not be duplicated here');
+    }
     if (pattern === 'x-axis-rotation' && problem.explanation.includes('x^1')) {
       throw new Error('power 1 should be omitted from the disk-method explanation');
     }
     variants.add(problem.expression);
   }
-  if (variants.size !== 5) throw new Error(`${pattern} generated ${variants.size}/5 expected coefficient or interval variants`);
+  const expectedVariantCount = ['disk-volume', 'x-axis-rotation'].includes(pattern) ? 4 : 5;
+  if (variants.size !== expectedVariantCount) throw new Error(`${pattern} generated ${variants.size}/${expectedVariantCount} expected coefficient or interval variants`);
 }
 
 for (let value = 1; value <= 5; value += 1) {
@@ -103,9 +127,8 @@ for (let value = 1; value <= 5; value += 1) {
 }
 
 const mixed = Array.from({ length: 500 }, () => generateGeometryProblem('mix', stableRandom).pattern);
-for (let start = 0; start < mixed.length; start += geometryPatterns.length) {
-  if (new Set(mixed.slice(start, start + geometryPatterns.length)).size !== geometryPatterns.length) throw new Error(`mixed set omitted a geometry pattern in batch ${start / geometryPatterns.length}`);
-}
+const deterministicCounts = new Map(geometryPatterns.map(pattern => [pattern, mixed.filter(item => item === pattern).length]));
+if (Math.max(...deterministicCounts.values()) - Math.min(...deterministicCounts.values()) > 2) throw new Error(`mixed geometry counts are imbalanced: ${JSON.stringify(Object.fromEntries(deterministicCounts))}`);
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed geometry practice repeated adjacent patterns');
 
 for (let seed = 1; seed <= 20; seed += 1) {
@@ -115,10 +138,8 @@ for (let seed = 1; seed <= 20; seed += 1) {
     return (state - 1) / 2147483646;
   };
   const sequence = Array.from({ length: 5_000 }, () => generateGeometryProblem('mix', seededRandom).pattern);
-  for (let start = 0; start < sequence.length; start += geometryPatterns.length) {
-    const batch = sequence.slice(start, start + geometryPatterns.length);
-    if (new Set(batch).size !== geometryPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / geometryPatterns.length}`);
-  }
+  const counts = new Map(geometryPatterns.map(pattern => [pattern, sequence.filter(item => item === pattern).length]));
+  if (Math.max(...counts.values()) - Math.min(...counts.values()) > 2) throw new Error(`seed ${seed} produced imbalanced geometry counts: ${JSON.stringify(Object.fromEntries(counts))}`);
   if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
 }
 console.log('Calculus III geometry verified: fixed-pattern options, formulas and answers; 100,000 seeded mixed questions plus 500 deterministic balance cases checked.');

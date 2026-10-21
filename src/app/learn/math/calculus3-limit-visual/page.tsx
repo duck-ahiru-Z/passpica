@@ -24,7 +24,7 @@ export default function Calculus3LimitVisualPage() {
   const mirrored = sineRatioForNonzeroRadians(-x);
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
+    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
       <div className="flex items-center justify-between gap-3">
         <div>
           <div className="text-[11px] text-slate-500">数学III / 極限</div>

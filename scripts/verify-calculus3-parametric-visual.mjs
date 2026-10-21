@@ -7,6 +7,10 @@ const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calcul
 if (!page.includes('getEllipseParametricState(t)') || !page.includes('aria-label="媒介変数t"') || !page.includes('role="img"')) {
   throw new Error('the accessible visual controls and displayed values must use the tested parametric model');
 }
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-differentiation-drill/page.tsx'), 'utf8');
+if (!page.includes('/learn/math/calculus3-differentiation-drill') || !drillPage.includes('/learn/math/calculus3-parametric-visual')) {
+  throw new Error('parametric visual and differentiation practice must link to each other');
+}
 
 const close = (actual, expected, tolerance = 1e-9) => {
   assert.ok(Math.abs(actual - expected) <= tolerance, `${actual} ≉ ${expected}`);

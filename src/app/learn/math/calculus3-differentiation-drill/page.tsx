@@ -20,10 +20,11 @@ export default function Calculus3DifferentiationDrillPage() {
   const strategyIsCorrect = strategy === problem.pattern;
   const valueIsCorrect = isDifferentiationAnswerCorrect(answer, problem.answer);
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
+    <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-sm">
       <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
       <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">数学III 微分法・解法選択ドリル</h1>
       <p className="text-gray-500 mb-6">式の形から微分法を選び、指定点での導関数の値を求めます。個別練習と全パターンランダムを切り替えられます。</p>
+      <div className="flex flex-wrap items-center gap-2 mb-4"><span className="text-slate-600 font-semibold">関連ビジュアル：</span><Link href="/learn/math/calculus3-parametric-visual" className="retro-btn-classic inline-flex">楕円の媒介変数表示 →</Link><Link href="/learn/math/calculus3-derivative-visual" className="retro-btn-classic inline-flex">接線・増減 →</Link></div>
       <section className="retro-box space-y-5">
         <div className="flex flex-wrap items-center gap-2"><label htmlFor="differentiation-mode" className="font-bold">演習モード</label><select id="differentiation-mode" aria-label="微分法の演習パターン" value={mode} onChange={e => { const selectedMode = e.target.value as Mode; setMode(selectedMode); next(selectedMode); }} className="border p-1"><option value="mix">実戦練習：微分法 全パターンランダム</option>{differentiationPatterns.map(p => <option key={p} value={p}>基礎練習：{differentiationLabels[p]}だけ</option>)}</select></div>
         <div className="bg-white border p-8 text-center text-2xl"><MathEq math={problem.expression} /></div>

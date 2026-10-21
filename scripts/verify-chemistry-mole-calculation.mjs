@@ -14,7 +14,7 @@ if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)")
 }
 
 const stableRandom = () => 0.37;
-const expectedUnits = { mass: 'mol', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', ph: '', yield: '%' };
+const expectedUnits = { mass: 'mol', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', 'limiting-reagent': 'mol', ph: '', yield: '%' };
 const checks = {
   mass: problem => {
     const [, mass, molarMass] = problem.question.match(/([\d.]+) g.*?([\d.]+) g\/mol/);
@@ -36,8 +36,26 @@ const checks = {
     const [, sourceCoefficient, targetCoefficient, amount] = problem.explanation.match(/係数比 .+=(\d+):(\d+) より、([\d.]+)×/);
     return Math.abs(problem.answer - (Number(amount) * Number(targetCoefficient)) / Number(sourceCoefficient)) < 1e-12;
   },
+  'limiting-reagent': problem => {
+    const match = problem.explanation.match(/([\d.]+)\/(\d+)=([\d.]+)、.*?([\d.]+)\/(\d+)=([\d.]+)。小さい (.+?) が制限試薬です。.*?生成量は ([\d.]+)×(\d+)=([\d.]+) mol。/);
+    if (!match) return false;
+    const [, amountA, coefficientA, ratioA, amountB, coefficientB, ratioB, limitingReactant, limitingAmount, productCoefficient, answer] = match;
+    const expectedRatioA = Number(amountA) / Number(coefficientA);
+    const expectedRatioB = Number(amountB) / Number(coefficientB);
+    const minimum = Math.min(expectedRatioA, expectedRatioB);
+    const expectedLimitingReactant = expectedRatioA <= expectedRatioB
+      ? problem.question.match(/。(.+?) [\d.]+ mol と/)?.[1]
+      : problem.question.match(/と (.+?) [\d.]+ mol を/)?.[1];
+    return Math.abs(Number(ratioA) - expectedRatioA) < 1e-12
+      && Math.abs(Number(ratioB) - expectedRatioB) < 1e-12
+      && Math.abs(Number(limitingAmount) - minimum) < 1e-12
+      && limitingReactant === expectedLimitingReactant
+      && Math.abs(problem.answer - minimum * Number(productCoefficient)) < 1e-12
+      && Math.abs(Number(answer) - problem.answer) < 1e-12;
+  },
   ph: problem => {
-    const [, power] = problem.question.match(/10⁻(\d+) mol\/L/);
+    const [, superscript] = problem.question.match(/10⁻([¹²³⁴⁵]) mol\/L/);
+    const power = { '¹': 1, '²': 2, '³': 3, '⁴': 4, '⁵': 5 }[superscript];
     return problem.answer === Number(power);
   },
   yield: problem => {
@@ -68,9 +86,9 @@ if (!/slug: 'concentration-visual'[\s\S]*?practiceLink: '\/learn\/chemistry\/mol
   throw new Error('molar concentration visual should link to its related calculation drill');
 }
 
-const mixed = Array.from({ length: 700 }, () => generateMoleProblem('mix', stableRandom).pattern);
+const mixed = Array.from({ length: 800 }, () => generateMoleProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += molePatterns.length) {
   if (new Set(mixed.slice(start, start + molePatterns.length)).size !== molePatterns.length) throw new Error(`mixed set omitted a chemistry pattern in batch ${start / molePatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed chemistry practice repeated adjacent patterns');
-console.log('Chemistry mole calculations verified: 3,500 fixed-pattern questions and 700 mixed questions; formulas, units, answer keys, variant coverage, balance, and adjacency checked.');
+console.log('Chemistry mole calculations verified: 4,000 fixed-pattern questions and 800 mixed questions; formulas, units, answer keys, variant coverage, balance, and adjacency checked.');

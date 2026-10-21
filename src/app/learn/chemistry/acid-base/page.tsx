@@ -10,7 +10,7 @@ export default function AcidBasePage() {
   const display = getIndicatorDisplay(indicator, pH);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ページヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -165,6 +165,12 @@ export default function AcidBasePage() {
         </div>
 
       </div>
+
+      <section className="retro-box bg-slate-50 p-4 space-y-2">
+        <h2 className="font-bold">関連する計算演習</h2>
+        <p className="text-slate-600">指示薬の変色を確認したら、反応式の係数比を使う中和滴定の濃度計算にも挑戦できます。</p>
+        <Link href="/learn/chemistry/titration-drill" className="retro-btn-classic inline-flex">中和滴定の濃度計算を練習する →</Link>
+      </section>
 
     </div>
   );

@@ -81,7 +81,7 @@ const GASES: GasInfo[] = [
     colorOdor: '無色・無臭',
     dryAgent: '濃硫酸、塩化カルシウムなど（H₂と反応しないもの）',
     reaction: 'Zn + H2SO4 ➔ ZnSO4 + H2',
-    explain: 'すべての気体の中で最も軽く、水にほとんど溶けないため水上置換法で集められます。水上置換を選ぶ直接の理由は水への溶けにくさで、空気との相対密度だけでは捕集法は決まりません。水素は可燃性があり、空気との混合気体は引火・爆発する危険があるため、火気を近づけず、学校の実験手順に従って扱います。'
+    explain: '水にほとんど溶けず、水とも反応しにくいため水上置換法で集められます。水上置換を選ぶ直接の理由は水への溶けにくさで、空気より軽い性質は水上置換を選ぶ理由ではありません（空気との密度差を利用する場合、水に溶けやすい軽い気体は上方置換法です）。水素は可燃性があり、空気との混合気体は引火・爆発する危険があるため、火気を近づけず、学校の実験手順に従って扱います。'
   },
   {
     formula: 'CO2',
@@ -102,7 +102,7 @@ export default function GasCollectionPage() {
   const [selectedGas, setSelectedGas] = useState<GasInfo>(GASES[0]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -263,7 +263,7 @@ export default function GasCollectionPage() {
               ■ {selectedGas.name} ({selectedGas.formula}) の性質
             </h3>
 
-            <table className="classic-table text-[10px]">
+            <table className="classic-table text-xs">
               <tbody>
                 <tr>
                   <td className="bg-gray-50 font-bold w-20">捕集方法</td>
@@ -293,7 +293,7 @@ export default function GasCollectionPage() {
             </table>
 
             {/* 詳細解説 */}
-            <div className="bg-gray-50 border border-gray-200 p-2.5 leading-relaxed text-[11px] text-slate-600">
+            <div className="bg-gray-50 border border-gray-200 p-2.5 leading-relaxed text-xs text-slate-600">
               {selectedGas.explain}
             </div>
           </div>

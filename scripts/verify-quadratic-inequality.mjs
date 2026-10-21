@@ -7,11 +7,20 @@ const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/q
 if (!/role="img"\s+aria-label=\{graphDescription\}/.test(drillPage)) {
   throw new Error('quadratic-inequality graph must provide an accessible description of the curve and solution region');
 }
+for (const label of ['${side}の分子', '${side}の分母', "'左側の境界値'", "'右側の境界値'", "'境界値'"]) {
+  if (!drillPage.includes(label)) throw new Error(`quadratic-inequality fraction input is missing its accessible context: ${label}`);
+}
+if (drillPage.includes('\\text{ のすべての実数}') || drillPage.includes('<MathEq math={inequalityRegion.boundary}')) {
+  throw new Error('quadratic-inequality Japanese explanations must stay outside KaTeX math expressions');
+}
 if (!drillPage.includes('Math.abs(problem.a) === 1 ?')) {
   throw new Error('repeated-root explanation must show the positive square after normalizing a negative leading coefficient');
 }
 if (!drillPage.includes('const normalizedSign = problem.a < 0 ? reverseQuadraticInequalitySign(problem.ineqSign) : problem.ineqSign;') || !drillPage.includes("problem.a < 0 ? '変形後の式' : '左辺'")) {
   throw new Error('negative-leading-coefficient explanations must consistently describe the normalized quadratic and inequality');
+}
+if (!drillPage.includes('transformedB === 0 ?')) {
+  throw new Error('normalized quadratic explanations must omit the x-term when its coefficient is zero');
 }
 for (const [sign, boundary, side] of [['<', '0未満', '下'], ['\\le', '0以下', '下'], ['>', '0より大きい（0超）', '上'], ['\\ge', '0以上', '上']]) {
   const region = getQuadraticInequalityRegion(sign);

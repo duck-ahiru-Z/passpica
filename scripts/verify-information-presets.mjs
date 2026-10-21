@@ -10,7 +10,26 @@ assert.ok(!exam2026Honshi.includes('実装してください'), '2026 main prese
 assert.ok(exam2026Honshi.includes('最大値('), '2026 main preset must exercise the maximum function');
 assert.ok(exam2026Honshi.includes('到着 = [0, 3, 4, 10, 11, 12]'), '2026 main preset must retain its documented shortened data');
 assert.ok(!exam2026Tsuishi.includes('実装してください'), '2026 retake preset must not be a placeholder');
-assert.ok(exam2026Tsuishi.includes('採用先') && exam2026Tsuishi.includes('セット を 1 から 4'), '2026 retake preset must demonstrate non-duplicating quiz-set selection');
+assert.ok(exam2026Tsuishi.includes('saidai = 5') && exam2026Tsuishi.includes('c を 1 から 4 まで'), '2026 retake preset must define four sets with a five-question subject limit');
+assert.ok(exam2026Tsuishi.includes('Saiyou[i] == 0') && exam2026Tsuishi.includes('Saiyou[i] = c'), '2026 retake preset must not assign one question to multiple sets');
+const categoriesMatch = exam2026Tsuishi.match(/Bunya = \[([0-5,\s]+)\]/);
+assert.ok(categoriesMatch, '2026 retake preset must provide the six-category study data');
+const categories = categoriesMatch[1].split(',').map(value => Number(value.trim()));
+assert.equal(categories.length, 193, 'the practice data should contain 193 questions');
+const selectedSets = Array(categories.length).fill(0);
+for (let set = 1; set <= 4; set++) {
+  const counts = Array(6).fill(0);
+  for (let index = 0; index < categories.length; index++) {
+    const category = categories[index];
+    if (selectedSets[index] === 0 && counts[category] < 5) {
+      selectedSets[index] = set;
+      counts[category]++;
+    }
+  }
+  assert.ok(counts.every(count => count === 5), `set ${set} must contain five questions from each category`);
+}
+assert.equal(new Set(selectedSets.filter(Boolean)).size, 4);
+assert.equal(selectedSets.filter(Boolean).length, 120, 'four sets should select 120 unique questions');
 assert.equal(exam2025TsuishiFig2.isOneBased, true);
 assert.equal((exam2025TsuishiFig2.code.match(/【整数を入力】/g) ?? []).length, 4);
 assert.equal(exam2025TsuishiFig5.isOneBased, true);

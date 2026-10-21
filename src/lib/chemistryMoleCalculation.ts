@@ -1,12 +1,12 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
-export type MolePattern = 'mass' | 'concentration' | 'dilution' | 'gas' | 'stoichiometry' | 'ph' | 'yield';
+export type MolePattern = 'mass' | 'concentration' | 'dilution' | 'gas' | 'stoichiometry' | 'limiting-reagent' | 'ph' | 'yield';
 export type MoleMode = MolePattern | 'mix';
 export type MoleProblem = { pattern: MolePattern; question: string; answer: number; unit: string; explanation: string };
 
-export const molePatterns: readonly MolePattern[] = ['mass', 'concentration', 'dilution', 'gas', 'stoichiometry', 'ph', 'yield'];
-export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', concentration: 'モル濃度', dilution: '希釈', gas: '気体の物質量', stoichiometry: '反応量比', ph: 'pH計算', yield: '収率' };
+export const molePatterns: readonly MolePattern[] = ['mass', 'concentration', 'dilution', 'gas', 'stoichiometry', 'limiting-reagent', 'ph', 'yield'];
+export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', concentration: 'モル濃度', dilution: '希釈', gas: '気体の物質量', stoichiometry: '反応量比', 'limiting-reagent': '制限試薬と生成量', ph: 'pH計算', yield: '収率' };
 
 const picker = new BalancedRandom(molePatterns);
 const variants = {
@@ -35,6 +35,13 @@ const variants = {
     { equation: '2Na + Cl₂ → 2NaCl', source: 'Cl₂', sourceCoefficient: 1, amount: 0.4, target: 'Na', targetCoefficient: 2 },
     { equation: 'CaCO₃ → CaO + CO₂', source: 'CaCO₃', sourceCoefficient: 1, amount: 0.75, target: 'CO₂', targetCoefficient: 1 },
   ]),
+  limitingReagent: new BalancedRandom([
+    { equation: '2H₂ + O₂ → 2H₂O', reactantA: 'H₂', coefficientA: 2, amountA: 2, reactantB: 'O₂', coefficientB: 1, amountB: 1.5, product: 'H₂O', productCoefficient: 2 },
+    { equation: 'N₂ + 3H₂ → 2NH₃', reactantA: 'N₂', coefficientA: 1, amountA: 1.5, reactantB: 'H₂', coefficientB: 3, amountB: 3, product: 'NH₃', productCoefficient: 2 },
+    { equation: '4Fe + 3O₂ → 2Fe₂O₃', reactantA: 'Fe', coefficientA: 4, amountA: 3, reactantB: 'O₂', coefficientB: 3, amountB: 3, product: 'Fe₂O₃', productCoefficient: 2 },
+    { equation: '2Al + 3Cl₂ → 2AlCl₃', reactantA: 'Al', coefficientA: 2, amountA: 1.2, reactantB: 'Cl₂', coefficientB: 3, amountB: 2.4, product: 'AlCl₃', productCoefficient: 2 },
+    { equation: 'CaCO₃ + 2HCl → CaCl₂ + CO₂ + H₂O', reactantA: 'CaCO₃', coefficientA: 1, amountA: 0.5, reactantB: 'HCl', coefficientB: 2, amountB: 0.8, product: 'CO₂', productCoefficient: 1 },
+  ]),
   ph: new BalancedRandom([1, 2, 3, 4, 5]),
   yield: new BalancedRandom([
     { actual: 8, theoretical: 10 }, { actual: 9, theoretical: 12 }, { actual: 14, theoretical: 20 },
@@ -43,6 +50,7 @@ const variants = {
 };
 
 const displayNumber = (value: number) => Number(value.toFixed(6)).toString();
+const superscriptDigits = (value: number) => String(value).replace(/\d/g, digit => '⁰¹²³⁴⁵⁶⁷⁸⁹'[Number(digit)]);
 export const formatMoleAnswer = displayNumber;
 
 export function isMoleAnswerCorrect(input: string, expected: number): boolean {
@@ -77,9 +85,25 @@ export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleP
       const answer = (value.amount * value.targetCoefficient) / value.sourceCoefficient;
       return { pattern, question: `${value.equation}。${value.source} ${value.amount} mol と完全反応する ${value.target} は何 mol か。`, answer, unit: 'mol', explanation: `反応式の係数比 ${value.source}:${value.target}=${value.sourceCoefficient}:${value.targetCoefficient} より、${value.amount}×${value.targetCoefficient}/${value.sourceCoefficient}=${displayNumber(answer)} mol。` };
     }
+    case 'limiting-reagent': {
+      const value = variants.limitingReagent.next(random);
+      const ratioA = value.amountA / value.coefficientA;
+      const ratioB = value.amountB / value.coefficientB;
+      const limitingAmount = Math.min(ratioA, ratioB);
+      const limitingReactant = ratioA <= ratioB ? value.reactantA : value.reactantB;
+      const answer = limitingAmount * value.productCoefficient;
+      return {
+        pattern,
+        question: `${value.equation}。${value.reactantA} ${value.amountA} mol と ${value.reactantB} ${value.amountB} mol を反応させる。反応が完了したとき、${value.product} は最大何 mol 生成するか。`,
+        answer,
+        unit: 'mol',
+        explanation: `反応式の係数で割って比較します。${value.reactantA} は ${value.amountA}/${value.coefficientA}=${displayNumber(ratioA)}、${value.reactantB} は ${value.amountB}/${value.coefficientB}=${displayNumber(ratioB)}。小さい ${limitingReactant} が制限試薬です。${value.product} の生成量は ${displayNumber(limitingAmount)}×${value.productCoefficient}=${displayNumber(answer)} mol。`,
+      };
+    }
     case 'ph': {
       const value = variants.ph.next(random);
-      return { pattern, question: `水素イオン濃度が 10⁻${value} mol/L の強酸水溶液の pH は？`, answer: value, unit: '', explanation: `[H⁺]=10⁻${value} mol/L なので pH=−log₁₀[H⁺]=${value}。` };
+      const concentration = `10⁻${superscriptDigits(value)}`;
+      return { pattern, question: `水素イオン濃度が ${concentration} mol/L の強酸水溶液の pH は？`, answer: value, unit: '', explanation: `[H⁺]=${concentration} mol/L なので pH=−log₁₀[H⁺]=${value}。` };
     }
     case 'yield': {
       const value = variants.yield.next(random);
