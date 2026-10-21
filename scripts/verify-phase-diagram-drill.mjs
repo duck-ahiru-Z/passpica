@@ -14,7 +14,19 @@ for (const pattern of phasePatterns) {
   assert.ok(problem.question.length > 10);
   assert.ok(problem.explanation.length > 20);
   assert.ok(problem.answer.length > 3);
+  const outcomes = [...new Set(phasePatterns.map(candidate => generatePhaseProblem(candidate).answer))];
+  assert.ok(outcomes.includes(problem.answer), `${pattern} answer must be selectable in the drill`);
 }
+const outcomes = [...new Set(phasePatterns.map(pattern => generatePhaseProblem(pattern).answer))];
+assert.equal(outcomes.length, 8, 'each phase-diagram pattern should have a distinct answer choice');
+assert.ok(outcomes.includes('固体・液体・気体の三相'));
+assert.ok(outcomes.includes('超臨界流体'));
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/phase-diagram-drill/page.tsx'), 'utf8');
+assert.match(drillPage, /disabled={!answer}/, 'answer submission should remain disabled until an option is selected');
+assert.match(drillPage, /role="status" aria-live="polite"/, 'grading feedback should be announced accessibly');
+assert.match(drillPage, /正解は「\$\{problem\.answer\}」です。/, 'incorrect answers should show the correct concept');
+assert.match(drillPage, /\{problem\.explanation\}/, 'grading feedback should include the explanation');
+assert.match(drillPage, /setAnswer\(outcome\); setChecked\(false\);/, 'changing the answer should clear stale feedback');
 for (const fact of [
   "meltingCurveSlope: '負の傾き (右下がり)'",
   "meltingCurveSlope: '正の傾き (右上がり／右傾斜)'",
