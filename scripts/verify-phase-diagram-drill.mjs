@@ -4,6 +4,17 @@ import path from 'node:path';
 import { generatePhaseProblem, phasePatterns } from '../src/lib/phaseDiagramDrill.ts';
 
 assert.equal(phasePatterns.length, 8);
+const expectedAnswers = {
+  'water-melting': '負の傾き（右下がり）',
+  'co2-melting': '正の傾き（右上がり）',
+  'water-one-atm': 'まず融解して液体になり、その後に蒸発する',
+  'co2-one-atm': '液体を経ず、固体から直接気体へ昇華する',
+  'triple-point': '固体・液体・気体の三相',
+  'co2-triple-pressure': '1気圧より高い',
+  'critical-point': '液体と気体の境界がなくなる',
+  supercritical: '超臨界流体',
+};
+assert.deepEqual(Object.keys(expectedAnswers).sort(), [...phasePatterns].sort(), 'every phase pattern needs an independently specified expected answer');
 const visual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');
 const drill = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/phase-diagram-drill/page.tsx'), 'utf8');
 assert.ok(visual.includes('href="/learn/chemistry/phase-diagram-drill"'));
@@ -11,13 +22,12 @@ assert.ok(drill.includes('href="/learn/chemistry/phase-diagram"'));
 for (const pattern of phasePatterns) {
   const problem = generatePhaseProblem(pattern);
   assert.equal(problem.pattern, pattern);
+  assert.equal(problem.answer, expectedAnswers[pattern], `${pattern} answer must match its independently checked concept`);
   assert.ok(problem.question.length > 10);
   assert.ok(problem.explanation.length > 20);
   assert.ok(problem.answer.length > 3);
-  const outcomes = [...new Set(phasePatterns.map(candidate => generatePhaseProblem(candidate).answer))];
-  assert.ok(outcomes.includes(problem.answer), `${pattern} answer must be selectable in the drill`);
 }
-const outcomes = [...new Set(phasePatterns.map(pattern => generatePhaseProblem(pattern).answer))];
+const outcomes = [...new Set(Object.values(expectedAnswers))];
 assert.equal(outcomes.length, 8, 'each phase-diagram pattern should have a distinct answer choice');
 assert.ok(outcomes.includes('固体・液体・気体の三相'));
 assert.ok(outcomes.includes('超臨界流体'));
@@ -27,6 +37,7 @@ assert.match(drillPage, /role="status" aria-live="polite"/, 'grading feedback sh
 assert.match(drillPage, /正解は「\$\{problem\.answer\}」です。/, 'incorrect answers should show the correct concept');
 assert.match(drillPage, /\{problem\.explanation\}/, 'grading feedback should include the explanation');
 assert.match(drillPage, /setAnswer\(outcome\); setChecked\(false\);/, 'changing the answer should clear stale feedback');
+assert.match(drillPage, /const outcomes = \[\.\.\.new Set\(phasePatterns\.map\(pattern => generatePhaseProblem\(pattern\)\.answer\)\)\];/, 'answer choices must be built from every checked fixed-pattern answer');
 for (const fact of [
   "meltingCurveSlope: '負の傾き (右下がり)'",
   "meltingCurveSlope: '正の傾き (右上がり／右傾斜)'",
