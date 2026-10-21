@@ -6,6 +6,7 @@ import { generateFlameReactionProblem } from '../src/lib/flameReactionDrill.ts';
 
 assert.equal(inorganicPatterns.length, 15);
 const visual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors/page.tsx'), 'utf8');
+assert.ok(visual.includes('15条件の個別練習と全パターンランダム'), 'the visual should advertise the current number of fixed reaction conditions');
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors-drill/page.tsx'), 'utf8');
 const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8')).scripts;
 assert.ok(packageScripts['test:inorganic-reaction-drill']?.includes('verify-inorganic-reaction-drill.mjs'), 'the inorganic fixed/mixed verifier must have a dedicated npm script');
