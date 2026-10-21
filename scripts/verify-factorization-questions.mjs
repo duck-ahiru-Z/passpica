@@ -9,7 +9,7 @@ if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage
 if (!drillPage.includes('setChoice(option); setChecked(false);')) {
   throw new Error('changing a factorization strategy must clear the previous feedback');
 }
-for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
+for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', '因数分解の結果を、因数の積の形で入力してください。', 'placeholder="因数の積（例：(x-3)(x+3)）"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
   if (!drillPage.includes(requirement)) throw new Error(`factorization practice is missing fixed-answer behavior: ${requirement}`);
 }
 
@@ -85,5 +85,6 @@ for (let start = 0; start < mixed.length; start += factorizationPatterns.length)
   if (new Set(mixed.slice(start, start + factorizationPatterns.length)).size !== factorizationPatterns.length) throw new Error(`mixed batch ${start} omitted a pattern`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mode repeated adjacent patterns');
+
 
 console.log('Factorization strategy verified: 2,500 seeded fixed-mode questions with diverse expressions and 1,000 balanced mixed questions across all five patterns.');
