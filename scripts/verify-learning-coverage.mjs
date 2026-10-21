@@ -83,6 +83,28 @@ for (const link of practiceLinks) {
     throw new Error(`Learning portal practice link must target an existing drill: ${link}`);
   }
 }
+const calculus3VisualPracticePairs = [
+  ['/learn/math/calculus3-limit-visual', '/learn/math/calculus3-limit-drill'],
+  ['/learn/math/calculus3-derivative-visual', '/learn/math/calculus3-differentiation-drill'],
+  ['/learn/math/calculus3-integral-visual', '/learn/math/calculus3-integral-drill'],
+  ['/learn/math/calculus3-volume-visual', '/learn/math/calculus3-area-volume-drill'],
+  ['/learn/math/calculus3-curvature-visual', '/learn/math/calculus3-curve-analysis-drill'],
+  ['/learn/math/calculus3-parametric-visual', '/learn/math/calculus3-differentiation-drill'],
+];
+for (const [visualRoute, drillRoute] of calculus3VisualPracticePairs) {
+  const visualEntry = learnEntries.find(entry => entry.link === visualRoute);
+  if (!visualEntry || !new RegExp(`slug: '${visualEntry.slug}'[\\s\\S]*?practiceLink: '${drillRoute}'`).test(learn)) {
+    throw new Error(`Calculus III learning portal card must link ${visualRoute} to ${drillRoute}`);
+  }
+  const visualPage = fs.readFileSync(routeFile(visualRoute), 'utf8');
+  const drillPage = fs.readFileSync(routeFile(drillRoute), 'utf8');
+  if (!visualPage.includes(`href="${drillRoute}"`)) {
+    throw new Error(`Calculus III visual must link to its matching practice: ${visualRoute} -> ${drillRoute}`);
+  }
+  if (!drillPage.includes(`href="${visualRoute}"`)) {
+    throw new Error(`Calculus III practice must link back to its visual: ${drillRoute} -> ${visualRoute}`);
+  }
+}
 const organic3dPage = fs.readFileSync(routeFile(learnEntries.find(entry => entry.slug === 'organic-3d').link), 'utf8');
 if (!learn.includes("title: '有機・高分子3D分子モデルビューア（立体構造）'")
   || !organic3dPage.includes('有機・高分子3D分子モデルビューア（立体構造）')
