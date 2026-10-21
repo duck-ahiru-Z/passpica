@@ -239,6 +239,12 @@ export default function OrganicSeparationPage() {
 
       </div>
 
+      <section className="retro-box space-y-2">
+        <h2 className="font-bold">分離の仕組みを問題で確認</h2>
+        <p className="text-slate-600">酸・塩基の強さから水層へ移る物質を判断する練習を、物質ごとの基礎と全パターン混合で行えます。</p>
+        <Link href="/learn/chemistry/organic-separation-drill" className="retro-btn-classic inline-flex">有機化合物の分離ドリルへ →</Link>
+      </section>
+
     </div>
   );
 }

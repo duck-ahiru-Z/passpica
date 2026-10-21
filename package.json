@@ -69,6 +69,8 @@
     "test:mechanical-energy": "node --experimental-strip-types scripts/verify-mechanical-energy.mjs",
     "test:chemistry-indicators": "node --experimental-strip-types scripts/verify-chemistry-indicators.mjs",
     "test:flame-reaction-drill": "node --experimental-strip-types scripts/verify-flame-reaction-drill.mjs",
+    "test:organic-separation-drill": "node --experimental-strip-types scripts/verify-organic-separation-drill.mjs",
+    "test:organic-separation-visual": "node scripts/verify-organic-separation-visual.mjs",
     "test:metal-ion-drill": "node --experimental-strip-types scripts/verify-metal-ion-drill.mjs",
     "test:phase-diagram-drill": "node --experimental-strip-types scripts/verify-phase-diagram-drill.mjs",
     "test:phase-diagram-visual": "node scripts/verify-phase-diagram-visual.mjs",
