@@ -75,6 +75,8 @@
     "test:organic-separation-visual": "node scripts/verify-organic-separation-visual.mjs",
     "test:metal-ion-drill": "node --experimental-strip-types scripts/verify-metal-ion-drill.mjs",
     "test:phase-diagram-drill": "node --experimental-strip-types scripts/verify-phase-diagram-drill.mjs",
+    "test:gas-collection-drill": "node --experimental-strip-types scripts/verify-gas-collection-drill.mjs",
+    "test:gas-collection-visual": "node scripts/verify-gas-collection-visual.mjs",
     "test:math2-bc-mixed": "node --experimental-strip-types scripts/verify-math2-bc-mixed-questions.mjs",
     "test:math": "node --experimental-strip-types scripts/verify-discriminant-pattern.mjs",
     "test:coverage": "node scripts/verify-learning-coverage.mjs",

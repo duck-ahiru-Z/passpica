@@ -302,6 +302,12 @@ export default function GasCollectionPage() {
 
       </div>
 
+      <div className="text-center">
+        <Link href="/learn/chemistry/gas-collection-drill" className="retro-btn-classic inline-flex">
+          気体の捕集法を問題で練習する →
+        </Link>
+      </div>
+
     </div>
   );
 }
