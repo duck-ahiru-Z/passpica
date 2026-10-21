@@ -126,6 +126,18 @@ for (let value = 1; value <= 5; value += 1) {
   }
 }
 
+const disk = generateGeometryProblem('disk-volume', () => 0);
+if (!isGeometryStrategyValid(disk, 'x-axis-rotation')) {
+  throw new Error('the y=x² rotating-body problem must accept the general x-axis disk-method strategy');
+}
+if (!getGeometryExplanation(disk, 'x-axis-rotation').includes('円板法')
+  || !getGeometryExplanation(disk, 'x-axis-rotation').includes(disk.answer.toFixed(3))) {
+  throw new Error('the accepted disk-method alternative must show its derivation and match the expected volume');
+}
+if (isGeometryStrategyValid(disk, 'curve-length')) {
+  throw new Error('unrelated strategies must remain invalid for the y=x² rotating-body problem');
+}
+
 const mixed = Array.from({ length: 500 }, () => generateGeometryProblem('mix', stableRandom).pattern);
 const deterministicCounts = new Map(geometryPatterns.map(pattern => [pattern, mixed.filter(item => item === pattern).length]));
 if (Math.max(...deterministicCounts.values()) - Math.min(...deterministicCounts.values()) > 2) throw new Error(`mixed geometry counts are imbalanced: ${JSON.stringify(Object.fromEntries(deterministicCounts))}`);
