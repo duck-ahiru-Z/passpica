@@ -20,12 +20,15 @@ export default function MechanicalEnergyVisualPage() {
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="text-[11px] text-slate-500">物理 / 力学</div>
           <h1 className="text-xl md:text-2xl font-bold text-slate-900">力学的エネルギーの変換ビジュアル</h1>
         </div>
-        <Link href="/learn" className="retro-btn-classic">学習一覧へ</Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/learn/physics/motion-calculation-drill" className="retro-btn-classic">力学の計算演習へ →</Link>
+          <Link href="/learn" className="retro-btn-classic">学習一覧へ</Link>
+        </div>
       </div>
 
       <section className="retro-box bg-white p-4 space-y-4">

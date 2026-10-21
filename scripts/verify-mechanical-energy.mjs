@@ -1,10 +1,16 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   calculateFallingEnergy,
   fallingObjectInitialHeight,
   fallingObjectMass,
   mechanicalEnergyGravity,
 } from '../src/lib/mechanicalEnergy.ts';
+
+const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/energy-visual/page.tsx'), 'utf8');
+assert.match(visualPage, /href="\/learn\/physics\/motion-calculation-drill"/, 'the energy visual should link to the related mechanics calculation drills');
+assert.match(visualPage, /力学の計算演習へ/, 'the related drill link should have a clear Japanese label');
 
 let previousPotential = Number.POSITIVE_INFINITY;
 let previousKinetic = Number.NEGATIVE_INFINITY;
