@@ -27,6 +27,7 @@
     "test:calculus3-curvature-visual": "node --experimental-strip-types scripts/verify-calculus3-curvature-visual.mjs",
     "test:calculus3-parametric-visual": "node --experimental-strip-types scripts/verify-calculus3-parametric-visual.mjs",
     "test:crystal-lattice-visual": "node scripts/verify-crystal-lattice-visual.mjs",
+    "test:crystal-lattice-drill": "node --experimental-strip-types scripts/verify-crystal-lattice-drill.mjs",
     "test:flame-reaction-visual": "node scripts/verify-flame-reaction-visual.mjs",
     "test:industrial-process-visual": "node scripts/verify-industrial-process-visual.mjs",
     "test:phase-diagram-visual": "node scripts/verify-phase-diagram-visual.mjs",
