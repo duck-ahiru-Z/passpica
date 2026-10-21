@@ -13,6 +13,9 @@ if (!visualPage.includes('xはラジアンで測ります') || !visualPage.inclu
 if (!drillPage.includes("href=\"/learn/math/calculus3-limit-visual\"")) {
   throw new Error('the limit drill must link directly to its related limit-intuition visual');
 }
+if (!visualPage.includes('href="/learn/math/calculus3-limit-drill"') || !visualPage.includes('極限の解法選択を問題で練習する →')) {
+  throw new Error('the limit-intuition visual must link directly to the fixed-pattern and mixed limit drill');
+}
 const close = (actual, expected, tolerance = 1e-12) => Math.abs(actual - expected) <= tolerance;
 for (const x of [0.05, 0.1, 0.5, 1, 2.8]) {
   const right = sineRatioForNonzeroRadians(x);
