@@ -68,6 +68,7 @@
     "test:rlc-calculation-drill": "node --experimental-strip-types scripts/verify-rlc-calculation-drill.mjs",
     "test:mechanical-energy": "node --experimental-strip-types scripts/verify-mechanical-energy.mjs",
     "test:chemistry-indicators": "node --experimental-strip-types scripts/verify-chemistry-indicators.mjs",
+    "test:metal-ion-drill": "node --experimental-strip-types scripts/verify-metal-ion-drill.mjs",
     "test:phase-diagram-drill": "node --experimental-strip-types scripts/verify-phase-diagram-drill.mjs",
     "test:phase-diagram-visual": "node scripts/verify-phase-diagram-visual.mjs",
     "test:math2-bc-mixed": "node --experimental-strip-types scripts/verify-math2-bc-mixed-questions.mjs",
