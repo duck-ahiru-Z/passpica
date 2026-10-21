@@ -36,5 +36,12 @@ assert.equal(getIndicatorDisplay('mo', 4.4).colorName, '黄色');
 assert.notEqual(getIndicatorDisplay('mo', 3.4).backgroundColor, getIndicatorDisplay('mo', 4.1).backgroundColor);
 assert.equal(getIndicatorDisplay('litmus', -5).colorName, getIndicatorDisplay('litmus', 1).colorName);
 assert.equal(getIndicatorDisplay('mo', 20).colorName, getIndicatorDisplay('mo', 14).colorName);
+for (const indicator of ['pp', 'litmus', 'mo']) {
+  const fallback = getIndicatorDisplay(indicator, Number.NaN);
+  assert.deepEqual(fallback, getIndicatorDisplay(indicator, 7), `${indicator} should fall back to a valid neutral display for NaN pH`);
+  assert.doesNotMatch(fallback.backgroundColor, /NaN/);
+  assert.equal(getIndicatorDisplay(indicator, Number.NEGATIVE_INFINITY).backgroundColor, getIndicatorDisplay(indicator, 1).backgroundColor);
+  assert.equal(getIndicatorDisplay(indicator, Number.POSITIVE_INFINITY).backgroundColor, getIndicatorDisplay(indicator, 14).backgroundColor);
+}
 
 console.log('Chemistry indicators verified: 393 pH-indicator combinations, transition intervals, endpoint colors, and pH bounds.');

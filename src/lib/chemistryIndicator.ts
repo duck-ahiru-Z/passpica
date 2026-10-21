@@ -24,7 +24,9 @@ const ORANGE: Rgb = [249, 115, 22];
 const YELLOW: Rgb = [234, 179, 8];
 
 export function getIndicatorDisplay(indicator: IndicatorKey, phInput: number): IndicatorDisplay {
-  const pH = Math.max(1, Math.min(14, phInput));
+  // Keep malformed values from producing NaN RGB channels in the visual.
+  // Neutral pH is a safe fallback; finite out-of-range values remain clamped.
+  const pH = Number.isNaN(phInput) ? 7 : Math.max(1, Math.min(14, phInput));
 
   if (indicator === 'pp') {
     if (pH < 8.3) {
