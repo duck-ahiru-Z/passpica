@@ -78,6 +78,9 @@ if (!drillPage.includes('isMotionMethodValid(problem, method)') || !drillPage.in
   throw new Error('accepted alternative mechanics methods must be graded and explained with their own derivation');
 }
 if (!drillPage.includes('href="/learn/physics/projectile-visual"')) throw new Error('projectile mechanics drill must link back to its visual simulator');
+if (!drillPage.includes('href="/learn/physics/motion-visual"') || !drillPage.includes('等加速度運動ビジュアルへ')) {
+  throw new Error('mechanics calculation drill must link back to the constant-acceleration visual');
+}
 const motionVisualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-visual/page.tsx'), 'utf8');
 if (!motionVisualPage.includes('href="/learn/physics/motion-calculation-drill"') || !motionVisualPage.includes('等加速度運動の計算演習へ')) {
   throw new Error('constant-acceleration visual must link directly to its calculation drill');
