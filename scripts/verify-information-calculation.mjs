@@ -48,7 +48,10 @@ const checks = {
     const expected = operation === 'A AND (NOT B)' ? Number(Boolean(left && !right))
       : operation === 'A OR (NOT B)' ? Number(Boolean(left || !right))
         : Number(Boolean(left !== right));
-    return Number(problem.answer) === expected && problem.unit === '';
+    const explanationMatches = operation === 'A XOR B'
+      ? problem.explanation.includes(`A と B は${left === right ? '等しい' : '異なる'}ので、XOR（排他的論理和）は ${expected}。`)
+      : problem.explanation.includes(`NOT B=${1 - right}`) && problem.explanation.includes(`計算すると ${expected}`);
+    return Number(problem.answer) === expected && problem.unit === '' && explanationMatches;
   },
   sampling: problem => {
     const [, khz, bits, channels] = problem.question.match(/(\d+(?:\.\d+)?) kHz、量子化ビット数 (\d+) bit、(ステレオ2 ch|モノラル1 ch)/);
@@ -79,7 +82,7 @@ for (const pattern of informationPatterns) {
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     questions.add(problem.question);
   }
-  const expectedVariants = pattern === 'compression' ? 7 : 5;
+  const expectedVariants = pattern === 'compression' ? 7 : pattern === 'logic' ? 12 : 5;
   if (questions.size !== expectedVariants) throw new Error(`${pattern} generated ${questions.size}/${expectedVariants} expected variants`);
 }
 

@@ -41,11 +41,16 @@ const variants = {
     { size: 80, rate: 20 }, { size: 12, rate: 24 }, { size: 150, rate: 100 },
     { size: 64, rate: 16 }, { size: 45, rate: 30 },
   ]),
-  logic: new BalancedRandom([
-    { a: 1, b: 0, operation: 'A AND (NOT B)', result: 1 }, { a: 0, b: 1, operation: 'A AND (NOT B)', result: 0 },
-    { a: 1, b: 1, operation: 'A OR (NOT B)', result: 1 }, { a: 0, b: 0, operation: 'A OR (NOT B)', result: 1 },
-    { a: 1, b: 1, operation: 'A XOR B', result: 0 },
-  ]),
+  logic: new BalancedRandom(['A AND (NOT B)', 'A OR (NOT B)', 'A XOR B'].flatMap(operation =>
+    [0, 1].flatMap(a => [0, 1].map(b => ({
+      a,
+      b,
+      operation,
+      result: Number(operation === 'A AND (NOT B)' ? Boolean(a && !b)
+        : operation === 'A OR (NOT B)' ? Boolean(a || !b)
+          : Boolean(a !== b)),
+    })))),
+  ),
   sampling: new BalancedRandom([
     { frequency: 44100, bits: 16, channels: 2 }, { frequency: 48000, bits: 24, channels: 2 },
     { frequency: 32000, bits: 16, channels: 1 }, { frequency: 22050, bits: 8, channels: 1 },
@@ -82,7 +87,7 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
     case 'logic': {
       const value = variants.logic.next(random);
       const explanation = value.operation === 'A XOR B'
-        ? `A と B はどちらも${value.a}なので、XOR（排他的論理和）は ${value.result}。`
+        ? `A と B は${value.a === value.b ? '等しい' : '異なる'}ので、XOR（排他的論理和）は ${value.result}。`
         : `NOT B=${1 - value.b}。${value.operation} を順に計算すると ${value.result}。`;
       return { pattern, question: `A=${value.a}、B=${value.b} のとき、${value.operation} の値は？`, answer: String(value.result), explanation, unit: '' };
     }
