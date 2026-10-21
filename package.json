@@ -47,6 +47,8 @@
     "test:factorization": "node --experimental-strip-types scripts/verify-factorization-questions.mjs",
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",
     "test:trig-synthesis-inputs": "node --experimental-strip-types scripts/verify-trig-synthesis-inputs.mjs",
+    "test:trigonometry-graph-drill": "node --experimental-strip-types scripts/verify-trigonometry-graph-drill.mjs",
+    "test:sine-rule": "node --experimental-strip-types scripts/verify-sine-rule.mjs",
     "test:strict-positive-integer": "node --experimental-strip-types scripts/verify-strict-positive-integer.mjs",
     "test:rational-drill-answers": "node --experimental-strip-types scripts/verify-rational-drill-answers.mjs",
     "test:sigma-vector-rational-answers": "node --experimental-strip-types scripts/verify-sigma-vector-rational-answers.mjs",

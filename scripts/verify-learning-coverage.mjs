@@ -23,6 +23,7 @@ const requiredDrills = [
   'motion-calculation-drill', 'mole-calculation-drill', 'calculation-drill',
   'titration-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
   'number-representation-drill',
+  'trigonometry-graph-drill',
 ];
 const aggregateDrills = new Set([
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill', 'mathbc-mixed-drill', 'calculus3-mixed-drill',
@@ -40,7 +41,7 @@ const practiceModeDescriptions = [
   'calculus-drill', 'symmetric-polynomial-drill', 'circle-tangent-drill',
   'completing-square-drill', 'quadratic-equation-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
-  'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill',
+  'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill', 'trigonometry-graph-drill',
   'calculus3-integral-drill',
 ];
 for (const slug of practiceModeDescriptions) {
@@ -91,6 +92,17 @@ const calculus3VisualPracticePairs = [
   ['/learn/math/calculus3-curvature-visual', '/learn/math/calculus3-curve-analysis-drill'],
   ['/learn/math/calculus3-parametric-visual', '/learn/math/calculus3-differentiation-drill'],
 ];
+const trigGraphDrillRoute = '/learn/math/trigonometry-graph-drill';
+const trigGraphVisualRoute = '/learn/math/trigonometry-graph';
+const trigGraphVisualEntry = learnEntries.find(entry => entry.link === trigGraphVisualRoute);
+if (!trigGraphVisualEntry || !new RegExp(`slug: '${trigGraphVisualEntry.slug}'[\\s\\S]*?practiceLink: '${trigGraphDrillRoute}'`).test(learn)) {
+  throw new Error('Trigonometry graph visual portal card must link to its focused-and-mixed drill');
+}
+const trigGraphVisualPage = fs.readFileSync(routeFile(trigGraphVisualRoute), 'utf8');
+const trigGraphDrillPage = fs.readFileSync(routeFile(trigGraphDrillRoute), 'utf8');
+if (!trigGraphVisualPage.includes(`href="${trigGraphDrillRoute}"`) || !trigGraphDrillPage.includes(`href="${trigGraphVisualRoute}"`)) {
+  throw new Error('Trigonometry graph visual and drill must link to each other');
+}
 for (const [visualRoute, drillRoute] of calculus3VisualPracticePairs) {
   const visualEntry = learnEntries.find(entry => entry.link === visualRoute);
   if (!visualEntry || !new RegExp(`slug: '${visualEntry.slug}'[\\s\\S]*?practiceLink: '${drillRoute}'`).test(learn)) {

@@ -39,7 +39,8 @@ const CONTENTS: LearningContent[] = [
     description: '振幅、周期、平行移動のパラメータを自由に動かし、sin/cos/tanのグラフがどのように変形するかを基本形と重ねて比較学習します。',
     difficulty: '標準',
     type: '実験シミュレータ',
-    link: '/learn/math/trigonometry-graph'
+    link: '/learn/math/trigonometry-graph',
+    practiceLink: '/learn/math/trigonometry-graph-drill'
   },
   {
     slug: 'unit-circle-complex',

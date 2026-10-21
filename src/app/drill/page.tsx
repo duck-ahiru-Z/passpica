@@ -613,6 +613,17 @@ const CONTENTS: LearningContent[] = [
     slug: 'trig-synthesis-drill',
   },
   {
+    title: '三角関数グラフ・解法選択',
+    description: '振幅・周期・左右/上下移動・値域・tanの漸近線を個別に練習し、実戦では全パターンを混ぜたランダム問題で性質の選択から練習します。',
+    link: '/learn/math/trigonometry-graph-drill',
+    subject: 'math',
+    subjectJp: '数学Ⅱ',
+    field: '三角関数',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    slug: 'trigonometry-graph-drill',
+  },
+  {
     title: '対数の底の変換公式と性質',
     description: '底の累乗・対数の積・逆数関係・対数を指数に含む型を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/logarithm-drill',
