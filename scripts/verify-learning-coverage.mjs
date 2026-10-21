@@ -21,7 +21,7 @@ const requiredDrills = [
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill',
   'mathbc-mixed-drill', 'calculus3-mixed-drill', 'quadratic-equation-drill',
   'motion-calculation-drill', 'mole-calculation-drill', 'calculation-drill',
-  'titration-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
+  'titration-drill', 'indicator-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
   'number-representation-drill',
   'trigonometry-graph-drill',
 ];
@@ -42,7 +42,7 @@ const practiceModeDescriptions = [
   'completing-square-drill', 'quadratic-equation-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
   'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill', 'trigonometry-graph-drill',
-  'calculus3-integral-drill',
+  'calculus3-integral-drill', 'indicator-drill',
 ];
 for (const slug of practiceModeDescriptions) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);

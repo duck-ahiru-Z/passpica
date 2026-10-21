@@ -11,7 +11,7 @@ interface LearningContent {
   title: string;
   description: string;
   difficulty: '基礎' | '標準' | '応用';
-  type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル';
+  type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル' | '無限演習';
   link: string;
 }
 
@@ -136,6 +136,17 @@ const CONTENTS: LearningContent[] = [
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/titration-drill'
+  },
+  {
+    slug: 'indicator-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基・中和指示薬',
+    title: '化学 中和指示薬・色判定ドリル',
+    description: 'フェノールフタレイン・リトマス液・メチルオレンジを個別練習し、全パターンランダムでpHから色を判断します。',
+    difficulty: '基礎',
+    type: '無限演習',
+    link: '/learn/chemistry/indicator-drill'
   },
   {
     slug: 'phase-diagram-drill',

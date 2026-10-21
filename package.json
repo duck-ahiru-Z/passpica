@@ -70,6 +70,7 @@
     "test:rlc-calculation-drill": "node --experimental-strip-types scripts/verify-rlc-calculation-drill.mjs",
     "test:mechanical-energy": "node --experimental-strip-types scripts/verify-mechanical-energy.mjs",
     "test:chemistry-indicators": "node --experimental-strip-types scripts/verify-chemistry-indicators.mjs",
+    "test:chemistry-indicator-drill": "node --experimental-strip-types scripts/verify-chemistry-indicator-drill.mjs",
     "test:flame-reaction-drill": "node --experimental-strip-types scripts/verify-flame-reaction-drill.mjs",
     "test:inorganic-reaction-drill": "node --experimental-strip-types scripts/verify-inorganic-reaction-drill.mjs",
     "test:inorganic-colors-visual": "node scripts/verify-inorganic-colors-visual.mjs",
