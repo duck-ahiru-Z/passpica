@@ -28,5 +28,17 @@ try {
 }
 if (!emptyRejected) throw new Error('empty pattern lists must be rejected');
 
+for (const [label, fixedRandom, expected] of [
+  ['exactly 1', () => 1, ['a', 'b', 'c']],
+  ['negative', () => -1, ['a', 'b', 'c']],
+  ['NaN', () => Number.NaN, ['a', 'b', 'c']],
+]) {
+  const picker = new BalancedRandom(['a', 'b', 'c']);
+  const actual = Array.from({ length: expected.length }, () => picker.next(fixedRandom));
+  if (actual.some(item => !expected.includes(item)) || new Set(actual).size !== expected.length) {
+    throw new Error(`invalid injected random (${label}) corrupted the balanced batch: ${actual}`);
+  }
+}
+
 const total = results.reduce((sum, result) => sum + result.output.length, 0);
 console.log(`BalancedRandom verified: ${total} outputs across 2/3/4/5/6/7-pattern sets, adjacent repeats 0`);

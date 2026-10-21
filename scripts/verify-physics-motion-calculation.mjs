@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { formatMotionAnswer, generateMotionProblem, getMotionExplanation, isMotionMethodValid, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
+import { calculateProjectileState } from '../src/lib/projectileMotion.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes('onClick={() => setMethod(pattern)}')) {
@@ -38,6 +39,12 @@ const checks = {
     const [, mass, velocity] = problem.question.match(/質量 ([\d.]+) kg .*? ([\d.]+) m\/s/);
     return Math.abs(problem.answer - Number(mass) * Number(velocity)) < 1e-12 && problem.unit === 'kg·m/s';
   },
+  impulse: problem => {
+    const [, force, time] = problem.question.match(/に ([\d.]+) N の一定の力を ([\d.]+) s/);
+    const expected = Number(force) * Number(time);
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'N·s'
+      && problem.explanation.includes(`I=FΔt=${force}×${time}=${formatMotionAnswer(expected)} N·s`);
+  },
   kineticEnergy: problem => {
     const [, mass, velocity] = problem.question.match(/質量 ([\d.]+) kg .*? ([\d.]+) m\/s/);
     return Math.abs(problem.answer - 0.5 * Number(mass) * Number(velocity) ** 2) < 1e-12 && problem.unit === 'J';
@@ -70,15 +77,44 @@ if (!drillPage.includes('Number(formatMotionAnswer(problem.answer))') || !drillP
 if (!drillPage.includes('isMotionMethodValid(problem, method)') || !drillPage.includes('getMotionExplanation(problem, method)')) {
   throw new Error('accepted alternative mechanics methods must be graded and explained with their own derivation');
 }
+if (!drillPage.includes('href="/learn/physics/projectile-visual"')) throw new Error('projectile mechanics drill must link back to its visual simulator');
+const motionVisualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-visual/page.tsx'), 'utf8');
+if (!motionVisualPage.includes('href="/learn/physics/motion-calculation-drill"') || !motionVisualPage.includes('等加速度運動の計算演習へ')) {
+  throw new Error('constant-acceleration visual must link directly to its calculation drill');
+}
 
 for (const pattern of motionPatterns) {
+  if (pattern.startsWith('projectile')) continue;
   const questions = new Set();
   for (let index = 0; index < 500; index += 1) {
     const problem = generateMotionProblem(pattern, stableRandom);
     if (problem.pattern !== pattern || !checks[pattern](problem) || !problem.explanation.trim()) throw new Error(`formula, unit, or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     questions.add(problem.question);
   }
-  if (questions.size !== 5) throw new Error(`${pattern} generated ${questions.size}/5 expected variants`);
+  const expectedVariants = pattern === 'projectileComponents' ? 12
+    : pattern === 'energyConservation' ? 6
+    : ['projectileMaxHeight', 'projectileFlightTime', 'projectileRange'].includes(pattern) ? 6 : 5;
+  if (questions.size !== expectedVariants) throw new Error(`${pattern} generated ${questions.size}/${expectedVariants} expected variants`);
+}
+
+for (const pattern of ['projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange']) {
+  for (let index = 0; index < 100; index += 1) {
+    const problem = generateMotionProblem(pattern);
+    const angle = Number(problem.question.match(/(?:射出角 |から )(\d+)°/)[1]);
+    const state = calculateProjectileState(angle, 0);
+    const expected = pattern === 'projectileComponents'
+      ? (problem.question.includes('水平方向') ? state.vx0 : state.vy0)
+      : pattern === 'projectileMaxHeight' ? state.maxHeight
+        : pattern === 'projectileFlightTime' ? state.flightTime : state.range;
+    const expectedUnit = pattern === 'projectileComponents' ? 'm/s'
+      : pattern === 'projectileMaxHeight' || pattern === 'projectileRange' ? 'm' : 's';
+    if (problem.pattern !== pattern || Math.abs(problem.answer - expected) > 1e-12 || problem.unit !== expectedUnit) {
+      throw new Error(`projectile calculation mismatch: ${JSON.stringify(problem)}`);
+    }
+    if (!problem.question.includes('小数第6位まで') || !problem.explanation.includes(formatMotionAnswer(problem.answer))) {
+      throw new Error(`projectile prompt precision or explanation mismatch: ${JSON.stringify(problem)}`);
+    }
+  }
 }
 
 const energyProblem = generateMotionProblem('energyConservation', stableRandom);
@@ -89,8 +125,8 @@ if (!isMotionMethodValid(energyProblem, 'freefall')
 }
 
 const mixed = Array.from({ length: 900 }, () => generateMotionProblem('mix', stableRandom).pattern);
-for (let start = 0; start < mixed.length; start += motionPatterns.length) {
+for (let start = 0; start <= mixed.length - motionPatterns.length; start += 1) {
   if (new Set(mixed.slice(start, start + motionPatterns.length)).size !== motionPatterns.length) throw new Error(`mixed set omitted a mechanics pattern in batch ${start / motionPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mechanics practice repeated adjacent patterns');
-console.log('Physics mechanics verified: 4,500 fixed-pattern questions and 900 mixed questions; formulas, units, answer keys, variants, balance, adjacency, and displayed rounding checked.');
+console.log('Physics mechanics verified: 5,400 fixed-pattern questions including projectile variants, and 900 mixed questions; formulas, units, answer keys, variants, balance, adjacency, and displayed rounding checked.');

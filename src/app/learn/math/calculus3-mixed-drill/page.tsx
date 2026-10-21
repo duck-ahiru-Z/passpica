@@ -10,7 +10,11 @@ import { createCalculus3MixedQuestionPicker, type Calculus3MixedMode, type Calcu
 const picker = createCalculus3MixedQuestionPicker();
 
 function MathEq({ math }: { math: string }) {
-  return <span dangerouslySetInnerHTML={{ __html: katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'error' }) }} />;
+  const markup = katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'error' });
+  const visualMath = markup.replace('<span class="katex">', '<span class="katex" aria-hidden="true">');
+  return (
+    <span role="math" aria-label={`数式: ${math.replace(/\\(?:,|quad|text\{[^}]*\})/g, ' ').replace(/[{}]/g, '')}`} dangerouslySetInnerHTML={{ __html: visualMath }} />
+  );
 }
 
 export default function Calculus3MixedDrillPage() {
@@ -36,7 +40,7 @@ export default function Calculus3MixedDrillPage() {
   const correct = acceptedAnswers.includes(answer);
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
+    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
       <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
       <div className="border-b border-gray-300 pb-2">
         <h1 className="text-xl md:text-2xl font-bold text-slate-900">数学III 総合・解法選択ランダムドリル</h1>

@@ -102,7 +102,7 @@ export default function GasCollectionPage() {
   const [selectedGas, setSelectedGas] = useState<GasInfo>(GASES[0]);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -263,7 +263,7 @@ export default function GasCollectionPage() {
               ■ {selectedGas.name} ({selectedGas.formula}) の性質
             </h3>
 
-            <table className="classic-table text-[10px]">
+            <table className="classic-table text-xs">
               <tbody>
                 <tr>
                   <td className="bg-gray-50 font-bold w-20">捕集方法</td>
@@ -293,7 +293,7 @@ export default function GasCollectionPage() {
             </table>
 
             {/* 詳細解説 */}
-            <div className="bg-gray-50 border border-gray-200 p-2.5 leading-relaxed text-[11px] text-slate-600">
+            <div className="bg-gray-50 border border-gray-200 p-2.5 leading-relaxed text-xs text-slate-600">
               {selectedGas.explain}
             </div>
           </div>

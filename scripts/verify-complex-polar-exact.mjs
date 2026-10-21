@@ -54,5 +54,17 @@ assert.match(page, /ansA = formatExactTrigComponent\(rRes, cosVal\)/);
 assert.match(page, /ansB = formatExactTrigComponent\(rRes, sinVal\)/);
 assert.match(page, /const thStr = formatPolarAngle\(thRes\)/);
 assert.match(page, /getSupportedPolarAnglePairs\(isProduct \? 'sum' : 'difference'\)/);
+assert.match(page, /type Pattern = 'pattern1' \| 'pattern2' \| 'pattern3' \| 'pattern4-product' \| 'pattern4-quotient'/);
+assert.match(page, /基礎練習：極形式の積だけ/);
+assert.match(page, /基礎練習：極形式の商だけ/);
+assert.match(page, /BalancedRandom<Pattern>\(\['pattern1', 'pattern2', 'pattern3', 'pattern4-product', 'pattern4-quotient'\]\)/);
+assert.match(page, /href="\/learn\/math\/unit-circle-complex"/);
+const visualPage = await (await import('node:fs/promises')).readFile(
+  new URL('../src/app/learn/math/unit-circle-complex/page.tsx', import.meta.url), 'utf8',
+);
+assert.match(visualPage, /href="\/learn\/math\/complex-polar-drill"/);
+assert.match(visualPage, /formatRectangular\(z1_x, z1_y\)/);
+assert.match(visualPage, /formatRectangular\(z2_x, z2_y\)/);
+assert.match(visualPage, /formatRectangular\(z3_x, z3_y\)/);
 
 console.log(`Complex-polar exact components verified: ${cases.length} signs, rational coefficients, and √2/√3 cases.`);

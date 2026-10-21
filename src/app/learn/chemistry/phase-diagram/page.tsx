@@ -42,7 +42,7 @@ export default function PhaseDiagramPage() {
   const info = PHASES[selectedPhase];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-sm">
       
       {/* ヘッダー */}
       <div className="border-b border-gray-300 pb-2">
@@ -148,7 +148,7 @@ export default function PhaseDiagramPage() {
           </div>
 
           <div className="w-full border-t border-gray-200 pt-4 text-center">
-            <span className="text-[10px] text-gray-500 font-mono">
+          <span className="text-xs text-gray-600">
               ※模式図（圧力・温度とも比例目盛ではありません）。曲線の交点・傾きと相の位置関係を示します。正確な代表値は右の表を参照してください。{selectedPhase === 'h2o' ? ' 赤い融解曲線は水に特徴的な負の傾きを示します。' : ' 黒い融解曲線は二酸化炭素の正の傾きを示します。'}
             </span>
           </div>
@@ -164,7 +164,7 @@ export default function PhaseDiagramPage() {
               ■ 状態図の重要座標データ
             </h3>
 
-            <table className="classic-table text-[10px]">
+            <table className="classic-table text-xs">
               <tbody>
                 <tr>
                   <td className="bg-gray-50 font-bold w-20">融解曲線の傾き</td>
@@ -188,15 +188,15 @@ export default function PhaseDiagramPage() {
               ■ 状態図から読み取る性質
             </h3>
             <div>
-              <span className="font-bold text-slate-800 block text-[11px]">【融解曲線の傾き】</span>
-              <p className="text-gray-600 text-[11px] leading-relaxed mt-0.5">{info.meltingCurveExplain}</p>
-              <p className="text-gray-500 text-[10px] leading-relaxed mt-1">融解曲線の傾きは固体と液体のモル体積差に関係します。図の横軸は温度、縦軸は圧力です。</p>
+              <span className="font-bold text-slate-800 block text-xs">【融解曲線の傾き】</span>
+              <p className="text-gray-600 text-xs leading-relaxed mt-0.5">{info.meltingCurveExplain}</p>
+              <p className="text-gray-600 text-xs leading-relaxed mt-1">融解曲線の傾きは固体と液体のモル体積差に関係します。図の横軸は温度、縦軸は圧力です。</p>
             </div>
             <div>
-              <span className="font-bold text-slate-700 block text-[11px]">【1気圧での挙動と昇華】</span>
-              <p className="text-gray-600 text-[11px] leading-relaxed mt-0.5">{info.sublimationExplain}</p>
+              <span className="font-bold text-slate-700 block text-xs">【1気圧での挙動と昇華】</span>
+              <p className="text-gray-600 text-xs leading-relaxed mt-0.5">{info.sublimationExplain}</p>
             </div>
-            <p className="text-[10px] text-gray-500">
+            <p className="text-xs text-gray-600">
               ※臨界点を超えると、気体と液体の境界がなくなり、両方の性質を併せ持った「超臨界流体」になります。
             </p>
           </div>
@@ -204,6 +204,12 @@ export default function PhaseDiagramPage() {
         </div>
 
       </div>
+
+      <section className="retro-box bg-slate-50 p-4 space-y-2">
+        <h2 className="font-bold">状態図の判断を演習する</h2>
+        <p className="text-slate-600">水と二酸化炭素の相図を見比べたら、三重点・臨界点・1気圧での相変化を問題で確認しましょう。</p>
+        <Link href="/learn/chemistry/phase-diagram-drill" className="retro-btn-classic inline-flex">状態図の判断ドリルへ →</Link>
+      </section>
 
     </div>
   );

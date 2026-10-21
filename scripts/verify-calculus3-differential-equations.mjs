@@ -49,8 +49,9 @@ if (normalizeDifferentialEquationAnswer(' y = 2x³ + 4 ') !== normalizeDifferent
   throw new Error('equivalent superscript and caret notation should be accepted');
 }
 if (normalizeDifferentialEquationAnswer('y=4e^(1x)') !== normalizeDifferentialEquationAnswer('y=4e^x')
-  || normalizeDifferentialEquationAnswer('y=4e^(5x)') !== normalizeDifferentialEquationAnswer('y=4e^5x')) {
-  throw new Error('equivalent exponential notation with an implicit coefficient 1 should be accepted');
+  || normalizeDifferentialEquationAnswer('y=4e^(x)') !== normalizeDifferentialEquationAnswer('y=4e^x')
+  || normalizeDifferentialEquationAnswer('y=4e^(5x)') === normalizeDifferentialEquationAnswer('y=4e^5x')) {
+  throw new Error('unit-rate exponent notation should normalize while ambiguous non-unit exponents stay distinct');
 }
 if (normalizeDifferentialEquationAnswer('y=1e^x') !== normalizeDifferentialEquationAnswer('y=e^x')) {
   throw new Error('an explicit leading coefficient of 1 should be accepted as equivalent');

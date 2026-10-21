@@ -53,7 +53,10 @@ export default function ACCircuitPage() {
       
       // 電圧 v(t) = V0 * sin(ωt)
       const vt = v0 * Math.sin(omega * t);
-      // 電流 i(t) = I0 * sin(ωt - φ)
+      // 電圧を基準に v(t)=V0 sin(ωt) とする。
+      // φ は電圧の電流に対する進み角なので、電流は sin(ωt - φ)。
+      // Reactance の符号と atan2(netReactance, R) の戻り値を使い、
+      // 誘導性なら電流が遅れ、容量性なら電流が進むよう符号を合わせる。
       const it = i0 * Math.sin(omega * t - phi);
 
       const pyV = cy - vt * scaleV;

@@ -29,7 +29,7 @@ export default function Calculus3CurvatureVisual() {
   const nearInflection = Math.min(...curvatureInflectionPoints.map(value => Math.abs(x - value))) < 0.05;
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
+    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
       <div className="flex items-center justify-between gap-3"><div><div className="text-[11px] text-slate-500">数学III / 微分法</div><h1 className="text-xl md:text-2xl font-bold text-slate-900">凹凸・極値・変曲点ビジュアル装置</h1></div><Link href="/learn" className="retro-btn-classic">学習一覧へ</Link></div>
       <section className="retro-box bg-white p-4 space-y-4">
         <p className="text-slate-600 leading-relaxed">f(x)=x⁴−2x² のグラフ上を点が動きます。接線の傾き f′(x) と二階導関数 f′′(x) の符号を、極大・極小や凹凸の切り替わりと結び付けて観察できます。</p>
@@ -51,6 +51,7 @@ export default function Calculus3CurvatureVisual() {
         <div className="grid sm:grid-cols-3 gap-2 text-center"><div className="border p-3 bg-blue-50"><div className="text-gray-500">f(x)</div><strong>{curvatureFunction(x).toFixed(3)}</strong></div><div className="border p-3 bg-red-50"><div className="text-gray-500">接線の傾き f′(x)</div><strong>{curvatureFirstDerivative(x).toFixed(3)}</strong></div><div className="border p-3 bg-amber-50"><div className="text-gray-500">f′′(x)</div><strong>{secondDerivative.toFixed(3)}</strong></div></div>
         <div className="text-center font-bold text-lg text-emerald-700">{concavity}</div>
         <p className="text-center text-slate-600">変曲点は x=±1/√3≈±{curvatureInflectionX.toFixed(3)} です。{nearInflection ? '今の点は変曲点の近くで、f′′の符号が切り替わります。' : '点をこの位置の前後へ動かし、f′′の符号とグラフの曲がり方を比べてください。'}</p>
+        <Link href="/learn/math/calculus3-curve-analysis-drill" className="retro-btn-classic inline-flex">凹凸・変曲点を問題で練習する →</Link>
       </section>
     </main>
   );

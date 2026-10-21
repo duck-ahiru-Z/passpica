@@ -1,6 +1,6 @@
 import { BalancedRandom } from './balancedRandom.ts';
 
-export type GeometryPattern = 'between-curves' | 'x-axis-rotation' | 'y-axis-rotation' | 'shell-method' | 'curve-length';
+export type GeometryPattern = 'between-curves' | 'x-axis-rotation' | 'disk-volume' | 'y-axis-rotation' | 'shell-method' | 'curve-length';
 export type GeometryMode = GeometryPattern | 'mix';
 export type GeometryProblem = {
   pattern: GeometryPattern;
@@ -12,8 +12,8 @@ export type GeometryProblem = {
   alternativeExplanations?: Partial<Record<GeometryPattern, string>>;
 };
 
-export const geometryPatterns: readonly GeometryPattern[] = ['between-curves', 'x-axis-rotation', 'y-axis-rotation', 'shell-method', 'curve-length'];
-export const geometryLabels: Record<GeometryPattern, string> = { 'between-curves': '2曲線間の面積', 'x-axis-rotation': 'x軸回転体の体積（円板法）', 'y-axis-rotation': 'y軸回転体の体積（円環法）', 'shell-method': 'y軸回転体の体積（円筒殻法）', 'curve-length': '曲線の長さ' };
+export const geometryPatterns: readonly GeometryPattern[] = ['between-curves', 'x-axis-rotation', 'disk-volume', 'y-axis-rotation', 'shell-method', 'curve-length'];
+export const geometryLabels: Record<GeometryPattern, string> = { 'between-curves': '2曲線間の面積', 'x-axis-rotation': 'x軸回転体の体積（円板法）', 'disk-volume': 'y=x²の回転体積', 'y-axis-rotation': 'y軸回転体の体積（円環法）', 'shell-method': 'y軸回転体の体積（円筒殻法）', 'curve-length': '曲線の長さ' };
 
 export function isGeometryStrategyValid(problem: GeometryProblem, strategy: GeometryPattern | ''): boolean {
   return strategy === problem.pattern || Boolean(strategy && problem.alternativeExplanations?.[strategy]);
@@ -26,7 +26,9 @@ export function getGeometryExplanation(problem: GeometryProblem, strategy: Geome
 const picker = new BalancedRandom(geometryPatterns);
 const variants = {
   'between-curves': new BalancedRandom([1, 2, 3, 4, 5]),
-  'x-axis-rotation': new BalancedRandom([1, 2, 3, 4, 5]),
+  // The y=x² case is covered by disk-volume with a variable upper bound.
+  'x-axis-rotation': new BalancedRandom([1, 3, 4, 5]),
+  'disk-volume': new BalancedRandom([0.5, 1, 1.5, 2]),
   'y-axis-rotation': new BalancedRandom([1, 2, 3, 4, 5]),
   'shell-method': new BalancedRandom([1, 2, 3, 4, 5]),
   'curve-length': new BalancedRandom([1, 2, 3, 4, 5]),
@@ -44,9 +46,10 @@ function formatReducedFraction(numerator: number, denominator: number): string {
 
 export function generateGeometryProblem(mode: GeometryMode, random = Math.random): GeometryProblem {
   const pattern = mode === 'mix' ? picker.next(random) : mode;
-  const value = variants[pattern].next(random);
+  const value = pattern === 'disk-volume' ? 2 : variants[pattern].next(random);
   const linearTerm = value === 1 ? 'x' : `${value}x`;
   const powerTerm = value === 1 ? 'x' : `x^{${value}}`;
+  const volumeUpper = pattern === 'disk-volume' ? variants['disk-volume'].next(random) : 1;
   const problems: Record<GeometryPattern, GeometryProblem> = {
     'between-curves': {
       pattern,
@@ -63,6 +66,14 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       accessibleExpression: `y イコール x の ${value} 乗、x は 0 以上 1 以下`,
       answer: Math.PI / (2 * value + 1),
       explanation: `円板法で V=π∫₀¹(${value === 1 ? 'x' : `x^${value}`})²dx=π/${2 * value + 1}。`,
+    },
+    'disk-volume': {
+      pattern,
+      prompt: '曲線 y=x² と x軸にはさまれた領域を、x軸のまわりに回転させた体積を求める。',
+      expression: `y=x^2\\quad(0\\le x\\le${volumeUpper})`,
+      accessibleExpression: `y イコール x の 2 乗、x は 0 以上 ${volumeUpper} 以下`,
+      answer: Math.PI * volumeUpper ** 5 / 5,
+      explanation: `断面円板の半径は x²、面積は πx⁴。V=π∫₀^${volumeUpper}x⁴dx=π×${volumeUpper}⁵/5≈${(Math.PI * volumeUpper ** 5 / 5).toFixed(3)}。ビジュアルの上端 b=${volumeUpper} と同じ条件です。`,
     },
     'y-axis-rotation': {
       pattern,

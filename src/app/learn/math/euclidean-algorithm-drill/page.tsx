@@ -4,92 +4,18 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictPositiveInteger } from '@/src/lib/strictPositiveInteger';
+import { generateEuclideanProblem, type EuclideanMode, type EuclideanProblem } from '@/src/lib/euclideanAlgorithm';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-interface Step {
-  a: number;
-  b: number;
-  q: number;
-  r: number;
-}
-
-function getSteps(a: number, b: number): Step[] {
-  const steps = [];
-  let _a = a;
-  let _b = b;
-  while (_b > 0) {
-    const q = Math.floor(_a / _b);
-    const r = _a % _b;
-    steps.push({ a: _a, b: _b, q, r });
-    _a = _b;
-    _b = r;
-  }
-  return steps;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  A: number;
-  B: number;
-  steps: Step[];
-  ans: number;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    let a = 0;
-    let b = 0;
-    if (p === 'pattern1') {
-      a = Math.floor(Math.random() * 80) + 20; // 20-99
-      b = Math.floor(Math.random() * (a - 10)) + 10;
-    } else if (p === 'pattern2') {
-      a = Math.floor(Math.random() * 800) + 150; // 150-949
-      b = Math.floor(Math.random() * 80) + 20; // 20-99
-    } else if (p === 'pattern3') {
-      a = Math.floor(Math.random() * 800) + 150; // 150-949
-      b = Math.floor(Math.random() * (a - 100)) + 100;
-    } else {
-      a = Math.floor(Math.random() * 8000) + 1500; // 1500-9499
-      b = Math.floor(Math.random() * (a - 500)) + 500;
-    }
-
-    const steps = getSteps(a, b);
-    let gcd = steps[steps.length - 1]?.a || 1; // wait, if r=0, last step a is the last divisor (which was b in previous step)
-    // Actually the last step in getSteps has r=0, so the GCD is the 'b' of the last step
-    gcd = steps[steps.length - 1].b;
-
-    if (p === 'pattern1' && steps.length <= 2) {
-      return { pattern: p, A: a, B: b, steps, ans: gcd };
-    }
-    if (p === 'pattern2' && steps.length >= 3) {
-      return { pattern: p, A: a, B: b, steps, ans: gcd };
-    }
-    if (p === 'pattern3' && gcd === 1 && steps.length >= 2) {
-      return { pattern: p, A: a, B: b, steps, ans: gcd };
-    }
-    if (p === 'pattern4' && steps.length >= 4) {
-      return { pattern: p, A: a, B: b, steps, ans: gcd };
-    }
-  }
-}
-
 export default function EuclideanAlgorithmDrill() {
-  const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [selectedPattern, setSelectedPattern] = useState<EuclideanMode>('mix');
+  const [problem, setProblem] = useClientGeneratedState<EuclideanProblem>(() => generateEuclideanProblem('mix'));
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -181,7 +107,7 @@ export default function EuclideanAlgorithmDrill() {
   }, [drawGraph]);
 
   const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+    setProblem(generateEuclideanProblem(selectedPattern));
     setAnsVal('');
     setHasChecked(false);
     setIsCorrect(false);
@@ -213,7 +139,7 @@ export default function EuclideanAlgorithmDrill() {
           ユークリッドの互除法ドリル
         </h1>
         <p className="text-gray-500">
-          大きな数の最大公約数を、割り算の繰り返し（ユークリッドの互除法）を用いて確実かつスピーディに求める演習です。
+          まずは数の大きさや最大公約数の特徴ごとに型を固定して練習し、慣れたら問題を見て解法を判断する全パターンランダムに挑戦できます。
         </p>
       </div>
 
@@ -228,14 +154,18 @@ export default function EuclideanAlgorithmDrill() {
               </h2>
               <select 
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal(''); setHasChecked(false); setIsCorrect(false); }}
+                onChange={e => { const pattern = e.target.value as EuclideanMode; setSelectedPattern(pattern); setProblem(generateEuclideanProblem(pattern)); setAnsVal(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
-                <option value="mix">ミックスモード (ランダム)</option>
-                <option value="pattern1">パターン1 (2桁と2桁・基本)</option>
-                <option value="pattern2">パターン2 (3桁と2桁)</option>
-                <option value="pattern3">パターン3 (互いに素・最大公約数1)</option>
-                <option value="pattern4">パターン4 (4桁を含む重量級)</option>
+                <optgroup label="実戦練習">
+                  <option value="mix">全パターンランダム</option>
+                </optgroup>
+                <optgroup label="基礎練習：パターン固定">
+                  <option value="pattern1">2桁と2桁・基本だけ</option>
+                  <option value="pattern2">3桁と2桁だけ</option>
+                  <option value="pattern3">互いに素・最大公約数1だけ</option>
+                  <option value="pattern4">4桁を含む問題だけ</option>
+                </optgroup>
               </select>
             </div>
 

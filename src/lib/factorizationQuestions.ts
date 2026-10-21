@@ -46,7 +46,7 @@ export function generateFactorizationQuestion(mode: FactorizationMode, random = 
       const forms = [
         { expression: `x^2-${n ** 2}`, factorization: `(x-${n})(x+${n})`, explanation: `平方の差 x²−${n ** 2}=(x−${n})(x+${n}) を使います。` },
         { expression: `x^2+${2 * n}x+${n ** 2}`, factorization: `(x+${n})^2`, explanation: `x²+2·${n}·x+${n}² の形なので、(${`x+${n}`})² です。` },
-        { expression: `x^2-${2 * n}x+${n ** 2}`, factorization: `(x-${n})^2`, explanation: `x²−2·${n}·x+${n}² の形なので、(${`x-${n}`})² です。` },
+        { expression: `x^2-${2 * n}x+${n ** 2}`, factorization: `(x-${n})^2`, explanation: `x²−2·${n}·x+${n}² の形なので、(${`x−${n}`})² です。` },
       ];
       const form = forms[integer(random, 0, forms.length - 1)];
       expression = form.expression;
@@ -58,15 +58,19 @@ export function generateFactorizationQuestion(mode: FactorizationMode, random = 
       const p = integer(random, 2, 4);
       const r = integer(random, 1, 3);
       const qOptions = Array.from({ length: 5 }, (_, index) => index + 1).filter(value => gcd(p, value) === 1);
-      const sOptions = Array.from({ length: 5 }, (_, index) => index + 1).filter(value => gcd(r, value) === 1);
       const q = qOptions[integer(random, 0, qOptions.length - 1)];
+      // Avoid identical binomials: those degenerate into a perfect-square identity drill.
+      const sOptions = Array.from({ length: 5 }, (_, index) => index + 1)
+        .filter(value => gcd(r, value) === 1 && !(p === r && value === q));
       const s = sOptions[integer(random, 0, sOptions.length - 1)];
       const leading = p * r;
       const middle = p * s + q * r;
       const constant = q * s;
       expression = `${leading}x^2+${middle}x+${constant}`;
-      factorization = `(${p}x+${q})(${r}x+${s})`;
-      explanation = `積の係数 ${leading} は ${p}×${r}、定数項 ${constant} は ${q}×${s} と分けます。交差積は ${p}×${s}=${p * s} と ${q}×${r}=${q * r} で、和が中項 ${middle} に一致します。したがって (${p}x+${q})(${r}x+${s}) です。`;
+      const firstFactor = `(${p === 1 ? '' : p}x+${q})`;
+      const secondFactor = `(${r === 1 ? '' : r}x+${s})`;
+      factorization = `${firstFactor}${secondFactor}`;
+      explanation = `積の係数 ${leading} は ${p}×${r}、定数項 ${constant} は ${q}×${s} と分けます。交差積は ${p}×${s}=${p * s} と ${q}×${r}=${q * r} で、和が中項 ${middle} に一致します。したがって ${factorization} です。`;
       break;
     }
     case 'substitution': {
@@ -99,7 +103,9 @@ export function generateFactorizationQuestion(mode: FactorizationMode, random = 
 }
 
 export function normalizeFactorizationAnswer(value: string): string {
-  return value.trim().replace(/\s+/g, '').replace(/[×·]/g, '*').replaceAll('−', '-').replaceAll('²', '^2').replaceAll('³', '^3').replaceAll('*', '');
+  return value.trim().replace(/\s+/g, '').replace(/[×·]/g, '*').replaceAll('−', '-').replaceAll('²', '^2').replaceAll('³', '^3').replaceAll('*', '')
+    // Treat an omitted leading coefficient as 1: x+5 and 1x+5 are the same factor.
+    .replace(/(^|[()+/-])x(?=\^|[)+/-]|$)/g, (_match, prefix: string) => `${prefix}1x`);
 }
 
 function splitParenthesizedFactors(expression: string): string[] | null {
@@ -132,8 +138,9 @@ export function areFactorizationsEquivalent(input: string, expected: string): bo
 
   const inputFactors = splitParenthesizedFactors(normalizedInput);
   const expectedFactors = splitParenthesizedFactors(normalizedExpected);
-  if (inputFactors === null || expectedFactors === null || inputFactors.length !== expectedFactors.length) return false;
+  if (inputFactors === null || expectedFactors === null) return false;
 
+  if (inputFactors.length !== expectedFactors.length) return false;
   const sortedInputFactors = inputFactors.sort();
   const sortedExpectedFactors = expectedFactors.sort();
   return sortedInputFactors.every((factor, index) => factor === sortedExpectedFactors[index]);

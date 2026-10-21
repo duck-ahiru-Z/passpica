@@ -62,7 +62,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const a2 = a*a;
       const b2 = b*b;
       
-      const qStr = `\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}`;
+      const qStr = `$\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}$`;
       
       const expLines = [
         `\\text{与えられた方程式は } \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 \\text{ の形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,
@@ -83,7 +83,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const a2 = a*a;
       const b2 = b*b;
       
-      const qStr = `\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}`;
+      const qStr = `$\\frac{x^2}{${a2}} + \\frac{y^2}{${b2}} = 1 \\quad \\text{の焦点の座標を求めよ。}$`;
       
       const expLines = [
         `\\text{与えられた方程式は } \\frac{x^2}{a^2} + \\frac{y^2}{b^2} = 1 \\text{ の形であり、} a^2 = ${a2}, b^2 = ${b2} \\text{ です。}`,

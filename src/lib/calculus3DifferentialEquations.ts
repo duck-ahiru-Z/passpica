@@ -15,8 +15,7 @@ export function normalizeDifferentialEquationAnswer(value: string): string {
     .replaceAll('²', '^2')
     .replaceAll('³', '^3')
     .replaceAll('−', '-')
-    .replaceAll(/e\^\((\d*x)\)/g, 'e^$1')
-    .replaceAll(/e\^1x/g, 'e^x')
+    .replaceAll(/e\^\(1?x\)/g, 'e^x')
     .replaceAll(/y=1e\^/g, 'y=e^');
 }
 

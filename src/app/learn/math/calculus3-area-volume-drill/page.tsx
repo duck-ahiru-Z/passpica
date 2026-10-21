@@ -23,6 +23,7 @@ export default function Calculus3AreaVolumeDrillPage() {
       <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
       <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">数学III 面積・体積・曲線の長さドリル</h1>
       <p className="text-gray-500 mb-6">図形の条件から方針を選び、面積・体積・長さを数値で求めます。係数・指数・区間も変わる個別練習と全パターンランダムです。</p>
+      <Link href="/learn/math/calculus3-volume-visual" className="retro-btn-classic inline-flex mb-4">回転体の断面・体積をビジュアルで確認 →</Link>
       <section className="retro-box space-y-5">
         <div className="flex flex-wrap items-center gap-2">
           <label htmlFor="geometry-mode" className="font-bold">演習モード</label>

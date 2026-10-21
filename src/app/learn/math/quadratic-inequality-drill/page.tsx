@@ -228,6 +228,14 @@ export default function QuadraticInequalityDrillPage() {
   const rootsLabel = problem.roots.map(formatRoot);
   const normalizedSign = problem.a < 0 ? reverseQuadraticInequalitySign(problem.ineqSign) : problem.ineqSign;
   const inequalityRegion = getQuadraticInequalityRegion(normalizedSign);
+  const transformedA = -problem.a;
+  const transformedB = -problem.b;
+  const transformedC = -problem.c;
+  const transformedExpression = [
+    `${transformedA === 1 ? '' : transformedA === -1 ? '-' : transformedA}x^2`,
+    transformedB === 0 ? '' : `${transformedB > 0 ? '+' : '-'}${Math.abs(transformedB) === 1 ? '' : Math.abs(transformedB)}x`,
+    transformedC === 0 ? '' : `${transformedC > 0 ? '+' : '-'}${Math.abs(transformedC)}`,
+  ].join('');
   const solutionLabel = (() => {
     switch (problem.ansType) {
       case 1: return `${rootsLabel[0]} < x < ${rootsLabel[1]}`;
@@ -409,7 +417,7 @@ export default function QuadraticInequalityDrillPage() {
                   <div className="bg-red-50 p-2 border border-red-200">
                     <p className="font-bold text-red-600 mb-1">【重要】最初に x² の係数をプラスにする！</p>
                     <p>両辺に <MathEq math="-1" /> を掛けます。<strong className="text-red-600 underline">このとき不等号の向きが逆になることに注意！</strong></p>
-                    <MathEq math={`${-problem.a === 1 ? '' : -problem.a}x^2 ${-problem.b > 0 ? '+' : ''} ${-problem.b === 1 ? '' : -problem.b === -1 ? '-' : -problem.b}x ${-problem.c > 0 ? '+' : ''} ${-problem.c === 0 ? '' : -problem.c} ${normalizedSign} 0`} block />
+                    <MathEq math={`${transformedExpression} ${normalizedSign} 0`} block />
                   </div>
                 )}
 

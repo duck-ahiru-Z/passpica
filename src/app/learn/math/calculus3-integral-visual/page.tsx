@@ -35,7 +35,7 @@ export default function Calculus3IntegralVisualPage() {
   const axisX = sx(0);
 
   return (
-    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-xs">
+    <main className="max-w-4xl mx-auto px-4 py-8 space-y-5 text-slate-800 font-sans text-sm">
       <div className="flex items-center justify-between gap-3"><div><div className="text-[11px] text-slate-500">数学III / 積分法</div><h1 className="text-xl md:text-2xl font-bold text-slate-900">定積分と面積ビジュアル装置</h1></div><Link href="/learn" className="retro-btn-classic">学習一覧へ</Link></div>
       <section className="retro-box bg-white p-4 space-y-4">
         <p className="text-slate-600 leading-relaxed">y = x² と x軸で囲まれる部分を表示します。上端 b を動かすと、積分区間 [0,b] と面積がどう変わるかを観察できます。</p>
@@ -44,7 +44,7 @@ export default function Calculus3IntegralVisualPage() {
         <label className="block space-y-2"><span className="font-bold">長方形の分割数 n = {rectangleCount}</span><input aria-label="長方形の分割数" type="range" min="4" max="32" step="4" value={rectangleCount} onChange={event => setRectangleCount(Number(event.target.value))} className="w-full accent-blue-600" /></label>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-2"><div className="border p-3 bg-blue-50"><div className="text-slate-500">正確な面積</div><b className="text-lg">{area.toFixed(4)}</b></div><div className="border p-3 bg-indigo-50"><div className="text-slate-500">右端和の近似（n={rectangleCount}）</div><b className="text-lg">{rectangleArea.toFixed(4)}</b></div><div className="border p-3 bg-slate-50"><div className="text-slate-500">立式</div><b>∫₀^{upper.toFixed(2)} x² dx</b></div><div className="border p-3 bg-green-50"><div className="text-slate-500">近似−正確</div><b>{(rectangleArea - area).toFixed(4)}</b></div></div>
       </section>
-      <section className="retro-box bg-slate-50 p-4 space-y-2"><h2 className="font-bold">読み取りポイント</h2><ul className="list-disc pl-5 space-y-1"><li>右端の高さで作る長方形和は、この増加関数では面積を大きめに見積もります。</li><li>分割数 n を増やすと長方形の幅が細くなり、近似値は正確な面積に近づきます。</li><li>区間の端 b を変えると、正確な面積は b³/3 に従って変化します。グラフの上下関係を確認してから「上−下」を積分するのが基本です。</li></ul></section>
+      <section className="retro-box bg-slate-50 p-4 space-y-2"><h2 className="font-bold">読み取りポイント</h2><ul className="list-disc pl-5 space-y-1"><li>右端の高さで作る長方形和は、この増加関数では面積を大きめに見積もります。</li><li>分割数 n を増やすと長方形の幅が細くなり、近似値は正確な面積に近づきます。</li><li>区間の端 b を変えると、正確な面積は b³/3 に従って変化します。グラフの上下関係を確認してから「上−下」を積分するのが基本です。</li></ul><Link href="/learn/math/calculus3-integral-drill" className="retro-btn-classic inline-flex">この面積を積分問題で練習する →</Link></section>
     </main>
   );
 }

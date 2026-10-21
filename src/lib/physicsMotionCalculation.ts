@@ -1,12 +1,13 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { mechanicalEnergyGravity } from './mechanicalEnergy.ts';
+import { calculateProjectileState, projectileGravity, projectileInitialHeight, projectileInitialSpeed } from './projectileMotion.ts';
 
-export type MotionPattern = 'speed' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring';
+export type MotionPattern = 'speed' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'impulse' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring' | 'projectileComponents' | 'projectileMaxHeight' | 'projectileFlightTime' | 'projectileRange';
 export type MotionMode = MotionPattern | 'mix';
 export type MotionProblem = { pattern: MotionPattern; question: string; answer: number; unit: string; explanation: string; alternativeExplanations?: Partial<Record<MotionPattern, string>> };
 
-export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring'];
-export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの力' };
+export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'impulse', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring', 'projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange'];
+export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', impulse: '力積', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの力', projectileComponents: '投射速度の分解', projectileMaxHeight: '斜方投射の最高点', projectileFlightTime: '斜方投射の飛行時間', projectileRange: '斜方投射の水平到達距離' };
 
 const picker = new BalancedRandom(motionPatterns);
 const variants = {
@@ -31,6 +32,10 @@ const variants = {
     { mass: 2, velocity: 6 }, { mass: 1.5, velocity: 8 }, { mass: 4, velocity: 3 },
     { mass: 0.5, velocity: 14 }, { mass: 3, velocity: 5 },
   ]),
+  impulse: new BalancedRandom([
+    { force: 12, time: 0.5 }, { force: 20, time: 0.3 }, { force: 8, time: 1.5 },
+    { force: 15, time: 0.8 }, { force: 25, time: 0.2 },
+  ]),
   kineticEnergy: new BalancedRandom([
     { mass: 2, velocity: 3 }, { mass: 4, velocity: 5 }, { mass: 1.5, velocity: 4 },
     { mass: 8, velocity: 2 }, { mass: 3, velocity: 6 },
@@ -42,12 +47,18 @@ const variants = {
   energyConservation: new BalancedRandom([
     { mass: 1, height: 5, gravity: 9.8 }, { mass: 2, height: 10, gravity: 10 },
     { mass: 1.5, height: 8, gravity: 9.8 }, { mass: 4, height: 2, gravity: 10 },
-    { mass: 0.5, height: 12, gravity: 9.8 },
+    { mass: 0.5, height: 12, gravity: 9.8 }, { mass: 1, height: 20, gravity: 9.8 },
   ]),
   spring: new BalancedRandom([
     { constant: 200, extension: 0.1 }, { constant: 150, extension: 0.2 }, { constant: 80, extension: 0.25 },
     { constant: 300, extension: 0.05 }, { constant: 500, extension: 0.08 },
   ]),
+  projectileComponents: new BalancedRandom([0, 15, 30, 45, 60, 75].flatMap(angle => [
+    { angle, component: 'horizontal' as const }, { angle, component: 'vertical' as const },
+  ])),
+  projectileMaxHeight: new BalancedRandom([0, 15, 30, 45, 60, 75]),
+  projectileFlightTime: new BalancedRandom([0, 15, 30, 45, 60, 75]),
+  projectileRange: new BalancedRandom([0, 15, 30, 45, 60, 75]),
 };
 
 const displayNumber = (value: number) => Number(value.toFixed(6)).toString();
@@ -92,6 +103,10 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
       const value = variants.momentum.next(random); const answer = value.mass * value.velocity;
       return { pattern, question: `質量 ${value.mass} kg の物体が速さ ${value.velocity} m/s で動く。運動量の大きさは？`, answer, unit: 'kg·m/s', explanation: `運動量 p=mv=${value.mass}×${value.velocity}=${displayNumber(answer)} kg·m/s。` };
     }
+    case 'impulse': {
+      const value = variants.impulse.next(random); const answer = value.force * value.time;
+      return { pattern, question: `物体に ${value.force} N の一定の力を ${value.time} s 加えた。力積の大きさは？`, answer, unit: 'N·s', explanation: `一定の力による力積 I=FΔt=${value.force}×${value.time}=${displayNumber(answer)} N·s。運動量の変化の大きさにも等しい。` };
+    }
     case 'kineticEnergy': {
       const value = variants.kineticEnergy.next(random); const answer = 0.5 * value.mass * value.velocity ** 2;
       return { pattern, question: `質量 ${value.mass} kg の物体が速さ ${value.velocity} m/s で動く。運動エネルギーは？`, answer, unit: 'J', explanation: `K=(1/2)mv²=(1/2)×${value.mass}×${value.velocity}²=${displayNumber(answer)} J。速さを2乗する。` };
@@ -107,6 +122,30 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
     case 'spring': {
       const value = variants.spring.next(random); const answer = value.constant * value.extension;
       return { pattern, question: `ばね定数 ${value.constant} N/m のばねを ${value.extension} m 伸ばした。弾性力の大きさは？`, answer, unit: 'N', explanation: `フックの法則より弾性力の大きさ F=kx=${value.constant}×${value.extension}=${displayNumber(answer)} N（向きは伸びと反対）。` };
+    }
+    case 'projectileComponents': {
+      const value = variants.projectileComponents.next(random);
+      const state = calculateProjectileState(value.angle, 0);
+      const horizontal = value.component === 'horizontal';
+      const answer = horizontal ? state.vx0 : state.vy0;
+      const symbol = horizontal ? 'vₓ₀' : 'vᵧ₀';
+      const trig = horizontal ? 'cos' : 'sin';
+      return { pattern, question: `初速度 ${projectileInitialSpeed} m/s、射出角 ${value.angle}° の斜方投射。${horizontal ? '水平' : '鉛直'}方向の初速度成分 ${symbol} は？（小数第6位まで）`, answer, unit: 'm/s', explanation: `${symbol}=${projectileInitialSpeed}${trig}${value.angle}°=${displayNumber(answer)} m/s。水平成分は一定、鉛直成分には重力加速度がはたらきます。` };
+    }
+    case 'projectileMaxHeight': {
+      const angle = variants.projectileMaxHeight.next(random);
+      const state = calculateProjectileState(angle, 0);
+      return { pattern, question: `初速度 ${projectileInitialSpeed} m/s、高さ ${projectileInitialHeight} m から ${angle}° で投射する。最高点の地面からの高さは？（g=${projectileGravity} m/s²、小数第6位まで）`, answer: state.maxHeight, unit: 'm', explanation: `最高点では vᵧ=0。h=h₀+vᵧ₀²/(2g)=${projectileInitialHeight}+(${displayNumber(state.vy0)})²/(2×${projectileGravity})=${displayNumber(state.maxHeight)} m。` };
+    }
+    case 'projectileFlightTime': {
+      const angle = variants.projectileFlightTime.next(random);
+      const state = calculateProjectileState(angle, 0);
+      return { pattern, question: `初速度 ${projectileInitialSpeed} m/s、高さ ${projectileInitialHeight} m から ${angle}° で投射する。地面に着くまでの時間は？（g=${projectileGravity} m/s²、小数第6位まで）`, answer: state.flightTime, unit: 's', explanation: `y=h₀+vᵧ₀t−(1/2)gt²=0 の正の解より t=(vᵧ₀+√(vᵧ₀²+2gh₀))/g=${displayNumber(state.flightTime)} s。` };
+    }
+    case 'projectileRange': {
+      const angle = variants.projectileRange.next(random);
+      const state = calculateProjectileState(angle, 0);
+      return { pattern, question: `初速度 ${projectileInitialSpeed} m/s、高さ ${projectileInitialHeight} m から ${angle}° で投射する。地面に着くまでの水平距離は？（g=${projectileGravity} m/s²、小数第6位まで）`, answer: state.range, unit: 'm', explanation: `水平速度 vₓ₀=${displayNumber(state.vx0)} m/s は一定。飛行時間 ${displayNumber(state.flightTime)} s を用いて R=vₓ₀t=${displayNumber(state.range)} m。` };
     }
   }
 }

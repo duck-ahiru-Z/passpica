@@ -69,8 +69,19 @@ for (const pattern of informationPatterns) {
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     questions.add(problem.question);
   }
-  if (questions.size !== 5) throw new Error(`${pattern} generated ${questions.size}/5 expected variants`);
+  const expectedVariants = pattern === 'compression' ? 7 : 5;
+  if (questions.size !== expectedVariants) throw new Error(`${pattern} generated ${questions.size}/${expectedVariants} expected variants`);
 }
+
+const compressionCases = new Map();
+for (let index = 0; index < 140; index += 1) {
+  const problem = generateInformationProblem('compression', stableRandom);
+  const [, original, compressed] = problem.question.match(/元データ ([\d.]+) MB を ([\d.]+) MB/);
+  compressionCases.set(`${original}:${compressed}`, Number(problem.answer));
+}
+if (compressionCases.get('10:10') !== 100) throw new Error('unchanged data must have a 100% compression ratio');
+if (compressionCases.get('10:12') !== 120) throw new Error('expanded data must exceed 100% compression ratio');
+if (compressionCases.get('12:3') !== 25) throw new Error('compressed data must use compressed/original × 100');
 
 const mixed = Array.from({ length: 700 }, () => generateInformationProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += informationPatterns.length) {

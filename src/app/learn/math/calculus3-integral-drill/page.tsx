@@ -32,10 +32,11 @@ export default function Calculus3IntegralDrillPage() {
   const strategyIsCorrect = isIntegralStrategyValid(problem, strategy);
   const valueIsCorrect = isIntegralAnswerCorrect(answer, problem.answer);
 
-  return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
+  return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-800 font-sans text-sm">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">数学III 積分法・解法選択ドリル</h1>
     <p className="text-gray-500 mb-6">積分の式を見て、最初に選ぶべき解法を判断する練習です。基礎練習では解法を固定し、実戦練習では全パターンを混ぜます。</p>
+    <Link href="/learn/math/calculus3-integral-visual" className="retro-btn-classic inline-flex mb-4">定積分と面積をビジュアルで確認 →</Link>
     <section className="retro-box space-y-5">
       <div className="flex flex-wrap items-center gap-2"><label htmlFor="integral-mode" className="font-bold">演習モード</label>
         <select id="integral-mode" aria-label="積分の演習パターン" value={mode} onChange={e => { const selectedMode = e.target.value as Mode; setMode(selectedMode); next(selectedMode); }} className="border p-1">

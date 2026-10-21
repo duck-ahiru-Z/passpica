@@ -6,7 +6,7 @@ export function rotationVolume(upper: number): number {
   return Math.PI * upper ** 5 / 5;
 }
 
-export function rotationDiskRadius(index: number, sliceCount: number, displayRadius: number): number {
+export function rotationDiskRadius(index: number, sliceCount: number, displayRadius: number, upper: number): number {
   if (!Number.isInteger(sliceCount) || sliceCount <= 0) {
     throw new RangeError('sliceCount must be a positive integer');
   }
@@ -16,7 +16,10 @@ export function rotationDiskRadius(index: number, sliceCount: number, displayRad
   if (!Number.isFinite(displayRadius) || displayRadius < 0) {
     throw new RangeError('displayRadius must be a finite non-negative number');
   }
-  return displayRadius * (index / sliceCount) ** 2;
+  if (!Number.isFinite(upper) || upper < 0) {
+    throw new RangeError('upper must be a finite non-negative number');
+  }
+  return displayRadius * (upper / 2) ** 2 * (index / sliceCount) ** 2;
 }
 
 export function rotationSectionIndices(sliceCount: number): number[] {

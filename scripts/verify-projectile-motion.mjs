@@ -50,6 +50,7 @@ close(calculateProjectileState(30, 2).time, calculateProjectileState(30, 1).flig
 assert.equal(calculateProjectileState(0, 0.5).vy, -projectileGravity * calculateProjectileState(0, 0.5).time, 'horizontal launch vertical velocity');
 assert.ok(projectileInitialSpeed > 0 && projectileInitialHeight > 0);
 const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/projectile-visual/page.tsx'), 'utf8');
+if (!visualPage.includes('href="/learn/physics/motion-calculation-drill"') || !visualPage.includes('投射運動の計算演習へ')) throw new Error('projectile visual must link directly to its calculation drill');
 assert.ok(visualPage.includes('Math.abs(vy) >= 0.01 ? <line') && visualPage.includes('sy(displayedY) + 30'), 'zero vertical speed should hide the velocity arrow and show a separate downward gravity arrow');
 assert.ok(visualPage.includes('Math.min(48, Math.max(18, Math.abs(vy) * 2.5))') && visualPage.includes('Math.sign(vy) * verticalVelocityArrowLength'), 'nonzero vertical velocity arrows should remain visible and follow the velocity sign');
 assert.ok(visualPage.includes("Math.abs(vy) < 0.01 ? '—'"), 'zero velocity should not be labeled with a false up/down direction');

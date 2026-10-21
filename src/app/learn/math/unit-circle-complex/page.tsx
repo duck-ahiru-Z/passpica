@@ -22,6 +22,7 @@ export default function UnitCircleComplexPage() {
   const rad1 = (theta1 * Math.PI) / 180;
   const rad2 = (theta2 * Math.PI) / 180;
   const cleanCoordinate = (value: number) => (Math.abs(value) < 1e-12 ? 0 : value);
+  const formatRectangular = (real: number, imaginary: number) => `${real.toFixed(3)} ${imaginary < 0 ? '−' : '+'} ${Math.abs(imaginary).toFixed(3)} i`;
 
   // デカルト座標表示
   const z1_x = cleanCoordinate(r1 * Math.cos(rad1));
@@ -304,7 +305,7 @@ export default function UnitCircleComplexPage() {
               <span className="font-bold text-blue-800 font-sans">z₁ :</span>
               <div>極形式: {r1.toFixed(2)} (cos {theta1}° + i sin {theta1}°)</div>
               <div>オイラー: {r1.toFixed(2)} e^(i {theta1}°)</div>
-              <div className="text-gray-500">直交形式: {z1_x.toFixed(3)} + {z1_y.toFixed(3)} i</div>
+              <div className="text-gray-500">直交形式: {formatRectangular(z1_x, z1_y)}</div>
             </div>
 
             {/* z2 数式 */}
@@ -312,7 +313,7 @@ export default function UnitCircleComplexPage() {
               <span className="font-bold text-orange-800 font-sans">z₂ :</span>
               <div>極形式: {r2.toFixed(2)} (cos {theta2}° + i sin {theta2}°)</div>
               <div>オイラー: {r2.toFixed(2)} e^(i {theta2}°)</div>
-              <div className="text-gray-500">直交形式: {z2_x.toFixed(3)} + {z2_y.toFixed(3)} i</div>
+              <div className="text-gray-500">直交形式: {formatRectangular(z2_x, z2_y)}</div>
             </div>
 
             {/* z3 数式 (積) */}
@@ -320,7 +321,7 @@ export default function UnitCircleComplexPage() {
               <span className="font-bold text-purple-800 font-sans">z₃ = z₁ · z₂ :</span>
               <div className="font-bold text-purple-900">極形式: {r3.toFixed(2)} (cos {theta3}° + i sin {theta3}°)</div>
               <div>オイラー: {r3.toFixed(2)} e^(i {theta3}°)</div>
-              <div className="text-gray-500">直交形式: {z3_x.toFixed(3)} + {z3_y.toFixed(3)} i</div>
+              <div className="text-gray-500">直交形式: {formatRectangular(z3_x, z3_y)}</div>
             </div>
 
           </div>
@@ -349,6 +350,7 @@ export default function UnitCircleComplexPage() {
                 これにより、絶対値が1の複素数（単位円上の点）を掛けることは、平面上の点（またはベクトル）を<strong>「長さは変えずに、角度だけ回転させる」</strong>ことと同等になります。
               </p>
             </div>
+            <Link href="/learn/math/complex-polar-drill" className="retro-btn-classic inline-flex">極形式の積・商を問題で練習する →</Link>
           </div>
 
         </div>

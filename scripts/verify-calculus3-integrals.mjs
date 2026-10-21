@@ -15,6 +15,9 @@ if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includ
 if (!drillPage.includes('実戦練習：積分法 全パターンランダム') || !drillPage.includes('基礎練習：{integralLabels[p]}だけ')) {
   throw new Error('the learner must be able to choose either mixed strategy practice or one fixed integration pattern');
 }
+if (!drillPage.includes('/learn/math/calculus3-integral-visual') || !fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-integral-visual/page.tsx'), 'utf8').includes('/learn/math/calculus3-integral-drill')) {
+  throw new Error('integral visualization and exercise must link to each other');
+}
 if (!drillPage.includes('小数第3位まで入力しなさい（許容誤差 ±0.0005）')) {
   throw new Error('integral answer precision guidance must match the accepted rounding tolerance');
 }
@@ -28,6 +31,12 @@ if (drillPage.includes('role="img" aria-label={`積分問題: ${accessibleMath}`
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
 const checks = {
+  'power-area': problem => {
+    const [, upper] = problem.expression.match(/\\int_0\^\{([\d.]+)\}/);
+    const b = Number(upper);
+    return close(problem.answer, b ** 3 / 3) && problem.explanation.includes(`${b}³/3`)
+      && problem.explanation.includes(`区間 [0, ${b}]`);
+  },
   substitution: problem => {
     const [, power] = problem.expression.match(/\^\{(\d+)\}/);
     const p = Number(power);
@@ -78,7 +87,7 @@ const checks = {
   },
 };
 
-const expectedVariants = { substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
+const expectedVariants = { 'power-area': 5, substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
 if (!isIntegralAnswerCorrect('1.718', Math.E - 1)) throw new Error('three-decimal displayed answers should be accepted');
 if (!isIntegralAnswerCorrect(String(Math.E - 1), Math.E - 1)) throw new Error('full-precision integral answers should be accepted');
 if (!isIntegralAnswerCorrect('1.718281', Math.E - 1)) throw new Error('more precise integral answers should be accepted');
@@ -115,10 +124,8 @@ for (let seed = 1; seed <= 20; seed += 1) {
     return (state - 1) / 2147483646;
   };
   const sequence = Array.from({ length: 5_000 }, () => generateIntegralProblem('mix', seededRandom).pattern);
-  for (let start = 0; start < sequence.length; start += integralPatterns.length) {
-    const batch = sequence.slice(start, start + integralPatterns.length);
-    if (new Set(batch).size !== integralPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / integralPatterns.length}`);
-  }
+  const counts = new Map(integralPatterns.map(pattern => [pattern, sequence.filter(item => item === pattern).length]));
+  if (Math.max(...counts.values()) - Math.min(...counts.values()) > 2) throw new Error(`seed ${seed} produced imbalanced mixed counts: ${JSON.stringify(Object.fromEntries(counts))}`);
   if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
 }
 

@@ -1,12 +1,13 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
-export type IntegralPattern = 'substitution' | 'parts' | 'rational' | 'trig' | 'radical';
+export type IntegralPattern = 'power-area' | 'substitution' | 'parts' | 'rational' | 'trig' | 'radical';
 export type IntegralMode = IntegralPattern | 'mix';
 export type IntegralProblem = { pattern: IntegralPattern; expression: string; answer: number; hint: string; explanation: string; alternativeStrategies?: Partial<Record<IntegralPattern, string>> };
 
-export const integralPatterns: readonly IntegralPattern[] = ['substitution', 'parts', 'rational', 'trig', 'radical'];
+export const integralPatterns: readonly IntegralPattern[] = ['power-area', 'substitution', 'parts', 'rational', 'trig', 'radical'];
 export const integralLabels: Record<IntegralPattern, string> = {
+  'power-area': 'べき関数の定積分・面積',
   substitution: '置換積分', parts: '部分積分', rational: '部分分数分解',
   trig: '三角関数の積分', radical: '三角置換（平方根）',
 };
@@ -25,6 +26,7 @@ export function getIntegralExplanation(problem: IntegralProblem, strategy: Integ
 
 const picker = new BalancedRandom(integralPatterns);
 const variants = {
+  'power-area': new BalancedRandom([0.5, 1, 1.5, 2, 2.5]),
   substitution: new BalancedRandom([2, 3, 4, 5]),
   parts: new BalancedRandom([1, 2, 3]),
   rational: new BalancedRandom(Array.from({ length: 9 }, (_, index) => ({ a: Math.floor(index / 3) + 1, b: (index % 3) + 1 }))),
@@ -39,6 +41,7 @@ export function generateIntegralProblem(mode: IntegralMode, random = Math.random
   const { a: partialA, b: partialB } = pattern === 'rational' ? variants.rational.next(random) : { a: 1, b: 1 };
   const oddPower = pattern === 'trig' ? variants.trig.next(random) : 3;
   const radius = pattern === 'radical' ? variants.radical.next(random) : 2;
+  const areaUpper = pattern === 'power-area' ? variants['power-area'].next(random) : 2;
   const radicalUpper = radius % 2 === 0 ? String(radius / 2) : `\\frac{${radius}}{2}`;
   const radicalUpperText = radius % 2 === 0 ? String(radius / 2) : `${radius}/2`;
   const trigFactors = Array.from({ length: (oddPower - 1) / 2 }, (_, index) => `${oddPower - 1 - 2 * index}/${oddPower - 2 * index}`);
@@ -54,6 +57,7 @@ export function generateIntegralProblem(mode: IntegralMode, random = Math.random
   const rationalNumeratorX = partialA + partialB;
   const rationalNumeratorConstant = 2 * partialA + partialB;
   const problems: Record<IntegralPattern, IntegralProblem> = {
+    'power-area': { pattern, expression: `\\int_0^{${areaUpper}} x^2\\,dx`, answer: areaUpper ** 3 / 3, hint: 'べき関数の積分公式を使い、上端と下端を代入する', explanation: `[x³/3]₀^${areaUpper} = ${areaUpper}³/3 = ${(areaUpper ** 3 / 3).toFixed(3)}。これはビジュアルで示す y=x² の区間 [0, ${areaUpper}] の正確な面積です。` },
     substitution: { pattern, expression: `\\int_0^1 2x(x^2+1)^{${power}}\\,dx`, answer: (2 ** (power + 1) - 1) / (power + 1), hint: '内側の式を u と置く', explanation: `u=x²+1 と置くと区間は1から2。積分値は (2^${power + 1}−1)/${power + 1}。` },
     parts: { pattern, expression: `\\int_0^1 x e^{${rate === 1 ? 'x' : `${rate}x`}}\\,dx`, answer: (Math.exp(rate) * (rate - 1) + 1) / rate ** 2, hint: '多項式 × 指数関数', explanation: partsExplanation },
     rational: { pattern, expression: `\\int_0^1 \\frac{${rationalNumeratorX}x+${rationalNumeratorConstant}}{(x+1)(x+2)}\\,dx`, answer: partialA * Math.log(2) + partialB * Math.log(1.5), hint: '分母を一次式の積に分ける', explanation: `部分分数分解すると ${partialA}/(x+1)+${partialB}/(x+2)。積分値は ${logTerm(partialA, '2')} + ${logTerm(partialB, '(3/2)')}。` },
