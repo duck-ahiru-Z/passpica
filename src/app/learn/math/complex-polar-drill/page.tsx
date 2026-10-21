@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs } from '@/src/lib/complexPolarExact';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -77,9 +77,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let signY = 1;
       
       if (p === 'pattern2') {
-        signX = Math.random() > 0.5 ? 1 : -1;
-        signY = Math.random() > 0.5 ? 1 : -1;
-        if (signX === 1 && signY === 1) signX = -1; // force quad II-IV
+        [signX, signY] = getUniformNonFirstQuadrantSigns();
       }
       
       const finalX = x * signX;

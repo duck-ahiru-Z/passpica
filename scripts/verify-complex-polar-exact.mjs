@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, polarAngleChoices, supportedPolarAngleLabels } from '../src/lib/complexPolarExact.ts';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, polarAngleChoices, supportedPolarAngleLabels } from '../src/lib/complexPolarExact.ts';
 
 const cases = [
   [1, 0, '0'], [1, 1, '1'], [1, -1, '-1'],
@@ -47,6 +47,23 @@ for (const operation of ['sum', 'difference']) {
 }
 assert(polarAngleChoices.some(({ val }) => val === Math.PI / 4), '45-degree practice should remain available');
 
+let state = 0x6d2b79f5;
+const seededRandom = () => {
+  state = (Math.imul(state ^ (state >>> 15), state | 1) + 0x6d2b79f5) | 0;
+  return ((state ^ (state >>> 14)) >>> 0) / 4294967296;
+};
+const quadrantCounts = new Map([['II', 0], ['III', 0], ['IV', 0]]);
+for (let index = 0; index < 12_000; index += 1) {
+  const [signX, signY] = getUniformNonFirstQuadrantSigns(seededRandom);
+  const quadrant = signX < 0 ? (signY > 0 ? 'II' : 'III') : 'IV';
+  quadrantCounts.set(quadrant, quadrantCounts.get(quadrant) + 1);
+  if (signX > 0 && signY > 0) throw new Error('quadrant II–IV practice must never generate a first-quadrant point');
+}
+const quadrantFrequencies = [...quadrantCounts.values()];
+if (quadrantFrequencies.some(count => count === 0) || Math.max(...quadrantFrequencies) - Math.min(...quadrantFrequencies) > 240) {
+  throw new Error(`quadrant II–IV practice is not balanced: ${JSON.stringify(Object.fromEntries(quadrantCounts))}`);
+}
+
 const page = await (await import('node:fs/promises')).readFile(
   new URL('../src/app/learn/math/complex-polar-drill/page.tsx', import.meta.url), 'utf8',
 );
@@ -54,6 +71,7 @@ assert.match(page, /ansA = formatExactTrigComponent\(rRes, cosVal\)/);
 assert.match(page, /ansB = formatExactTrigComponent\(rRes, sinVal\)/);
 assert.match(page, /const thStr = formatPolarAngle\(thRes\)/);
 assert.match(page, /getSupportedPolarAnglePairs\(isProduct \? 'sum' : 'difference'\)/);
+assert.match(page, /\[signX, signY\] = getUniformNonFirstQuadrantSigns\(\)/);
 assert.match(page, /type Pattern = 'pattern1' \| 'pattern2' \| 'pattern3' \| 'pattern4-product' \| 'pattern4-quotient'/);
 assert.match(page, /基礎練習：極形式の積だけ/);
 assert.match(page, /基礎練習：極形式の商だけ/);
