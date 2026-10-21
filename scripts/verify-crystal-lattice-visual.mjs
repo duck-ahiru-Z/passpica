@@ -9,6 +9,8 @@ const required = [
   ['面心立方格子の配置図。立方体の8つの頂点と6つの面の中心に原子があります。', 'FCC unit-cell description'],
   ['体心立方格子の体対角線を含む断面。', 'BCC contact-section description'],
   ['面心立方格子の面を通る断面。', 'FCC contact-section description'],
+  ['href="/learn/chemistry/crystal-lattice-drill"', 'link to focused and mixed crystal-lattice practice'],
+  ['結晶格子の計算問題で練習する →', 'clear visual-to-practice link label'],
 ];
 
 for (const [text, label] of required) {
