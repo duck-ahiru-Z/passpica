@@ -117,11 +117,13 @@ for (let value = 1; value <= 5; value += 1) {
   if (!isGeometryStrategyValid(washer, 'shell-method') || !isGeometryStrategyValid(shell, 'y-axis-rotation')) {
     throw new Error(`equivalent y-axis rotation methods must both be accepted`);
   }
-  if (isGeometryStrategyValid(washer, 'x-axis-rotation') || isGeometryStrategyValid(shell, 'curve-length')) {
-    throw new Error('unrelated geometry strategies must remain invalid');
+  const diskVolume = generateGeometryProblem('disk-volume', () => (value - 0.5) / 5);
+  if (!isGeometryStrategyValid(diskVolume, 'x-axis-rotation') || isGeometryStrategyValid(shell, 'curve-length')) {
+    throw new Error('the generic disk method must be accepted for y=x² rotation volume, while unrelated strategies remain invalid');
   }
   if (!getGeometryExplanation(washer, 'shell-method').includes('円筒殻法')
-    || !getGeometryExplanation(shell, 'y-axis-rotation').includes('円環')) {
+    || !getGeometryExplanation(shell, 'y-axis-rotation').includes('円環')
+    || !getGeometryExplanation(diskVolume, 'x-axis-rotation').includes('円板法')) {
     throw new Error('accepted alternate method must show its own derivation');
   }
 }

@@ -53,7 +53,8 @@ const geometryPicker = createCalculus3MixedQuestionPicker();
 const geometryQuestions = Array.from({ length: 500 }, () => geometryPicker.next('geometry'));
 const washerQuestion = geometryQuestions.find(question => question.pattern === 'geometry:y-axis-rotation');
 const shellQuestion = geometryQuestions.find(question => question.pattern === 'geometry:shell-method');
-if (!washerQuestion || !shellQuestion) throw new Error('geometry mode must generate both y-axis rotation patterns');
+const diskVolumeQuestion = geometryQuestions.find(question => question.pattern === 'geometry:disk-volume');
+if (!washerQuestion || !shellQuestion || !diskVolumeQuestion) throw new Error('geometry mode must generate y-axis rotation and y=x² disk-volume patterns');
 for (const question of [washerQuestion, shellQuestion]) {
   const expectedMethods = question.pattern === 'geometry:y-axis-rotation'
     ? ['y軸回転体の体積（円環法）', 'y軸回転体の体積（円筒殻法）']
@@ -64,6 +65,11 @@ for (const question of [washerQuestion, shellQuestion]) {
   if (expectedMethods.slice(1).some(method => !question.alternativeExplanations?.[method]?.trim())) {
     throw new Error(`${question.pattern} must explain each valid alternate method`);
   }
+}
+if (!diskVolumeQuestion.acceptedAnswers?.includes('x軸回転体の体積（円板法）')
+  || !diskVolumeQuestion.options.includes('x軸回転体の体積（円板法）')
+  || !diskVolumeQuestion.alternativeExplanations?.['x軸回転体の体積（円板法）']?.includes('円板法')) {
+  throw new Error('Math III mixed practice must accept and explain the general disk method for the y=x² rotation-volume problem');
 }
 
 const integralPicker = createCalculus3MixedQuestionPicker();
