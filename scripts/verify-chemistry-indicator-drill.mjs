@@ -14,7 +14,9 @@ for (const pattern of indicatorDrillPatterns) {
     const problem = generateIndicatorProblem(pattern);
     assert.equal(problem.pattern, pattern, `${pattern} fixed mode must not leak another indicator`);
     assert.equal(problem.answer, getIndicatorDisplay(pattern, problem.pH).colorName);
-    assert.match(problem.question, new RegExp(`pH ${problem.pH.toFixed(1)}`));
+    const displayedPH = problem.question.match(/pH ([\d.]+)/);
+    assert.ok(displayedPH, 'question must show its pH');
+    assert.equal(Number(displayedPH[1]), problem.pH, 'question must not round away an indicator boundary');
     assert.ok(problem.explanation.includes(problem.answer), 'explanation must state the generated answer');
     assert.notEqual(problem.pH, previousPH, 'balanced scenario batches should avoid adjacent repeats');
     pHCounts.set(problem.pH, (pHCounts.get(problem.pH) ?? 0) + 1);
@@ -46,6 +48,10 @@ for (const pattern of indicatorDrillPatterns) {
   assert.equal(pHCounts.size, 8, `${pattern} mixed mode must reach each pH scenario`);
   for (const count of pHCounts.values()) assert.equal(count, mixedSamples / indicatorDrillPatterns.length / 8);
 }
+
+const exactMethylOrangeBoundary = Array.from({ length: 8 }, () => generateIndicatorProblem('mo')).find(problem => problem.pH === 3.75);
+assert.ok(exactMethylOrangeBoundary, 'fixed methyl-orange practice must reach the midpoint pH');
+assert.ok(exactMethylOrangeBoundary.question.includes('pH 3.75'), 'the midpoint pH must be displayed exactly');
 
 for (const pattern of indicatorDrillPatterns) {
   for (const pH of [3.1, 3.75, 4.4, 5, 7, 8, 8.2, 8.3, 10]) {

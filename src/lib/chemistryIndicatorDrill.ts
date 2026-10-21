@@ -53,6 +53,10 @@ function getColorRule(pattern: IndicatorKey, pH: number): string {
   }
 }
 
+function formatPH(pH: number): string {
+  return Number(pH.toFixed(2)).toString();
+}
+
 export function generateIndicatorProblem(
   mode: IndicatorDrillMode,
   random = Math.random,
@@ -64,7 +68,7 @@ export function generateIndicatorProblem(
   return {
     pattern,
     pH,
-    question: `pH ${pH.toFixed(1)} の水溶液に${display.indicatorName}を加えると、何色を示すか。`,
+    question: `pH ${formatPH(pH)} の水溶液に${display.indicatorName}を加えると、何色を示すか。`,
     answer: display.colorName,
     explanation: `${getColorRule(pattern, pH)} この条件では${display.colorName}を示します。`,
   };
