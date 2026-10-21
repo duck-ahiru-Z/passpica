@@ -7,6 +7,7 @@ import {
 } from '../src/lib/rlcCalculationDrill.ts';
 
 const page = readFileSync('src/app/learn/physics/ac-circuit-drill/page.tsx', 'utf8');
+const visualPage = readFileSync('src/app/learn/physics/ac-circuit/page.tsx', 'utf8');
 const learningPortal = readFileSync('src/app/learn/page.tsx', 'utf8');
 const drillPortal = readFileSync('src/app/drill/page.tsx', 'utf8');
 const packageScripts = JSON.parse(readFileSync('package.json', 'utf8')).scripts;
@@ -30,6 +31,9 @@ if (!page.includes('実戦練習：交流回路 全パターンランダム') ||
 if (!learningPortal.includes("practiceLink: '/learn/physics/ac-circuit-drill'")
   || !drillPortal.includes("link: '/learn/physics/ac-circuit-drill'")) {
   throw new Error('RLC visual and drill must both be linked from their portals');
+}
+if (!visualPage.includes('href="/learn/physics/ac-circuit-drill"') || !visualPage.includes('交流回路の計算問題で練習する')) {
+  throw new Error('RLC visual must link directly to its focused and mixed calculation drill');
 }
 
 const stableRandom = (() => {
