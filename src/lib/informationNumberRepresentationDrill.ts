@@ -21,10 +21,11 @@ export const numberRepresentationLabels: Record<NumberRepresentationPattern, str
 };
 
 export function isNumberRepresentationAnswerCorrect(problem: NumberRepresentationProblem, input: string): boolean {
-  const compact = input.trim().toLowerCase().replace(/\s/g, '').replaceAll('₂', '');
+  const compact = input.trim().toLowerCase().replace(/\s/g, '');
   if (!compact) return false;
   if (problem.pattern === 'binaryDecimal') {
-    const bits = compact.startsWith('0b') ? compact.slice(2) : compact;
+    const withoutPrefix = compact.startsWith('0b') ? compact.slice(2) : compact;
+    const bits = withoutPrefix.endsWith('₂') ? withoutPrefix.slice(0, -1) : withoutPrefix;
     return /^[01]{8}$/.test(bits) && bits === problem.answer;
   }
   const integer = compact.replaceAll('−', '-');
