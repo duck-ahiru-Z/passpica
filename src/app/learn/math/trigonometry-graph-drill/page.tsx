@@ -34,7 +34,7 @@ export default function TrigonometryGraphDrillPage() {
   if (!problem) return <main className="max-w-3xl mx-auto px-4 py-8">問題を準備しています…</main>;
   const answerValues = answers.problem === problem ? answers.values : problem.answers.map(() => '');
   const strategyCorrect = mode !== 'mix' || isTrigGraphStrategyValid(problem, strategy);
-  const answerCorrect = isTrigGraphAnswerCorrect(problem, answers);
+  const answerCorrect = isTrigGraphAnswerCorrect(problem, answerValues);
   const correct = strategyCorrect && answerCorrect;
   const answersText = problem.answers.map((answer, index) => `${problem.answerLabels[index]} ${answer.toFixed(2)}${problem.unit}`).join('、');
 
