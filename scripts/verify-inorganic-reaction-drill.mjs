@@ -4,7 +4,7 @@ import path from 'node:path';
 import { generateInorganicProblem, inorganicPatterns } from '../src/lib/inorganicReactionDrill.ts';
 import { generateFlameReactionProblem } from '../src/lib/flameReactionDrill.ts';
 
-assert.equal(inorganicPatterns.length, 14);
+assert.equal(inorganicPatterns.length, 15);
 const visual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors/page.tsx'), 'utf8');
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors-drill/page.tsx'), 'utf8');
 const packageScripts = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf8')).scripts;
@@ -29,6 +29,7 @@ const visualReactionEvidence = {
   'zn-sulfide-acid': '酸性下では沈殿せず',
   'zn-sulfide-base': 'Zn²⁺ + S²⁻ → ZnS↓ (白色沈殿)',
   'fe3-sulfide-acid': '2Fe³⁺ + H₂S → 2Fe²⁺ + S（コロイド） + 2H⁺',
+  'fe3-sulfide-base': '2Fe³⁺ + 3H₂S + 6OH⁻ → 2FeS↓ + S↓ + 6H₂O',
   'fe3-iodide': '2Fe³⁺ + 2I⁻ → 2Fe²⁺ + I₂ (褐色溶液)',
   'cu-iodide': '2Cu²⁺ + 4I⁻ → 2CuI↓ + I₂ (白色沈殿・褐色溶液)',
 };
@@ -51,7 +52,7 @@ assert.ok(outcomes.size >= 10, 'distinct visible reaction outcomes should remain
 assert.equal(generateFlameReactionProblem('Li').color, '赤色');
 const counts = Object.fromEntries(inorganicPatterns.map(pattern => [pattern, 0]));
 let previous = '';
-const sampleCount = 14000;
+const sampleCount = 15000;
 for (let index = 0; index < sampleCount; index += 1) {
   const problem = generateInorganicProblem('mix');
   counts[problem.pattern] += 1;

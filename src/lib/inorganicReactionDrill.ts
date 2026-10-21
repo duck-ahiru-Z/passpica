@@ -1,12 +1,12 @@
 import { BalancedRandom } from './balancedRandom.ts';
 
-export type InorganicPattern = 'cu-ammonia-small' | 'cu-ammonia-excess' | 'al-sodium-small' | 'al-sodium-excess' | 'zn-sodium-small' | 'zn-sodium-excess' | 'ag-ammonia-small' | 'ag-ammonia-excess' | 'pb-iodide' | 'zn-sulfide-acid' | 'zn-sulfide-base' | 'fe3-sulfide-acid' | 'fe3-iodide' | 'cu-iodide';
+export type InorganicPattern = 'cu-ammonia-small' | 'cu-ammonia-excess' | 'al-sodium-small' | 'al-sodium-excess' | 'zn-sodium-small' | 'zn-sodium-excess' | 'ag-ammonia-small' | 'ag-ammonia-excess' | 'pb-iodide' | 'zn-sulfide-acid' | 'zn-sulfide-base' | 'fe3-sulfide-acid' | 'fe3-sulfide-base' | 'fe3-iodide' | 'cu-iodide';
 export type InorganicMode = InorganicPattern | 'mix';
 export type InorganicProblem = { pattern: InorganicPattern; label: string; prompt: string; answer: string; formula: string; explanation: string };
 export const inorganicPatterns: readonly InorganicPattern[] = [
   'cu-ammonia-small', 'cu-ammonia-excess', 'al-sodium-small', 'al-sodium-excess',
   'zn-sodium-small', 'zn-sodium-excess', 'ag-ammonia-small', 'ag-ammonia-excess',
-  'pb-iodide', 'zn-sulfide-acid', 'zn-sulfide-base', 'fe3-sulfide-acid', 'fe3-iodide', 'cu-iodide',
+  'pb-iodide', 'zn-sulfide-acid', 'zn-sulfide-base', 'fe3-sulfide-acid', 'fe3-sulfide-base', 'fe3-iodide', 'cu-iodide',
 ];
 const reactions: Record<InorganicPattern, InorganicProblem> = {
   'cu-ammonia-small': { pattern: 'cu-ammonia-small', label: 'Cu²⁺にNH₃水を少量', prompt: 'Cu²⁺水溶液にアンモニア水を少量加えると、どの変化が起こるか。', answer: '青白色のCu(OH)₂沈殿', formula: 'Cu²⁺ + 2OH⁻ → Cu(OH)₂↓', explanation: '少量のアンモニア水は弱塩基としてOH⁻を生じ、青白色の水酸化銅(II)を沈殿させます。' },
@@ -21,6 +21,7 @@ const reactions: Record<InorganicPattern, InorganicProblem> = {
   'zn-sulfide-acid': { pattern: 'zn-sulfide-acid', label: 'Zn²⁺にH₂Sを酸性下', prompt: 'Zn²⁺水溶液を酸性に保ってH₂Sを通すと、このシミュレーターではどうなるか。', answer: '沈殿せず、Zn²⁺が溶液中に残る', formula: '酸性下では沈殿せず', explanation: '酸性下ではS²⁻濃度が低く、ZnSは沈殿しません。' },
   'zn-sulfide-base': { pattern: 'zn-sulfide-base', label: 'Zn²⁺にH₂Sを塩基性下', prompt: 'Zn²⁺水溶液を塩基性にしてH₂Sを通すと、何が生じるか。', answer: '白色のZnS沈殿', formula: 'Zn²⁺ + S²⁻ → ZnS↓', explanation: '塩基性ではS²⁻濃度が高まり、例外的に白色の硫化物ZnSが沈殿します。' },
   'fe3-sulfide-acid': { pattern: 'fe3-sulfide-acid', label: 'Fe³⁺にH₂Sを酸性下', prompt: 'Fe³⁺水溶液を酸性に保ってH₂Sを通したとき、観察される変化はどれか。', answer: 'Fe²⁺の淡緑色溶液と硫黄コロイドの黄白色白濁', formula: '2Fe³⁺ + H₂S → 2Fe²⁺ + S + 2H⁺', explanation: 'Fe³⁺はH₂SによりFe²⁺へ還元され、H₂Sは単体硫黄となり、微粒子が分散して黄白色に白濁します。' },
+  'fe3-sulfide-base': { pattern: 'fe3-sulfide-base', label: 'Fe³⁺にH₂Sを塩基性下', prompt: 'Fe³⁺水溶液を塩基性にしてH₂Sを通したとき、生じる沈殿の組合せはどれか。', answer: '黒色のFeS沈殿と単体硫黄の沈殿', formula: '2Fe³⁺ + 3H₂S + 6OH⁻ → 2FeS↓ + S↓ + 6H₂O', explanation: '塩基性ではFe³⁺がH₂SによりFe²⁺へ還元された後、Fe²⁺がS²⁻と反応して黒色FeSとなります。同時に単体硫黄も沈殿します。' },
   'fe3-iodide': { pattern: 'fe3-iodide', label: 'Fe³⁺にKI', prompt: 'Fe³⁺水溶液にKIを加えると、沈殿は生じるか。溶液はどう変化するか。', answer: '沈殿せず、ヨウ素により褐色の溶液', formula: '2Fe³⁺ + 2I⁻ → 2Fe²⁺ + I₂', explanation: 'Fe³⁺がI⁻を酸化してI₂を生じ、自身はFe²⁺に還元されます。ヨウ素で溶液が褐色になります。' },
   'cu-iodide': { pattern: 'cu-iodide', label: 'Cu²⁺にKI', prompt: 'Cu²⁺水溶液にKIを加えると、生じる固体と溶液の色の組合せはどれか。', answer: '白色のCuI沈殿と褐色のヨウ素溶液', formula: '2Cu²⁺ + 4I⁻ → 2CuI↓ + I₂', explanation: 'I⁻はCu²⁺をCu⁺へ還元し、自身はI₂に酸化されます。白色CuIと褐色のヨウ素が生じます。' },
 };
