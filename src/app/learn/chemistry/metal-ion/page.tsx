@@ -42,12 +42,12 @@ const STEPS: Step[] = [
     id: 2,
     reagent: '② 濾液を酸性にした状態で、硫化水素を通す',
     reagentFormula: 'H2S (酸性下)',
-    precipitates: ['CuS (黒色)'],
-    remains: ['Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
-    precipitateColor: '黒色',
-    precipitateColors: ['#1e293b'],
-    reaction: 'Cu2+ + S2- ➔ CuS↓',
-    explain: '先に希塩酸を加えてAg+とPb2+を塩化物として分離した後の濾液に、酸性条件で硫化水素を通します。酸性下ではS2-濃度が低く保たれるため、この対象イオンの中では溶解度積の小さいCuSだけが沈殿します。Fe3+やZn2+などはこの段階では溶液中に残ります。'
+    precipitates: ['CuS (黒色)', 'S (淡黄色)'],
+    remains: ['Fe2+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
+    precipitateColor: '黒色 ＆ 淡黄色',
+    precipitateColors: ['#1e293b', '#fde68a'],
+    reaction: 'Cu2+ + H2S ➔ CuS↓ + 2H+ , 2Fe3+ + H2S ➔ 2Fe2+ + S↓ + 2H+',
+    explain: '先に希塩酸を加えてAg+とPb2+を塩化物として分離した後の濾液に、酸性条件で硫化水素を通します。酸性下ではS2-濃度が低く保たれるため、この対象イオンの硫化物では溶解度積の小さいCuSだけが沈殿します。一方、Fe3+はH2Sに還元されてFe2+となり、単体硫黄S（淡黄色）が生じます。Fe2+はこの段階では溶液中に残り、次段階でH2Sを除いて硝酸でFe3+へ酸化してから分離します。'
   },
   {
     id: 3,
@@ -58,7 +58,7 @@ const STEPS: Step[] = [
     precipitateColor: '赤褐色 ＆ 白色ゲル状',
     precipitateColors: ['#b45309', '#f8fafc'],
     reaction: 'Fe3+ + 3OH- ➔ Fe(OH)3↓ , Al3+ + 3OH- ➔ Al(OH)3↓',
-    explain: '煮沸してH2Sを追い出した後、硝酸で鉄をFe3+に酸化し、アンモニア水を過剰に加えます。塩基性（OH-）になり、鉄とアルミニウムが水酸化物の沈殿として落ちます。★ポイント: 亜鉛イオン(Zn2+)も一度は水酸化物Zn(OH)2を作りますが、アンモニア水を過剰に加えることで無色透明の錯イオン [Zn(NH3)4]2+ となり再溶解します。'
+    explain: '前段階でH2SによりFe2+となった鉄は、煮沸してH2Sを追い出した後、硝酸でFe3+に酸化します。その後アンモニア水を過剰に加えると、塩基性（OH-）になりFe(OH)3とAl(OH)3が沈殿します。★ポイント: 亜鉛イオン(Zn2+)も一度は水酸化物Zn(OH)2を作りますが、アンモニア水を過剰に加えることで無色透明の錯イオン [Zn(NH3)4]2+ となり再溶解します。'
   },
   {
     id: 4,

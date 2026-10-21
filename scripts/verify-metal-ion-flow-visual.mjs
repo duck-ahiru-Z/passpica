@@ -6,8 +6,8 @@ const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/m
 const orderedStepRequirements = [
   ["reagentFormula: '-'", "remains: ['Ag+', 'Pb2+', 'Cu2+', 'Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+']", "reaction: '-'"] ,
   ["reagentFormula: 'HCl'", "precipitates: ['AgCl (白色)', 'PbCl2 (白色)']", "remains: ['Cu2+', 'Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+']", "Ag+ + Cl- ➔ AgCl↓ , Pb2+ + 2Cl- ➔ PbCl2↓"],
-  ["reagentFormula: 'H2S (酸性下)'", "precipitates: ['CuS (黒色)']", "remains: ['Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+']", "Cu2+ + S2- ➔ CuS↓"],
-  ["reagentFormula: 'HNO3 ➔ NH3水 (過剰)'", "precipitates: ['Fe(OH)3', 'Al(OH)3']", "remains: ['[Zn(NH3)4]2+ (溶解)', 'Ca2+', 'Na+']", "Fe3+ + 3OH- ➔ Fe(OH)3↓ , Al3+ + 3OH- ➔ Al(OH)3↓"],
+  ["reagentFormula: 'H2S (酸性下)'", "precipitates: ['CuS (黒色)', 'S (淡黄色)']", "remains: ['Fe2+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+']", "2Fe3+ + H2S ➔ 2Fe2+ + S↓ + 2H+"],
+  ["reagentFormula: 'HNO3 ➔ NH3水 (過剰)'", "precipitates: ['Fe(OH)3', 'Al(OH)3']", "remains: ['[Zn(NH3)4]2+ (溶解)', 'Ca2+', 'Na+']", "Fe2+となった鉄は、煮沸してH2Sを追い出した後、硝酸でFe3+に酸化", "Fe3+ + 3OH- ➔ Fe(OH)3↓ , Al3+ + 3OH- ➔ Al(OH)3↓"],
   ["reagentFormula: 'H2S (塩基性下)'", "precipitates: ['ZnS (白色)']", "remains: ['Ca2+', 'Na+']", "Zn2+ + S2- ➔ ZnS↓"],
   ["reagentFormula: '(NH4)2CO3'", "precipitates: ['CaCO3 (白色)']", "remains: ['Na+']", "Ca2+ + CO3 2- ➔ CaCO3↓"],
   ["reagentFormula: '炎色反応'", "precipitates: []", "remains: []", "reaction: 'Na ➔ 黄色発色'"]
@@ -56,6 +56,9 @@ if (!page.includes('step.remains.length === 0 ? (') || !page.includes('（イオ
 
 if (!page.includes("precipitateColors: ['#b45309', '#f8fafc']")) {
   throw new Error('iron and aluminum hydroxide precipitates must retain distinct brown and white colors');
+}
+if (!page.includes("precipitateColors: ['#1e293b', '#fde68a']") || !page.includes('酸性条件で硫化水素') || !page.includes('Fe2+となった鉄は、煮沸してH2Sを追い出した後、硝酸でFe3+に酸化')) {
+  throw new Error('acidic H2S must show Fe3+ reduction to dissolved Fe2+ and sulfur, followed by nitric-acid reoxidation before hydroxide precipitation');
 }
 if (!page.includes('const isMixedColorPair = count === 2 && step.precipitateColors[0] !== step.precipitateColors[1];')) {
   throw new Error('mixed-color sediment labels must stay centered on their own color segments');

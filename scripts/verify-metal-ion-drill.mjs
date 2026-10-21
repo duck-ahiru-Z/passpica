@@ -11,6 +11,9 @@ for (const [index, pattern] of metalIonPatterns.entries()) {
   assert.equal(problem.answer, expectedAnswers[index]);
   assert.ok(problem.explanation.length > 10);
 }
+const acidicSulfideProblem = generateMetalIonProblem('acidicSulfide');
+assert.match(acidicSulfideProblem.explanation, /Fe³⁺はH₂Sに還元されてFe²⁺となり/);
+assert.match(acidicSulfideProblem.explanation, /硝酸でFe³⁺へ酸化してから/);
 assert.equal(generateFlameReactionProblem('Na').color, '黄色', 'final Na+ identification should agree with the flame visual');
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/metal-ion-drill/page.tsx'), 'utf8');
 for (const answer of expectedAnswers) {
