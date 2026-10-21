@@ -96,7 +96,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（面積）',
     title: '定積分と面積ビジュアル装置',
-    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。',
+    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。関連する積分ドリルでは基本のべき関数から解法別・ランダムまで練習できます。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/math/calculus3-integral-visual',

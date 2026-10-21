@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const areas = ['limit', 'differentiation', 'curve-analysis', 'integral', 'geometry', 'differential-equation'];
-const patternCounts = { limit: 7, differentiation: 7, 'curve-analysis': 6, integral: 5, geometry: 5, 'differential-equation': 4 };
+const patternCounts = { limit: 7, differentiation: 7, 'curve-analysis': 6, integral: 6, geometry: 5, 'differential-equation': 4 };
 const areaLabels = { limit: '極限', differentiation: '微分法', 'curve-analysis': '曲線分析', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式' };
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-mixed-drill/page.tsx'), 'utf8');
 for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}', 'acceptedAnswers.includes(answer)', 'question.alternativeExplanations?.[answer]']) {
@@ -95,4 +95,4 @@ for (let seed = 1; seed <= 20; seed += 1) {
   }
 }
 
-console.log('Calculus III mixed practice verified: all 34 lower-level strategy patterns, varied generated questions, six-area balance across 10,000 seeded questions, KaTeX rendering, single-choice UI, and balanced answer positions.');
+console.log('Calculus III mixed practice verified: all 35 lower-level strategy patterns, varied generated questions, six-area balance across 10,000 seeded questions, KaTeX rendering, single-choice UI, and balanced answer positions.');

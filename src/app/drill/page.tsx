@@ -44,7 +44,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（解法選択）',
     title: '数学III 積分法・解法選択ドリル',
-    description: '置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
+    description: 'べき関数の定積分・面積、置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-integral-drill'

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateIntegralProblem, integralPatterns, isIntegralAnswerCorrect } from '../src/lib/calculus3Integrals.ts';
+import { createIntegralProblemPicker, generateIntegralProblem, integralPatterns, isIntegralAnswerCorrect } from '../src/lib/calculus3Integrals.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-integral-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="integral-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
@@ -25,6 +25,14 @@ if (drillPage.includes('role="img" aria-label={`積分問題: ${accessibleMath}`
 const stableRandom = () => 0.37;
 const close = (actual, expected) => Math.abs(actual - expected) < 1e-10;
 const checks = {
+  power: problem => {
+    const [, exponent] = problem.expression.match(/x\^\{(\d+)\}/);
+    const n = Number(exponent);
+    return close(problem.answer, 1 / (n + 1))
+      && problem.explanation.includes(`x^{${n + 1}}`)
+      && problem.explanation.includes(`1}{${n + 1}`)
+      && problem.explanation.includes((1 / (n + 1)).toFixed(3));
+  },
   substitution: problem => {
     const [, power] = problem.expression.match(/\^\{(\d+)\}/);
     const p = Number(power);
@@ -75,7 +83,7 @@ const checks = {
   },
 };
 
-const expectedVariants = { substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
+const expectedVariants = { power: 5, substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
 if (!isIntegralAnswerCorrect('1.718', Math.E - 1)) throw new Error('three-decimal displayed answers should be accepted');
 if (!isIntegralAnswerCorrect(String(Math.E - 1), Math.E - 1)) throw new Error('full-precision integral answers should be accepted');
 if (!isIntegralAnswerCorrect('1.718281', Math.E - 1)) throw new Error('more precise integral answers should be accepted');
@@ -91,12 +99,20 @@ for (const pattern of integralPatterns) {
   if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
 }
 
-const mixed = Array.from({ length: 600 }, () => generateIntegralProblem('mix', stableRandom).pattern);
-for (let start = 0; start < mixed.length; start += integralPatterns.length) {
-  const batch = mixed.slice(start, start + integralPatterns.length);
-  if (new Set(batch).size !== integralPatterns.length) throw new Error(`mixed set omitted an integral pattern in batch ${start / integralPatterns.length}`);
-}
-if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed integral practice repeated adjacent patterns');
+const verifyMixed = (sequence, label) => {
+  const frequencies = new Map(integralPatterns.map(pattern => [pattern, 0]));
+  for (const [index, pattern] of sequence.entries()) {
+    frequencies.set(pattern, frequencies.get(pattern) + 1);
+    if (index > 0 && pattern === sequence[index - 1]) throw new Error(`${label} repeated ${pattern} consecutively at ${index}`);
+  }
+  const counts = [...frequencies.values()];
+  if (counts.some(count => count === 0) || Math.max(...counts) - Math.min(...counts) > 1) {
+    throw new Error(`${label} did not balance all patterns: ${JSON.stringify(Object.fromEntries(frequencies))}`);
+  }
+};
+
+const deterministicPicker = createIntegralProblemPicker();
+verifyMixed(Array.from({ length: 600 }, () => deterministicPicker.next('mix', stableRandom).pattern), 'deterministic mixed practice');
 
 for (let seed = 1; seed <= 20; seed += 1) {
   let state = seed;
@@ -104,12 +120,9 @@ for (let seed = 1; seed <= 20; seed += 1) {
     state = (state * 48271) % 2147483647;
     return (state - 1) / 2147483646;
   };
-  const sequence = Array.from({ length: 5_000 }, () => generateIntegralProblem('mix', seededRandom).pattern);
-  for (let start = 0; start < sequence.length; start += integralPatterns.length) {
-    const batch = sequence.slice(start, start + integralPatterns.length);
-    if (new Set(batch).size !== integralPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / integralPatterns.length}`);
-  }
-  if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
+  const picker = createIntegralProblemPicker();
+  const sequence = Array.from({ length: 5_000 }, () => picker.next('mix', seededRandom).pattern);
+  verifyMixed(sequence, `seed ${seed}`);
 }
 
 console.log('Calculus III integration verified: fixed-pattern options, formulas, answers, and variants; 100,000 seeded mixed questions plus 600 deterministic balance cases checked.');

@@ -36,6 +36,7 @@ const practiceModeDescriptions = [
   'completing-square-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
   'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill',
+  'calculus3-integral-drill',
 ];
 for (const slug of practiceModeDescriptions) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);

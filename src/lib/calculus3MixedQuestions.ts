@@ -1,7 +1,7 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { generateLimitProblem, limitLabels } from './calculus3Limits.ts';
 import { generateDifferentiationProblem, differentiationLabels } from './calculus3Differentiation.ts';
-import { generateIntegralProblem, integralLabels } from './calculus3Integrals.ts';
+import { createIntegralProblemPicker, integralLabels } from './calculus3Integrals.ts';
 import { generateGeometryProblem, geometryLabels } from './calculus3Geometry.ts';
 import { generateDifferentialEquationProblem, differentialEquationLabels } from './calculus3DifferentialEquations.ts';
 import { generateCurveProblem, curveLabels } from './calculus3CurveAnalysis.ts';
@@ -34,6 +34,7 @@ const areaOptions: Record<Calculus3Area, readonly string[]> = {
   geometry: [...new Set(Object.values(geometryLabels))],
   'differential-equation': [...new Set(Object.values(differentialEquationLabels))],
 };
+const integralPicker = createIntegralProblemPicker();
 
 function createQuestion(area: Calculus3Area, random: () => number): Calculus3Question {
   switch (area) {
@@ -69,7 +70,7 @@ function createQuestion(area: Calculus3Area, random: () => number): Calculus3Que
       };
     }
     case 'integral': {
-      const problem = generateIntegralProblem('mix', random);
+      const problem = integralPicker.next('mix', random);
       return {
         area, areaLabel: areaLabels[area], pattern: `${area}:${problem.pattern}`,
         prompt: '次の積分を計算するとき、最初に使う方法は？', expression: problem.expression,
