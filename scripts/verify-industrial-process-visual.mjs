@@ -8,6 +8,8 @@ for (const [needle, label] of [
   ['図は左右にスクロールできます。', 'mobile scroll guidance'],
   ['aria-pressed={selectedProcess === p.id}', 'an accessible active-process state'],
   ['${proc.stages.map(stage => `${stage.name}、${stage.reaction}`).join(\'。\')}', 'an accessible summary of all selected process stages'],
+  ['href="/learn/chemistry/industrial-process-drill"', 'a direct link to process-sequence practice'],
+  ['工業的製法の問題で練習する →', 'a clear label for the related practice'],
 ]) {
   if (!page.includes(needle)) throw new Error(`industrial process visual is missing ${label}`);
 }

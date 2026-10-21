@@ -79,6 +79,7 @@ const checks = {
     const [, coefficient] = problem.expression.match(/\\sin\((?:(\d+)x|x)\)/);
     const n = Number(coefficient ?? 1);
     return Number(problem.answer) === n && problem.expression.includes('ラジアン')
+      && problem.explanation.includes(`sin(${n === 1 ? 'x' : `${n}x`})/x=${n}·sin u/u`)
       && problem.explanation.includes('sin u/u=1') && problem.explanation.includes(`極限値は ${n}`);
   },
   continuity: problem => {
