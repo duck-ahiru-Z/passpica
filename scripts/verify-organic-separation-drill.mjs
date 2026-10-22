@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateOrganicSeparationProblem, organicSeparationPatterns } from '../src/lib/organicSeparationDrill.ts';
+import { generateOrganicSeparationProblem, organicSeparationLabels, organicSeparationPatterns } from '../src/lib/organicSeparationDrill.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/organic-separation-drill/page.tsx'), 'utf8');
 const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/organic-separation/page.tsx'), 'utf8');
@@ -19,7 +19,13 @@ assert.match(drillPage, /href="\/learn\/chemistry\/organic-separation"/, 'the dr
 assert.match(visualPage, /href="\/learn\/chemistry\/organic-separation-drill"/, 'the layer visual should link back to the drill');
 
 const expected = { aniline: 'アニリン', benzoicAcid: '安息香酸', phenol: 'フェノール' };
+const expectedLabels = {
+  aniline: 'HClによるアニリンの抽出',
+  benzoicAcid: 'NaHCO₃による安息香酸の抽出',
+  phenol: 'NaOHによるフェノールの抽出',
+};
 for (const pattern of organicSeparationPatterns) {
+  assert.equal(organicSeparationLabels[pattern], expectedLabels[pattern], `${pattern} fixed-mode label must read naturally in the selector and practice legend`);
   const prompts = new Set();
   for (let index = 0; index < 12; index += 1) {
     const problem = generateOrganicSeparationProblem(pattern);
