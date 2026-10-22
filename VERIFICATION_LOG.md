@@ -111,6 +111,12 @@ Earlier work in this thread also reports browser and focused automated checks fo
 - `/learn/math/permutation-combination-drill` (pre-fix preview `ckpvs3doo`): mixed question 7C3 accepted 35; explanation and choose-3-of-7 diagram matched. The selector exposed four focused patterns plus mixed mode. Source now names the pattern/answer controls and provides a pattern-specific screen-reader description for the canvas; `npm run test:strict-positive-integer` and ESLint pass. **Post-fix browser rendering pending preview verification.**
 - `/learn/math/sigma-calculation-drill` (pre-fix preview `ckpvs3doo`): mixed linear-sum question Σ(k+2), k=1…10 accepted 75; explanation expanded it to n(n+1)/2+2n and evaluated 55+20. Selector listed all four strategies. Source now adds accessible names for mode and answer; post-fix browser verification pending.
 
+## 2026-10-23 follow-up
+
+- Ran the complete local suite after the recent page-control accessibility updates: `npm run test:all` — all 97 verification scripts passed. In particular, fixed-pattern generation and mixed scheduling for Math III integration/differentiation/curve analysis/limits/differential equations passed, along with the 38-pattern Math III overall mixed drill; the focused individual verifiers sampled over 620,000 seeded/generated cases in aggregate.
+- Browser follow-up remains pending for the post-fix permutation/combination and sigma screens, and the recent data-analysis 2D derivation/chart-description changes. Vercel's branch deployment list currently exposes `c59313c` as the newest Ready preview; it does not include later commits and the branch deployment is marked Error, so no post-fix browser pass is claimed. Recheck only after Vercel successfully builds a newer preview; no need to revisit already-passed screens absent a relevant change.
+- The full automated run also passed the existing coverage audit: 67 linked drills, 29 linked practice drills, 32 linked learning pages (14 required visuals), 53 fixed-plus-mixed pattern drills across subjects, and 61 Math learning pages audited.
+
 ## Reopen criteria
 
 - A change touches the page, its generator/formula/answer checker, shared UI used by it, or its navigation/data dependencies.
