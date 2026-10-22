@@ -71,7 +71,7 @@ export function generateGasCollectionProblem(mode: GasCollectionMode, random = M
       ? `${gas.solubility}ため水上置換法は避けます。${gas.density}ため、逆さの集気びんを使う上方置換法で集めます。`
       : gas.formula === 'CO₂'
         ? `${gas.solubility}ため、回収量を確保する場合は水上置換法を避け、一般には${gas.density}性質を利用した下方置換法で集めます。ただし、少量の溶解を許容する条件では水上置換法も使えます。`
-        : `${gas.solubility}ため水上置換法は避けます。${gas.density}ため、口を上にした集気びんを使う下方置換法で集めます。`;
+      : `${gas.solubility}ため水上置換法は避けます。${gas.density}ため、上向きの集気びんに気体を底から導入し、空気を上へ押し出す下方置換法で集めます。`;
   return {
     pattern, questionStyle, formula: gas.formula, name: gas.name, solubility: gas.solubility,
     density: gas.density, method,

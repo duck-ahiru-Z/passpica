@@ -38,7 +38,7 @@ for (const pattern of gasCollectionPatterns) {
 }
 assert.match(generateGasCollectionProblem('waterDisplacement').explanation, /空気との密度差は、この方法を選ぶ理由ではありません/);
 assert.match(generateGasCollectionProblem('upwardDisplacement').explanation, /逆さの集気びん/);
-assert.match(generateGasCollectionProblem('downwardDisplacement').explanation, /口を上にした集気びん/);
+assert.match(generateGasCollectionProblem('downwardDisplacement').explanation, /上向きの集気びんに気体を底から導入し、空気を上へ押し出す/);
 const carbonDioxide = generateGasCollectionProblem('downwardDisplacement', () => 0.999);
 assert.equal(carbonDioxide.formula, 'CO₂');
 assert.match(carbonDioxide.explanation, /水に少し溶けるため、回収量を確保する場合は水上置換法を避け/);
