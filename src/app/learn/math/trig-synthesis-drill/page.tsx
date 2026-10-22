@@ -169,9 +169,16 @@ export default function TrigSynthesisDrill() {
 
   if (!problem) return <main className="max-w-5xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
+  const formatCoordinate = (term: ProblemData['a']) => `${term.sign < 0 ? '-' : ''}${term.d === 1 ? term.c : `${term.c === 1 ? '' : term.c}√${term.d}`}`;
+  const graphXTerm = formatCoordinate(problem.a);
+  const graphYTerm = formatCoordinate(problem.b);
   let rStr = "";
   if (problem.rInner === 1) rStr = `${problem.rOuter}`;
   else rStr = `${problem.rOuter === 1 ? '' : problem.rOuter}\\sqrt{${problem.rInner}}`;
+  const graphRadius = problem.rInner === 1 ? `${problem.rOuter}` : `${problem.rOuter === 1 ? '' : problem.rOuter}√${problem.rInner}`;
+  const graphDescription = problem.ansAlpha === 'alpha'
+    ? `三角関数の合成の座標図。点Pは(${graphXTerm}, ${graphYTerm})。合成半径は${graphRadius}、cos α=${problem.ansCos}、sin α=${problem.ansSin}。`
+    : `三角関数の合成の座標図。点Pは(${graphXTerm}, ${graphYTerm})。合成半径は${graphRadius}、偏角αは${problem.ansAlpha.replaceAll('pi', 'π')}ラジアン。`;
 
   let explanationEl = <></>;
   if (hasChecked) {
@@ -362,7 +369,7 @@ export default function TrigSynthesisDrill() {
             </div>
 
             <div className="flex justify-center mb-4 bg-white border border-gray-300 shadow-sm relative">
-              <canvas ref={canvasRef} width={260} height={200} className="w-full max-w-full h-auto" />
+              <canvas ref={canvasRef} width={260} height={200} role="img" aria-label={graphDescription} className="w-full max-w-full h-auto" />
             </div>
 
             {!hasChecked ? (
