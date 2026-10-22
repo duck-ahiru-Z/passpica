@@ -312,7 +312,7 @@ const CONTENTS: LearningContent[] = [
     subject: 'chemistry',
     subjectJp: '化学',
     field: '無機工業化学（製法）',
-    title: '無機工業化学の製造プロセス流程図',
+    title: '無機工業化学の製造プロセスフロー図',
     description: '接触法・オストワルト法・アンモニアソーダ法の製造ラインの流れと、必要な化学反応式・触媒を整理します。',
     difficulty: '標準',
     type: '製法フロー',

@@ -4,6 +4,9 @@ import path from 'node:path';
 const root = process.cwd();
 const drill = fs.readFileSync(path.join(root, 'src/app/drill/page.tsx'), 'utf8');
 const learn = fs.readFileSync(path.join(root, 'src/app/learn/page.tsx'), 'utf8');
+if (learn.includes('製造プロセス流程図') || !learn.includes('製造プロセスフロー図')) {
+  throw new Error('The industrial chemistry learning-card title must use the Japanese term フロー図.');
+}
 
 function readPortalEntries(source) {
   return [...source.matchAll(/link:\s*'([^']+)'/g)].map(match => {
