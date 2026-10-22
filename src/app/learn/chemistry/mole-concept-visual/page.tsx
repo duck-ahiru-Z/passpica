@@ -36,18 +36,18 @@ export default function MoleConceptVisualPage() {
             <input id="mole-visual-amount" aria-label="物質量 n（mol）" type="range" min="0.25" max="2" step="0.25" value={amountMol} onChange={event => setAmountMol(Number(event.target.value))} className="w-full accent-amber-600" />
             <div className="flex justify-between text-xs text-slate-500"><span>0.25 mol</span><span>2.00 mol</span></div>
             <p className="rounded border border-amber-200 bg-amber-50 p-3 leading-relaxed">
-              1 mol は粒子を約 6.02×10²³ 個集めた量です。粒子が小さすぎて数えられないため、mol を「粒子のまとまりを数える単位」として使います。
+              1 mol は対象となる粒子を約 6.02×10²³ 個集めた量です。分子なら分子、イオン結晶なら式単位を数え、mol を「粒子のまとまりを数える単位」として使います。
             </p>
           </div>
 
-          <figure className="rounded-xl border-2 border-sky-200 bg-sky-50 p-4 text-center space-y-3" role="img" aria-label={`${amountMol.toFixed(2)} mol の${substance.name}を模式的に表した粒子図。丸は${state.diagramDots}個で、実際の粒子数を縮尺どおりに描いたものではありません。`}>
+          <figure className="rounded-xl border-2 border-sky-200 bg-sky-50 p-4 text-center space-y-3" role="img" aria-label={`${amountMol.toFixed(2)} mol の${substance.name}（${substance.entity}）を模式的に表した粒子図。丸は${state.diagramDots}個で、実際の粒子数を縮尺どおりに描いたものではありません。`}>
             <figcaption className="font-bold">粒子のまとまり（模式図）</figcaption>
             <div className="relative mx-auto h-48 w-full max-w-xs rounded-b-3xl border-x-4 border-b-4 border-sky-500 bg-white/80">
               {dotPositions.slice(0, state.diagramDots).map(([left, top], index) => (
                 <span key={index} aria-hidden="true" className="absolute h-4 w-4 rounded-full border border-amber-700 bg-amber-400 shadow-sm" style={{ left: `${left}%`, top: `${top}%` }} />
               ))}
             </div>
-            <p className="text-xs text-slate-600">丸の数は物質量に合わせた模式表現です。1つの丸が1個の分子という意味ではありません。</p>
+            <p className="text-xs text-slate-600">丸の数は物質量に合わせた模式表現です。1つの丸が1個の{substance.entity}という意味ではありません。</p>
           </figure>
         </div>
 

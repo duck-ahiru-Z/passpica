@@ -23,6 +23,9 @@ for (const item of moleVisualSubstances) {
 assert.equal(getMoleVisualState(1, 'water').massGrams, 18);
 assert.equal(getMoleVisualState(1, 'carbon-dioxide').massGrams, 44);
 assert.equal(getMoleVisualState(1, 'sodium-chloride').massGrams, 58.5);
+assert.equal(moleVisualSubstances.find(item => item.id === 'water').entity, '水分子');
+assert.equal(moleVisualSubstances.find(item => item.id === 'carbon-dioxide').entity, '二酸化炭素分子');
+assert.equal(moleVisualSubstances.find(item => item.id === 'sodium-chloride').entity, 'NaClの式単位');
 assert.throws(() => getMoleVisualState(0, 'water'), RangeError);
 assert.throws(() => getMoleVisualState(Number.NaN, 'water'), RangeError);
 assert.throws(() => getMoleVisualState(1, 'unknown'), RangeError);
@@ -31,7 +34,8 @@ for (const content of [
   'aria-label="モル質量を比べる物質"',
   'aria-label="物質量 n（mol）"',
   'role="img"',
-  '1つの丸が1個の分子という意味ではありません',
+  '1 mol は対象となる粒子を約 6.02×10²³ 個集めた量です',
+  '1つの丸が1個の{substance.entity}という意味ではありません',
   '理想気体のモル体積 22.4 L/mol',
   'href="/learn/chemistry/mole-calculation-drill"',
   'href="/learn/chemistry/concentration-visual"',

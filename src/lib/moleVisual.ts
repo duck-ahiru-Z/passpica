@@ -2,9 +2,9 @@ export const AVOGADRO_CONSTANT = 6.02e23;
 export const STANDARD_MOLAR_VOLUME_L = 22.4;
 
 export const moleVisualSubstances = [
-  { id: 'water', formula: 'H₂O', name: '水', molarMass: 18 },
-  { id: 'carbon-dioxide', formula: 'CO₂', name: '二酸化炭素', molarMass: 44 },
-  { id: 'sodium-chloride', formula: 'NaCl', name: '塩化ナトリウム', molarMass: 58.5 },
+  { id: 'water', formula: 'H₂O', name: '水', entity: '水分子', molarMass: 18 },
+  { id: 'carbon-dioxide', formula: 'CO₂', name: '二酸化炭素', entity: '二酸化炭素分子', molarMass: 44 },
+  { id: 'sodium-chloride', formula: 'NaCl', name: '塩化ナトリウム', entity: 'NaClの式単位', molarMass: 58.5 },
 ] as const;
 
 export type MoleVisualSubstanceId = (typeof moleVisualSubstances)[number]['id'];
