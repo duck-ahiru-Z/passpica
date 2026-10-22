@@ -41,7 +41,8 @@ assert.match(generateGasCollectionProblem('upwardDisplacement').explanation, /�
 assert.match(generateGasCollectionProblem('downwardDisplacement').explanation, /口を上にした集気びん/);
 const carbonDioxide = generateGasCollectionProblem('downwardDisplacement', () => 0.999);
 assert.equal(carbonDioxide.formula, 'CO₂');
-assert.match(carbonDioxide.explanation, /水に少し溶けるため水上置換法は避けます/);
+assert.match(carbonDioxide.explanation, /水に少し溶けるため、回収量を確保する場合は水上置換法を避け/);
+assert.match(carbonDioxide.explanation, /少量の溶解を許容する条件では水上置換法も使えます/);
 assert.doesNotMatch(carbonDioxide.explanation, /水に溶けやすい気体/);
 assert.deepEqual(carbonDioxide.acceptedMethods, ['下方置換法', '水上置換法']);
 assert.equal(getGasCollectionAcceptedAnswerLabel(carbonDioxide), '下方置換法 または 水上置換法');
