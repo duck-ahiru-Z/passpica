@@ -320,6 +320,7 @@ export default function EllipseDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="出題パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -332,7 +333,7 @@ export default function EllipseDrill() {
               </select>
             </div>
 
-            <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed">
+            <div role="group" aria-label="問題文" className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-4 text-base font-bold text-slate-700 text-center leading-relaxed">
               <div>
                 {problem.qStr.split('$').map((part, i) => 
                   i % 2 === 1 ? <MathEq key={i} math={part} /> : <span key={i}>{part}</span>
@@ -346,6 +347,7 @@ export default function EllipseDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span><MathEq math="A =" /></span>
                     <input 
+                      aria-label="A の値"
                       type="number" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
@@ -355,6 +357,7 @@ export default function EllipseDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span><MathEq math="B =" /></span>
                     <input 
+                      aria-label="B の値"
                       type="number" 
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
@@ -368,6 +371,7 @@ export default function EllipseDrill() {
                   <div className="flex items-center gap-2 text-xl">
                     <span>(</span>
                     <input 
+                      aria-label="座標の x 成分"
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
@@ -376,6 +380,7 @@ export default function EllipseDrill() {
                     />
                     <span>,</span>
                     <input 
+                      aria-label="座標の y 成分"
                       type="text" 
                       className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
@@ -424,7 +429,7 @@ export default function EllipseDrill() {
             </div>
 
             <div className="flex justify-center mb-4 bg-white border border-gray-300 shadow-sm relative">
-              <canvas ref={canvasRef} width={260} height={200} className="w-full max-w-full h-auto" />
+              <canvas ref={canvasRef} width={260} height={200} role="img" aria-label={`楕円の図。中心 (${problem.cx}, ${problem.cy})、${problem.isHorizontal ? '横長' : '縦長'}、焦点間の中心からの距離 ${problem.c}`} className="w-full max-w-full h-auto" />
             </div>
 
             {!hasChecked ? (
