@@ -15,11 +15,11 @@ interface MetalSalt {
 
 const METALS: MetalSalt[] = [
   { formula: 'LiCl', name: 'Lithium', jpName: 'リチウム', colorName: '赤色', colorHex: '#ef4444', mnemonic: 'リアカー（Li:赤）', explain: '炎色反応は赤色。スマートフォンやPC等のリチウムイオン二次電池として多用されます。' },
-  { formula: 'NaCl', name: 'Sodium', jpName: 'ナトリウム', colorName: '黄色', colorHex: '#eab308', mnemonic: '無き（Na:黄）', explain: '炎色反応は黄色。食塩（塩化ナトリウム）や、かつてトンネル照明に使用されたナトリウムランプでおなじみです。' },
-  { formula: 'KCl', name: 'Potassium', jpName: 'カリウム', colorName: '赤紫色', colorHex: '#c084fc', mnemonic: 'Kの村（K:紫）', explain: '炎色反応は赤紫色。植物の生長を支える「肥料の三要素」の主成分であり、細胞液の浸透圧調節に重要です。' },
-  { formula: 'CuCl2', name: 'Copper', jpName: '銅', colorName: '青緑色', colorHex: '#0d9488', mnemonic: '動力（Cu:緑）', explain: '炎色反応は青緑色。花火の着色剤として配合されます。電気の良導体であり、電線や配線に大量に使用されます。' },
-  { formula: 'CaCl2', name: 'Calcium', jpName: 'カルシウム', colorName: '橙赤色', colorHex: '#ff4500', mnemonic: '借りるとう（Ca:橙）', explain: '炎色反応は橙赤色。融雪剤（塩化カルシウム）として道路に散布されるほか、骨や歯を構成する必須元素です。' },
-  { formula: 'BaCl2', name: 'Barium', jpName: 'バリウム', colorName: '黄緑色', colorHex: '#84cc16', mnemonic: '馬力（Ba:緑）', explain: '炎色反応は黄緑色。消化管（胃）のレントゲン検査で用いられる造影剤（硫酸バリウム）として有名です。' }
+  { formula: 'NaCl', name: 'Sodium', jpName: 'ナトリウム', colorName: '黄色', colorHex: '#eab308', mnemonic: 'リアカーなき（Na:黄）', explain: '炎色反応は黄色。食塩（塩化ナトリウム）や、かつてトンネル照明に使用されたナトリウムランプでおなじみです。' },
+  { formula: 'KCl', name: 'Potassium', jpName: 'カリウム', colorName: '赤紫色', colorHex: '#c084fc', mnemonic: 'リアカーなきK村（K:赤紫）', explain: '炎色反応は赤紫色。植物の生長を支える「肥料の三要素」の主成分であり、細胞液の浸透圧調節に重要です。' },
+  { formula: 'CuCl2', name: 'Copper', jpName: '銅', colorName: '青緑色', colorHex: '#0d9488', mnemonic: 'リアカーなきK村、動力（Cu:青緑）', explain: '炎色反応は青緑色。花火の着色剤として配合されます。電気の良導体であり、電線や配線に大量に使用されます。' },
+  { formula: 'CaCl2', name: 'Calcium', jpName: 'カルシウム', colorName: '橙赤色', colorHex: '#ff4500', mnemonic: 'リアカーなきK村、動力借りると（Ca:橙赤）', explain: '炎色反応は橙赤色。融雪剤（塩化カルシウム）として道路に散布されるほか、骨や歯を構成する必須元素です。' },
+  { formula: 'BaCl2', name: 'Barium', jpName: 'バリウム', colorName: '黄緑色', colorHex: '#84cc16', mnemonic: 'リアカーなきK村、動力借りるとする馬力（Ba:黄緑）', explain: '炎色反応は黄緑色。消化管（胃）のレントゲン検査で用いられる造影剤（硫酸バリウム）として有名です。' }
 ];
 
 export default function FlameReactionPage() {
@@ -146,7 +146,7 @@ export default function FlameReactionPage() {
 
             <div className="border-t border-gray-200 pt-2 text-xs text-gray-600 leading-relaxed">
               <strong>全体の語呂合わせ：</strong><br/>
-              リアカー無き（Li:赤 / Na:黄）Kの村（K:紫）動力（Cu:緑）借りるとう（Ca:橙）馬力（Ba:緑）
+              リアカーなき（Li:赤 / Na:黄）K村（K:赤紫）動力（Cu:青緑）借りると（Ca:橙赤）する（Sr:紅色・演習対象外）馬力（Ba:黄緑）
             </div>
           </div>
 
