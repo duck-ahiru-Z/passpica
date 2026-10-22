@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
-import { buildCrossTableExplanation, isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
+import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -463,7 +463,14 @@ export default function DataAnalysis2DDrill() {
 
             {problem.pattern !== 'pattern4' && (
               <div className="flex justify-center mb-4 bg-white border border-gray-300 shadow-sm relative pt-4">
-                <canvas ref={canvasRef} width={260} height={200} className="w-full max-w-full h-auto" />
+                <canvas
+                  ref={canvasRef}
+                  width={260}
+                  height={200}
+                  role="img"
+                  aria-label={buildScatterPlotDescription(problem.scatterPoints)}
+                  className="w-full max-w-full h-auto"
+                />
               </div>
             )}
 

@@ -19,6 +19,16 @@ type CrossTable = {
   targetCell: 'a' | 'b' | 'c' | 'd';
 };
 
+type ScatterPoint = { x: number; y: number };
+
+export function buildScatterPlotDescription(points: ScatterPoint[] | undefined): string {
+  if (!points?.length) return '散布図。横軸x、縦軸y。データ点はありません。';
+  const coordinates = points
+    .map(({ x, y }) => `(${x.toFixed(1)}, ${y.toFixed(1)})`)
+    .join('、');
+  return `散布図。横軸x、縦軸y。${points.length}個のデータ点の座標: ${coordinates}`;
+}
+
 export function buildCrossTableExplanation(table: CrossTable): string[] {
   switch (table.targetCell) {
     case 'a':

@@ -1,12 +1,20 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { getCorrelationDirectionLabel } from '../src/lib/dataAnalysis2D.ts';
-import { buildCrossTableExplanation, isDataAnalysis2DAnswerCorrect } from '../src/lib/dataAnalysis2DAnswers.ts';
+import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect } from '../src/lib/dataAnalysis2DAnswers.ts';
 
 const page = fs.readFileSync('src/app/learn/math/data-analysis-2d-drill/page.tsx', 'utf8');
 assert.ok(page.includes('getCorrelationDirectionLabel(rNum)'), 'scatter explanation must use the tested correlation classification');
 assert.ok(page.includes('aria-label="2変量データ分析の演習パターン"'), 'pattern selector must have an accessible name');
 assert.ok(page.includes('isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? \'\')'), 'grading must use strict numeric answer validation');
+assert.ok(page.includes('role="img"'), 'scatter canvas must be exposed as an image to assistive technology');
+assert.ok(page.includes('aria-label={buildScatterPlotDescription(problem.scatterPoints)}'), 'scatter description must follow the current problem data');
+
+assert.equal(
+  buildScatterPlotDescription([{ x: 1.24, y: -3.26 }, { x: 4, y: 2 }]),
+  '散布図。横軸x、縦軸y。2個のデータ点の座標: (1.2, -3.3)、(4.0, 2.0)',
+);
+assert.equal(buildScatterPlotDescription(undefined), '散布図。横軸x、縦軸y。データ点はありません。');
 
 for (const [answer, expected, result] of [
   ['', '0', false], ['   ', '0', false], ['0', '0', true], ['-0.8', '-0.8', true],
