@@ -141,6 +141,9 @@ export default function TriangleAreaDrillPage() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const graphDescription = problem.pattern === 'pattern3'
+    ? `三角形ABC。辺aは${problem.a.num}、辺bは${problem.b.num}、辺cは${problem.c.num}。3辺からヘロンの公式で面積を求めます。`
+    : `三角形ABC。辺ABの長さbは${problem.b.num}、辺ACの長さcは${problem.c.num}、その間の角Aは${problem.A}度です。${problem.pattern === 'pattern4' ? `面積Sは${problem.S.num}${problem.S.root === 1 ? '' : `√${problem.S.root}`}${problem.S.den === 1 ? '' : `/${problem.S.den}`}で、辺cを求める問題です。` : '面積Sを求める問題です。'}`;
 
   const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
@@ -276,6 +279,7 @@ export default function TriangleAreaDrillPage() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="三角形の面積ドリルの出題パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -313,7 +317,7 @@ export default function TriangleAreaDrillPage() {
               <div className="flex flex-col items-center gap-6 text-lg font-bold">
                 <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                   <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'S ='} />
-                  <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
+                  <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign label={problem.pattern === 'pattern4' ? '辺cの長さ' : '三角形の面積'} />
                 </div>
               </div>
             </div>
@@ -355,6 +359,8 @@ export default function TriangleAreaDrillPage() {
                 ref={canvasRef} 
                 width={250} 
                 height={200} 
+                role="img"
+                aria-label={graphDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
