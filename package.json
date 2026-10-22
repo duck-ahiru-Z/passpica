@@ -43,6 +43,7 @@
     "test:chemistry-titration-visual": "node --experimental-strip-types scripts/verify-chemistry-titration-visual.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
     "test:information-pcm-visual": "node --experimental-strip-types scripts/verify-information-pcm-visual.mjs",
+    "test:organic-3d-content": "node scripts/verify-organic-3d-content.mjs",
     "test:information-number-representation": "node --experimental-strip-types scripts/verify-information-number-representation.mjs",
     "test:information-number-representation-drill": "node --experimental-strip-types scripts/verify-information-number-representation-drill.mjs",
     "test:information-presets": "node --experimental-strip-types scripts/verify-information-presets.mjs",

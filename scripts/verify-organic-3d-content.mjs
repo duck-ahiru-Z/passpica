@@ -10,5 +10,8 @@ if (!boat.includes('約 29 kJ/mol 高いエネルギー')) throw new Error('The 
 if (!boat.includes('ねじれ舟型は舟型より安定で、椅子型より約 23 kJ/mol')) throw new Error('The approximately 23 kJ/mol value must be distinguished as the twist-boat conformer.');
 if (!source.includes('舟型が椅子型より不安定（約29kJ/mol）')) throw new Error('The flagpole explanation must use the boat conformer energy.');
 if (source.includes('舟型が椅子型より不安定（約23kJ/mol）')) throw new Error('The old twist-boat energy must not be attributed to the boat conformer.');
+if (!source.includes('このモデルはシス-2-ブテンです。') || !source.includes('シス-1,4-ポリイソプレンもシス型の二重結合')) throw new Error('The cis-butene model and polymer analogy must be distinguished.');
+if (!source.includes('このモデルはトランス-2-ブテンです。') || !source.includes('トランス-1,4-ポリイソプレン（グッタペルカ）')) throw new Error('The trans-butene model and polymer analogy must be distinguished.');
+if (!source.includes('【幾何異性体と高分子への関連】')) throw new Error('The selector group must distinguish the small-molecule models from polymer context.');
 
 console.log('Cyclohexane conformer content verified: boat energy is distinguished from twist-boat energy and flagpole geometry remains present.');
