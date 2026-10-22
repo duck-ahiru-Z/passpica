@@ -50,9 +50,9 @@ export function generateNumberRepresentationProblem(
     const bits = byteToBinary(value);
     return {
       pattern,
-      question: `10進数 ${value} を8 bitの2進数で表せ。`,
+      question: `10進数 ${value} を符号なし8 bitの2進数で表せ。`,
       answer: bits,
-      explanation: `${value} を2のべき乗の和に分けると ${bits}₂。8 bitになるよう左側を0で埋めます。`,
+      explanation: `符号なし8 bitでは ${value} を2のべき乗の和に分けると ${bits}₂。8 bitになるよう左側を0で埋めます。`,
     };
   }
 

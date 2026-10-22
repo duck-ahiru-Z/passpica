@@ -19,6 +19,8 @@ assert.ok(packageScripts['test:information-number-representation-drill']?.includ
 const minSigned = { pattern: 'twosComplement', question: '', answer: '-56', explanation: '' };
 const integer42 = { pattern: 'unsigned', question: '', answer: '42', explanation: '' };
 const binary = generateNumberRepresentationProblem('binaryDecimal', () => 0.1);
+assert.ok(binary.question.includes('符号なし8 bit'), 'decimal-to-binary questions must state the unsigned encoding');
+assert.ok(binary.explanation.includes('符号なし8 bit'), 'decimal-to-binary explanations must reinforce the selected encoding');
 assert.equal(isNumberRepresentationAnswerCorrect(minSigned, '−56'), true, 'Unicode minus should be accepted for negative integers');
 assert.equal(isNumberRepresentationAnswerCorrect(minSigned, '-57'), false, 'a neighboring negative integer must not pass');
 assert.equal(isNumberRepresentationAnswerCorrect(binary, `0b${binary.answer}`), true, 'a conventional binary prefix should be accepted');
