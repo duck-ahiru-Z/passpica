@@ -176,6 +176,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
+    slug: 'spring-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（ばねの弾性力・弾性エネルギー）',
+    title: 'ばねの伸び・復元力・弾性エネルギービジュアル',
+    description: 'ばねを伸ばす・縮める量を変え、復元力 F=−kx の向きと弾性エネルギー U=½kx² がどう変わるかを図とグラフで確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/spring-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
     slug: 'concentration-visual',
     subject: 'chemistry',
     subjectJp: '化学',

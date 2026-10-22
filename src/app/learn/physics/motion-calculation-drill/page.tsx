@@ -23,6 +23,7 @@ export default function MotionCalculationDrillPage() {
     <div className="flex flex-wrap gap-x-4 gap-y-1">
       <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
       <Link href="/learn/physics/motion-visual" className="text-blue-600 hover:underline">等加速度運動ビジュアルへ →</Link>
+      <Link href="/learn/physics/spring-visual" className="text-blue-600 hover:underline">ばねの弾性力ビジュアルへ →</Link>
       <Link href="/learn/physics/projectile-visual" className="text-blue-600 hover:underline">投射運動ビジュアルへ →</Link>
     </div>
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">物理 力学・計算ドリル</h1>

@@ -35,7 +35,7 @@ const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual',
+  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual',
   'concentration-visual', 'crystal-lattice',
 ];
 
@@ -144,6 +144,14 @@ for (const slug of ['projectile-visual', 'motion-visual']) {
   if (!entry || !new RegExp(`slug: '${slug}'[\\s\\S]*?practiceLink: '/learn/physics/motion-calculation-drill'`).test(learn)) {
     throw new Error(`Physics visual ${slug} must link to its related mechanics practice`);
   }
+}
+const springVisual = fs.readFileSync(path.join(root, 'src/app/learn/physics/spring-visual/page.tsx'), 'utf8');
+const motionDrill = fs.readFileSync(path.join(root, 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
+const springVisualEntry = learnEntries.find(entry => entry.slug === 'spring-visual');
+if (!springVisualEntry || !new RegExp(`slug: 'spring-visual'[\\s\\S]*?practiceLink: '/learn/physics/motion-calculation-drill'`).test(learn)
+  || !springVisual.includes('href="/learn/physics/motion-calculation-drill"')
+  || !motionDrill.includes('href="/learn/physics/spring-visual"')) {
+  throw new Error('The spring visual and its mechanics drill must link to each other.');
 }
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');
