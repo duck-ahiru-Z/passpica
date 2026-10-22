@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { getMoleVisualState, moleVisualSubstances, type MoleVisualSubstanceId } from '@/src/lib/moleVisual';
+import { formatParticleCount, getMoleVisualState, moleVisualSubstances, type MoleVisualSubstanceId } from '@/src/lib/moleVisual';
 
 const dotPositions = [
   [14, 18], [38, 13], [63, 20], [83, 15],
@@ -55,7 +55,7 @@ export default function MoleConceptVisualPage() {
           <article className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-1">
             <h2 className="font-bold text-amber-900">粒子数 N</h2>
             <p className="text-xs text-slate-600">N = n × 6.02×10²³</p>
-            <p className="text-lg font-bold tabular-nums">{state.particles.toExponential(2)} 個</p>
+            <p className="text-lg font-bold tabular-nums">{formatParticleCount(state.particles)} 個</p>
           </article>
           <article className="rounded-lg border border-emerald-200 bg-emerald-50 p-4 space-y-1">
             <h2 className="font-bold text-emerald-900">質量 m</h2>

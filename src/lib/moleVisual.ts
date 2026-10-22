@@ -9,6 +9,15 @@ export const moleVisualSubstances = [
 
 export type MoleVisualSubstanceId = (typeof moleVisualSubstances)[number]['id'];
 
+export function formatParticleCount(count: number): string {
+  if (!Number.isFinite(count) || count <= 0) throw new RangeError('粒子数は0より大きい有限の値にしてください。');
+  // Nudge exact decimal half cases so common values such as 0.25 mol × 6.02×10²³
+  // display with ordinary half-up rounding instead of binary floating-point ties.
+  const [coefficient, exponent] = (count * (1 + Number.EPSILON)).toExponential(2).split('e');
+  const exponentSuperscript = exponent.replace(/^\+/, '').replace('-', '⁻').replace(/\d/g, digit => '⁰¹²³⁴⁵⁶⁷⁸⁹'[Number(digit)]);
+  return `${coefficient}×10${exponentSuperscript}`;
+}
+
 export function getMoleVisualState(amountMol: number, substanceId: MoleVisualSubstanceId) {
   if (!Number.isFinite(amountMol) || amountMol <= 0) {
     throw new RangeError('物質量は0より大きい有限の値にしてください。');

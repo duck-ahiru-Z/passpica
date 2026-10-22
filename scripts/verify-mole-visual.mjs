@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import assert from 'node:assert/strict';
-import { AVOGADRO_CONSTANT, STANDARD_MOLAR_VOLUME_L, getMoleVisualState, moleVisualSubstances } from '../src/lib/moleVisual.ts';
+import { AVOGADRO_CONSTANT, STANDARD_MOLAR_VOLUME_L, formatParticleCount, getMoleVisualState, moleVisualSubstances } from '../src/lib/moleVisual.ts';
 
 const root = process.cwd();
 const page = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/mole-concept-visual/page.tsx'), 'utf8');
@@ -26,6 +26,10 @@ assert.equal(getMoleVisualState(1, 'sodium-chloride').massGrams, 58.5);
 assert.equal(moleVisualSubstances.find(item => item.id === 'water').entity, '水分子');
 assert.equal(moleVisualSubstances.find(item => item.id === 'carbon-dioxide').entity, '二酸化炭素分子');
 assert.equal(moleVisualSubstances.find(item => item.id === 'sodium-chloride').entity, 'NaClの式単位');
+assert.equal(formatParticleCount(getMoleVisualState(1, 'water').particles), '6.02×10²³');
+assert.equal(formatParticleCount(getMoleVisualState(2, 'water').particles), '1.20×10²⁴');
+assert.equal(formatParticleCount(getMoleVisualState(0.25, 'water').particles), '1.51×10²³');
+assert.throws(() => formatParticleCount(0), RangeError);
 assert.throws(() => getMoleVisualState(0, 'water'), RangeError);
 assert.throws(() => getMoleVisualState(Number.NaN, 'water'), RangeError);
 assert.throws(() => getMoleVisualState(1, 'unknown'), RangeError);
@@ -37,6 +41,7 @@ for (const content of [
   '1 mol は対象となる粒子を約 6.02×10²³ 個集めた量です',
   '1つの丸が1個の{substance.entity}という意味ではありません',
   '理想気体のモル体積 22.4 L/mol',
+  'formatParticleCount(state.particles)',
   'href="/learn/chemistry/mole-calculation-drill"',
   'href="/learn/chemistry/concentration-visual"',
 ]) {
