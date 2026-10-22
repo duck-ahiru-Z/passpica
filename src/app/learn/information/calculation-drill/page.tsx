@@ -19,6 +19,7 @@ export default function InformationCalculationDrillPage() {
 
   return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
+    <Link href="/learn/information/pcm-sampling-visual" className="ml-4 text-blue-600 hover:underline">PCM標本化ビジュアルへ →</Link>
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">情報I 計算・処理ドリル</h1>
     <p className="text-gray-500 mb-6">問題の形から処理方法を選び、計算結果まで答える練習です。分類別の基礎練習と全パターンランダムを切り替えられます。</p>
     <section className="retro-box space-y-5">

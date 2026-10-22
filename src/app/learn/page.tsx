@@ -392,6 +392,18 @@ const CONTENTS: LearningContent[] = [
     type: 'ビジュアル図解',
     link: '/learn/information/number-representation-visual',
     practiceLink: '/learn/information/number-representation-drill'
+  },
+  {
+    slug: 'pcm-sampling-visual',
+    subject: 'information',
+    subjectJp: '情報I',
+    field: '音声のデジタル化・データ量',
+    title: '標本化とPCMデータ量シミュレーター',
+    description: '標本化周波数・量子化ビット数・チャンネル数・記録時間を切り替え、音声データ量の変化を波形の概念図と計算式で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/information/pcm-sampling-visual',
+    practiceLink: '/learn/information/calculation-drill'
   }
 ];
 
