@@ -61,7 +61,8 @@ export function generateQuadraticMaxMinProblem(
   }
 
   const q = Math.floor(random() * 9) - 4;
-  const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}(x ${p === 0 ? '' : p > 0 ? '-' : '+'} ${Math.abs(p)})^2 ${q >= 0 ? '+' : '-'} ${Math.abs(q)}`;
+  const vertexTerm = p === 0 ? 'x' : `(x ${p > 0 ? '-' : '+'} ${Math.abs(p)})`;
+  const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}${vertexTerm}^2 ${q >= 0 ? '+' : '-'} ${Math.abs(q)}`;
   const f = (x: number) => a * (x - p) * (x - p) + q;
   const candidates = [alpha, beta];
   if (p >= alpha && p <= beta) candidates.push(p);

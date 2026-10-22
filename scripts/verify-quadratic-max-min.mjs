@@ -41,6 +41,8 @@ function verifyProblem(problem, requestedPattern) {
   assert.ok(problem.a !== 0 && Math.abs(problem.a) <= 3);
   assert.ok(problem.q >= -4 && problem.q <= 4);
   assert.equal(problem.isDownward, problem.a < 0);
+  assert.ok(!problem.eq.includes('x0'), `zero-axis form must not render an extraneous 0: ${problem.eq}`);
+  if (problem.p === 0) assert.match(problem.eq, /^y = -?(?:[23])?x\^2 /, `zero-axis form should render as x²: ${problem.eq}`);
   if (requestedPattern === 'pattern1') {
     assert.ok(problem.p > problem.alpha && problem.p < problem.beta);
     assert.notEqual(problem.p - problem.alpha, problem.beta - problem.p);
