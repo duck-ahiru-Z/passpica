@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -163,7 +164,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       const qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('\\quad / \\quad')}$`;
       
-      const dir = rNum > 0.4 ? '右上がり（正の相関）' : (rNum < -0.4 ? '右下がり（負の相関）' : 'バラバラ（無相関）');
+      const dir = getCorrelationDirectionLabel(rNum);
       
       const expLines = [
         `\\text{散布図の点の分布を見ると、全体的に}${dir}\\text{の傾向があります。}`,

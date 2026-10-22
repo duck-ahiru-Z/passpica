@@ -2,10 +2,15 @@ import assert from 'node:assert/strict';
 import { generateGasCollectionProblem, gasCollectionPatterns, getGasCollectionAcceptedAnswerLabel, isGasCollectionAnswerCorrect } from '../src/lib/gasCollectionDrill.ts';
 
 const counts = Object.fromEntries(gasCollectionPatterns.map(pattern => [pattern, 0]));
+let randomState = 20261022;
+const seededRandom = () => {
+  randomState = (randomState * 48271) % 2147483647;
+  return (randomState - 1) / 2147483646;
+};
 let previous = '';
 const mixedCount = 6000;
 for (let index = 0; index < mixedCount; index += 1) {
-  const problem = generateGasCollectionProblem('mix');
+  const problem = generateGasCollectionProblem('mix', seededRandom);
   assert.ok(gasCollectionPatterns.includes(problem.pattern));
   assert.equal(problem.method, {
     waterDisplacement: '水上置換法',
@@ -23,7 +28,7 @@ for (const pattern of gasCollectionPatterns) {
   let previousQuestion = '';
   const fixedCount = 60;
   for (let index = 0; index < fixedCount; index += 1) {
-    const fixed = generateGasCollectionProblem(pattern);
+    const fixed = generateGasCollectionProblem(pattern, seededRandom);
     assert.equal(fixed.pattern, pattern);
     assert.equal(fixed.method, {
       waterDisplacement: '水上置換法',

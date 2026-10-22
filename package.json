@@ -47,6 +47,7 @@
     "test:information-presets": "node --experimental-strip-types scripts/verify-information-presets.mjs",
     "test:math1-mixed": "node --experimental-strip-types scripts/verify-math1-mixed-questions.mjs",
     "test:factorization": "node --experimental-strip-types scripts/verify-factorization-questions.mjs",
+    "test:data-analysis-2d": "node --experimental-strip-types scripts/verify-data-analysis-2d.mjs",
     "test:double-radical": "node --experimental-strip-types scripts/verify-double-radical-problems.mjs",
     "test:trig-synthesis-inputs": "node --experimental-strip-types scripts/verify-trig-synthesis-inputs.mjs",
     "test:trigonometry-graph-drill": "node --experimental-strip-types scripts/verify-trigonometry-graph-drill.mjs",
