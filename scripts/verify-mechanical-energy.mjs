@@ -42,4 +42,16 @@ assert.equal(ground.kinetic, ground.total);
 assert.equal(calculateFallingEnergy(-4).height, 0);
 assert.equal(calculateFallingEnergy(100).height, fallingObjectInitialHeight);
 
-console.log('Mechanical-energy visual verified: 201 heights, conservation, monotonic transfer, endpoint states, and slider bounds.');
+const heavier = calculateFallingEnergy(10, 2, 20);
+assert.equal(heavier.total, 392);
+assert.equal(heavier.potential, 196);
+assert.equal(heavier.kinetic, 196);
+assert.equal(heavier.dropDistance, 10);
+assert.equal(calculateFallingEnergy(40, 2, 30).height, 30);
+assert.equal(calculateFallingEnergy(-2, 2, 30).height, 0);
+const zeroHeight = calculateFallingEnergy(0, 0, 0);
+assert.equal(zeroHeight.total, 0);
+assert.equal(zeroHeight.potentialFraction, 1);
+assert.equal(zeroHeight.kineticFraction, 0);
+
+console.log('Mechanical-energy visual verified: 201 heights, conservation, monotonic transfer, endpoint states, adjustable mass/initial height, and slider bounds.');
