@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import { curvatureExtrema, curvatureFirstDerivative, curvatureFunction, curvatureInflectionPoints, curvatureInflectionX, curvatureSecondDerivative } from '@/src/lib/calculus3CurvatureVisual';
+import { curvatureExtrema, curvatureFirstDerivative, curvatureFunction, curvatureInflectionPoints, curvatureInflectionX, curvatureSecondDerivative, snapCurvatureXToInflection } from '@/src/lib/calculus3CurvatureVisual';
 
 const W = 440;
 const H = 240;
@@ -49,7 +49,7 @@ export default function Calculus3CurvatureVisual() {
           </svg>
           <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 px-2 pt-2 text-[10px] text-slate-600"><span><i className="inline-block w-3 border-t-2 border-blue-600 align-middle" /> 関数</span><span><i className="inline-block w-3 border-t-2 border-red-500 align-middle" /> 接線</span><span className="text-emerald-700">● 極値</span><span className="text-amber-700">● 変曲点</span></div>
         </div>
-        <label className="block text-center font-bold">移動点 x = {x.toFixed(3)}<input aria-label="xの位置" type="range" min={X_MIN} max={X_MAX} step="0.001" value={x} onChange={event => setX(Number(event.target.value))} className="w-full mt-2 accent-blue-600" /></label>
+        <label className="block text-center font-bold">移動点 x = {x.toFixed(3)}<input aria-label="xの位置" type="range" min={X_MIN} max={X_MAX} step="0.001" value={x} onChange={event => setX(snapCurvatureXToInflection(Number(event.target.value)))} className="w-full mt-2 accent-blue-600" /></label>
         <div className="grid sm:grid-cols-3 gap-2 text-center"><div className="border p-3 bg-blue-50"><div className="text-gray-500">f(x)</div><strong>{curvatureFunction(x).toFixed(3)}</strong></div><div className="border p-3 bg-red-50"><div className="text-gray-500">接線の傾き f′(x)</div><strong>{curvatureFirstDerivative(x).toFixed(3)}</strong></div><div className="border p-3 bg-amber-50"><div className="text-gray-500">f′′(x)</div><strong>{secondDerivative.toFixed(3)}</strong></div></div>
         <div className="text-center font-bold text-lg text-emerald-700">{concavity}</div>
         <p className="text-center text-slate-600">変曲点は x=±1/√3≈±{curvatureInflectionX.toFixed(3)} です。{atInflection ? '今の点は変曲点です。前後へ動かすと f′′ の符号とグラフの曲がり方が入れ替わります。' : nearInflection ? '今の点は変曲点の近くです。点を前後へ動かし、f′′ の符号とグラフの曲がり方を比べてください。' : '点を変曲点の前後へ動かし、f′′ の符号とグラフの曲がり方を比べてください。'}</p>
