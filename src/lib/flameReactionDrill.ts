@@ -11,8 +11,8 @@ export const flameColorLabels: Record<FlameMetal, string> = {
   Li: '赤色', Na: '黄色', K: '赤紫色', Cu: '青緑色', Ca: '橙赤色', Ba: '黄緑色',
 };
 export const flameReactionMnemonics: Record<FlameMetal, string> = {
-  Li: 'リアカー（Li:赤）', Na: '無き（Na:黄）', K: 'Kの村（K:紫）',
-  Cu: '動力（Cu:緑）', Ca: '借りるとう（Ca:橙）', Ba: '馬力（Ba:緑）',
+  Li: 'リアカー（Li:赤）', Na: 'リアカーなき（Na:黄）', K: 'リアカーなきK村（K:紫）',
+  Cu: 'リアカーなきK村、動力（Cu:青緑）', Ca: 'リアカーなきK村、動力借りると（Ca:橙）', Ba: 'リアカーなきK村、動力借りるとする馬力（Ba:緑）',
 };
 const picker = new BalancedRandom(flameMetals);
 export function generateFlameReactionProblem(mode: FlameReactionMode, random = Math.random): FlameReactionProblem {
