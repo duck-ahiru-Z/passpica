@@ -20,6 +20,11 @@ for (const pattern of trigGraphPatterns) {
     assert.ok(!isTrigGraphStrategyValid(problem, ''));
     assert.ok(isTrigGraphAnswerCorrect(problem, problem.answers.map(String)));
     assert.ok(!isTrigGraphAnswerCorrect(problem, problem.answers.map(() => '')));
+    if (pattern === 'tanAsymptote') {
+      assert.match(problem.question, /中身が 0 になる角度/);
+      assert.match(problem.explanation, /中身が 90° になる位置/);
+      assert.ok(problem.explanation.includes(`${problem.answers[0]}°`));
+    }
     const wrong = [...problem.answers];
     wrong[0] += 37;
     assert.ok(!isTrigGraphAnswerCorrect(problem, wrong.map(String)), `${pattern} accepts a wrong answer`);

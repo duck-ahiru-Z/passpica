@@ -126,9 +126,9 @@ export function createTrigGraphProblemPicker() {
           return {
             pattern,
             expression: `y = tan ${inner}`,
-            question: 'θ=c より右に最も近い垂直漸近線の角度を求めなさい。',
+            question: 'tan の中身が 0 になる角度より右に最も近い垂直漸近線を、度数法で求めなさい。',
             answers: [asymptote], answerLabels: ['角度'], unit: '°',
-            explanation: `tan の垂直漸近線は ${frequency}${shiftedAngle(shift)}=90°+180°k。${shiftedAngle(shift)}=90°/${frequency} から、θ=c より右で最も近い角度は ${asymptote}°です。`,
+            explanation: `tan の中身が 0 になる角度は θ=${signed(shift)}°です。垂直漸近線は中身が 90° になる位置なので、θ=${signed(shift)}°+90°/${frequency}=${asymptote}°。`,
           };
         }
       }

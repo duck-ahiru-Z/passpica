@@ -5,11 +5,13 @@ export type GasCollectionMode = GasCollectionPattern | 'mix';
 export type GasCollectionMethod = '水上置換法' | '上方置換法' | '下方置換法';
 export type GasCollectionProblem = {
   pattern: GasCollectionPattern;
+  questionStyle: (typeof questionStyles)[number];
   formula: string;
   name: string;
   solubility: string;
   density: string;
   method: GasCollectionMethod;
+  acceptedMethods: readonly GasCollectionMethod[];
   question: string;
   explanation: string;
 };
@@ -23,6 +25,10 @@ export const gasCollectionLabels: Record<GasCollectionPattern, string> = {
   downwardDisplacement: '下方置換法を選ぶ問題',
 };
 const patternPicker = new BalancedRandom(gasCollectionPatterns);
+const questionStyles = ['identify', 'compare', 'apply'] as const;
+const questionStylePickers = Object.fromEntries(
+  gasCollectionPatterns.map(pattern => [pattern, new BalancedRandom(questionStyles)]),
+) as Record<GasCollectionPattern, BalancedRandom<(typeof questionStyles)[number]>>;
 const gasSets: Record<GasCollectionPattern, readonly { formula: string; name: string; solubility: string; density: string; clue: string }[]> = {
   waterDisplacement: [
     { formula: 'O₂', name: '酸素', solubility: '水にほとんど溶けない', density: '空気よりやや重い', clue: '水にほとんど溶けず、水と反応しにくい' },
@@ -40,6 +46,14 @@ const gasSets: Record<GasCollectionPattern, readonly { formula: string; name: st
 const methodFor: Record<GasCollectionPattern, GasCollectionMethod> = {
   waterDisplacement: '水上置換法', upwardDisplacement: '上方置換法', downwardDisplacement: '下方置換法',
 };
+
+export function isGasCollectionAnswerCorrect(problem: GasCollectionProblem, pattern: GasCollectionPattern | ''): boolean {
+  return pattern !== '' && problem.acceptedMethods.includes(methodFor[pattern]);
+}
+
+export function getGasCollectionAcceptedAnswerLabel(problem: GasCollectionProblem): string {
+  return problem.acceptedMethods.join(' または ');
+}
 const pick = <T,>(items: readonly T[], random: () => number): T => {
   const sample = random();
   const index = Number.isFinite(sample) ? Math.min(items.length - 1, Math.max(0, Math.floor(sample * items.length))) : 0;
@@ -49,16 +63,22 @@ const pick = <T,>(items: readonly T[], random: () => number): T => {
 export function generateGasCollectionProblem(mode: GasCollectionMode, random = Math.random): GasCollectionProblem {
   const pattern = mode === 'mix' ? patternPicker.next(random) : mode;
   const gas = pick(gasSets[pattern], random);
+  const questionStyle = questionStylePickers[pattern].next(random);
   const method = methodFor[pattern];
   const why = pattern === 'waterDisplacement'
-    ? '水に溶けにくく反応しないので水上置換法。空気との密度差は、この方法を選ぶ理由ではありません。'
+    ? `${gas.solubility}ため水上置換法で集めます。空気との密度差は、この方法を選ぶ理由ではありません。`
     : pattern === 'upwardDisplacement'
-      ? '水に溶けやすい気体なので水上置換は避けます。空気より軽いため、逆さの集気びんを使う上方置換法で集めます。'
-      : '水に溶けやすい気体なので水上置換は避けます。空気より重いため、口を上にした集気びんを使う下方置換法で集めます。';
+      ? `${gas.solubility}ため水上置換法は避けます。${gas.density}ため、逆さの集気びんを使う上方置換法で集めます。`
+      : `${gas.solubility}ため水上置換法は避けます。${gas.density}ため、口を上にした集気びんを使う下方置換法で集めます。`;
   return {
-    pattern, formula: gas.formula, name: gas.name, solubility: gas.solubility,
+    pattern, questionStyle, formula: gas.formula, name: gas.name, solubility: gas.solubility,
     density: gas.density, method,
-    question: `${gas.name}（${gas.formula}）は${gas.clue}。適切な捕集法を選んでください。`,
+    acceptedMethods: pattern === 'downwardDisplacement' && gas.formula === 'CO₂' ? [method, '水上置換法'] : [method],
+    question: questionStyle === 'identify'
+      ? `${gas.name}（${gas.formula}）は${gas.clue}。適切な捕集法を選んでください。`
+      : questionStyle === 'compare'
+        ? `「${gas.clue}」という性質をもつ${gas.name}（${gas.formula}）。水への溶けやすさと空気との密度差をもとに、どの捕集法を選ぶか。`
+        : `実験室で${gas.name}（${gas.formula}）を集めます。${gas.clue}ことを踏まえ、最も適切な装置はどれですか。`,
     explanation: `${gas.solubility}。${gas.density}。${why}`,
   };
 }
