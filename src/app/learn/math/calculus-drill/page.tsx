@@ -348,6 +348,7 @@ export default function CalculusDrillPage() {
             <button
               key={m.id}
               onClick={() => { setSelectedMode(m.id); generateProblem(m.id); }}
+              aria-pressed={selectedMode === m.id}
               className={`retro-btn-classic ${selectedMode === m.id ? 'bg-blue-200 border-blue-400 font-bold' : ''}`}
             >
               {m.name}
@@ -383,6 +384,7 @@ export default function CalculusDrillPage() {
                 <div className="flex flex-col items-center gap-1">
                   <input
                     type="number"
+                    aria-label="面積 S の分子"
                     value={inputNum}
                     onChange={e => setInputNum(e.target.value)}
                     placeholder="分子"
@@ -392,6 +394,7 @@ export default function CalculusDrillPage() {
                   <div className="w-full h-px bg-slate-800"></div>
                   <input
                     type="number"
+                    aria-label="面積 S の分母。整数の場合は空欄でも可"
                     value={inputDen}
                     onChange={e => setInputDen(e.target.value)}
                     placeholder="分母(整数時は1)"
@@ -404,7 +407,7 @@ export default function CalculusDrillPage() {
                 <button type="submit" className="retro-btn-classic bg-blue-100 border-blue-400 font-bold px-4 py-2 flex-grow">
                   解答する
                 </button>
-                <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
+                <button type="button" aria-expanded={showExplanation} onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
                   {showExplanation ? '解説を隠す' : '正解と解説を見る'}
                 </button>
                 <button type="button" onClick={() => generateProblem(selectedMode)} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
@@ -426,7 +429,7 @@ export default function CalculusDrillPage() {
           <div className="retro-box bg-white p-2">
              <div className="flex justify-between items-center mb-2 px-2 border-b border-gray-200 pb-1">
                <span className="font-bold text-slate-700">■ グラフ表示</span>
-               <button onClick={() => setShowGraph(!showGraph)} type="button" className="retro-btn-classic text-[10px] px-2 py-0.5">
+               <button onClick={() => setShowGraph(!showGraph)} type="button" aria-expanded={showGraph} className="retro-btn-classic text-[10px] px-2 py-0.5">
                  {showGraph ? 'グラフを隠す' : 'グラフを表示する'}
                </button>
              </div>
@@ -436,6 +439,8 @@ export default function CalculusDrillPage() {
                    ref={canvasRef} 
                    width={500} 
                    height={300} 
+                   role="img"
+                   aria-label={`面積グラフ。青線 f(x)=${formatPoly(problem.f)}、灰線 g(x)=${formatPoly(problem.g)}。x=${problem.r1}とx=${problem.r2}で交わり、その間の領域を表示。`}
                    className="w-full h-auto border border-gray-200 bg-gray-50"
                  />
                  <div className="text-center text-[10px] text-gray-500 mt-1">

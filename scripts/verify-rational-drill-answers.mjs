@@ -12,6 +12,13 @@ for (const [slug, expectedCall] of routes) {
   if (!page.includes(expectedCall) || !page.includes('rationalEquals(')) {
     throw new Error(`${slug} must use strict rational parsing and exact rational equality`);
   }
+  if (slug === 'calculus-drill'
+    && (!page.includes('aria-label="面積 S の分子"')
+      || !page.includes('aria-label="面積 S の分母。整数の場合は空欄でも可"')
+      || !page.includes('aria-label={`面積グラフ。')
+      || !page.includes('aria-pressed={selectedMode === m.id}'))) {
+    throw new Error('calculus-drill must expose named answer fields, selected modes, and a descriptive graph to assistive technology');
+  }
 }
 
 const cases = [
