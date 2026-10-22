@@ -28,6 +28,11 @@ for (const [activationEnergy, heatReleased] of [[40, 20], [150, 120]]) {
 
 const page = energyPage;
 assert.match(page, /C₆H₇O₂\(ONO₂\)₃/);
+assert.match(page, /置換数1〜3の理想化した単位モデル/);
+assert.match(page, /セルロイドに使われる硝酸セルロースは一般に窒素含有率約10\.5〜11\.5%で、この1置換モデル（約6\.8%）とは異なります/);
+assert.match(page, /外部酸素が乏しい条件でも自己燃焼することがあります/);
+assert.match(page, /燃焼性は硝化度だけでなく組成・含水率・状態にも依存します/);
+assert.doesNotMatch(page, /外部の空気から酸素を供給されなくても、分子内の窒素・酸素を利用して自己燃焼/);
 assert.match(page, /ΔH = −\{reactionHeat\} kJ/);
 assert.match(page, /硝酸エステル基/);
 assert.match(page, /過酸化物・超酸化物の危険な皮膜/);
