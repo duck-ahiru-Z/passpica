@@ -1,4 +1,14 @@
 import { generateEuclideanProblem, getEuclideanSteps } from '../src/lib/euclideanAlgorithm.ts';
+import fs from 'node:fs';
+
+const drillPage = fs.readFileSync('src/app/learn/math/euclidean-algorithm-drill/page.tsx', 'utf8');
+for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
+  if (!drillPage.includes(`<option value="${pattern}">`)) throw new Error(`${pattern} must remain independently selectable`);
+}
+if (!drillPage.includes('<option value="mix">')) throw new Error('Mixed practice must remain selectable');
+if (!drillPage.includes('aria-label="互除法ドリルの出題パターン"')) throw new Error('Pattern selector must have an accessible name');
+if (!drillPage.includes('aria-label="最大公約数の答え"')) throw new Error('Answer field must have an accessible name');
+if (!drillPage.includes('role="img"') || !drillPage.includes('aria-label={`ユークリッドの互除法の図。')) throw new Error('Diagram must describe the current operands to assistive technology');
 
 const patterns = ['pattern1', 'pattern2', 'pattern3', 'pattern4'];
 let seed = 0x4e71d;

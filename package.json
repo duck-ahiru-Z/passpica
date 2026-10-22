@@ -15,6 +15,7 @@
     "test:rationalization": "node --experimental-strip-types scripts/verify-rationalization-problems.mjs",
     "test:fraction-root-input": "node --experimental-strip-types scripts/verify-fraction-root-input.mjs",
     "test:trig-identity-parameters": "node --experimental-strip-types scripts/verify-trig-identity-parameters.mjs",
+    "test:euclidean-algorithm": "node --experimental-strip-types scripts/verify-euclidean-algorithm.mjs",
     "test:triangle-area-drill": "node --experimental-strip-types scripts/verify-triangle-area-drill.mjs",
     "test:sequence-sum-prompt": "node --experimental-strip-types scripts/verify-sequence-sum-prompt.mjs",
     "test:sequence-sum-questions": "node --experimental-strip-types scripts/verify-sequence-sum-questions.mjs",
