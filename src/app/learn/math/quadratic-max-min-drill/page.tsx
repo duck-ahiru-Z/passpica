@@ -4,104 +4,21 @@ import { useCallback, useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { isQuadraticExtremumAnswerCorrect } from '@/src/lib/quadraticMaxMin';
+import {
+  generateQuadraticMaxMinProblem,
+  isQuadraticExtremumAnswerCorrect,
+  type QuadraticMaxMinPattern as Pattern,
+} from '@/src/lib/quadraticMaxMin';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  eq: string;
-  alpha: number;
-  beta: number;
-  a: number;
-  p: number;
-  q: number;
-  maxV: number;
-  maxX: number[];
-  minV: number;
-  minX: number[];
-  isDownward: boolean;
-}
-
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p_type = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    const alpha = Math.floor(Math.random() * 9) - 4; // -4 to 4
-    let length = Math.floor(Math.random() * 4) + 2; // 2 to 5
-    let beta = alpha + length;
-    
-    let p = 0, a = 1, isDownward = false;
-    
-    let logicPattern = p_type;
-    if (p_type === 'pattern4') {
-      a = -(Math.floor(Math.random() * 3) + 1); // -1 to -3
-      isDownward = true;
-      const sub = Math.floor(Math.random() * 3);
-      if (sub === 0) logicPattern = 'pattern1';
-      if (sub === 1) logicPattern = 'pattern2';
-      if (sub === 2) logicPattern = 'pattern3';
-    } else {
-      a = Math.floor(Math.random() * 3) + 1; // 1 to 3
-    }
-    
-    if (logicPattern === 'pattern1') {
-      p = alpha + Math.floor(Math.random() * (length - 1)) + 1;
-      if (p - alpha === beta - p) {
-        p += Math.random() < 0.5 ? 1 : -1;
-        if (p <= alpha || p >= beta) p = alpha + 1;
-        if (p - alpha === beta - p) p = alpha + 1;
-      }
-    } else if (logicPattern === 'pattern2') {
-      if (Math.random() < 0.5) p = alpha - Math.floor(Math.random() * 3) - 1;
-      else p = beta + Math.floor(Math.random() * 3) + 1;
-    } else if (logicPattern === 'pattern3') {
-      if (length % 2 !== 0) {
-        length++;
-        beta++;
-      }
-      p = alpha + length / 2;
-    }
-    
-    const q = Math.floor(Math.random() * 9) - 4;
-    const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}(x ${p === 0 ? '' : p > 0 ? '-' : '+'} ${Math.abs(p)})^2 ${q >= 0 ? '+' : '-'} ${Math.abs(q)}`;
-    
-    const f = (x: number) => a * (x - p) * (x - p) + q;
-    let maxV = -Infinity; let minV = Infinity;
-    let maxX: number[] = []; let minX: number[] = [];
-    
-    const testPoints = [alpha, beta];
-    if (p >= alpha && p <= beta) testPoints.push(p);
-    
-    for (const x of testPoints) {
-      const y = f(x);
-      if (y > maxV) { maxV = y; maxX = [x]; }
-      else if (y === maxV && !maxX.includes(x)) { maxX.push(x); }
-      
-      if (y < minV) { minV = y; minX = [x]; }
-      else if (y === minV && !minX.includes(x)) { minX.push(x); }
-    }
-    
-    maxX.sort((x1, x2) => x1 - x2);
-    minX.sort((x1, x2) => x1 - x2);
-    
-    return { pattern: p_type, eq, alpha, beta, a, p, q, maxV, maxX, minV, minX, isDownward };
-  }
-}
-
 export default function QuadraticMaxMinDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState(() => generateQuadraticMaxMinProblem('mix'));
   
   const [ansMaxV, setAnsMaxV] = useState('');
   const [ansMaxX1, setAnsMaxX1] = useState('');
@@ -220,7 +137,7 @@ export default function QuadraticMaxMinDrillPage() {
   }, [drawGraph]);
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
-    setProblem(generateProblem(pattern));
+    setProblem(generateQuadraticMaxMinProblem(pattern));
     setAnsMaxV(''); setAnsMaxX1(''); setAnsMaxX2('');
     setAnsMinV(''); setAnsMinX1(''); setAnsMinX2('');
     setHasChecked(false);
@@ -264,6 +181,7 @@ export default function QuadraticMaxMinDrillPage() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="最大・最小問題の出題パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -292,22 +210,22 @@ export default function QuadraticMaxMinDrillPage() {
               <div className="flex flex-col gap-4 max-w-sm mx-auto">
                 <div className="flex items-center gap-2 bg-red-50 p-2 border border-red-200 rounded">
                   <div className="font-bold text-red-700 w-12 text-right">最大値:</div>
-                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMaxV} onChange={e => { setAnsMaxV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+                  <input type="number" aria-label="最大値の答え" className="w-16 border p-1 text-center font-bold" value={ansMaxV} onChange={e => { setAnsMaxV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="ml-2 text-[10px] text-gray-600">
-                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX1} onChange={e => { setAnsMaxX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+                    (x = <input type="number" aria-label="最大値をとる x の値" className="w-10 border p-1 text-center mx-1" value={ansMaxX1} onChange={e => { setAnsMaxX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="mx-1">,</span>
-                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMaxX2} onChange={e => { setAnsMaxX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
+                    <input type="number" aria-label="最大値をとる2つ目の x の値。1つだけなら空欄" className="w-10 border p-1 text-center mx-1" value={ansMaxX2} onChange={e => { setAnsMaxX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
                     のとき)
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 bg-blue-50 p-2 border border-blue-200 rounded">
                   <div className="font-bold text-blue-700 w-12 text-right">最小値:</div>
-                  <input type="number" className="w-16 border p-1 text-center font-bold" value={ansMinV} onChange={e => { setAnsMinV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+                  <input type="number" aria-label="最小値の答え" className="w-16 border p-1 text-center font-bold" value={ansMinV} onChange={e => { setAnsMinV(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                   <div className="ml-2 text-[10px] text-gray-600">
-                    (x = <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX1} onChange={e => { setAnsMinX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
+                    (x = <input type="number" aria-label="最小値をとる x の値" className="w-10 border p-1 text-center mx-1" value={ansMinX1} onChange={e => { setAnsMinX1(e.target.value); setHasChecked(false); setIsCorrect(false); }} />
                     <span className="mx-1">,</span>
-                    <input type="number" className="w-10 border p-1 text-center mx-1" value={ansMinX2} onChange={e => { setAnsMinX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
+                    <input type="number" aria-label="最小値をとる2つ目の x の値。1つだけなら空欄" className="w-10 border p-1 text-center mx-1" value={ansMinX2} onChange={e => { setAnsMinX2(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="空" />
                     のとき)
                   </div>
                 </div>
@@ -362,6 +280,8 @@ export default function QuadraticMaxMinDrillPage() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
+                role="img"
+                aria-label={`定義域${problem.alpha}以上${problem.beta}以下での二次関数 ${problem.eq} のグラフ。青い太線が定義域、灰色の破線が放物線全体${hasChecked ? `。最大値${problem.maxV}はx=${problem.maxX.join('と')}、最小値${problem.minV}はx=${problem.minX.join('と')}` : ''}。`}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>
