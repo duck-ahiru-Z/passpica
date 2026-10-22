@@ -194,6 +194,11 @@ function collectPages(directory) {
 }
 const pages = collectPages(learnRoot);
 const mathPages = pages.filter(file => file.includes(`${path.sep}math${path.sep}`));
+const clientGeneratedState = fs.readFileSync(path.join(root, 'src/lib/useClientGeneratedState.ts'), 'utf8');
+if (!clientGeneratedState.includes('useEffect(() => {\n    setValue(factoryRef.current());\n  }, []);')
+  || clientGeneratedState.includes('requestAnimationFrame')) {
+  throw new Error('Client-generated drill questions must initialize after hydration without waiting for an animation frame.');
+}
 const randomStateInitializer = /\buseState(?:<[^;\n]*?>)?\s*\(\s*(?:\(\s*\)\s*=>\s*)?(?:generate[A-Z]\w*|create[A-Z]\w*|[\w$.]+\.(?:next|pick))\s*\(/;
 const unsafeRandomInitializers = pages.filter(file => randomStateInitializer.test(fs.readFileSync(file, 'utf8')));
 if (unsafeRandomInitializers.length > 0) {
