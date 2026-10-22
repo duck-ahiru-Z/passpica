@@ -71,9 +71,28 @@ const checks = {
   },
   squeeze: problem => {
     const [, coefficient] = problem.expression.match(/\\sin\\frac\{(\d+)\}\{x\}/);
-    return Number(problem.answer) === 0 && problem.explanation.includes(`sin(${coefficient}/x)`);
+    const k = Number(coefficient);
+    const boundHoldsForBothSigns = [-0.1, -0.01, -0.001, 0.001, 0.01, 0.1].every(x => {
+      const value = x * Math.sin(k / x);
+      return -Math.abs(x) <= value && value <= Math.abs(x);
+    });
+    return Number(problem.answer) === 0 && problem.explanation.includes(`sin(${coefficient}/x)`)
+      && problem.explanation.includes('−|x|≤') && boundHoldsForBothSigns;
   },
   sequence: problem => {
+    if (problem.expression.includes('\\sqrt')) {
+      const [, aText] = problem.expression.match(/\\sqrt\{n\^2\+(\d+)n\}-n/);
+      const a = Number(aText);
+      return close(Number(problem.answer), a / 2)
+        && problem.explanation.includes(`${a}n/(√(n²+${a}n)+n)`)
+        && problem.explanation.includes(`極限値は ${a}/2`);
+    }
+    if (problem.expression.includes('n^2')) {
+      const [, aText, cText] = problem.expression.match(/\\frac\{(?:(\d+)n\^2|n\^2)\+n\}\{(?:(\d+)n\^2|n\^2)\+2\}/);
+      const a = Number(aText ?? 1); const c = Number(cText ?? 1);
+      return close(Number(problem.answer), a / c) && problem.explanation.includes(`最高次係数の比 ${a}/${c}`)
+        && !problem.expression.includes('1n^2');
+    }
     const [, aText, cText] = problem.expression.match(/\\frac\{(?:(\d+)n|n)\+1\}\{(?:(\d+)n|n)\+2\}/);
     const a = Number(aText ?? 1); const c = Number(cText ?? 1);
     return close(Number(problem.answer), a / c) && problem.explanation.includes(`${a}/${c}`);
@@ -92,7 +111,7 @@ const checks = {
       && problem.expression.includes(`x=${n}`) && problem.explanation.includes(`極限値=f(${n})=k`);
   },
 };
-const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 9, trigonometric: 5, continuity: 5 };
+const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 27, trigonometric: 5, continuity: 5 };
 
 for (const pattern of limitPatterns) {
   const seen = new Set();
@@ -105,6 +124,10 @@ for (const pattern of limitPatterns) {
     seen.add(problem.expression);
   }
   if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
+  if (pattern === 'sequence') {
+    const forms = new Set([...seen].map(expression => expression.includes('\\sqrt') ? 'radical' : expression.includes('n^2') ? 'quadratic-ratio' : 'linear-ratio'));
+    if (forms.size !== 3) throw new Error(`sequence limits must include linear ratios, higher-degree ratios, and radical differences: ${JSON.stringify([...forms])}`);
+  }
 }
 
 const mixed = Array.from({ length: 700 }, () => generateLimitProblem('mix', stableRandom).pattern);
