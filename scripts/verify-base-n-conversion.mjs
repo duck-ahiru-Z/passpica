@@ -66,6 +66,11 @@ for (const [baseIndex, base] of [2, 4, 5, 8].entries()) {
   }
 }
 assert.equal(exhaustiveFractionalVariants.size, 90, 'fractional conversion must cover all valid two-digit answers across the four supported bases');
+const displayDraws = [0.625, 0.3, 0.1];
+let displayDrawIndex = 0;
+const floatingPointDisplayCase = generateBaseNProblem('pattern4', () => displayDraws[displayDrawIndex++]);
+assert.equal(floatingPointDisplayCase.q_val, 0.24, 'finite decimal values must not expose binary floating-point artifacts');
+assert.equal(String(floatingPointDisplayCase.q_val), '0.24');
 
 const counts = new Map(patterns.map(pattern => [pattern, 0]));
 let previous;
