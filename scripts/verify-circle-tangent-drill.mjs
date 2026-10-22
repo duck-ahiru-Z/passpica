@@ -44,6 +44,9 @@ assert.ok(page.includes('value="mix"'), 'mixed strategy mode must remain availab
 assert.ok(page.includes('value="contact"'), 'contact-point strategy must be individually selectable');
 assert.ok(page.includes('value="distance"'), 'center-distance strategy must be individually selectable');
 assert.ok(page.includes('aria-label={`中心O'), 'canvas must have a dynamic accessible description');
+for (const label of ['接線1のx係数 A', '接線1のy係数 B', '接線1の右辺 C', '接線2のx係数 A', '接線2のy係数 B', '接線2の右辺 C']) {
+  assert.ok(page.includes(`aria-label="${label}"`), `${label} input must have an accessible name`);
+}
 const distanceHtml = katex.renderToString(slopeLineDistanceFormula, { throwOnError: true });
 assert.match(distanceHtml, /<mfrac/, 'detailed distance formula must render a fraction, not raw command text');
 assert.match(distanceHtml, /<msqrt/, 'detailed distance formula must render the radical correctly');

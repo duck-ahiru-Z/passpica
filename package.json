@@ -72,6 +72,7 @@
     "test:base-n-conversion": "node --experimental-strip-types scripts/verify-base-n-conversion.mjs",
     "test:binomial-probability": "node --experimental-strip-types scripts/verify-binomial-probability.mjs",
     "test:logarithm-drill": "node --experimental-strip-types scripts/verify-logarithm-drill.mjs",
+    "test:circle-tangent-drill": "node --experimental-strip-types scripts/verify-circle-tangent-drill.mjs",
     "test:matha-mixed": "node --experimental-strip-types scripts/verify-matha-mixed-questions.mjs",
     "test:physics-motion": "node --experimental-strip-types scripts/verify-physics-motion-calculation.mjs",
     "test:motion-visual": "node --experimental-strip-types scripts/verify-motion-visual.mjs",
