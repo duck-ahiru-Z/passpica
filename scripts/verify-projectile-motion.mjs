@@ -23,6 +23,8 @@ for (let angleDeg = 0; angleDeg <= 75; angleDeg += 5) {
   close(atLanding.displayedY, 0, `displayed landing height at ${angleDeg}°`);
   assert.ok(atLanding.vy < 0, `object should be descending at landing for ${angleDeg}°`);
   close(atLanding.x, atLanding.range, `landing range at ${angleDeg}°`);
+  const landingArrowLength = Math.min(48, Math.max(18, Math.abs(atLanding.vy) * 2.5));
+  assert.ok(288 + landingArrowLength <= 350, `downward landing velocity arrow must fit in the diagram at ${angleDeg}°`);
 
   for (let percent = 0; percent <= 100; percent++) {
     const state = calculateProjectileState(angleDeg, percent / 100);
@@ -53,6 +55,8 @@ const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physi
 if (!visualPage.includes('href="/learn/physics/motion-calculation-drill"') || !visualPage.includes('投射運動の計算演習へ')) throw new Error('projectile visual must link directly to its calculation drill');
 assert.ok(visualPage.includes('Math.abs(vy) >= 0.01 ? <line') && visualPage.includes('sy(displayedY) + 30'), 'zero vertical speed should hide the velocity arrow and show a separate downward gravity arrow');
 assert.ok(visualPage.includes('Math.min(48, Math.max(18, Math.abs(vy) * 2.5))') && visualPage.includes('Math.sign(vy) * verticalVelocityArrowLength'), 'nonzero vertical velocity arrows should remain visible and follow the velocity sign');
+assert.ok(visualPage.includes('const H = 350;') && visualPage.includes('H - 62 - (value / (maxHeight + 3)) * (H - 95)'), 'the plot must reserve bottom space without changing its plotted y-scale');
+assert.ok(visualPage.includes('width={W} height={H}'), 'the plot clip region must include the reserved arrow margin below ground');
 assert.ok(visualPage.includes("Math.abs(vy) < 0.01 ? '—'"), 'zero velocity should not be labeled with a false up/down direction');
 assert.ok(visualPage.includes('id="vertical-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z"'), 'vertical-vector arrowhead should point along its line after automatic rotation');
 assert.ok(visualPage.includes('↓ 重力加速度 g = {projectileGravity} m/s²'), 'zero-speed state should label the acceleration separately from velocity');
