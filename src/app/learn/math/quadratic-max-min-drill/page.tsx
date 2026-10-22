@@ -74,7 +74,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     
     const q = Math.floor(Math.random() * 9) - 4;
-    const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}(x ${p === 0 ? '' : p > 0 ? '-' : '+'} ${Math.abs(p)})^2 ${q === 0 ? '' : q > 0 ? '+' : '-'} ${Math.abs(q)}`;
+    const eq = `y = ${a === 1 ? '' : a === -1 ? '-' : a}(x ${p === 0 ? '' : p > 0 ? '-' : '+'} ${Math.abs(p)})^2 ${q >= 0 ? '+' : '-'} ${Math.abs(q)}`;
     
     const f = (x: number) => a * (x - p) * (x - p) + q;
     let maxV = -Infinity; let minV = Infinity;
