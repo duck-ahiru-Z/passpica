@@ -12,6 +12,8 @@ assert.ok(page.includes("new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'p
 assert.ok(page.includes('mixedPatternPicker.next()'), 'mixed mode must use the balanced scheduler');
 assert.ok(page.includes('role="img"') && page.includes('aria-label={graphDescription}'), 'diagram must describe its current geometry');
 assert.ok(page.includes('label={problem.pattern === \'pattern4\' ? \'辺cの長さ\' : \'三角形の面積\'}'), 'answer controls must name the quantity being entered');
+assert.ok(page.includes('function formatCanvasTerm') && page.includes('formatCanvasTerm(problem.S)'), 'canvas labels must use readable radical notation rather than raw LaTeX');
+assert.ok(page.includes("ctx.fillText('h = b sin A'"), 'altitude label must be rendered as plain canvas text');
 
 const heronTriangles = [[3,4,5], [5,12,13], [13,14,15], [4,13,15], [7,24,25], [9,10,17], [5,5,6], [5,5,8], [10,13,13]];
 for (const [a, b, c] of heronTriangles) {

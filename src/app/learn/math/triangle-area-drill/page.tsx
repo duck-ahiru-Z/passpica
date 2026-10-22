@@ -50,6 +50,12 @@ function formatTerm(v: TermVal): string {
   return `\\frac{${numStr}}{${v.den}}`;
 }
 
+function formatCanvasTerm(v: TermVal): string {
+  if (v.num === 0) return '0';
+  const numerator = v.root === 1 ? `${v.num}` : `${v.num === 1 ? '' : v.num}√${v.root}`;
+  return v.den === 1 ? numerator : `${numerator}/${v.den}`;
+}
+
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
@@ -205,7 +211,7 @@ export default function TriangleAreaDrillPage() {
 
       ctx.fillStyle = '#ef4444';
       ctx.font = '12px sans-serif';
-      ctx.fillText(`h = b \\sin A`, ptC.x + 35, ptH.y - (ptH.y - ptC.y)/2);
+      ctx.fillText('h = b sin A', ptC.x + 35, ptH.y - (ptH.y - ptC.y)/2);
     }
 
     // Labels
@@ -219,7 +225,7 @@ export default function TriangleAreaDrillPage() {
     if (hasChecked) {
       ctx.fillStyle = '#f59e0b';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText(`S = ${formatTerm(problem.S).replace(/\\/g, '').replace(/frac{([^}]*)}{([^}]*)}/g, '$1/$2')}`, cx, cy - max_y*scale/2);
+      ctx.fillText(`S = ${formatCanvasTerm(problem.S)}`, cx, cy - max_y*scale/2);
     }
   }, [problem, hasChecked]);
 
