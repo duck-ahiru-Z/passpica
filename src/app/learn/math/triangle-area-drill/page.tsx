@@ -141,10 +141,6 @@ export default function TriangleAreaDrillPage() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const graphDescription = problem.pattern === 'pattern3'
-    ? `三角形ABC。辺aは${problem.a.num}、辺bは${problem.b.num}、辺cは${problem.c.num}。3辺からヘロンの公式で面積を求めます。`
-    : `三角形ABC。辺ABの長さbは${problem.b.num}、辺ACの長さcは${problem.c.num}、その間の角Aは${problem.A}度です。${problem.pattern === 'pattern4' ? `面積Sは${problem.S.num}${problem.S.root === 1 ? '' : `√${problem.S.root}`}${problem.S.den === 1 ? '' : `/${problem.S.den}`}で、辺cを求める問題です。` : '面積Sを求める問題です。'}`;
-
   const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -253,6 +249,10 @@ export default function TriangleAreaDrillPage() {
   };
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
+
+  const graphDescription = problem.pattern === 'pattern3'
+    ? `三角形ABC。辺aは${problem.a.num}、辺bは${problem.b.num}、辺cは${problem.c.num}。3辺からヘロンの公式で面積を求めます。`
+    : `三角形ABC。辺ABの長さbは${problem.b.num}、辺ACの長さcは${problem.c.num}、その間の角Aは${problem.A}度です。${problem.pattern === 'pattern4' ? `面積Sは${problem.S.num}${problem.S.root === 1 ? '' : `√${problem.S.root}`}${problem.S.den === 1 ? '' : `/${problem.S.den}`}で、辺cを求める問題です。` : '面積Sを求める問題です。'}`;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
