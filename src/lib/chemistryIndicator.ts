@@ -38,9 +38,9 @@ export function getIndicatorDisplay(indicator: IndicatorKey, phInput: number): I
   }
 
   if (indicator === 'litmus') {
-    const color = pH <= 7
+    const color = pH <= 6.5
       ? blend(RED, PURPLE, (pH - 5) / 2)
-      : blend(PURPLE, BLUE, pH - 7);
+      : blend(PURPLE, BLUE, (pH - 6.5) / 1.5);
     const colorName = pH <= 5 ? '赤色' : pH >= 8 ? '青色' : pH < 7 ? '赤紫色' : pH === 7 ? '紫色' : '青紫色';
     return { indicatorName: 'リトマス液', colorName, backgroundColor: rgba(color, 0.7) };
   }
