@@ -12,6 +12,16 @@ for (const route of routes) {
   assert.ok(!/parseInt\((?:parts\[|uStr)/.test(page), `${route} must not truncate malformed answers`);
 }
 
+const sigmaPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/sigma-calculation-drill/page.tsx'), 'utf8');
+for (const label of ['aria-label="Σの演習パターン"', 'aria-label="Σ計算の答え"']) {
+  assert.ok(sigmaPage.includes(label), `sigma drill is missing ${label}`);
+}
+assert.ok(sigmaPage.includes("new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4'])"));
+assert.ok(sigmaPage.includes('mixedPatternPicker.next()'));
+for (const pattern of ['1次式の和', '2次式の和', '分数型の和・望遠鏡和', '等比数列のΣ']) {
+  assert.ok(sigmaPage.includes(pattern), `sigma drill mode selector is missing ${pattern}`);
+}
+
 const vectorPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/vector-dot-product-drill/page.tsx'), 'utf8');
 for (const label of ['ベクトルaとbの内積', 'ベクトルaとbのなす角（度）', '垂直条件を満たすxの値', 'ベクトルaとbの和の大きさの二乗']) {
   assert.ok(vectorPage.includes(label), `vector dot-product answer needs an accessible label for ${label}`);
