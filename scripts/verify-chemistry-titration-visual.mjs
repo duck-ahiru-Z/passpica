@@ -14,6 +14,13 @@ assert.equal(equivalence.ph, 7);
 assert.equal(equivalence.acidMoles, equivalence.baseMoles);
 assert.equal(equivalence.indicator, 'colorless', 'phenolphthalein is still colorless at pH 7');
 
+const justBeforeEquivalence = getTitrationVisualState(24.99);
+const justAfterEquivalence = getTitrationVisualState(25.01);
+assert.equal((justBeforeEquivalence.acidMoles * 1000).toFixed(3), '2.500');
+assert.equal((justBeforeEquivalence.baseMoles * 1000).toFixed(3), '2.499', 'three decimal places should expose the slight acid excess');
+assert.equal((justAfterEquivalence.acidMoles * 1000).toFixed(3), '2.500');
+assert.equal((justAfterEquivalence.baseMoles * 1000).toFixed(3), '2.501', 'three decimal places should expose the slight base excess');
+
 const afterEquivalence = getTitrationVisualState(26);
 assert.equal(afterEquivalence.phase, 'basic');
 assert.ok(afterEquivalence.ph > 10);
@@ -49,6 +56,8 @@ assert.match(page, /aria-label="加えた水酸化ナトリウム水溶液の体
 assert.match(page, /role="img" aria-label=\{`塩酸/);
 assert.match(page, /フェノールフタレインはpH約8\.3から変色/);
 assert.match(page, /中和に必要な体積/);
+assert.match(page, /state\.acidMoles \* 1000\)\.toFixed\(3\)/);
+assert.match(page, /state\.baseMoles \* 1000\)\.toFixed\(3\)/);
 assert.match(page, /getIndicatorDisplay\('pp', state\.ph\)/);
 assert.match(page, /pHに応じて濃さが変化/);
 assert.match(page, /step="0\.01"/);
