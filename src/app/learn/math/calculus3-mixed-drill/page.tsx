@@ -11,10 +11,9 @@ const picker = createCalculus3MixedQuestionPicker();
 
 function MathEq({ math }: { math: string }) {
   const markup = katex.renderToString(math, { displayMode: true, throwOnError: true, strict: 'error' });
-  const visualMath = markup.replace('<span class="katex">', '<span class="katex" aria-hidden="true">');
-  return (
-    <span role="math" aria-label={`数式: ${math.replace(/\\(?:,|quad|text\{[^}]*\})/g, ' ').replace(/[{}]/g, '')}`} dangerouslySetInnerHTML={{ __html: visualMath }} />
-  );
+  // Keep KaTeX's generated MathML available to assistive technology instead of
+  // replacing it with a lossy TeX-to-text label (for example, "fracdydx").
+  return <span dangerouslySetInnerHTML={{ __html: markup }} />;
 }
 
 export default function Calculus3MixedDrillPage() {

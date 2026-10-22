@@ -20,6 +20,9 @@ if (!drillPage.includes("mode === 'all' ? '解法選択' : '方針を選択'")) 
 if (drillPage.includes('aria-pressed=') || drillPage.includes('question.options.map(option => <button')) {
   throw new Error('single-choice method selection must be exposed as a radio group');
 }
+if (drillPage.includes('数式: ${math.replace') || /markup\.replace\('<span class="katex">'.*aria-hidden/.test(drillPage)) {
+  throw new Error('mixed-drill math must preserve KaTeX MathML instead of exposing a lossy flattened TeX label');
+}
 
 const validateQuestion = (question, allMode = false) => {
   if (!areas.includes(question.area) || question.areaLabel !== areaLabels[question.area]) throw new Error(`invalid area metadata: ${JSON.stringify(question)}`);
