@@ -182,6 +182,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/chemistry/organic-separation-drill'
   },
   {
+    slug: 'organic-structure-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '有機化学（立体構造・混成軌道）',
+    title: '化学 有機分子の立体構造・解法選択ドリル',
+    description: '混成軌道・配座・シクロヘキサン・シス／トランスを分子別に練習し、実戦では全9パターンから構造の特徴を判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/organic-structure-drill'
+  },
+  {
     slug: 'industrial-process-drill',
     subject: 'chemistry',
     subjectJp: '化学',

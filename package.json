@@ -79,6 +79,7 @@
     "test:inorganic-reaction-drill": "node --experimental-strip-types scripts/verify-inorganic-reaction-drill.mjs",
     "test:inorganic-colors-visual": "node scripts/verify-inorganic-colors-visual.mjs",
     "test:organic-separation-drill": "node --experimental-strip-types scripts/verify-organic-separation-drill.mjs",
+    "test:organic-structure-drill": "node --experimental-strip-types scripts/verify-organic-structure-drill.mjs",
     "test:organic-separation-visual": "node scripts/verify-organic-separation-visual.mjs",
     "test:metal-ion-drill": "node --experimental-strip-types scripts/verify-metal-ion-drill.mjs",
     "test:phase-diagram-drill": "node --experimental-strip-types scripts/verify-phase-diagram-drill.mjs",

@@ -573,6 +573,7 @@ export default function Organic3DPage() {
         <p className="text-xs text-gray-500 mt-1">
           メタンやベンゼンといった代表的な有機分子、シクロヘキサンの「椅子型」「舟型」配座、高分子のシス・トランスによる折れ曲がり構造を3D回転モデルで直感的に学びます。
         </p>
+        <Link href="/learn/chemistry/organic-structure-drill" className="inline-block mt-2 text-blue-700 underline">有機化学・立体構造の個別／ランダム演習へ →</Link>
       </div>
 
       {/* 分子選択パネル */}
@@ -683,6 +684,7 @@ export default function Organic3DPage() {
                 </div>
                 <input
                   type="range"
+                  aria-label="左右回転 (Yaw)"
                   min="-180"
                   max="180"
                   value={yaw}
@@ -698,6 +700,7 @@ export default function Organic3DPage() {
                 </div>
                 <input
                   type="range"
+                  aria-label="上下回転 (Pitch)"
                   min="-90"
                   max="90"
                   value={pitch}

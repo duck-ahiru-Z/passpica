@@ -24,6 +24,8 @@ function seededRandom(seed) {
 if (normalizeFactorizationAnswer(' (x−3) (x+3) ') !== normalizeFactorizationAnswer('(x-3)(x+3)')) throw new Error('full-width minus and spacing should be accepted in factorization answers');
 if (normalizeFactorizationAnswer('(x+4)²') !== normalizeFactorizationAnswer('(x+4)^2')) throw new Error('superscript powers should be accepted in factorization answers');
 if (!areFactorizationsEquivalent('(x²−5)(x²−3)', '(x^2-3)(x^2-5)')) throw new Error('commuted quadratic factors must be accepted as equivalent');
+if (!areFactorizationsEquivalent('(x-4)(x-4)', '(x-4)^2')) throw new Error('repeating a factor explicitly must be equivalent to its squared form');
+if (!areFactorizationsEquivalent('(x-4)^2(x+1)', '(x+1)(x-4)(x-4)')) throw new Error('factored expressions with repeated powers must be accepted in either factor order');
 if (!areFactorizationsEquivalent('(4x+3)(x+5)', '(4x+3)(1x+5)')) throw new Error('an omitted coefficient of 1 must be accepted as equivalent');
 if (!areFactorizationsEquivalent('(x^2-3)(x+5)', '(1x^2-3)(1x+5)')) throw new Error('implicit coefficients of 1 must be accepted on linear and quadratic terms');
 if (!areFactorizationsEquivalent('(x-1)(x+4)(x+2)', '(x+2)(x-1)(x+4)')) throw new Error('all reordered groups of factors must be accepted');

@@ -233,7 +233,8 @@ const CONTENTS: LearningContent[] = [
     description: 'メタン・ベンゼンなどの基本分子、シクロヘキサンの椅子型・舟型、シス・トランス異性体を3次元で回転・観察できます。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/organic-3d'
+    link: '/learn/chemistry/organic-3d',
+    practiceLink: '/learn/chemistry/organic-structure-drill'
   },
   // 化学基礎・化学（新設含む）
   {

@@ -125,7 +125,17 @@ function splitParenthesizedFactors(expression: string): string[] | null {
       }
     }
     if (depth !== 0) return null;
-    factors.push(expression.slice(start, index));
+    const factor = expression.slice(start, index);
+    const exponent = /^\^([2-9]\d*)/.exec(expression.slice(index));
+    let repetitions = 1;
+    if (expression[index] === '^') {
+      if (exponent === null) return null;
+      repetitions = Number(exponent[1]);
+      if (!Number.isSafeInteger(repetitions) || repetitions > 12) return null;
+      index += exponent[0].length;
+    }
+    factors.push(...Array.from({ length: repetitions }, () => factor));
+    if (factors.length > 12) return null;
   }
 
   return factors.length > 1 ? factors : null;

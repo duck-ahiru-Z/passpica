@@ -1,5 +1,5 @@
 import { BalancedRandom } from './balancedRandom.ts';
-import { byteToBinary, decodeByte, getByteContributions, type ByteMode } from './informationNumberRepresentation.ts';
+import { byteToBinary, decodeByte, getBitWeights } from './informationNumberRepresentation.ts';
 
 export type NumberRepresentationPattern = 'unsigned' | 'twosComplement' | 'bitWeight' | 'binaryDecimal';
 export type NumberRepresentationMode = NumberRepresentationPattern | 'mix';
@@ -39,6 +39,7 @@ const byteValues = {
   signed: new BalancedRandom([0, 1, 13, 42, 85, 127, 128, 129, 200, 254, 255]),
 };
 const decimalValues = new BalancedRandom([0, 1, 13, 42, 85, 127, 128, 200, 254, 255]);
+const bitPositions = new BalancedRandom([0, 1, 2, 3, 4, 5, 6, 7]);
 
 export function generateNumberRepresentationProblem(
   mode: NumberRepresentationMode,
@@ -53,6 +54,17 @@ export function generateNumberRepresentationProblem(
       question: `10進数 ${value} を符号なし8 bitの2進数で表せ。`,
       answer: bits,
       explanation: `符号なし8 bitでは ${value} を2のべき乗の和に分けると ${bits}₂。8 bitになるよう左側を0で埋めます。`,
+    };
+  }
+
+  if (pattern === 'bitWeight') {
+    const positionFromRight = bitPositions.next(random);
+    const answer = getBitWeights('unsigned')[7 - positionFromRight];
+    return {
+      pattern,
+      question: `符号なし8 bitで、右から${positionFromRight + 1}桁目の重みはいくつか。`,
+      answer: String(answer),
+      explanation: `右から${positionFromRight + 1}桁目の重みは 2^${positionFromRight} = ${answer}。`,
     };
   }
 
@@ -78,14 +90,5 @@ export function generateNumberRepresentationProblem(
         : `最上位ビットが0なので正の数。値は ${answer}。`,
     };
   }
-
-  const modeForWeights: ByteMode = value >= 128 ? 'twos-complement' : 'unsigned';
-  const answer = decodeByte(value, modeForWeights);
-  const contributions = getByteContributions(value, modeForWeights).filter(part => part !== 0);
-  return {
-    pattern,
-    question: `ビット列 ${byteToBinary(value)}₂ を${modeForWeights === 'twos-complement' ? '2の補数' : '符号なし'}として読み、各桁の重みの和を答えよ。`,
-    answer: String(answer),
-    explanation: `各ビットの重みを足すと ${contributions.join(' + ')} = ${answer}。`,
-  };
+  throw new Error(`Unsupported number representation pattern: ${pattern}`);
 }

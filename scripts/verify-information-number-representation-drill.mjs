@@ -4,7 +4,7 @@ import { generateNumberRepresentationProblem, isNumberRepresentationAnswerCorrec
 const expected = {
   unsigned: [0, 1, 13, 42, 85, 127, 128, 200, 254, 255],
   twosComplement: [-128, -127, -56, -2, -1, 0, 13, 42, 85, 127],
-  bitWeight: [-128, -127, -56, -2, -1, 0, 13, 42, 85, 127],
+  bitWeight: [1, 2, 4, 8, 16, 32, 64, 128],
   binaryDecimal: ['00000000', '00000001', '00001101', '00101010', '01010101', '01111111', '10000000', '11001000', '11111110', '11111111'],
 };
 for (const pattern of numberRepresentationPatterns) {
@@ -12,6 +12,16 @@ for (const pattern of numberRepresentationPatterns) {
   for (let i = 0; i < 1000; i += 1) answers.add(generateNumberRepresentationProblem(pattern).answer);
   for (const answer of expected[pattern]) assert.ok(answers.has(String(answer)), `${pattern} never produced boundary/value ${answer}`);
 }
+const observedWeights = new Set();
+for (let index = 0; index < 8; index += 1) {
+  const problem = generateNumberRepresentationProblem('bitWeight', () => 0.25);
+  const position = Number(problem.question.match(/右から(\d+)桁目/)?.[1]);
+  assert.ok(position >= 1 && position <= 8, `invalid bit position: ${problem.question}`);
+  assert.equal(problem.answer, String(2 ** (position - 1)));
+  assert.equal(problem.pattern, 'bitWeight');
+  observedWeights.add(problem.answer);
+}
+assert.deepEqual([...observedWeights].sort((a, b) => Number(a) - Number(b)), ['1', '2', '4', '8', '16', '32', '64', '128']);
 
 const page = (await import('node:fs')).readFileSync('src/app/learn/information/number-representation-drill/page.tsx', 'utf8');
 const packageScripts = JSON.parse((await import('node:fs')).readFileSync('package.json', 'utf8')).scripts;
@@ -37,6 +47,7 @@ assert.ok(page.includes("disabled={!answer.trim() || (mode === 'mix' && !strateg
 assert.ok(page.includes('!strategyCorrect') && page.includes('!answerCorrect'), 'feedback must distinguish a wrong method from a wrong value');
 assert.ok(page.includes('isNumberRepresentationAnswerCorrect(problem, answer)'), 'the page must use pattern-aware answer normalization');
 assert.ok(page.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)"), 'fixed practice should lock its method while mixed practice starts unselected');
+assert.ok(!page.includes('符号なし2進数として読み、各桁の重みの和'), 'mixed pattern choice must not ask learners to distinguish duplicate unsigned-decoding and bit-weight questions');
 
 const counts = Object.fromEntries(numberRepresentationPatterns.map(pattern => [pattern, 0]));
 let previous = '';

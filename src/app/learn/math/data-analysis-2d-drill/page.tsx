@@ -397,16 +397,37 @@ export default function DataAnalysis2DDrill() {
             
             <div className="space-y-4">
               <div className="flex flex-col items-center justify-center gap-4 font-bold border-t pt-4">
-                <div className="flex items-center gap-4 text-xl">
-                  <span>解答 =</span>
-                  <input 
-                    type={problem.pattern === 'pattern3' ? "number" : "text"} step="0.1"
-                    className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
-                    value={ans1} 
-                    onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
-                    placeholder={problem.pattern === 'pattern3' ? "0.8" : ""}
-                  />
-                </div>
+                {problem.pattern === 'pattern3' && problem.scatterChoices ? (
+                  <fieldset className="w-full max-w-sm space-y-2">
+                    <legend className="mb-2 text-center">相関係数を選択してください</legend>
+                    {problem.scatterChoices.map(choice => {
+                      const value = choice.toFixed(1);
+                      return (
+                        <label key={value} className={`flex items-center gap-3 border p-3 cursor-pointer ${ans1 === value ? 'bg-blue-50 border-blue-400' : 'bg-white border-slate-300'}`}>
+                          <input
+                            type="radio"
+                            name="scatter-correlation-choice"
+                            value={value}
+                            checked={ans1 === value}
+                            onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
+                          />
+                          <MathEq math={`r = ${value}`} />
+                        </label>
+                      );
+                    })}
+                  </fieldset>
+                ) : (
+                  <div className="flex items-center gap-4 text-xl">
+                    <span>解答 =</span>
+                    <input
+                      type="text"
+                      aria-label="解答"
+                      className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500"
+                      value={ans1}
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
