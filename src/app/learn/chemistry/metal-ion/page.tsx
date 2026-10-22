@@ -129,6 +129,7 @@ export default function MetalIonPage() {
         <p className="text-xs text-gray-500 mt-1">
           各試薬を加えることで、溶液中の多様な金属イオンが溶解度の違い（溶解度積）に基づいて段階的に分離されていく様子をシミュレートします。
         </p>
+        <Link href="/learn/chemistry/metal-ion-drill" className="retro-btn-classic inline-flex mt-3">金属イオンの判別を問題で練習する →</Link>
       </div>
 
       {/* シミュレーション操作バー */}

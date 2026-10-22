@@ -2,6 +2,13 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/metal-ion/page.tsx'), 'utf8');
+const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/metal-ion-drill/page.tsx'), 'utf8');
+
+if (!page.includes('href="/learn/chemistry/metal-ion-drill"')
+  || !page.includes('金属イオンの判別を問題で練習する')
+  || !drillPage.includes('href="/learn/chemistry/metal-ion"')) {
+  throw new Error('metal-ion flow visual and fixed/mixed drill must link to each other');
+}
 
 const orderedStepRequirements = [
   ["reagentFormula: '-'", "remains: ['Ag+', 'Pb2+', 'Cu2+', 'Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+']", "reaction: '-'"] ,
