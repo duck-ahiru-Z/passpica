@@ -56,6 +56,7 @@
     "test:trigonometry-graph-drill": "node --experimental-strip-types scripts/verify-trigonometry-graph-drill.mjs",
     "test:trigonometry-graph-probe": "node --experimental-strip-types scripts/verify-trigonometry-graph-probe.mjs",
     "test:sine-rule": "node --experimental-strip-types scripts/verify-sine-rule.mjs",
+    "test:cosine-rule-drill": "node --experimental-strip-types scripts/verify-cosine-rule-drill.mjs",
     "test:strict-positive-integer": "node --experimental-strip-types scripts/verify-strict-positive-integer.mjs",
     "test:rational-drill-answers": "node --experimental-strip-types scripts/verify-rational-drill-answers.mjs",
     "test:sigma-vector-rational-answers": "node --experimental-strip-types scripts/verify-sigma-vector-rational-answers.mjs",
