@@ -49,8 +49,8 @@ export default function MechanicalEnergyVisualPage() {
             {state.dropDistance > 0 && <line x1="145" y1={TRACK_TOP + 8} x2="145" y2={objectY - 9} stroke="#2563eb" strokeWidth="2" strokeDasharray="4 4" />}
             <circle cx="145" cy={objectY} r="12" fill="#f97316" stroke="#9a3412" strokeWidth="2" />
             <text x="145" y={Math.max(18, objectY - 20)} fill="#9a3412" fontSize="13" textAnchor="middle">物体</text>
-            <text x="360" y="82" fill="#1d4ed8" fontSize="15" fontWeight="bold">位置エネルギー Eₚ = mgh</text>
-            <text x="360" y="112" fill="#15803d" fontSize="15" fontWeight="bold">運動エネルギー Eₖ</text>
+            <text x="360" y="82" fill="#1d4ed8" fontSize="15" fontWeight="bold">位置エネルギー Eₚ = {state.potential.toFixed(1)} J</text>
+            <text x="360" y="112" fill="#15803d" fontSize="15" fontWeight="bold">運動エネルギー Eₖ = {state.kinetic.toFixed(1)} J</text>
             <text x="360" y="160" fill="#334155" fontSize="14">落下距離：{state.dropDistance.toFixed(1)} m</text>
             <text x="360" y="190" fill="#334155" fontSize="14">重力加速度：{mechanicalEnergyGravity} m/s²</text>
           </svg>
