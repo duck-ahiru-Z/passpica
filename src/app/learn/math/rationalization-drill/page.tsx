@@ -117,18 +117,17 @@ export default function RationalizationDrillPage() {
               </div>
               <div className="flex items-center justify-center gap-2 text-xl">
                 <MathEq math="=" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="A" />
-                <MathEq math="\sqrt{" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => { setAns_a(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
-                <MathEq math={`} ${problem.answerSign}`} />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="B" />
-                <MathEq math="\sqrt{" />
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => { setAns_b(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="b" />
-                <MathEq math="}" />
+                <input aria-label="√aの係数" type="number" className="w-10 border p-1 text-center font-bold" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="A" />
+                <span aria-hidden="true" className="font-serif">√</span>
+                <input aria-label="最初の根号の中身" type="number" className="w-10 border p-1 text-center font-bold" value={ans_a} onChange={e => { setAns_a(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
+                <span>{problem.answerSign}</span>
+                <input aria-label="√bの係数" type="number" className="w-10 border p-1 text-center font-bold" value={ansB} onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="B" />
+                <span aria-hidden="true" className="font-serif">√</span>
+                <input aria-label="2つ目の根号の中身" type="number" className="w-10 border p-1 text-center font-bold" value={ans_b} onChange={e => { setAns_b(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="b" />
               </div>
               <div className="text-[10px] text-gray-500 text-center">
                 ※ 係数(A, B)が1の場合も省略せずに「1」と入力してください。<br/>
-                ※ ルートの中身が1になる場合も「\(\sqrt{1}\)」として入力してください。
+                ※ ルートの中身が1になる場合も「√1」として入力してください。
               </div>
             </div>
 

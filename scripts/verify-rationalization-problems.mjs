@@ -11,7 +11,13 @@ for (const text of [
   'checkRationalizationAnswer(problem',
   'parseRationalizationInteger(ansA)',
   'aria-label="有理化の演習モード"',
+  'aria-label="√aの係数"',
+  'aria-label="最初の根号の中身"',
+  'aria-label="√bの係数"',
+  'aria-label="2つ目の根号の中身"',
+  '<span aria-hidden="true" className="font-serif">√</span>',
 ]) assert.ok(page.includes(text), `rationalization drill UI is missing ${text}`);
+assert.ok(!page.includes('<MathEq math="\\sqrt{"'), 'answer input must show an actual radical, not malformed KaTeX');
 
 function seeded(seed) {
   let state = seed >>> 0;
