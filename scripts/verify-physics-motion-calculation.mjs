@@ -66,6 +66,22 @@ const checks = {
     const [, constant, extension] = problem.question.match(/ばね定数 ([\d.]+) N\/m のばねを ([\d.]+) m/);
     return Math.abs(problem.answer - Number(constant) * Number(extension)) < 1e-12 && problem.unit === 'N';
   },
+  springSignedForce: problem => {
+    const [, constant, magnitude, direction] = problem.question.match(/ばね定数 ([\d.]+) N\/m のばねを自然長から ([\d.]+) m (伸ばした|縮めた)/);
+    const displacement = Number(magnitude) * (direction === '縮めた' ? -1 : 1);
+    const expected = -Number(constant) * displacement;
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'N'
+      && problem.question.includes('右向きを正')
+      && problem.explanation.includes(`F=−${constant}×(${displacement})=${formatMotionAnswer(expected)} N`);
+  },
+  springEnergy: problem => {
+    const [, constant, magnitude, direction] = problem.question.match(/ばね定数 ([\d.]+) N\/m のばねを自然長から ([\d.]+) m (伸ばした|縮めた)/);
+    const displacement = Number(magnitude) * (direction === '縮めた' ? -1 : 1);
+    const expected = 0.5 * Number(constant) * displacement ** 2;
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'J'
+      && problem.explanation.includes(`(${displacement})²=${formatMotionAnswer(expected)} J`)
+      && problem.explanation.includes('向きによらず0以上');
+  },
 };
 
 if (formatMotionAnswer(30.000000000000007) !== '30' || formatMotionAnswer(2.4492935982947064e-15) !== '0') {
@@ -132,4 +148,4 @@ for (let start = 0; start <= mixed.length - motionPatterns.length; start += 1) {
   if (new Set(mixed.slice(start, start + motionPatterns.length)).size !== motionPatterns.length) throw new Error(`mixed set omitted a mechanics pattern in batch ${start / motionPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mechanics practice repeated adjacent patterns');
-console.log('Physics mechanics verified: 5,400 fixed-pattern questions including projectile variants, and 900 mixed questions; formulas, units, answer keys, variants, balance, adjacency, and displayed rounding checked.');
+console.log('Physics mechanics verified: fixed-pattern questions including magnitude, signed restoring force, elastic potential energy, and projectile variants; 900 mixed questions; formulas, units, answer keys, variants, balance, adjacency, and displayed rounding checked.');
