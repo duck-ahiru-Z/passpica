@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { getCorrelationDirectionLabel } from '../src/lib/dataAnalysis2D.ts';
-import { isDataAnalysis2DAnswerCorrect } from '../src/lib/dataAnalysis2DAnswers.ts';
+import { buildCrossTableExplanation, isDataAnalysis2DAnswerCorrect } from '../src/lib/dataAnalysis2DAnswers.ts';
 
 const page = fs.readFileSync('src/app/learn/math/data-analysis-2d-drill/page.tsx', 'utf8');
 assert.ok(page.includes('getCorrelationDirectionLabel(rNum)'), 'scatter explanation must use the tested correlation classification');
@@ -14,6 +14,16 @@ for (const [answer, expected, result] of [
   ['Infinity', 'Infinity', false], ['NaN', 'NaN', false], ['.5', '0.5', true],
 ]) {
   assert.equal(isDataAnalysis2DAnswerCorrect(answer, expected), result, `answer validation failed for ${JSON.stringify(answer)}`);
+}
+
+for (const [targetCell, expected] of [
+  ['a', '[A] = 31 - 17 = 14'], ['b', '[A] = 31 - 14 = 17'],
+  ['c', '[A] = 27 - 14 = 13'], ['d', '[A] = 39 - 17 = 22'],
+]) {
+  const [formula] = buildCrossTableExplanation({
+    a: 14, b: 17, c: 13, d: 22, totA: 31, totB: 35, totC: 27, totD: 39, targetCell,
+  }).slice(1);
+  assert.equal(formula, expected, `wrong cross-table derivation for cell ${targetCell}`);
 }
 
 for (const [correlation, expected] of [

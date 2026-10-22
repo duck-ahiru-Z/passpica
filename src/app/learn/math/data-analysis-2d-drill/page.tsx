@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
-import { isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
+import { buildCrossTableExplanation, isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -193,10 +193,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       const qStr = `次のクロス集計表において、空欄 [ A ] に入る数値を求めよ。`;
       
-      const expLines = [
-        `\\text{表の縦と横の合計が一致することを利用します。}`,
-        `\\text{例えば、}[A]\\text{ を含む行または列の合計値から、他の数値を引くことで求まります。}`
-      ];
+      const tableData = { a, b, c, d, totA, totB, totC, totD, tot, targetCell };
+      const expLines = buildCrossTableExplanation(tableData);
       
       let ansStr = "";
       if (targetCell === 'a') ansStr = a.toString();
@@ -204,7 +202,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (targetCell === 'c') ansStr = c.toString();
       if (targetCell === 'd') ansStr = d.toString();
       
-      return { pattern: p, qStr, ans1: ansStr, tableData: { a,b,c,d, totA,totB,totC,totD, tot, targetCell }, expLines };
+      return { pattern: p, qStr, ans1: ansStr, tableData, expLines };
     }
   }
 }
