@@ -85,6 +85,10 @@ const learningPortal = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/p
 if (!/slug: 'concentration-visual'[\s\S]*?practiceLink: '\/learn\/chemistry\/mole-calculation-drill'/.test(learningPortal)) {
   throw new Error('molar concentration visual should link to its related calculation drill');
 }
+if (!drillPage.includes('href="/learn/chemistry/concentration-visual"')
+  || !drillPage.includes('モル濃度・希釈をビジュアルで確認')) {
+  throw new Error('mole calculation practice should link back to its molar concentration visual');
+}
 
 const mixed = Array.from({ length: 800 }, () => generateMoleProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += molePatterns.length) {
