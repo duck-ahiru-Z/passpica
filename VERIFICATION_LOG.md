@@ -102,6 +102,10 @@ Browser checks were performed on Vercel previews on 2026-10-23. Older entries us
 
 Earlier work in this thread also reports browser and focused automated checks for the projectile-motion visual, RLC circuit drill/visual, chemistry organic-structure visual/drill, and Calculus III differentiation/integral/curve-analysis drills. When changing those areas, consult their existing focused verifier before considering a new browser pass; do not treat these notes as a full audit of every existing question.
 
+- `/learn/math/derivative-graph` (preview `kim5t0zx4`): slider moved to x=1 and x=−1; displayed f(1)=−2, f′(1)=0 and f(−1)=2, f′(−1)=0 with the horizontal tangent at both stationary points. Screenshot checked curve, moving point, tangent, slider and page layout. | **Passed**; representative stationary values and visual synchronization checked.
+- `/learn/math/inscribed-circle-drill` (preview `kim5t0zx4`): selected fixed right-triangle pattern for sides 7,24,25; entered r=3, accepted. Explanation correctly calculated area 84 and r=2·84/(7+24+25)=3; triangle and incircle diagram rendered. Selector showed mixed mode and all four focused patterns. | **Passed**; one focused pattern, answer/explanation, diagram and selector checked.
+- `/learn/math/point-line-distance-drill` (preview `kim5t0zx4`): mixed question P=(−1,−2), 8x−15y−24=0 accepted 2/17. Verified the plotted line has positive slope 8/15 (matching the equation) and the perpendicular-distance explanation computes |−2|/17; screenshot checked the plot and formula. Selector exposes four focused patterns plus mixed mode. | **Passed**; mixed answer, derivation, plot and selector checked.
+
 ## Reopen criteria
 
 - A change touches the page, its generator/formula/answer checker, shared UI used by it, or its navigation/data dependencies.
