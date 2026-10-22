@@ -6,6 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
+import { isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -227,10 +228,7 @@ export default function DataAnalysis2DDrill() {
 
   const handleCheck = () => {
     if (!problem) return;
-    let isOk = false;
-    const actual = Number(ans1.trim().replaceAll(',', ''));
-    const expected = Number(problem.ans1);
-    if (Number.isFinite(actual) && Number.isFinite(expected) && Math.abs(actual - expected) < 1e-9) isOk = true;
+    const isOk = isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? '');
     
     setIsCorrect(isOk);
     setHasChecked(true);
@@ -336,6 +334,7 @@ export default function DataAnalysis2DDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="2変量データ分析の演習パターン"
                 value={selectedPattern}
                 onChange={e => {
                   const nextPattern = e.target.value as Pattern | 'mix';
