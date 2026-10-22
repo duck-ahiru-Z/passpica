@@ -86,6 +86,7 @@ const page = fs.readFileSync('src/app/learn/math/base-n-conversion-drill/page.ts
 for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `${pattern} must remain independently selectable`);
 assert.ok(page.includes('generateBaseNProblem'), 'the UI must call the tested production generator');
 assert.ok(page.includes('ansVal.trim() === problem.a_val'), 'answers must be checked against the generated conversion result');
+assert.ok(page.includes('aria-label="変換した数値の答え"'), 'the answer input must have an accessible name');
 assert.ok(page.includes('mulSteps.map(s =>'), 'fractional conversion explanation must show its repeated-multiplication steps');
 assert.ok(!page.includes('\\cline'), 'KaTeX explanations must not contain unsupported cline commands');
 
