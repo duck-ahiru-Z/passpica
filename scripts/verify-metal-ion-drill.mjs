@@ -4,7 +4,7 @@ import path from 'node:path';
 import { generateMetalIonProblem, metalIonPatterns } from '../src/lib/metalIonDrill.ts';
 import { generateFlameReactionProblem } from '../src/lib/flameReactionDrill.ts';
 
-const expectedAnswers = ['Ag⁺・Pb²⁺', 'Cu²⁺', 'Fe³⁺・Al³⁺', 'Zn²⁺', 'Ca²⁺', '炎色反応・黄色'];
+const expectedAnswers = ['Ag⁺・Pb²⁺', 'AgCl残渣・PbCl₂再沈殿', 'Cu²⁺', 'Fe³⁺・Al³⁺', 'Zn²⁺', 'Ca²⁺', '炎色反応・黄色'];
 for (const [index, pattern] of metalIonPatterns.entries()) {
   const problem = generateMetalIonProblem(pattern);
   assert.equal(problem.pattern, pattern);
@@ -14,6 +14,9 @@ for (const [index, pattern] of metalIonPatterns.entries()) {
 const acidicSulfideProblem = generateMetalIonProblem('acidicSulfide');
 assert.match(acidicSulfideProblem.explanation, /Fe³⁺はH₂Sに還元されてFe²⁺となり/);
 assert.match(acidicSulfideProblem.explanation, /硝酸でFe³⁺へ酸化してから/);
+const leadChlorideProblem = generateMetalIonProblem('leadChloride');
+assert.match(leadChlorideProblem.prompt, /熱水を加えてろ過/);
+assert.match(leadChlorideProblem.explanation, /冷却するとPbCl₂が白色結晶として再び析出/);
 assert.equal(generateFlameReactionProblem('Na').color, '黄色', 'final Na+ identification should agree with the flame visual');
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/metal-ion-drill/page.tsx'), 'utf8');
 for (const answer of expectedAnswers) {
@@ -27,7 +30,7 @@ assert.match(drillPage, /setAnswer\(''\);\s*setChecked\(false\);/, 'next questio
 assert.match(drillPage, /<input type="radio" name="metal-ion-answer"/, 'answer choices should be a single-choice radio group');
 const counts = Object.fromEntries(metalIonPatterns.map(pattern => [pattern, 0]));
 let previous = '';
-const sampleCount = 12000;
+const sampleCount = 14000;
 for (let index = 0; index < sampleCount; index += 1) {
   const problem = generateMetalIonProblem('mix');
   counts[problem.pattern] += 1;
@@ -36,4 +39,4 @@ for (let index = 0; index < sampleCount; index += 1) {
   previous = problem.pattern;
 }
 for (const pattern of metalIonPatterns) assert.equal(counts[pattern], sampleCount / metalIonPatterns.length);
-console.log(`Metal-ion drill verified: six fixed stages and ${sampleCount} balanced mixed questions (${JSON.stringify(counts)}).`);
+console.log(`Metal-ion drill verified: seven fixed stages and ${sampleCount} balanced mixed questions (${JSON.stringify(counts)}).`);
