@@ -20,7 +20,7 @@ const CONTENTS: LearningContent[] = [
   {
     slug: 'mathbc-mixed-drill', subject: 'math', subjectJp: '数学B・C', field: '数学B・C総合（解法選択）',
     title: '数学B・C 総合・解法選択ランダムドリル',
-    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式を、分野固定または全体ランダムで練習。',
+    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式・統計的な推測を、分野固定または全体ランダムで練習。',
     difficulty: '標準', type: '無限計算ドリル', link: '/learn/math/mathbc-mixed-drill'
   },
 

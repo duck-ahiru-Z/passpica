@@ -40,6 +40,12 @@ const requiredVisuals = [
 ];
 
 const drillEntries = readPortalEntries(drill);
+const mathBcCardIndex = drill.indexOf("slug: 'mathbc-mixed-drill'");
+const mathBcCardEnd = drill.indexOf('\n  },', mathBcCardIndex);
+const mathBcCard = drill.slice(drill.lastIndexOf('  {', mathBcCardIndex), mathBcCardEnd);
+if (!mathBcCard.includes('統計的な推測') || !mathBcCard.includes('全体ランダム')) {
+  throw new Error('The Math B/C portal card must include Statistics and advertise its mixed-practice mode.');
+}
 const practiceModeDescriptions = [
   'calculus-drill', 'symmetric-polynomial-drill', 'circle-tangent-drill',
   'completing-square-drill', 'quadratic-equation-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
