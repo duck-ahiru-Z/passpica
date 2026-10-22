@@ -5,9 +5,9 @@ export type MetalIonMode = MetalIonPattern | 'mix';
 export type MetalIonProblem = { pattern: MetalIonPattern; prompt: string; answer: string; explanation: string };
 export const metalIonPatterns: readonly MetalIonPattern[] = ['chlorides', 'leadChloride', 'acidicSulfide', 'excessAmmonia', 'basicSulfide', 'carbonate', 'flameTest'];
 export const metalIonLabels: Record<MetalIonPattern, string> = {
-  chlorides: '希塩酸で塩化物を沈殿', leadChloride: '熱水でAgClとPbCl₂を分離', acidicSulfide: '酸性下で硫化物を沈殿',
-  excessAmmonia: '過剰アンモニア水で水酸化物を分離', basicSulfide: '塩基性下で硫化物を沈殿',
-  carbonate: '炭酸イオンでカルシウムを分離', flameTest: '残ったNa⁺を炎色反応で確認',
+  chlorides: '希塩酸による塩化物沈殿', leadChloride: '熱水によるAgCl・PbCl₂の分離', acidicSulfide: '酸性条件での硫化物沈殿',
+  excessAmmonia: '過剰アンモニア水での水酸化物分離', basicSulfide: '塩基性条件での硫化物沈殿',
+  carbonate: '炭酸イオンによるCa²⁺の分離', flameTest: '残留Na⁺の炎色反応確認',
 };
 const problems: Record<MetalIonPattern, MetalIonProblem> = {
   chlorides: { pattern: 'chlorides', prompt: '対象イオン Ag⁺・Pb²⁺・Cu²⁺・Fe³⁺・Al³⁺・Zn²⁺・Ca²⁺・Na⁺ を含む溶液に、希塩酸を加える。沈殿するイオンはどれか。', answer: 'Ag⁺・Pb²⁺', explanation: 'AgClとPbCl₂はいずれも白色沈殿になります。このモデルではCu²⁺以下のイオンは濾液に残ります。' },

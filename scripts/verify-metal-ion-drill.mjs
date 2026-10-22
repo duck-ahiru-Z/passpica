@@ -1,14 +1,16 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateMetalIonProblem, metalIonPatterns } from '../src/lib/metalIonDrill.ts';
+import { generateMetalIonProblem, metalIonLabels, metalIonPatterns } from '../src/lib/metalIonDrill.ts';
 import { generateFlameReactionProblem } from '../src/lib/flameReactionDrill.ts';
 
 const expectedAnswers = ['Ag⁺・Pb²⁺', 'AgCl残渣・PbCl₂再沈殿', 'Cu²⁺', 'Fe³⁺・Al³⁺', 'Zn²⁺', 'Ca²⁺', '炎色反応・黄色'];
+const expectedLabels = ['希塩酸による塩化物沈殿', '熱水によるAgCl・PbCl₂の分離', '酸性条件での硫化物沈殿', '過剰アンモニア水での水酸化物分離', '塩基性条件での硫化物沈殿', '炭酸イオンによるCa²⁺の分離', '残留Na⁺の炎色反応確認'];
 for (const [index, pattern] of metalIonPatterns.entries()) {
   const problem = generateMetalIonProblem(pattern);
   assert.equal(problem.pattern, pattern);
   assert.equal(problem.answer, expectedAnswers[index]);
+  assert.equal(metalIonLabels[pattern], expectedLabels[index]);
   assert.ok(problem.explanation.length > 10);
 }
 const acidicSulfideProblem = generateMetalIonProblem('acidicSulfide');
