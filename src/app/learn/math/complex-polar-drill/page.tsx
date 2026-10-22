@@ -110,11 +110,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay.includes("/")) {
         const pts = thDisplay.split("/");
-        thDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
+        thDisplay = `\\frac{${pts[1]}}{${pts[0]}}`;
       }
       
       const expLines = [
-        `r = \\sqrt{(${finalXS})^2 + (${finalYS})^2} = ${rStr}`,
+        `r = \\sqrt{${finalXS.startsWith('-') ? `(${finalXS})` : finalXS}^2 + ${finalYS.startsWith('-') ? `(${finalYS})` : finalYS}^2} = ${rStr}`,
         `\\cos\\theta = \\frac{${finalXS}}{${rStr}}, \\quad \\sin\\theta = \\frac{${finalYS}}{${rStr}}`,
         `0 \\le \\theta < 2\\pi \\text{ の範囲でこれを満たす } \\theta \\text{ は } ${thDisplay}`,
         `\\text{よって極形式は } z = ${rStr}\\left(\\cos ${thDisplay} + i\\sin ${thDisplay}\\right)`
@@ -139,7 +139,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (thDisplay === "0") thDisplay = "0";
       else if (thDisplay.includes("/")) {
         const pts = thDisplay.split("/");
-        thDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
+        thDisplay = `\\frac{${pts[1]}}{${pts[0]}}`;
       }
       
       const expLines = [
@@ -232,7 +232,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (finalThDisplay.startsWith("1\\pi")) finalThDisplay = finalThDisplay.replace("1\\pi", "\\pi");
       if (finalThDisplay.includes("/")) {
         const pts = finalThDisplay.split("/");
-        finalThDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
+        finalThDisplay = `\\frac{${pts[1]}}{${pts[0]}}`;
       }
       if (finalThDisplay === "0") finalThDisplay = "0";
 

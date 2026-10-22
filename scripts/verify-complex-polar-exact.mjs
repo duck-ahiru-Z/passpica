@@ -71,6 +71,9 @@ assert.match(page, /ansA = formatExactTrigComponent\(rRes, cosVal\)/);
 assert.match(page, /ansB = formatExactTrigComponent\(rRes, sinVal\)/);
 assert.match(page, /const thStr = formatPolarAngle\(thRes\)/);
 assert.match(page, /getSupportedPolarAnglePairs\(isProduct \? 'sum' : 'difference'\)/);
+assert.match(page, /\\frac\{\$\{pts\[1\]\}\}\{\$\{pts\[0\]\}\}/, 'fractional polar angles must render numerator over denominator');
+assert.match(page, /finalXS\.startsWith\('-'\) \? `\(\$\{finalXS\}\)` : finalXS/,
+  'negative rectangular components must be grouped before squaring');
 assert.match(page, /\[signX, signY\] = getUniformNonFirstQuadrantSigns\(\)/);
 assert.match(page, /type Pattern = 'pattern1' \| 'pattern2' \| 'pattern3' \| 'pattern4-product' \| 'pattern4-quotient'/);
 assert.match(page, /基礎練習：極形式の積だけ/);
