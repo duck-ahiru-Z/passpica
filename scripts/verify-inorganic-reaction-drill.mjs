@@ -1,10 +1,16 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateInorganicProblem, inorganicPatterns } from '../src/lib/inorganicReactionDrill.ts';
+import { generateInorganicProblem, inorganicPatternLabels, inorganicPatterns } from '../src/lib/inorganicReactionDrill.ts';
 import { generateFlameReactionProblem } from '../src/lib/flameReactionDrill.ts';
 
 assert.equal(inorganicPatterns.length, 15);
+const expectedPatternLabels = [
+  'Cu²⁺へのNH₃水の少量添加', 'Cu²⁺へのNH₃水の過剰添加', 'Al³⁺へのNaOHの少量添加', 'Al³⁺へのNaOHの過剰添加',
+  'Zn²⁺へのNaOHの少量添加', 'Zn²⁺へのNaOHの過剰添加', 'Ag⁺へのNH₃水の少量添加', 'Ag⁺へのNH₃水の過剰添加',
+  'Pb²⁺へのKI添加', 'Zn²⁺の酸性条件下でのH₂S反応', 'Zn²⁺の塩基性条件下でのH₂S反応', 'Fe³⁺の酸性条件下でのH₂S反応',
+  'Fe³⁺の塩基性条件下でのH₂S反応', 'Fe³⁺へのKI添加', 'Cu²⁺へのKI添加',
+];
 const visual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors/page.tsx'), 'utf8');
 assert.ok(visual.includes('15条件の個別練習と全パターンランダム'), 'the visual should advertise the current number of fixed reaction conditions');
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/inorganic-colors-drill/page.tsx'), 'utf8');
@@ -48,6 +54,9 @@ for (const pattern of inorganicPatterns) {
   assert.ok(visual.includes(visualReactionEvidence[pattern]), `${pattern} must match an exact reaction represented in the simulator`);
   assert.ok(problem.formula.includes(drillEquationEvidence[pattern]), `${pattern} equation must match the simulator's reaction`);
   outcomes.add(problem.answer);
+}
+for (const [index, pattern] of inorganicPatterns.entries()) {
+  assert.equal(inorganicPatternLabels[pattern], expectedPatternLabels[index], `${pattern} must have a grammatical practice label`);
 }
 assert.ok(outcomes.size >= 10, 'distinct visible reaction outcomes should remain represented');
 assert.equal(generateFlameReactionProblem('Li').color, '赤色');
