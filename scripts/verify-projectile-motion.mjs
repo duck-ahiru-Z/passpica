@@ -56,6 +56,13 @@ if (!visualPage.includes('href="/learn/physics/motion-calculation-drill"') || !v
 assert.ok(visualPage.includes('Math.abs(vy) >= 0.01 ? <line') && visualPage.includes('sy(displayedY) + 30'), 'zero vertical speed should hide the velocity arrow and show a separate downward gravity arrow');
 assert.ok(visualPage.includes('Math.min(48, Math.max(18, Math.abs(vy) * 2.5))') && visualPage.includes('Math.sign(vy) * verticalVelocityArrowLength'), 'nonzero vertical velocity arrows should remain visible and follow the velocity sign');
 assert.ok(visualPage.includes('const H = 350;') && visualPage.includes('H - 62 - (value / (maxHeight + 3)) * (H - 95)'), 'the plot must reserve bottom space without changing its plotted y-scale');
+assert.ok(visualPage.includes('H - 62 - (py / (maxHeight + 3)) * (H - 95)'), 'trajectory must use the same vertical scale as the axes and projectile marker');
+const groundY = 350 - 62;
+for (let angleDeg = 0; angleDeg <= 75; angleDeg += 5) {
+  const landing = calculateProjectileState(angleDeg, 1);
+  const plottedLandingY = 350 - 62 - (Math.max(0, landing.y) / (landing.maxHeight + 3)) * (350 - 95);
+  close(plottedLandingY, groundY, `trajectory ground alignment at ${angleDeg}°`);
+}
 assert.ok(visualPage.includes('width={W} height={H}'), 'the plot clip region must include the reserved arrow margin below ground');
 assert.ok(visualPage.includes("Math.abs(vy) < 0.01 ? '—'"), 'zero velocity should not be labeled with a false up/down direction');
 assert.ok(visualPage.includes('id="vertical-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z"'), 'vertical-vector arrowhead should point along its line after automatic rotation');

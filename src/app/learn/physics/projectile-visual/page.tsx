@@ -29,7 +29,7 @@ export default function ProjectileVisualPage() {
     const t = flightTime * index / 60;
     const px = vx0 * t;
     const py = Math.max(0, projectileInitialHeight + vy0 * t - 0.5 * projectileGravity * t * t);
-    return `${index === 0 ? 'M' : 'L'} ${55 + (px / (maxX + 4)) * (W - 90)} ${H - 42 - (py / (maxHeight + 3)) * (H - 75)}`;
+    return `${index === 0 ? 'M' : 'L'} ${55 + (px / (maxX + 4)) * (W - 90)} ${H - 62 - (py / (maxHeight + 3)) * (H - 95)}`;
   }).join(' '), [flightTime, vx0, vy0, maxX, maxHeight]);
 
   return (
