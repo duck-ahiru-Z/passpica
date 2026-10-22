@@ -57,4 +57,5 @@ assert.ok(visualPage.includes("Math.abs(vy) < 0.01 ? '—'"), 'zero velocity sho
 assert.ok(visualPage.includes('id="vertical-arrow" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z"'), 'vertical-vector arrowhead should point along its line after automatic rotation');
 assert.ok(visualPage.includes('↓ 重力加速度 g = {projectileGravity} m/s²'), 'zero-speed state should label the acceleration separately from velocity');
 assert.ok(visualPage.includes('重力加速度は下向き'), 'the accessible diagram description should distinguish zero velocity from downward acceleration');
+assert.ok(visualPage.includes('setAngleDeg(Number(event.target.value)); setTimeFraction(1);'), 'changing launch angle should reset the timeline to the new trajectory landing point');
 console.log('Projectile motion verified: 16 launch angles × 101 timeline positions, launch/apex/landing conditions, and input bounds.');
