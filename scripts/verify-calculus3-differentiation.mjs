@@ -45,8 +45,11 @@ const checks = {
       && problem.explanation.includes(problem.answer.toFixed(3));
   },
   logarithmic: problem => {
-    const [, a] = problem.expression.match(/y=x\^\{(\d+)x\}/);
-    return problem.answer === Number(a) && problem.explanation.includes('対数微分');
+    const [, aText] = problem.expression.match(/y=x\^\{(?:(\d+)x|x)\}/);
+    const a = Number(aText ?? 1);
+    return problem.answer === a && problem.explanation.includes('対数微分')
+      && !problem.expression.includes('1x') && !problem.explanation.includes('x^(1x)')
+      && (a !== 1 || (problem.expression.includes('y=x^{x}') && !problem.explanation.includes('·1(')));
   },
   parametric: problem => {
     const [, c] = problem.expression.match(/y=t\^3-(\d+)t/);
@@ -76,8 +79,10 @@ const checks = {
       && problem.explanation.includes(problem.answer.toFixed(3));
   },
   inverse: problem => {
-    const [, a] = problem.expression.match(/f\(x\)=x\^3\+(\d+)x/);
-    return close(problem.answer, 1 / (Number(a) + 3))
+    const [, aText] = problem.expression.match(/f\(x\)=x\^3\+(?:(\d+)x|x)/);
+    const a = Number(aText ?? 1);
+    return close(problem.answer, 1 / (a + 3))
+      && !problem.expression.includes('+1x')
       && problem.expression.includes('g=f^{-1}')
       && problem.explanation.includes('逆関数の微分公式');
   },

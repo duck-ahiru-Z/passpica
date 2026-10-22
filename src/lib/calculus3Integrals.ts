@@ -24,7 +24,6 @@ export function getIntegralExplanation(problem: IntegralProblem, strategy: Integ
   return (strategy && problem.alternativeStrategies?.[strategy]) || problem.explanation;
 }
 
-const picker = new BalancedRandom(integralPatterns);
 const variants = {
   'power-area': new BalancedRandom([0.5, 1, 1.5, 2, 2.5]),
   substitution: new BalancedRandom([2, 3, 4, 5]),
@@ -34,8 +33,17 @@ const variants = {
   radical: new BalancedRandom([2, 3, 4, 5, 6]),
 };
 
-export function generateIntegralProblem(mode: IntegralMode, random = Math.random): IntegralProblem {
-  const pattern = mode === 'mix' ? picker.next(random) : mode;
+export function createIntegralProblemPicker() {
+  const patternPicker = new BalancedRandom(integralPatterns);
+  return {
+    next(mode: IntegralMode = 'mix', random = Math.random): IntegralProblem {
+      return generateIntegralProblem(mode, random, patternPicker);
+    },
+  };
+}
+
+export function generateIntegralProblem(mode: IntegralMode, random = Math.random, patternPicker = new BalancedRandom(integralPatterns)): IntegralProblem {
+  const pattern = mode === 'mix' ? patternPicker.next(random) : mode;
   const power = pattern === 'substitution' ? variants.substitution.next(random) : 2;
   const rate = pattern === 'parts' ? variants.parts.next(random) : 1;
   const { a: partialA, b: partialB } = pattern === 'rational' ? variants.rational.next(random) : { a: 1, b: 1 };

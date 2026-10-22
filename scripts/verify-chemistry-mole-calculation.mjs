@@ -37,19 +37,22 @@ const checks = {
     return Math.abs(problem.answer - (Number(amount) * Number(targetCoefficient)) / Number(sourceCoefficient)) < 1e-12;
   },
   'limiting-reagent': problem => {
-    const match = problem.explanation.match(/([\d.]+)\/(\d+)=([\d.]+)、.*?([\d.]+)\/(\d+)=([\d.]+)。小さい (.+?) が制限試薬です。.*?生成量は ([\d.]+)×(\d+)=([\d.]+) mol。/);
+    const match = problem.explanation.match(/([\d.]+)\/(\d+)=([\d.]+)、.*?([\d.]+)\/(\d+)=([\d.]+)。([\s\S]*?)生成量は ([\d.]+)×(\d+)=([\d.]+) mol。/);
     if (!match) return false;
-    const [, amountA, coefficientA, ratioA, amountB, coefficientB, ratioB, limitingReactant, limitingAmount, productCoefficient, answer] = match;
+    const [, amountA, coefficientA, ratioA, amountB, coefficientB, ratioB, limitingExplanation, limitingAmount, productCoefficient, answer] = match;
     const expectedRatioA = Number(amountA) / Number(coefficientA);
     const expectedRatioB = Number(amountB) / Number(coefficientB);
     const minimum = Math.min(expectedRatioA, expectedRatioB);
-    const expectedLimitingReactant = expectedRatioA <= expectedRatioB
+    const equalRatios = Math.abs(expectedRatioA - expectedRatioB) < 1e-12;
+    const expectedLimitingReactant = expectedRatioA < expectedRatioB
       ? problem.question.match(/。(.+?) [\d.]+ mol と/)?.[1]
       : problem.question.match(/と (.+?) [\d.]+ mol を/)?.[1];
     return Math.abs(Number(ratioA) - expectedRatioA) < 1e-12
       && Math.abs(Number(ratioB) - expectedRatioB) < 1e-12
       && Math.abs(Number(limitingAmount) - minimum) < 1e-12
-      && limitingReactant === expectedLimitingReactant
+      && (equalRatios
+        ? limitingExplanation.includes('両方とも過不足なく反応する共制限試薬です。')
+        : limitingExplanation.includes(`小さい ${expectedLimitingReactant} が制限試薬です。`))
       && Math.abs(problem.answer - minimum * Number(productCoefficient)) < 1e-12
       && Math.abs(Number(answer) - problem.answer) < 1e-12;
   },
@@ -71,7 +74,8 @@ for (const pattern of molePatterns) {
     if (problem.pattern !== pattern || problem.unit !== expectedUnits[pattern] || !checks[pattern](problem)) throw new Error(`formula, unit, or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     variants.add(problem.question);
   }
-  if (variants.size !== 5) throw new Error(`${pattern} generated ${variants.size}/5 expected variants`);
+  const expectedVariants = pattern === 'limiting-reagent' ? 6 : 5;
+  if (variants.size !== expectedVariants) throw new Error(`${pattern} generated ${variants.size}/${expectedVariants} expected variants`);
 }
 
 if (formatMoleAnswer(0.30000000000000004) !== '0.3') throw new Error('answer feedback should show a readable rounded value');
@@ -84,6 +88,10 @@ if (isMoleAnswerCorrect('', 1) || isMoleAnswerCorrect('Infinity', 1)) throw new 
 const learningPortal = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/page.tsx'), 'utf8');
 if (!/slug: 'concentration-visual'[\s\S]*?practiceLink: '\/learn\/chemistry\/mole-calculation-drill'/.test(learningPortal)) {
   throw new Error('molar concentration visual should link to its related calculation drill');
+}
+if (!drillPage.includes('href="/learn/chemistry/concentration-visual"')
+  || !drillPage.includes('モル濃度・希釈をビジュアルで確認')) {
+  throw new Error('mole calculation practice should link back to its molar concentration visual');
 }
 
 const mixed = Array.from({ length: 800 }, () => generateMoleProblem('mix', stableRandom).pattern);

@@ -207,6 +207,7 @@ export default function LinearDiophantineDrill() {
                 <MathEq math="x =" />
                 <input 
                   type="number" 
+                  aria-label="整数解の x の値"
                   className="w-20 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansX} 
                   onChange={e => { setAnsX(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -215,6 +216,7 @@ export default function LinearDiophantineDrill() {
                 <MathEq math="y =" />
                 <input 
                   type="number" 
+                  aria-label="整数解の y の値"
                   className="w-20 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansY} 
                   onChange={e => { setAnsY(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -259,6 +261,7 @@ export default function LinearDiophantineDrill() {
                 ref={canvasRef} 
                 width={360} 
                 height={200} 
+                role="img"
                 aria-label={`格子点を示す直線 ${problem.A}x ${problem.B > 0 ? '+' : ''}${problem.B}y = ${problem.C}。既知の解(${problem.x0},${problem.y0})から(B,-A)=(${problem.B},${-problem.A})ずつ移動した整数解を描いています。`}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />

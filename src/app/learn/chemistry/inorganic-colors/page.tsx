@@ -670,6 +670,14 @@ export default function InorganicColorsPage() {
 
       </div>
 
+      <section className="retro-box flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h2 className="font-bold">反応条件を自分で判断する</h2>
+          <p className="text-slate-600">シミュレーターで色と沈殿を確認したら、15条件の個別練習と全パターンランダムに挑戦できます。</p>
+        </div>
+        <Link href="/learn/chemistry/inorganic-colors-drill" className="retro-btn-classic">無機イオン反応ドリルへ →</Link>
+      </section>
+
     </div>
   );
 }

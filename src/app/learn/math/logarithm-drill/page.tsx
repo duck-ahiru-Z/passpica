@@ -117,6 +117,7 @@ export default function LogarithmDrill() {
                 </div>
                 <input 
                   type="text" 
+                  aria-label="対数計算の答え"
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
                   onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}

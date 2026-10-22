@@ -7,8 +7,23 @@ import {
 } from '../src/lib/rlcCalculationDrill.ts';
 
 const page = readFileSync('src/app/learn/physics/ac-circuit-drill/page.tsx', 'utf8');
+const visualPage = readFileSync('src/app/learn/physics/ac-circuit/page.tsx', 'utf8');
 const learningPortal = readFileSync('src/app/learn/page.tsx', 'utf8');
 const drillPortal = readFileSync('src/app/drill/page.tsx', 'utf8');
+const packageScripts = JSON.parse(readFileSync('package.json', 'utf8')).scripts;
+if (!packageScripts['test:rlc-calculation-drill']?.includes('verify-rlc-calculation-drill.mjs')) {
+  throw new Error('RLC calculation drill verifier must be available as a dedicated npm script');
+}
+for (const requirement of [
+  'aria-label="計算結果"',
+  'name="rlc-method"',
+  'role="status" aria-live="polite"',
+  'method === problem.pattern && isRlcCalculationAnswerCorrect(answer, problem.answer)',
+  '計算方法は「${rlcCalculationLabels[problem.pattern]}」、正解は ${formatRlcCalculationAnswer(problem.answer)} ${problem.unit} です。',
+  '<span className="ml-2 font-bold">{problem.unit}</span>',
+]) {
+  if (!page.includes(requirement)) throw new Error(`RLC calculation drill UI is missing required behavior: ${requirement}`);
+}
 if (!page.includes('実戦練習：交流回路 全パターンランダム') || !page.includes("mode === 'mix' ?")
   || !page.includes('基礎練習：{rlcCalculationLabels[mode]}に固定して繰り返します。')) {
   throw new Error('RLC drill must offer both method-specific practice and mixed method selection');
@@ -16,6 +31,9 @@ if (!page.includes('実戦練習：交流回路 全パターンランダム') ||
 if (!learningPortal.includes("practiceLink: '/learn/physics/ac-circuit-drill'")
   || !drillPortal.includes("link: '/learn/physics/ac-circuit-drill'")) {
   throw new Error('RLC visual and drill must both be linked from their portals');
+}
+if (!visualPage.includes('href="/learn/physics/ac-circuit-drill"') || !visualPage.includes('交流回路の計算問題で練習する')) {
+  throw new Error('RLC visual must link directly to its focused and mixed calculation drill');
 }
 
 const stableRandom = (() => {

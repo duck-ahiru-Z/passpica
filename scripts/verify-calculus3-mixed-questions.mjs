@@ -20,15 +20,30 @@ if (!drillPage.includes("mode === 'all' ? '解法選択' : '方針を選択'")) 
 if (drillPage.includes('aria-pressed=') || drillPage.includes('question.options.map(option => <button')) {
   throw new Error('single-choice method selection must be exposed as a radio group');
 }
+if (drillPage.includes('数式: ${math.replace') || /markup\.replace\('<span class="katex">'.*aria-hidden/.test(drillPage)) {
+  throw new Error('mixed-drill math must preserve KaTeX MathML instead of exposing a lossy flattened TeX label');
+}
 
-const validateQuestion = question => {
+const validateQuestion = (question, allMode = false) => {
   if (!areas.includes(question.area) || question.areaLabel !== areaLabels[question.area]) throw new Error(`invalid area metadata: ${JSON.stringify(question)}`);
   if (!question.pattern.startsWith(`${question.area}:`)) throw new Error(`pattern is not linked to its area: ${question.pattern}`);
   if (!question.prompt.trim() || !question.explanation.trim() || !question.expression.trim()) throw new Error(`question content must not be empty: ${question.pattern}`);
-  if (question.options.length !== patternCounts[question.area] || new Set(question.options).size !== question.options.length) throw new Error(`unexpected unique options for ${question.pattern}`);
+  const expectedOptionCount = allMode ? areas.length + (question.acceptedAnswers?.length ?? 1) : patternCounts[question.area];
+  if (question.options.length !== expectedOptionCount || new Set(question.options).size !== question.options.length) throw new Error(`unexpected unique options for ${question.pattern}`);
   if (question.options.filter(option => option === question.answer).length !== 1) throw new Error(`answer must occur exactly once for ${question.pattern}`);
   for (const answer of question.acceptedAnswers ?? [question.answer]) {
     if (!question.options.includes(answer)) throw new Error(`accepted method is missing from the options for ${question.pattern}: ${answer}`);
+  }
+  if (allMode) {
+    const countsByArea = new Map(areas.map(area => [area, question.options.filter(option => option.startsWith(`${areaLabels[area]}：`)).length]));
+    for (const area of areas) {
+      const expectedCount = area === question.area ? (question.acceptedAnswers?.length ?? 1) + 1 : 1;
+      if (countsByArea.get(area) !== expectedCount) throw new Error(`all-mode choices must cover every Math III area with plausible same-area alternatives: ${question.pattern}`);
+    }
+    if (!question.answer.startsWith(`${question.areaLabel}：`)
+      || (question.acceptedAnswers ?? []).some(answer => !answer.startsWith(`${question.areaLabel}：`))) {
+      throw new Error(`all-mode answers must identify both the area and the strategy: ${question.pattern}`);
+    }
   }
   if (question.pattern === 'geometry:x-axis-rotation' && !question.prompt.includes('xで積分')) throw new Error('x-axis disk-method prompts must specify integration with respect to x');
   if (question.pattern === 'geometry:y-axis-rotation' && !question.prompt.includes('yで積分')) throw new Error('y-axis washer-method prompts must specify integration with respect to y');
@@ -38,12 +53,19 @@ const validateQuestion = question => {
 
 const allPicker = createCalculus3MixedQuestionPicker();
 const allQuestions = Array.from({ length: 1_002 }, () => allPicker.next('all'));
-for (const question of allQuestions) validateQuestion(question);
+for (const question of allQuestions) validateQuestion(question, true);
 const allPatterns = new Map(areas.map(area => [area, new Set()]));
 for (const question of allQuestions) allPatterns.get(question.area).add(question.pattern);
 for (let index = 0; index < allQuestions.length; index += areas.length) {
   const batch = allQuestions.slice(index, index + areas.length);
   if (new Set(batch.map(question => question.area)).size !== areas.length) throw new Error(`all-range batch ${index / areas.length} did not evenly mix all six areas`);
+}
+for (let index = 0; index < allQuestions.length; index += areas.length + 1) {
+  const batch = allQuestions.slice(index, index + areas.length + 1);
+  const correctPositions = batch.map(question => question.options.indexOf(question.answer));
+  if (batch.length === areas.length + 1 && new Set(correctPositions).size !== correctPositions.length) {
+    throw new Error(`all-mode answer positions were not balanced in batch ${index / (areas.length + 1)}`);
+  }
 }
 for (const area of areas) {
   if (allPatterns.get(area).size !== patternCounts[area]) throw new Error(`${area} exposes ${allPatterns.get(area).size}/${patternCounts[area]} lower-level patterns in the full-range picker`);
@@ -53,7 +75,8 @@ const geometryPicker = createCalculus3MixedQuestionPicker();
 const geometryQuestions = Array.from({ length: 500 }, () => geometryPicker.next('geometry'));
 const washerQuestion = geometryQuestions.find(question => question.pattern === 'geometry:y-axis-rotation');
 const shellQuestion = geometryQuestions.find(question => question.pattern === 'geometry:shell-method');
-if (!washerQuestion || !shellQuestion) throw new Error('geometry mode must generate both y-axis rotation patterns');
+const diskVolumeQuestion = geometryQuestions.find(question => question.pattern === 'geometry:disk-volume');
+if (!washerQuestion || !shellQuestion || !diskVolumeQuestion) throw new Error('geometry mode must generate y-axis rotation and y=x² disk-volume patterns');
 for (const question of [washerQuestion, shellQuestion]) {
   const expectedMethods = question.pattern === 'geometry:y-axis-rotation'
     ? ['y軸回転体の体積（円環法）', 'y軸回転体の体積（円筒殻法）']
@@ -64,6 +87,11 @@ for (const question of [washerQuestion, shellQuestion]) {
   if (expectedMethods.slice(1).some(method => !question.alternativeExplanations?.[method]?.trim())) {
     throw new Error(`${question.pattern} must explain each valid alternate method`);
   }
+}
+if (!diskVolumeQuestion.acceptedAnswers?.includes('x軸回転体の体積（円板法）')
+  || !diskVolumeQuestion.options.includes('x軸回転体の体積（円板法）')
+  || !diskVolumeQuestion.alternativeExplanations?.['x軸回転体の体積（円板法）']?.includes('円板法')) {
+  throw new Error('Math III mixed practice must accept and explain the general disk method for the y=x² rotation-volume problem');
 }
 
 const integralPicker = createCalculus3MixedQuestionPicker();
@@ -100,7 +128,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
   };
   const picker = createCalculus3MixedQuestionPicker();
   const questions = Array.from({ length: 504 }, () => picker.next('all', random));
-  for (const question of questions) validateQuestion(question);
+  for (const question of questions) validateQuestion(question, true);
   for (let index = 0; index < questions.length; index += areas.length) {
     if (new Set(questions.slice(index, index + areas.length).map(question => question.area)).size !== areas.length) {
       throw new Error(`seed ${seed} failed to include every area in a six-question batch`);

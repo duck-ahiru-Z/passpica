@@ -58,6 +58,9 @@ export default function CrystalLatticePage() {
         <p className="text-xs text-gray-500 mt-1">
           金属結晶の代表的な単位格子（体心立方・面心立方）の立体配置と、計算問題の第一歩となる原子の接触断面図を示します。
         </p>
+        <Link href="/learn/chemistry/crystal-lattice-drill" className="retro-btn-classic inline-flex mt-3">
+          結晶格子の計算問題で練習する →
+        </Link>
       </div>
 
       {/* タブ切り替え */}

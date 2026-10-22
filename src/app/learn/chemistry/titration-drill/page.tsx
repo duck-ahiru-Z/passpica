@@ -27,7 +27,7 @@ export default function TitrationDrillPage() {
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">化学 中和滴定・濃度計算ドリル</h1>
     <p className="text-gray-600 mb-6">中和点での物質量比を反応式の係数から判断します。価数ごとの基礎練習と、解法を選ぶ全パターン混合を切り替えられます。</p>
-    <Link href="/learn/chemistry/acid-base" className="retro-btn-classic inline-flex mb-4">酸塩基指示薬の色変化をビジュアルで確認 →</Link>
+    <div className="mb-4 flex flex-wrap gap-2"><Link href="/learn/chemistry/titration-visual" className="retro-btn-classic inline-flex">中和点とpH変化をビジュアルで確認 →</Link><Link href="/learn/chemistry/acid-base" className="retro-btn-classic inline-flex">酸塩基指示薬を確認 →</Link></div>
     <section className="retro-box space-y-5">
       <div className="flex flex-wrap items-center gap-2"><label htmlFor="titration-mode" className="font-bold">演習モード</label><select id="titration-mode" aria-label="中和滴定の演習パターン" value={mode} onChange={event => { const selected = event.target.value as TitrationMode; setMode(selected); next(selected); }} className="border p-2 bg-white"><option value="mix">実戦練習：中和滴定 全パターンランダム</option>{titrationPatterns.map(pattern => <option key={pattern} value={pattern}>基礎練習：{titrationLabels[pattern]}だけ</option>)}</select></div>
       <div className="bg-white border p-6 md:p-8 text-center text-base md:text-lg font-bold leading-relaxed">{problem?.question ?? '問題を準備しています…'}</div>

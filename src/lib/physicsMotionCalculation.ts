@@ -2,12 +2,12 @@ import { BalancedRandom } from './balancedRandom.ts';
 import { mechanicalEnergyGravity } from './mechanicalEnergy.ts';
 import { calculateProjectileState, projectileGravity, projectileInitialHeight, projectileInitialSpeed } from './projectileMotion.ts';
 
-export type MotionPattern = 'speed' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'impulse' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring' | 'projectileComponents' | 'projectileMaxHeight' | 'projectileFlightTime' | 'projectileRange';
+export type MotionPattern = 'speed' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'impulse' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring' | 'springSignedForce' | 'springEnergy' | 'projectileComponents' | 'projectileMaxHeight' | 'projectileFlightTime' | 'projectileRange';
 export type MotionMode = MotionPattern | 'mix';
 export type MotionProblem = { pattern: MotionPattern; question: string; answer: number; unit: string; explanation: string; alternativeExplanations?: Partial<Record<MotionPattern, string>> };
 
-export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'impulse', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring', 'projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange'];
-export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', impulse: '力積', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの力', projectileComponents: '投射速度の分解', projectileMaxHeight: '斜方投射の最高点', projectileFlightTime: '斜方投射の飛行時間', projectileRange: '斜方投射の水平到達距離' };
+export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'impulse', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring', 'springSignedForce', 'springEnergy', 'projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange'];
+export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', impulse: '力積', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの弾性力（大きさ）', springSignedForce: 'ばねの復元力（符号・向き）', springEnergy: 'ばねの弾性エネルギー', projectileComponents: '投射速度の分解', projectileMaxHeight: '斜方投射の最高点', projectileFlightTime: '斜方投射の飛行時間', projectileRange: '斜方投射の水平到達距離' };
 
 const picker = new BalancedRandom(motionPatterns);
 const variants = {
@@ -52,6 +52,16 @@ const variants = {
   spring: new BalancedRandom([
     { constant: 200, extension: 0.1 }, { constant: 150, extension: 0.2 }, { constant: 80, extension: 0.25 },
     { constant: 300, extension: 0.05 }, { constant: 500, extension: 0.08 },
+  ]),
+  springSignedForce: new BalancedRandom([
+    { constant: 100, displacement: -0.2 }, { constant: 150, displacement: -0.1 },
+    { constant: 200, displacement: -0.05 }, { constant: 250, displacement: 0.1 },
+    { constant: 300, displacement: 0.2 },
+  ]),
+  springEnergy: new BalancedRandom([
+    { constant: 200, displacement: 0.1 }, { constant: 150, displacement: -0.2 },
+    { constant: 80, displacement: 0.25 }, { constant: 300, displacement: -0.05 },
+    { constant: 500, displacement: 0.08 },
   ]),
   projectileComponents: new BalancedRandom([0, 15, 30, 45, 60, 75].flatMap(angle => [
     { angle, component: 'horizontal' as const }, { angle, component: 'vertical' as const },
@@ -122,6 +132,18 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
     case 'spring': {
       const value = variants.spring.next(random); const answer = value.constant * value.extension;
       return { pattern, question: `ばね定数 ${value.constant} N/m のばねを ${value.extension} m 伸ばした。弾性力の大きさは？`, answer, unit: 'N', explanation: `フックの法則より弾性力の大きさ F=kx=${value.constant}×${value.extension}=${displayNumber(answer)} N（向きは伸びと反対）。` };
+    }
+    case 'springSignedForce': {
+      const value = variants.springSignedForce.next(random);
+      const answer = -value.constant * value.displacement;
+      const displacementText = `${Math.abs(value.displacement)} m ${value.displacement < 0 ? '縮めた' : '伸ばした'}`;
+      return { pattern, question: `ばね定数 ${value.constant} N/m のばねを自然長から ${displacementText}。右向きを正として、復元力 F の符号付きの値は？`, answer, unit: 'N', explanation: `変位 x=${displayNumber(value.displacement)} m とすると、フックの法則 F=−kx より F=−${value.constant}×(${displayNumber(value.displacement)})=${displayNumber(answer)} N。正なら右向き、負なら左向き。` };
+    }
+    case 'springEnergy': {
+      const value = variants.springEnergy.next(random);
+      const answer = 0.5 * value.constant * value.displacement ** 2;
+      const displacementText = `${Math.abs(value.displacement)} m ${value.displacement < 0 ? '縮めた' : '伸ばした'}`;
+      return { pattern, question: `ばね定数 ${value.constant} N/m のばねを自然長から ${displacementText}。蓄えられる弾性エネルギーは？`, answer, unit: 'J', explanation: `弾性エネルギー U=½kx²=½×${value.constant}×(${displayNumber(value.displacement)})²=${displayNumber(answer)} J。変位を2乗するため、伸び・縮みの向きによらず0以上。` };
     }
     case 'projectileComponents': {
       const value = variants.projectileComponents.next(random);

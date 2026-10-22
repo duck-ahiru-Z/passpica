@@ -5,6 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { hasUniqueMode, isDataAnalysisAnswerCorrect } from '@/src/lib/dataAnalysis1DValidation';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -69,7 +70,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         }
       }
       
-      if (sum % n !== 0) continue; // retry if fail
+      if (sum % n !== 0 || !hasUniqueMode(data, modeVal)) continue; // keep the intended mode unique after adjusting the mean
       const mean = sum / n;
       
       const sorted = [...data].sort((a,b)=>a-b);
@@ -204,20 +205,11 @@ export default function DataAnalysis1DDrill() {
     if (!problem) return;
     let isOk = false;
     
-    const v1 = parseFloat(ans1.trim() || 'NaN');
-    const v2 = parseFloat(ans2.trim() || 'NaN');
-    const v3 = parseFloat(ans3.trim() || 'NaN');
-    
-    if (problem.pattern === 'pattern1') {
-      if (Math.abs(v1 - parseFloat(problem.ans1!)) < 0.01 && 
-          Math.abs(v2 - parseFloat(problem.ans2!)) < 0.01 && 
-          Math.abs(v3 - parseFloat(problem.ans3!)) < 0.01) isOk = true;
-    } else if (problem.pattern === 'pattern2' || problem.pattern === 'pattern3') {
-      if (Math.abs(v1 - parseFloat(problem.ans1!)) < 0.01) isOk = true;
-    } else if (problem.pattern === 'pattern4') {
-      if (Math.abs(v1 - parseFloat(problem.ans1!)) < 0.01 &&
-          Math.abs(v2 - parseFloat(problem.ans2!)) < 0.01) isOk = true;
-    }
+    const answers = problem.pattern === 'pattern1' ? [ans1, ans2, ans3]
+      : problem.pattern === 'pattern4' ? [ans1, ans2] : [ans1];
+    const expected = problem.pattern === 'pattern1' ? [problem.ans1, problem.ans2, problem.ans3]
+      : problem.pattern === 'pattern4' ? [problem.ans1, problem.ans2] : [problem.ans1];
+    isOk = isDataAnalysisAnswerCorrect(answers, expected);
     
     setIsCorrect(isOk);
     setHasChecked(true);
@@ -337,7 +329,8 @@ export default function DataAnalysis1DDrill() {
               <h2 className="text-sm font-bold">
                 ■ 問題
               </h2>
-              <select 
+              <select
+                aria-label="1変量データ分析の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -364,7 +357,7 @@ export default function DataAnalysis1DDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span>平均値 =</span>
                     <input 
-                      type="number" step="0.1"
+                      aria-label="平均値の答え" type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
                       onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -373,7 +366,7 @@ export default function DataAnalysis1DDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span>中央値 =</span>
                     <input 
-                      type="number" step="0.5"
+                      aria-label="中央値の答え" type="number" step="0.5"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
                       onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -382,7 +375,7 @@ export default function DataAnalysis1DDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span>最頻値 =</span>
                     <input 
-                      type="number" 
+                      aria-label="最頻値の答え" type="number"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans3} 
                       onChange={e => { setAns3(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -395,7 +388,7 @@ export default function DataAnalysis1DDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span>分散 <MathEq math="s^2" /> =</span>
                     <input 
-                      type="number" step="0.1"
+                      aria-label="分散の答え" type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
                       onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -408,7 +401,7 @@ export default function DataAnalysis1DDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span>平均値 <MathEq math="\bar{y}" /> =</span>
                     <input 
-                      type="number" step="0.1"
+                      aria-label="変換後の平均値の答え" type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans1} 
                       onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -417,7 +410,7 @@ export default function DataAnalysis1DDrill() {
                   <div className="flex items-center gap-4 text-xl">
                     <span>分散 <MathEq math="s_y^2" /> =</span>
                     <input 
-                      type="number" step="0.1"
+                      aria-label="変換後の分散の答え" type="number" step="0.1"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ans2} 
                       onChange={e => { setAns2(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -461,7 +454,7 @@ export default function DataAnalysis1DDrill() {
 
             {problem.pattern !== 'pattern4' && (
               <div className="flex justify-center mb-4 bg-white border border-gray-300 shadow-sm relative pt-4">
-                <canvas ref={canvasRef} width={260} height={120} className="w-full max-w-full h-auto" />
+                <canvas ref={canvasRef} width={260} height={120} role="img" aria-label={`データのドットプロット。${problem.data.join('、')}。${hasChecked ? `平均値は${problem.ans1}` : '解答後に平均値の位置を表示'}`} className="w-full max-w-full h-auto" />
               </div>
             )}
 

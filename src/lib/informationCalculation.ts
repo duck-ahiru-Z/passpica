@@ -6,6 +6,20 @@ export type InformationProblem = { pattern: InformationPattern; question: string
 
 export const informationPatterns: readonly InformationPattern[] = ['binary', 'data', 'transfer', 'logic', 'sampling', 'compression', 'complement'];
 export const informationLabels: Record<InformationPattern, string> = { binary: '2進数変換', data: 'データ量', transfer: '通信時間', logic: '論理演算', sampling: '標本化', compression: '圧縮率', complement: '補数表現' };
+const numericPatterns = new Set<InformationPattern>(['data', 'transfer', 'sampling', 'compression']);
+
+export function isInformationAnswerCorrect(pattern: InformationPattern, input: string, expected: string): boolean {
+  const answer = input.trim();
+  if (answer === '') return false;
+  if (!numericPatterns.has(pattern)) return answer.toLowerCase() === expected.toLowerCase();
+
+  // Accept either plain digits or correctly grouped thousands; do not silently
+  // erase malformed punctuation such as "2,,764,800".
+  if (!/^[+-]?(?:(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d*)?|\.\d+)$/.test(answer)) return false;
+  const value = Number(answer.replaceAll(',', ''));
+  const target = Number(expected);
+  return Number.isFinite(value) && Number.isFinite(target) && value === target;
+}
 
 function binaryAddends(value: number): string {
   const addends: number[] = [];
@@ -27,11 +41,16 @@ const variants = {
     { size: 80, rate: 20 }, { size: 12, rate: 24 }, { size: 150, rate: 100 },
     { size: 64, rate: 16 }, { size: 45, rate: 30 },
   ]),
-  logic: new BalancedRandom([
-    { a: 1, b: 0, operation: 'A AND (NOT B)', result: 1 }, { a: 0, b: 1, operation: 'A AND (NOT B)', result: 0 },
-    { a: 1, b: 1, operation: 'A OR (NOT B)', result: 1 }, { a: 0, b: 0, operation: 'A OR (NOT B)', result: 1 },
-    { a: 1, b: 1, operation: 'A XOR B', result: 0 },
-  ]),
+  logic: new BalancedRandom(['A AND (NOT B)', 'A OR (NOT B)', 'A XOR B'].flatMap(operation =>
+    [0, 1].flatMap(a => [0, 1].map(b => ({
+      a,
+      b,
+      operation,
+      result: Number(operation === 'A AND (NOT B)' ? Boolean(a && !b)
+        : operation === 'A OR (NOT B)' ? Boolean(a || !b)
+          : Boolean(a !== b)),
+    })))),
+  ),
   sampling: new BalancedRandom([
     { frequency: 44100, bits: 16, channels: 2 }, { frequency: 48000, bits: 24, channels: 2 },
     { frequency: 32000, bits: 16, channels: 1 }, { frequency: 22050, bits: 8, channels: 1 },
@@ -68,7 +87,7 @@ export function generateInformationProblem(mode: InformationMode, random = Math.
     case 'logic': {
       const value = variants.logic.next(random);
       const explanation = value.operation === 'A XOR B'
-        ? `A と B はどちらも${value.a}なので、XOR（排他的論理和）は ${value.result}。`
+        ? `A と B は${value.a === value.b ? '等しい' : '異なる'}ので、XOR（排他的論理和）は ${value.result}。`
         : `NOT B=${1 - value.b}。${value.operation} を順に計算すると ${value.result}。`;
       return { pattern, question: `A=${value.a}、B=${value.b} のとき、${value.operation} の値は？`, answer: String(value.result), explanation, unit: '' };
     }

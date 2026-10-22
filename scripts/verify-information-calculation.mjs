@@ -1,6 +1,7 @@
+import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateInformationProblem, informationPatterns } from '../src/lib/informationCalculation.ts';
+import { generateInformationProblem, informationPatterns, isInformationAnswerCorrect } from '../src/lib/informationCalculation.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/information/calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="information-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
@@ -16,6 +17,15 @@ if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)")
 }
 
 const stableRandom = () => 0.37;
+assert.equal(isInformationAnswerCorrect('data', '2,764,800', '2764800'), true, 'valid thousands separators should be accepted');
+assert.equal(isInformationAnswerCorrect('data', '2764800', '2764800'), true, 'unformatted exact numeric answers should be accepted');
+for (const malformed of ['2,,764,800', '27,64800', '2,76,4800', '2 764 800', '2,764,800x']) {
+  assert.equal(isInformationAnswerCorrect('data', malformed, '2764800'), false, `malformed numeric input should be rejected: ${malformed}`);
+}
+assert.equal(isInformationAnswerCorrect('binary', '101010', '101010'), true, 'exact binary answers should be accepted');
+assert.equal(isInformationAnswerCorrect('binary', '10,1010', '101010'), false, 'binary answers should not silently discard separators');
+assert.equal(isInformationAnswerCorrect('complement', '-5', '-5'), true, 'signed complement answers should remain accepted');
+assert.equal(isInformationAnswerCorrect('complement', '-,5', '-5'), false, 'malformed signed answers should be rejected');
 const checks = {
   binary: problem => {
     const [, decimal] = problem.question.match(/10進数の (\d+)/);
@@ -38,7 +48,10 @@ const checks = {
     const expected = operation === 'A AND (NOT B)' ? Number(Boolean(left && !right))
       : operation === 'A OR (NOT B)' ? Number(Boolean(left || !right))
         : Number(Boolean(left !== right));
-    return Number(problem.answer) === expected && problem.unit === '';
+    const explanationMatches = operation === 'A XOR B'
+      ? problem.explanation.includes(`A と B は${left === right ? '等しい' : '異なる'}ので、XOR（排他的論理和）は ${expected}。`)
+      : problem.explanation.includes(`NOT B=${1 - right}`) && problem.explanation.includes(`計算すると ${expected}`);
+    return Number(problem.answer) === expected && problem.unit === '' && explanationMatches;
   },
   sampling: problem => {
     const [, khz, bits, channels] = problem.question.match(/(\d+(?:\.\d+)?) kHz、量子化ビット数 (\d+) bit、(ステレオ2 ch|モノラル1 ch)/);
@@ -69,7 +82,7 @@ for (const pattern of informationPatterns) {
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     questions.add(problem.question);
   }
-  const expectedVariants = pattern === 'compression' ? 7 : 5;
+  const expectedVariants = pattern === 'compression' ? 7 : pattern === 'logic' ? 12 : 5;
   if (questions.size !== expectedVariants) throw new Error(`${pattern} generated ${questions.size}/${expectedVariants} expected variants`);
 }
 

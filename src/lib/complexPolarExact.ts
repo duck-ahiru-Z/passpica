@@ -3,6 +3,18 @@ function gcd(a: number, b: number): number {
   return Math.abs(a);
 }
 
+const nonFirstQuadrantSigns = [
+  [-1, 1],
+  [-1, -1],
+  [1, -1],
+] as const;
+
+/** Pick quadrants II, III, and IV uniformly for fixed-pattern practice. */
+export function getUniformNonFirstQuadrantSigns(random = Math.random) {
+  const index = Math.min(nonFirstQuadrantSigns.length - 1, Math.floor(random() * nonFirstQuadrantSigns.length));
+  return nonFirstQuadrantSigns[index];
+}
+
 /** Familiar angles available to the product/quotient drill. */
 export const polarAngleChoices = [
   { val: Math.PI / 6, s: "\\frac{\\pi}{6}" },

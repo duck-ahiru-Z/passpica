@@ -11,7 +11,7 @@ interface LearningContent {
   title: string;
   description: string;
   difficulty: '基礎' | '標準' | '応用';
-  type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル';
+  type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル' | '無限演習';
   link: string;
 }
 
@@ -20,7 +20,7 @@ const CONTENTS: LearningContent[] = [
   {
     slug: 'mathbc-mixed-drill', subject: 'math', subjectJp: '数学B・C', field: '数学B・C総合（解法選択）',
     title: '数学B・C 総合・解法選択ランダムドリル',
-    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式を、分野固定または全体ランダムで練習。',
+    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式・統計的な推測を、分野固定または全体ランダムで練習。',
     difficulty: '標準', type: '無限計算ドリル', link: '/learn/math/mathbc-mixed-drill'
   },
 
@@ -44,7 +44,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（解法選択）',
     title: '数学III 積分法・解法選択ドリル',
-    description: '置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
+    description: 'べき関数の定積分・面積、置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-integral-drill'
@@ -138,6 +138,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/chemistry/titration-drill'
   },
   {
+    slug: 'indicator-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基・中和指示薬',
+    title: '化学 中和指示薬・色判定ドリル',
+    description: 'フェノールフタレイン・リトマス液・メチルオレンジを個別練習し、全パターンランダムでpHから色を判断します。',
+    difficulty: '基礎',
+    type: '無限演習',
+    link: '/learn/chemistry/indicator-drill'
+  },
+  {
     slug: 'phase-diagram-drill',
     subject: 'chemistry',
     subjectJp: '化学',
@@ -169,6 +180,17 @@ const CONTENTS: LearningContent[] = [
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/chemistry/organic-separation-drill'
+  },
+  {
+    slug: 'organic-structure-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '有機化学（立体構造・混成軌道）',
+    title: '化学 有機分子の立体構造・解法選択ドリル',
+    description: '混成軌道・配座・シクロヘキサン・シス／トランスを分子別に練習し、実戦では全9パターンから構造の特徴を判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/organic-structure-drill'
   },
   {
     slug: 'industrial-process-drill',
@@ -613,6 +635,17 @@ const CONTENTS: LearningContent[] = [
     slug: 'trig-synthesis-drill',
   },
   {
+    title: '三角関数グラフ・解法選択',
+    description: '振幅・周期・左右/上下移動・値域・tanの漸近線を個別に練習し、実戦では全パターンを混ぜたランダム問題で性質の選択から練習します。',
+    link: '/learn/math/trigonometry-graph-drill',
+    subject: 'math',
+    subjectJp: '数学Ⅱ',
+    field: '三角関数',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    slug: 'trigonometry-graph-drill',
+  },
+  {
     title: '対数の底の変換公式と性質',
     description: '底の累乗・対数の積・逆数関係・対数を指数に含む型を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/logarithm-drill',
@@ -733,7 +766,7 @@ export default function DrillPortalPage() {
           無限演習ポータル
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          綺麗な数値になるよう逆算で自動生成された無限計算ドリルで、圧倒的な計算力と解法パターンを身につけます。
+          数値計算から知識の判定まで、分野ごとの演習をパターン別に反復できます。苦手な型を個別に練習し、慣れたら全パターンランダムで解法選択を練習しましょう。
         </p>
       </div>
 

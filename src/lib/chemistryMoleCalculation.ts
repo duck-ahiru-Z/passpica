@@ -37,6 +37,7 @@ const variants = {
   ]),
   limitingReagent: new BalancedRandom([
     { equation: '2H₂ + O₂ → 2H₂O', reactantA: 'H₂', coefficientA: 2, amountA: 2, reactantB: 'O₂', coefficientB: 1, amountB: 1.5, product: 'H₂O', productCoefficient: 2 },
+    { equation: '2H₂ + O₂ → 2H₂O', reactantA: 'H₂', coefficientA: 2, amountA: 4, reactantB: 'O₂', coefficientB: 1, amountB: 2, product: 'H₂O', productCoefficient: 2 },
     { equation: 'N₂ + 3H₂ → 2NH₃', reactantA: 'N₂', coefficientA: 1, amountA: 1.5, reactantB: 'H₂', coefficientB: 3, amountB: 3, product: 'NH₃', productCoefficient: 2 },
     { equation: '4Fe + 3O₂ → 2Fe₂O₃', reactantA: 'Fe', coefficientA: 4, amountA: 3, reactantB: 'O₂', coefficientB: 3, amountB: 3, product: 'Fe₂O₃', productCoefficient: 2 },
     { equation: '2Al + 3Cl₂ → 2AlCl₃', reactantA: 'Al', coefficientA: 2, amountA: 1.2, reactantB: 'Cl₂', coefficientB: 3, amountB: 2.4, product: 'AlCl₃', productCoefficient: 2 },
@@ -90,6 +91,7 @@ export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleP
       const ratioA = value.amountA / value.coefficientA;
       const ratioB = value.amountB / value.coefficientB;
       const limitingAmount = Math.min(ratioA, ratioB);
+      const bothLimiting = ratioA === ratioB;
       const limitingReactant = ratioA <= ratioB ? value.reactantA : value.reactantB;
       const answer = limitingAmount * value.productCoefficient;
       return {
@@ -97,7 +99,7 @@ export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleP
         question: `${value.equation}。${value.reactantA} ${value.amountA} mol と ${value.reactantB} ${value.amountB} mol を反応させる。反応が完了したとき、${value.product} は最大何 mol 生成するか。`,
         answer,
         unit: 'mol',
-        explanation: `反応式の係数で割って比較します。${value.reactantA} は ${value.amountA}/${value.coefficientA}=${displayNumber(ratioA)}、${value.reactantB} は ${value.amountB}/${value.coefficientB}=${displayNumber(ratioB)}。小さい ${limitingReactant} が制限試薬です。${value.product} の生成量は ${displayNumber(limitingAmount)}×${value.productCoefficient}=${displayNumber(answer)} mol。`,
+        explanation: `反応式の係数で割って比較します。${value.reactantA} は ${value.amountA}/${value.coefficientA}=${displayNumber(ratioA)}、${value.reactantB} は ${value.amountB}/${value.coefficientB}=${displayNumber(ratioB)}。${bothLimiting ? `両方の比が${displayNumber(limitingAmount)} molで等しいため、両方とも過不足なく反応する共制限試薬です。` : `小さい ${limitingReactant} が制限試薬です。`}${value.product} の生成量は ${displayNumber(limitingAmount)}×${value.productCoefficient}=${displayNumber(answer)} mol。`,
       };
     }
     case 'ph': {

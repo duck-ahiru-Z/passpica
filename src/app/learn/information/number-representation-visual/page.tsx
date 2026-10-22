@@ -67,8 +67,11 @@ export default function NumberRepresentationVisualPage() {
           </div>
           <label className="mt-7 block font-bold" htmlFor="byte-slider">{mode === 'twos-complement' ? 'ビット列の符号なし表現（0〜255）から設定' : '値からビット列を変更'} <span className="font-mono text-blue-800">{value}</span></label>
           <input id="byte-slider" aria-label={mode === 'twos-complement' ? 'ビット列の符号なし表現値（0〜255）' : '符号なしの値（0〜255）'} className="mt-3 w-full accent-blue-700" type="range" min="0" max="255" value={value} onChange={(event) => setValue(Number(event.target.value))} />
-          <div className="mt-4 flex flex-wrap gap-2" aria-label="例を試す">
-            {presets.map((preset) => <button key={preset.value} type="button" onClick={() => { if (preset.value >= 128) setMode('twos-complement'); setValue(preset.value); }} className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100">{preset.label}</button>)}
+          <div className="mt-4" aria-label="2の補数の例を試す">
+            <p className="mb-2 text-sm text-slate-600">{mode === 'twos-complement' ? '2の補数の例を試す' : '選ぶと2の補数表示に切り替わります'}</p>
+            <div className="flex flex-wrap gap-2">
+              {presets.map((preset) => <button key={preset.value} type="button" onClick={() => { setMode('twos-complement'); setValue(preset.value); }} className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100">{preset.label}</button>)}
+            </div>
           </div>
         </section>
 

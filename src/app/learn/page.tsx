@@ -39,7 +39,8 @@ const CONTENTS: LearningContent[] = [
     description: '振幅、周期、平行移動のパラメータを自由に動かし、sin/cos/tanのグラフがどのように変形するかを基本形と重ねて比較学習します。',
     difficulty: '標準',
     type: '実験シミュレータ',
-    link: '/learn/math/trigonometry-graph'
+    link: '/learn/math/trigonometry-graph',
+    practiceLink: '/learn/math/trigonometry-graph-drill'
   },
   {
     slug: 'unit-circle-complex',
@@ -96,7 +97,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（面積）',
     title: '定積分と面積ビジュアル装置',
-    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。',
+    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。関連する積分ドリルでは基本のべき関数から解法別・ランダムまで練習できます。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/math/calculus3-integral-visual',
@@ -175,6 +176,30 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
+    slug: 'spring-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（ばねの弾性力・弾性エネルギー）',
+    title: 'ばねの伸び・復元力・弾性エネルギービジュアル',
+    description: 'ばねを伸ばす・縮める量を変え、復元力 F=−kx の向きと弾性エネルギー U=½kx² がどう変わるかを図とグラフで確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/spring-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'mole-concept-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質量・粒子数・質量・気体',
+    title: 'モルの正体：粒子数・質量・気体体積をつなぐ',
+    description: '物質量を動かし、アボガドロ定数・モル質量・標準状態のモル体積が同じ「mol」を介してつながる様子を模式図と計算値で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/mole-concept-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
     slug: 'concentration-visual',
     subject: 'chemistry',
     subjectJp: '化学',
@@ -220,7 +245,8 @@ const CONTENTS: LearningContent[] = [
     description: 'メタン・ベンゼンなどの基本分子、シクロヘキサンの椅子型・舟型、シス・トランス異性体を3次元で回転・観察できます。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/organic-3d'
+    link: '/learn/chemistry/organic-3d',
+    practiceLink: '/learn/chemistry/organic-structure-drill'
   },
   // 化学基礎・化学（新設含む）
   {
@@ -283,6 +309,18 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/chemistry/titration-drill'
   },
   {
+    slug: 'titration-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基（中和滴定）',
+    title: '中和滴定とpH変化ビジュアル',
+    description: '滴下量スライダーで強酸・強塩基のpH曲線、中和点、フェノールフタレインの変色域を対応づけて観察します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/titration-visual',
+    practiceLink: '/learn/chemistry/titration-drill'
+  },
+  {
     slug: 'metal-ion',
     subject: 'chemistry',
     subjectJp: '化学',
@@ -311,7 +349,7 @@ const CONTENTS: LearningContent[] = [
     subject: 'chemistry',
     subjectJp: '化学',
     field: '無機工業化学（製法）',
-    title: '無機工業化学の製造プロセス流程図',
+    title: '無機工業化学の製造プロセスフロー図',
     description: '接触法・オストワルト法・アンモニアソーダ法の製造ラインの流れと、必要な化学反応式・触媒を整理します。',
     difficulty: '標準',
     type: '製法フロー',
@@ -366,6 +404,18 @@ const CONTENTS: LearningContent[] = [
     type: 'ビジュアル図解',
     link: '/learn/information/number-representation-visual',
     practiceLink: '/learn/information/number-representation-drill'
+  },
+  {
+    slug: 'pcm-sampling-visual',
+    subject: 'information',
+    subjectJp: '情報I',
+    field: '音声のデジタル化・データ量',
+    title: '標本化とPCMデータ量シミュレーター',
+    description: '標本化周波数・量子化ビット数・チャンネル数・記録時間を切り替え、音声データ量の変化を波形の概念図と計算式で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/information/pcm-sampling-visual',
+    practiceLink: '/learn/information/calculation-drill'
   }
 ];
 

@@ -50,6 +50,12 @@ function formatTerm(v: TermVal): string {
   return `\\frac{${numStr}}{${v.den}}`;
 }
 
+function formatCanvasTerm(v: TermVal): string {
+  if (v.num === 0) return '0';
+  const numerator = v.root === 1 ? `${v.num}` : `${v.num === 1 ? '' : v.num}√${v.root}`;
+  return v.den === 1 ? numerator : `${numerator}/${v.den}`;
+}
+
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
@@ -141,7 +147,6 @@ export default function TriangleAreaDrillPage() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
-
   const drawGraph = useCallback(() => {
     if (!problem || !canvasRef.current) return;
     const canvas = canvasRef.current;
@@ -206,7 +211,7 @@ export default function TriangleAreaDrillPage() {
 
       ctx.fillStyle = '#ef4444';
       ctx.font = '12px sans-serif';
-      ctx.fillText(`h = b \\sin A`, ptC.x + 35, ptH.y - (ptH.y - ptC.y)/2);
+      ctx.fillText('h = b sin A', ptC.x + 35, ptH.y - (ptH.y - ptC.y)/2);
     }
 
     // Labels
@@ -220,7 +225,7 @@ export default function TriangleAreaDrillPage() {
     if (hasChecked) {
       ctx.fillStyle = '#f59e0b';
       ctx.font = 'bold 16px sans-serif';
-      ctx.fillText(`S = ${formatTerm(problem.S).replace(/\\/g, '').replace(/frac{([^}]*)}{([^}]*)}/g, '$1/$2')}`, cx, cy - max_y*scale/2);
+      ctx.fillText(`S = ${formatCanvasTerm(problem.S)}`, cx, cy - max_y*scale/2);
     }
   }, [problem, hasChecked]);
 
@@ -251,6 +256,10 @@ export default function TriangleAreaDrillPage() {
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
+  const graphDescription = problem.pattern === 'pattern3'
+    ? `三角形ABC。辺aは${problem.a.num}、辺bは${problem.b.num}、辺cは${problem.c.num}。3辺からヘロンの公式で面積を求めます。`
+    : `三角形ABC。辺ABの長さbは${problem.b.num}、辺ACの長さcは${problem.c.num}、その間の角Aは${problem.A}度です。${problem.pattern === 'pattern4' ? `面積Sは${problem.S.num}${problem.S.root === 1 ? '' : `√${problem.S.root}`}${problem.S.den === 1 ? '' : `/${problem.S.den}`}で、辺cを求める問題です。` : '面積Sを求める問題です。'}`;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -276,6 +285,7 @@ export default function TriangleAreaDrillPage() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="三角形の面積ドリルの出題パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -313,7 +323,7 @@ export default function TriangleAreaDrillPage() {
               <div className="flex flex-col items-center gap-6 text-lg font-bold">
                 <div className="flex items-center gap-4 bg-gray-50 p-4 border rounded">
                   <MathEq math={problem.pattern === 'pattern4' ? 'c =' : 'S ='} />
-                  <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign />
+                  <FractionRootInput value={ansVal} onChange={value => { setAnsVal(value); setHasChecked(false); setIsCorrect(false); }} hideSign label={problem.pattern === 'pattern4' ? '辺cの長さ' : '三角形の面積'} />
                 </div>
               </div>
             </div>
@@ -355,6 +365,8 @@ export default function TriangleAreaDrillPage() {
                 ref={canvasRef} 
                 width={250} 
                 height={200} 
+                role="img"
+                aria-label={graphDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>

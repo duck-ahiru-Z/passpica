@@ -221,6 +221,11 @@ export default function TrigonometryGraphPage() {
         </p>
       </div>
 
+      <div className="retro-box flex flex-wrap items-center justify-between gap-3">
+        <p className="font-bold">式を見て、どの性質を調べるか選ぶ練習もできます。</p>
+        <Link href="/learn/math/trigonometry-graph-drill" className="retro-btn-classic bg-blue-100 border-blue-400 font-bold">個別・全パターンランダム演習へ →</Link>
+      </div>
+
       {/* プリセット選択エリア */}
       <div className="border border-gray-300 bg-gray-50 p-4 space-y-2.5">
         <span className="font-bold text-slate-700 block">■ 学びたいグラフのプリセットを選択</span>

@@ -74,6 +74,7 @@ export default function Calculus3LimitVisualPage() {
           <li>このページは、式の値と「近づく先」を区別する直感を補助します。</li>
           <li>発展問題では、はさみうちの原理や連続性を使って極限値を説明します。</li>
         </ul>
+        <Link href="/learn/math/calculus3-limit-drill" className="retro-btn-classic inline-flex">極限の解法選択を問題で練習する →</Link>
       </section>
     </main>
   );

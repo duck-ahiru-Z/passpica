@@ -53,6 +53,7 @@ assert.equal(maxRun, 1, 'mixed practice should not repeat a pattern consecutivel
 const page = fs.readFileSync('src/app/learn/math/linear-diophantine-drill/page.tsx', 'utf8');
 assert.ok(page.includes('generateLinearDiophantineProblem'), 'UI must use the tested production generator');
 assert.ok(page.includes('BigInt(problem.A) * BigInt(ux) + BigInt(problem.B) * BigInt(uy)'), 'any integer solution must be accepted by exact arithmetic');
-assert.ok(page.includes('aria-label={`格子点を示す直線'), 'canvas needs an equation-aware accessible description');
+assert.ok(page.includes('aria-label="整数解の x の値"') && page.includes('aria-label="整数解の y の値"'), 'answer fields need distinct accessible names');
+assert.ok(page.includes('role="img"') && page.includes('aria-label={`格子点を示す直線'), 'canvas must have an equation-aware image description');
 for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `${pattern} must be individually selectable`);
 console.log('Linear Diophantine mixed mode verified: 20,000 questions, exactly 5,000 per strategy, no adjacent repeats.');

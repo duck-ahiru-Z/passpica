@@ -378,6 +378,7 @@ export default function VectorDotProductDrill() {
                 </div>
                 <input 
                   type="text" 
+                  aria-label={problem.pattern === 'pattern1' ? 'ベクトルaとbの内積' : problem.pattern === 'pattern2' ? 'ベクトルaとbのなす角（度）' : problem.pattern === 'pattern3' ? '垂直条件を満たすxの値' : 'ベクトルaとbの和の大きさの二乗'}
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
                   onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}

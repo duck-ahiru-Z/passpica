@@ -3,11 +3,9 @@
 import { useState } from 'react';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
-import { generateInformationProblem, informationLabels, informationPatterns, type InformationMode, type InformationPattern } from '@/src/lib/informationCalculation';
+import { generateInformationProblem, informationLabels, informationPatterns, isInformationAnswerCorrect, type InformationMode, type InformationPattern } from '@/src/lib/informationCalculation';
 
 type Pattern = InformationPattern;
-const numericPatterns = new Set<Pattern>(['data', 'transfer', 'sampling', 'compression']);
-const normalizeAnswer = (value: string) => value.trim().replaceAll(',', '').replaceAll(' ', '').toLowerCase();
 
 export default function InformationCalculationDrillPage() {
   const [mode, setMode] = useState<InformationMode>('mix');
@@ -17,15 +15,11 @@ export default function InformationCalculationDrillPage() {
   const [checked, setChecked] = useState(false);
   const next = (selectedMode: InformationMode = mode) => { setProblem(generateInformationProblem(selectedMode)); setMethod(selectedMode === 'mix' ? '' : selectedMode); setAnswer(''); setChecked(false); };
   if (!problem) return <main className="max-w-3xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const normalizedAnswer = normalizeAnswer(answer);
-  const normalizedExpected = normalizeAnswer(problem.answer);
-  const answerCorrect = numericPatterns.has(problem.pattern) && normalizedAnswer !== '' && normalizedExpected !== '' && Number.isFinite(Number(normalizedAnswer))
-    ? Number(normalizedAnswer) === Number(normalizedExpected)
-    : normalizedAnswer === normalizedExpected;
-  const correct = answer.trim() !== '' && method === problem.pattern && answerCorrect;
+  const correct = answer.trim() !== '' && method === problem.pattern && isInformationAnswerCorrect(problem.pattern, answer, problem.answer);
 
   return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
     <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
+    <Link href="/learn/information/pcm-sampling-visual" className="ml-4 text-blue-600 hover:underline">PCM標本化ビジュアルへ →</Link>
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">情報I 計算・処理ドリル</h1>
     <p className="text-gray-500 mb-6">問題の形から処理方法を選び、計算結果まで答える練習です。分類別の基礎練習と全パターンランダムを切り替えられます。</p>
     <section className="retro-box space-y-5">

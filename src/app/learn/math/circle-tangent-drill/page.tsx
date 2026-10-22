@@ -239,19 +239,19 @@ export default function CircleTangentDrillPage() {
               <div className="flex flex-col gap-3 text-base font-bold w-full max-w-sm">
                 <div className="flex items-center justify-center gap-1">
                   <span className="text-gray-500 mr-2 text-sm">接線1:</span>
-                  <input type="number" value={L1_A} onChange={e => setL1_A(e.target.value)} placeholder="A" className="retro-input w-16 text-center font-mono" />
+                  <input type="number" value={L1_A} onChange={e => setL1_A(e.target.value)} placeholder="A" aria-label="接線1のx係数 A" className="retro-input w-16 text-center font-mono" />
                   <MathEq math="x +" />
-                  <input type="number" value={L1_B} onChange={e => setL1_B(e.target.value)} placeholder="B" className="retro-input w-16 text-center font-mono" />
+                  <input type="number" value={L1_B} onChange={e => setL1_B(e.target.value)} placeholder="B" aria-label="接線1のy係数 B" className="retro-input w-16 text-center font-mono" />
                   <MathEq math="y =" />
-                  <input type="number" value={L1_C} onChange={e => setL1_C(e.target.value)} placeholder="C" required className="retro-input w-16 text-center font-mono" />
+                  <input type="number" value={L1_C} onChange={e => setL1_C(e.target.value)} placeholder="C" aria-label="接線1の右辺 C" required className="retro-input w-16 text-center font-mono" />
                 </div>
                 <div className="flex items-center justify-center gap-1">
                   <span className="text-gray-500 mr-2 text-sm">接線2:</span>
-                  <input type="number" value={L2_A} onChange={e => setL2_A(e.target.value)} placeholder="A" className="retro-input w-16 text-center font-mono" />
+                  <input type="number" value={L2_A} onChange={e => setL2_A(e.target.value)} placeholder="A" aria-label="接線2のx係数 A" className="retro-input w-16 text-center font-mono" />
                   <MathEq math="x +" />
-                  <input type="number" value={L2_B} onChange={e => setL2_B(e.target.value)} placeholder="B" className="retro-input w-16 text-center font-mono" />
+                  <input type="number" value={L2_B} onChange={e => setL2_B(e.target.value)} placeholder="B" aria-label="接線2のy係数 B" className="retro-input w-16 text-center font-mono" />
                   <MathEq math="y =" />
-                  <input type="number" value={L2_C} onChange={e => setL2_C(e.target.value)} placeholder="C" required className="retro-input w-16 text-center font-mono" />
+                  <input type="number" value={L2_C} onChange={e => setL2_C(e.target.value)} placeholder="C" aria-label="接線2の右辺 C" required className="retro-input w-16 text-center font-mono" />
                 </div>
                 <div className="text-center text-[10px] text-gray-400 font-normal">
                   ※ <MathEq math="x" /> や <MathEq math="y" /> の係数が無い場合は 0 を入力するか空欄にしてください。<br/>

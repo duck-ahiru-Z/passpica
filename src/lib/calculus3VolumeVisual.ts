@@ -19,7 +19,9 @@ export function rotationDiskRadius(index: number, sliceCount: number, displayRad
   if (!Number.isFinite(upper) || upper < 0) {
     throw new RangeError('upper must be a finite non-negative number');
   }
-  return displayRadius * (upper / 2) ** 2 * (index / sliceCount) ** 2;
+  if (upper === 0) return 0;
+  const x = upper * index / sliceCount;
+  return displayRadius * (x / upper) ** 2;
 }
 
 export function rotationSectionIndices(sliceCount: number): number[] {

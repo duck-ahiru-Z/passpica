@@ -153,6 +153,7 @@ export default function EuclideanAlgorithmDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="互除法ドリルの出題パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as EuclideanMode; setSelectedPattern(pattern); setProblem(generateEuclideanProblem(pattern)); setAnsVal(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
@@ -178,6 +179,7 @@ export default function EuclideanAlgorithmDrill() {
               <div className="flex items-center justify-center gap-4 text-xl">
                 <input 
                   type="number" 
+                  aria-label="最大公約数の答え"
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
                   onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -223,6 +225,8 @@ export default function EuclideanAlgorithmDrill() {
                 ref={canvasRef} 
                 width={360} 
                 height={200} 
+                role="img"
+                aria-label={`ユークリッドの互除法の図。${problem.A}かける${problem.B}の長方形を正方形で分割し、最大公約数を図解します。`}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>

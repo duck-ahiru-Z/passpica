@@ -4,6 +4,9 @@ import path from 'node:path';
 const root = process.cwd();
 const drill = fs.readFileSync(path.join(root, 'src/app/drill/page.tsx'), 'utf8');
 const learn = fs.readFileSync(path.join(root, 'src/app/learn/page.tsx'), 'utf8');
+if (learn.includes('製造プロセス流程図') || !learn.includes('製造プロセスフロー図')) {
+  throw new Error('The industrial chemistry learning-card title must use the Japanese term フロー図.');
+}
 
 function readPortalEntries(source) {
   return [...source.matchAll(/link:\s*'([^']+)'/g)].map(match => {
@@ -21,8 +24,9 @@ const requiredDrills = [
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill',
   'mathbc-mixed-drill', 'calculus3-mixed-drill', 'quadratic-equation-drill',
   'motion-calculation-drill', 'mole-calculation-drill', 'calculation-drill',
-  'titration-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
+  'titration-drill', 'indicator-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
   'number-representation-drill',
+  'trigonometry-graph-drill',
 ];
 const aggregateDrills = new Set([
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill', 'mathbc-mixed-drill', 'calculus3-mixed-drill',
@@ -31,16 +35,23 @@ const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual',
-  'concentration-visual', 'crystal-lattice',
+  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual',
+  'mole-concept-visual', 'concentration-visual', 'crystal-lattice', 'titration-visual',
 ];
 
 const drillEntries = readPortalEntries(drill);
+const mathBcCardIndex = drill.indexOf("slug: 'mathbc-mixed-drill'");
+const mathBcCardEnd = drill.indexOf('\n  },', mathBcCardIndex);
+const mathBcCard = drill.slice(drill.lastIndexOf('  {', mathBcCardIndex), mathBcCardEnd);
+if (!mathBcCard.includes('統計的な推測') || !mathBcCard.includes('全体ランダム')) {
+  throw new Error('The Math B/C portal card must include Statistics and advertise its mixed-practice mode.');
+}
 const practiceModeDescriptions = [
   'calculus-drill', 'symmetric-polynomial-drill', 'circle-tangent-drill',
   'completing-square-drill', 'quadratic-equation-drill', 'quadratic-max-min-drill', 'sine-rule-drill', 'cosine-rule-drill', 'triangle-area-drill',
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
-  'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill',
+  'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill', 'trigonometry-graph-drill',
+  'calculus3-integral-drill', 'indicator-drill',
 ];
 for (const slug of practiceModeDescriptions) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);
@@ -82,6 +93,50 @@ for (const link of practiceLinks) {
     throw new Error(`Learning portal practice link must target an existing drill: ${link}`);
   }
 }
+const calculus3VisualPracticePairs = [
+  ['/learn/math/calculus3-limit-visual', '/learn/math/calculus3-limit-drill'],
+  ['/learn/math/calculus3-derivative-visual', '/learn/math/calculus3-differentiation-drill'],
+  ['/learn/math/calculus3-integral-visual', '/learn/math/calculus3-integral-drill'],
+  ['/learn/math/calculus3-volume-visual', '/learn/math/calculus3-area-volume-drill'],
+  ['/learn/math/calculus3-curvature-visual', '/learn/math/calculus3-curve-analysis-drill'],
+  ['/learn/math/calculus3-parametric-visual', '/learn/math/calculus3-differentiation-drill'],
+];
+const titrationVisualRoute = '/learn/chemistry/titration-visual';
+const titrationDrillRoute = '/learn/chemistry/titration-drill';
+const titrationVisualEntry = learnEntries.find(entry => entry.link === titrationVisualRoute);
+if (!titrationVisualEntry || !new RegExp(`slug: '${titrationVisualEntry.slug}'[\\s\\S]*?practiceLink: '${titrationDrillRoute}'`).test(learn)) {
+  throw new Error('Chemistry titration visual portal card must link to its calculation drill');
+}
+const titrationVisualPage = fs.readFileSync(routeFile(titrationVisualRoute), 'utf8');
+const titrationDrillPage = fs.readFileSync(routeFile(titrationDrillRoute), 'utf8');
+if (!titrationVisualPage.includes(`href="${titrationDrillRoute}"`) || !titrationDrillPage.includes(`href="${titrationVisualRoute}"`)) {
+  throw new Error('Chemistry titration visual and calculation drill must link to each other');
+}
+const trigGraphDrillRoute = '/learn/math/trigonometry-graph-drill';
+const trigGraphVisualRoute = '/learn/math/trigonometry-graph';
+const trigGraphVisualEntry = learnEntries.find(entry => entry.link === trigGraphVisualRoute);
+if (!trigGraphVisualEntry || !new RegExp(`slug: '${trigGraphVisualEntry.slug}'[\\s\\S]*?practiceLink: '${trigGraphDrillRoute}'`).test(learn)) {
+  throw new Error('Trigonometry graph visual portal card must link to its focused-and-mixed drill');
+}
+const trigGraphVisualPage = fs.readFileSync(routeFile(trigGraphVisualRoute), 'utf8');
+const trigGraphDrillPage = fs.readFileSync(routeFile(trigGraphDrillRoute), 'utf8');
+if (!trigGraphVisualPage.includes(`href="${trigGraphDrillRoute}"`) || !trigGraphDrillPage.includes(`href="${trigGraphVisualRoute}"`)) {
+  throw new Error('Trigonometry graph visual and drill must link to each other');
+}
+for (const [visualRoute, drillRoute] of calculus3VisualPracticePairs) {
+  const visualEntry = learnEntries.find(entry => entry.link === visualRoute);
+  if (!visualEntry || !new RegExp(`slug: '${visualEntry.slug}'[\\s\\S]*?practiceLink: '${drillRoute}'`).test(learn)) {
+    throw new Error(`Calculus III learning portal card must link ${visualRoute} to ${drillRoute}`);
+  }
+  const visualPage = fs.readFileSync(routeFile(visualRoute), 'utf8');
+  const drillPage = fs.readFileSync(routeFile(drillRoute), 'utf8');
+  if (!visualPage.includes(`href="${drillRoute}"`)) {
+    throw new Error(`Calculus III visual must link to its matching practice: ${visualRoute} -> ${drillRoute}`);
+  }
+  if (!drillPage.includes(`href="${visualRoute}"`)) {
+    throw new Error(`Calculus III practice must link back to its visual: ${drillRoute} -> ${visualRoute}`);
+  }
+}
 const organic3dPage = fs.readFileSync(routeFile(learnEntries.find(entry => entry.slug === 'organic-3d').link), 'utf8');
 if (!learn.includes("title: '有機・高分子3D分子モデルビューア（立体構造）'")
   || !organic3dPage.includes('有機・高分子3D分子モデルビューア（立体構造）')
@@ -100,6 +155,14 @@ for (const slug of ['projectile-visual', 'motion-visual']) {
   if (!entry || !new RegExp(`slug: '${slug}'[\\s\\S]*?practiceLink: '/learn/physics/motion-calculation-drill'`).test(learn)) {
     throw new Error(`Physics visual ${slug} must link to its related mechanics practice`);
   }
+}
+const springVisual = fs.readFileSync(path.join(root, 'src/app/learn/physics/spring-visual/page.tsx'), 'utf8');
+const motionDrill = fs.readFileSync(path.join(root, 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
+const springVisualEntry = learnEntries.find(entry => entry.slug === 'spring-visual');
+if (!springVisualEntry || !new RegExp(`slug: 'spring-visual'[\\s\\S]*?practiceLink: '/learn/physics/motion-calculation-drill'`).test(learn)
+  || !springVisual.includes('href="/learn/physics/motion-calculation-drill"')
+  || !motionDrill.includes('href="/learn/physics/spring-visual"')) {
+  throw new Error('The spring visual and its mechanics drill must link to each other.');
 }
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');
@@ -131,6 +194,11 @@ function collectPages(directory) {
 }
 const pages = collectPages(learnRoot);
 const mathPages = pages.filter(file => file.includes(`${path.sep}math${path.sep}`));
+const clientGeneratedState = fs.readFileSync(path.join(root, 'src/lib/useClientGeneratedState.ts'), 'utf8');
+if (!clientGeneratedState.includes('useEffect(() => {\n    setValue(factoryRef.current());\n  }, []);')
+  || clientGeneratedState.includes('requestAnimationFrame')) {
+  throw new Error('Client-generated drill questions must initialize after hydration without waiting for an animation frame.');
+}
 const randomStateInitializer = /\buseState(?:<[^;\n]*?>)?\s*\(\s*(?:\(\s*\)\s*=>\s*)?(?:generate[A-Z]\w*|create[A-Z]\w*|[\w$.]+\.(?:next|pick))\s*\(/;
 const unsafeRandomInitializers = pages.filter(file => randomStateInitializer.test(fs.readFileSync(file, 'utf8')));
 if (unsafeRandomInitializers.length > 0) {

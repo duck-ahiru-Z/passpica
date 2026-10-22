@@ -1,25 +1,32 @@
 import { BalancedRandom } from './balancedRandom.ts';
 
-export type MathBcArea = 'sequence' | 'sigma' | 'vector' | 'complex' | 'conic';
+export type MathBcArea = 'sequence' | 'sigma' | 'statistics' | 'vector' | 'complex' | 'conic';
 export type MathBcMode = MathBcArea | 'all';
 export type MathBcQuestion = { area: MathBcArea; subject: string; prompt: string; answer: string; options: string[]; explanation: string };
-export const mathBcAreas: readonly MathBcArea[] = ['sequence', 'sigma', 'vector', 'complex', 'conic'];
-export const mathBcLabels: Record<MathBcArea, string> = { sequence: '数列', sigma: '数列の和', vector: 'ベクトル', complex: '複素数平面', conic: '図形と方程式' };
+export const mathBcAreas: readonly MathBcArea[] = ['sequence', 'sigma', 'statistics', 'vector', 'complex', 'conic'];
+export const mathBcLabels: Record<MathBcArea, string> = { sequence: '数列', sigma: '数列の和', statistics: '統計的な推測', vector: 'ベクトル', complex: '複素数平面', conic: '図形と方程式' };
 
 const questions: Record<MathBcArea, MathBcQuestion[]> = {
   sequence: [
     { area: 'sequence', subject: '数学B', prompt: 'aₙ₊₁=aₙ+3、a₁=2 の一般項を求めるときの見方は？', answer: '等差数列の一般項', options: ['等差数列の一般項', '定常値を引く', '階差をとる', '特性方程式'], explanation: '公差3の等差数列なので aₙ=2+3(n−1)=3n−1。' },
     { area: 'sequence', subject: '数学B', prompt: 'aₙ₊₁=2aₙ+3 のような一次漸化式を解く基本方針は？', answer: '定常値を引いて等比数列にする', options: ['定常値を引いて等比数列にする', '階差をとって和に戻す', '特性方程式を立てる', '初項と公比を推定する'], explanation: '定常値 L=2L+3 を満たす L=−3 を引くと aₙ₊₁+3=2(aₙ+3)。' },
-    { area: 'sequence', subject: '数学B', prompt: '初項3、公比2の等比数列の初項から第n項までの和を求める式は？', answer: '初項×(公比ⁿ−1)/(公比−1)', options: ['初項×(公比ⁿ−1)/(公比−1)', '初項×n(n+1)/2', '初項+(n−1)公差', '末項−初項'], explanation: 'Sₙ=3(2ⁿ−1)/(2−1)=3(2ⁿ−1)。' },
-    { area: 'sequence', subject: '数学B', prompt: 'n→∞で (5n²+1)/(2n²−3n) の極限を求める方針は？', answer: '分子・分母を最高次のn²で割る', options: ['分子・分母を最高次のn²で割る', '最初の数項を足す', '階差数列にする', '分母を0とおく'], explanation: '最高次の係数比が残り、極限は5/2。' },
-    { area: 'sequence', subject: '数学B', prompt: 'Σk を使って 1+2+…+n の公式を証明するときに適した方法は？', answer: '数学的帰納法', options: ['数学的帰納法', '背理法だけ', '余弦定理', '部分積分'], explanation: 'n=1で成り立つことと、nで成り立つならn+1でも成り立つことを示す。' },
+    { area: 'sequence', subject: '数学B', prompt: 'a₁=1、aₙ₊₁=2aₙ+1 のとき a₄ は？', answer: '15', options: ['15', '14', '8', '7'], explanation: 'a₂=3、a₃=7、a₄=15 と順に代入する。一般項ではaₙ=2ⁿ−1。' },
+    { area: 'sequence', subject: '数学B', prompt: 'a₁=2、aₙ₊₁−aₙ=2n+1 のとき a₄ は？', answer: '17', options: ['17', '15', '16', '18'], explanation: '階差は3、5、7なので、a₄=2+3+5+7=17。' },
+    { area: 'sequence', subject: '数学B', prompt: 'aₙ=2・3ⁿ⁻¹ を数学的帰納法で証明するとき、nからn+1へ進む計算は？', answer: 'aₙ₊₁=3aₙ=3・2・3ⁿ⁻¹=2・3ⁿ', options: ['aₙ₊₁=3aₙ=3・2・3ⁿ⁻¹=2・3ⁿ', 'aₙ₊₁=aₙ+3=2・3ⁿ', 'aₙ₊₁=2aₙ=2・3ⁿ⁻¹', 'aₙ₊₁=aₙ/3=2・3ⁿ'], explanation: '漸化式aₙ₊₁=3aₙと帰納法の仮定aₙ=2・3ⁿ⁻¹を使えば、次の項の式が得られる。' },
   ],
   sigma: [
     { area: 'sigma', subject: '数学B', prompt: 'Σ(k=1..n) k を計算するときに使う公式は？', answer: 'n(n+1)/2', options: ['n(n+1)/2', 'n(n+1)(2n+1)/6', 'n²', '2ⁿ−1'], explanation: '1からnまでの和は n(n+1)/2。' },
     { area: 'sigma', subject: '数学B', prompt: 'Σ(k=1..n) k² を計算するときに使う公式は？', answer: 'n(n+1)(2n+1)/6', options: ['n(n+1)(2n+1)/6', 'n(n+1)/2', 'n³', 'n(n−1)/2'], explanation: '平方和の公式 Σk²=n(n+1)(2n+1)/6。' },
     { area: 'sigma', subject: '数学B', prompt: 'Σ(k=0..n−1) 3·2ᵏ の和を求めるときの基本公式は？', answer: '等比数列の和', options: ['等比数列の和', '平方和', '階差数列の和', '部分積分'], explanation: '初項3、公比2なので和は3(2ⁿ−1)/(2−1)=3(2ⁿ−1)。' },
     { area: 'sigma', subject: '数学B', prompt: 'Σ(k=1..n) 1/[k(k+1)] を簡単にする変形は？', answer: '部分分数分解して望遠鏡和にする', options: ['部分分数分解して望遠鏡和にする', '等比数列とみなす', '平方和の公式を使う', '各項を二乗する'], explanation: '1/[k(k+1)]=1/k−1/(k+1) と分解すると隣り合う項が消え、和は1−1/(n+1)。' },
-    { area: 'sigma', subject: '数学B', prompt: 'Σ(k=1..n) (2k+1) を計算する簡潔な方針は？', answer: '和の線形性でΣkとΣ1に分ける', options: ['和の線形性でΣkとΣ1に分ける', '部分分数分解', '等比数列の和だけ使う', '階差を2回とる'], explanation: '2Σk+Σ1=n(n+1)+n=n(n+2)。' },
+    { area: 'sigma', subject: '数学B', prompt: 'Σk の公式を数学的帰納法で証明するとき、nからn+1へ進む段階で示す等式は？', answer: 'n(n+1)/2+(n+1)=(n+1)(n+2)/2', options: ['n(n+1)/2+(n+1)=(n+1)(n+2)/2', 'n(n+1)/2+n=(n+2)(n+3)/2', 'n(n+1)/2×(n+1)=(n+1)(n+2)/2', 'n(n+1)/2−(n+1)=(n+1)(n+2)/2'], explanation: '仮定の和に次の項n+1を加え、(n+1)(n+2)/2に整理して帰納段階を示す。' },
+  ],
+  statistics: [
+    { area: 'statistics', subject: '数学B', prompt: '母標準偏差6の母集団から大きさ36の標本を無作為抽出した。標本平均の標準偏差は？', answer: '1', options: ['1', '6', '36', '1/6'], explanation: '標本平均の標準偏差（標準誤差）は σ/√n=6/6=1。' },
+    { area: 'statistics', subject: '数学B', prompt: '標本平均 X̄ の期待値と標準偏差を表す組は？', answer: 'E(X̄)=μ、σ(X̄)=σ/√n', options: ['E(X̄)=μ、σ(X̄)=σ/√n', 'E(X̄)=nμ、σ(X̄)=nσ', 'E(X̄)=μ/n、σ(X̄)=σ/n', 'E(X̄)=σ、σ(X̄)=μ/√n'], explanation: '標本平均は母平均を中心とし、標準偏差は母標準偏差を√nで割った値。' },
+    { area: 'statistics', subject: '数学B', prompt: '母比率0.4の集団から大きさ100の標本をとる。標本比率の標準偏差に最も近い値は？', answer: '0.049', options: ['0.049', '0.24', '0.0049', '0.4'], explanation: '√(p(1−p)/n)=√(0.24/100)≈0.049。' },
+    { area: 'statistics', subject: '数学B', prompt: '母標準偏差が既知のとき、母平均の信頼区間を作る標準化で使う量は？', answer: '(標本平均−母平均)/(母標準偏差/√n)', options: ['(標本平均−母平均)/(母標準偏差/√n)', '(標本平均−母平均)/母標準偏差', '(標本平均−母平均)×√n', '標本平均/標本サイズ'], explanation: '標本平均の標準誤差 σ/√n で平均との差を割ると標準正規分布に従う。' },
+    { area: 'statistics', subject: '数学B', prompt: '標本サイズを n から 4n にすると、標本平均の標準誤差は何倍？', answer: '1/2倍', options: ['1/2倍', '2倍', '1/4倍', '変わらない'], explanation: '標準誤差は σ/√n なので、nを4倍にすると1/√4=1/2倍。' },
   ],
   vector: [
     { area: 'vector', subject: '数学C', prompt: '2ベクトルのなす角を内積から求める関係式は？', answer: 'a・b=|a||b|cosθ', options: ['a・b=|a||b|cosθ', 'a・b=|a|+|b|', 'a×b=|a||b|cosθ', '|a+b|=|a|+|b|'], explanation: '内積の定義から cosθ=(a・b)/(|a||b|)。' },
