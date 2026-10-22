@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { getIndicatorDisplay } from '@/src/lib/chemistryIndicator';
 import {
   getTitrationCurvePoints,
   getTitrationVisualState,
@@ -18,12 +19,13 @@ const yForPh = (ph: number) => chart.bottom - ph / 14 * (chart.bottom - chart.to
 export default function TitrationVisualPage() {
   const [baseVolumeMl, setBaseVolumeMl] = useState(0);
   const state = getTitrationVisualState(baseVolumeMl);
+  const indicatorDisplay = getIndicatorDisplay('pp', state.ph);
   const curvePath = getTitrationCurvePoints(120)
     .map(({ volumeMl, ph }, index) => `${index === 0 ? 'M' : 'L'}${xForVolume(volumeMl)},${yForPh(ph)}`)
     .join(' ');
   const markerX = xForVolume(state.baseVolumeMl);
   const markerY = yForPh(state.ph);
-  const liquidColor = state.indicator === 'pink' ? '#f9a8d4' : '#bfdbfe';
+  const liquidColor = indicatorDisplay.backgroundColor;
   const phaseLabel = state.phase === 'equivalence' ? '中和点' : state.phase === 'acidic' ? '酸性（酸が過剰）' : '塩基性（塩基が過剰）';
 
   return <main className="mx-auto max-w-4xl space-y-5 px-4 py-8 text-sm text-slate-800">
@@ -51,7 +53,7 @@ export default function TitrationVisualPage() {
         </div>
 
         <div className="space-y-3">
-          <svg viewBox="0 0 180 220" className="mx-auto block h-auto w-full max-w-[220px]" role="img" aria-label={`ビーカーの液体は${state.indicator === 'pink' ? '薄いピンク色' : '無色に近い色'}。フェノールフタレインの色を模式的に示しています。`}>
+          <svg viewBox="0 0 180 220" className="mx-auto block h-auto w-full max-w-[220px]" role="img" aria-label={`ビーカーの液体は${indicatorDisplay.colorName}。pHに応じたフェノールフタレインの色の濃さを模式的に示しています。`}>
             <path d="M35 28 H145 M48 30 V182 Q48 198 64 198 H116 Q132 198 132 182 V30" fill="none" stroke="#475569" strokeWidth="5" />
             <path d="M51 105 H129 V181 Q129 195 115 195 H65 Q51 195 51 181 Z" fill={liquidColor} stroke="none" />
             <line x1="56" y1="111" x2="124" y2="111" stroke="#64748b" strokeWidth="2" />
@@ -59,11 +61,11 @@ export default function TitrationVisualPage() {
             <path d="M90 67 L84 57 H96 Z" fill="#2563eb" />
             <text x="90" y="215" textAnchor="middle" fontSize="11" fill="#334155">フェノールフタレイン（模式図）</text>
           </svg>
-          <div className="border bg-slate-50 p-3 text-center"><p className="text-xs text-slate-500">現在の状態</p><p className="text-lg font-bold">{phaseLabel}</p><p className="text-2xl font-bold text-blue-800">pH {state.ph.toFixed(2)}</p><p className="text-xs">指示薬の色：{state.indicator === 'pink' ? '薄いピンク（変色域）' : '無色に近い'}</p></div>
+          <div className="border bg-slate-50 p-3 text-center"><p className="text-xs text-slate-500">現在の状態</p><p className="text-lg font-bold">{phaseLabel}</p><p className="text-2xl font-bold text-blue-800">pH {state.ph.toFixed(2)}</p><p className="text-xs">指示薬の色：{indicatorDisplay.colorName}（pHに応じて濃さが変化）</p></div>
         </div>
       </div>
 
-      <label className="block space-y-2"><span className="font-bold">加えたNaOH水溶液：{state.baseVolumeMl.toFixed(1)} mL</span><input aria-label="加えた水酸化ナトリウム水溶液の体積" type="range" min="0" max={titrationVisualMaxBaseVolumeMl} step="0.5" value={state.baseVolumeMl} onChange={event => setBaseVolumeMl(Number(event.target.value))} className="w-full accent-blue-600" /><span className="flex justify-between text-xs text-slate-500"><span>0 mL</span><span>中和点 {state.equivalenceVolumeMl.toFixed(1)} mL</span><span>{titrationVisualMaxBaseVolumeMl} mL</span></span></label>
+      <label className="block space-y-2"><span className="font-bold">加えたNaOH水溶液：{state.baseVolumeMl.toFixed(2)} mL</span><input aria-label="加えた水酸化ナトリウム水溶液の体積" type="range" min="0" max={titrationVisualMaxBaseVolumeMl} step="0.01" value={state.baseVolumeMl} onChange={event => setBaseVolumeMl(Number(event.target.value))} className="w-full accent-blue-600" /><span className="flex justify-between text-xs text-slate-500"><span>0 mL</span><span>中和点 {state.equivalenceVolumeMl.toFixed(2)} mL</span><span>{titrationVisualMaxBaseVolumeMl} mL</span></span><span className="block text-[10px] text-slate-500">中和点付近はpHが急変するため、細かく動かすと指示薬の変色域を観察できます。</span></label>
 
       <div className="grid gap-2 sm:grid-cols-3"><div className="border bg-red-50 p-3"><span className="text-slate-600">塩酸の物質量</span><p className="text-lg font-bold">{(state.acidMoles * 1000).toFixed(2)} mmol</p></div><div className="border bg-blue-50 p-3"><span className="text-slate-600">加えたNaOHの物質量</span><p className="text-lg font-bold">{(state.baseMoles * 1000).toFixed(2)} mmol</p></div><div className="border bg-emerald-50 p-3"><span className="text-slate-600">中和に必要な体積</span><p className="text-lg font-bold">{state.equivalenceVolumeMl.toFixed(1)} mL</p></div></div>
 

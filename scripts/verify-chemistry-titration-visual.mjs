@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { getTitrationCurvePoints, getTitrationVisualState } from '../src/lib/chemistryTitrationVisual.ts';
+import { getIndicatorDisplay } from '../src/lib/chemistryIndicator.ts';
 
 const initial = getTitrationVisualState(0);
 assert.equal(initial.phase, 'acidic');
@@ -19,6 +20,15 @@ assert.ok(afterEquivalence.ph > 10);
 assert.equal(afterEquivalence.indicator, 'pink');
 assert.ok(afterEquivalence.ph > equivalence.ph);
 assert.ok(getTitrationVisualState(50).ph > afterEquivalence.ph);
+const earlyTransition = getTitrationVisualState(25.01);
+const lateTransition = getTitrationVisualState(25.03);
+assert.ok(earlyTransition.ph >= 8.3 && earlyTransition.ph < 10, 'the fine slider step should reach the phenolphthalein transition range');
+assert.ok(lateTransition.ph > earlyTransition.ph && lateTransition.ph < 10);
+const firstColor = getIndicatorDisplay('pp', earlyTransition.ph);
+const transitionColor = getIndicatorDisplay('pp', lateTransition.ph);
+const strongColor = getIndicatorDisplay('pp', getTitrationVisualState(26).ph);
+assert.notEqual(firstColor.backgroundColor, transitionColor.backgroundColor, 'phenolphthalein color intensity should change through its transition range');
+assert.notEqual(transitionColor.backgroundColor, strongColor.backgroundColor, 'phenolphthalein color should deepen after equivalence');
 assert.equal(getTitrationVisualState(-20).baseVolumeMl, 0);
 assert.equal(getTitrationVisualState(100).baseVolumeMl, 50);
 assert.throws(() => getTitrationVisualState(Number.NaN), RangeError);
@@ -39,6 +49,9 @@ assert.match(page, /aria-label="加えた水酸化ナトリウム水溶液の体
 assert.match(page, /role="img" aria-label=\{`塩酸/);
 assert.match(page, /フェノールフタレインはpH約8\.3から変色/);
 assert.match(page, /中和に必要な体積/);
+assert.match(page, /getIndicatorDisplay\('pp', state\.ph\)/);
+assert.match(page, /pHに応じて濃さが変化/);
+assert.match(page, /step="0\.01"/);
 assert.match(page, /href="\/learn\/chemistry\/titration-drill"/);
 assert.match(drill, /href="\/learn\/chemistry\/titration-visual"/);
 assert.match(portal, /slug: 'titration-visual'[\s\S]*?practiceLink: '\/learn\/chemistry\/titration-drill'/);
