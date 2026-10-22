@@ -36,7 +36,7 @@ const requiredVisuals = [
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual',
-  'concentration-visual', 'crystal-lattice',
+  'concentration-visual', 'crystal-lattice', 'titration-visual',
 ];
 
 const drillEntries = readPortalEntries(drill);
@@ -101,6 +101,17 @@ const calculus3VisualPracticePairs = [
   ['/learn/math/calculus3-curvature-visual', '/learn/math/calculus3-curve-analysis-drill'],
   ['/learn/math/calculus3-parametric-visual', '/learn/math/calculus3-differentiation-drill'],
 ];
+const titrationVisualRoute = '/learn/chemistry/titration-visual';
+const titrationDrillRoute = '/learn/chemistry/titration-drill';
+const titrationVisualEntry = learnEntries.find(entry => entry.link === titrationVisualRoute);
+if (!titrationVisualEntry || !new RegExp(`slug: '${titrationVisualEntry.slug}'[\\s\\S]*?practiceLink: '${titrationDrillRoute}'`).test(learn)) {
+  throw new Error('Chemistry titration visual portal card must link to its calculation drill');
+}
+const titrationVisualPage = fs.readFileSync(routeFile(titrationVisualRoute), 'utf8');
+const titrationDrillPage = fs.readFileSync(routeFile(titrationDrillRoute), 'utf8');
+if (!titrationVisualPage.includes(`href="${titrationDrillRoute}"`) || !titrationDrillPage.includes(`href="${titrationVisualRoute}"`)) {
+  throw new Error('Chemistry titration visual and calculation drill must link to each other');
+}
 const trigGraphDrillRoute = '/learn/math/trigonometry-graph-drill';
 const trigGraphVisualRoute = '/learn/math/trigonometry-graph';
 const trigGraphVisualEntry = learnEntries.find(entry => entry.link === trigGraphVisualRoute);

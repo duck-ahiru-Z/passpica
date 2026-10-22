@@ -40,6 +40,7 @@
     "test:point-line-distance": "node --experimental-strip-types scripts/verify-point-line-distance-drill.mjs",
     "test:chemistry-mole": "node --experimental-strip-types scripts/verify-chemistry-mole-calculation.mjs",
     "test:chemistry-titration": "node --experimental-strip-types scripts/verify-chemistry-titration.mjs",
+    "test:chemistry-titration-visual": "node --experimental-strip-types scripts/verify-chemistry-titration-visual.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
     "test:information-number-representation": "node --experimental-strip-types scripts/verify-information-number-representation.mjs",
     "test:information-number-representation-drill": "node --experimental-strip-types scripts/verify-information-number-representation-drill.mjs",

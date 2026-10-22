@@ -296,6 +296,18 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/chemistry/titration-drill'
   },
   {
+    slug: 'titration-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基（中和滴定）',
+    title: '中和滴定とpH変化ビジュアル',
+    description: '滴下量スライダーで強酸・強塩基のpH曲線、中和点、フェノールフタレインの変色域を対応づけて観察します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/titration-visual',
+    practiceLink: '/learn/chemistry/titration-drill'
+  },
+  {
     slug: 'metal-ion',
     subject: 'chemistry',
     subjectJp: '化学',
