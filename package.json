@@ -42,6 +42,7 @@
     "test:calculus3-mixed": "node --experimental-strip-types scripts/verify-calculus3-mixed-questions.mjs",
     "test:point-line-distance": "node --experimental-strip-types scripts/verify-point-line-distance-drill.mjs",
     "test:chemistry-mole": "node --experimental-strip-types scripts/verify-chemistry-mole-calculation.mjs",
+    "test:mole-visual": "node --experimental-strip-types scripts/verify-mole-visual.mjs",
     "test:chemistry-titration": "node --experimental-strip-types scripts/verify-chemistry-titration.mjs",
     "test:chemistry-titration-visual": "node --experimental-strip-types scripts/verify-chemistry-titration-visual.mjs",
     "test:reaction-safety": "node --experimental-strip-types scripts/verify-reaction-safety.mjs",

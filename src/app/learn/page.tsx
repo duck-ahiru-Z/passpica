@@ -188,6 +188,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
+    slug: 'mole-concept-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質量・粒子数・質量・気体',
+    title: 'モルの正体：粒子数・質量・気体体積をつなぐ',
+    description: '物質量を動かし、アボガドロ定数・モル質量・標準状態のモル体積が同じ「mol」を介してつながる様子を模式図と計算値で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/mole-concept-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
     slug: 'concentration-visual',
     subject: 'chemistry',
     subjectJp: '化学',

@@ -36,7 +36,7 @@ const requiredVisuals = [
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual',
-  'concentration-visual', 'crystal-lattice', 'titration-visual',
+  'mole-concept-visual', 'concentration-visual', 'crystal-lattice', 'titration-visual',
 ];
 
 const drillEntries = readPortalEntries(drill);
