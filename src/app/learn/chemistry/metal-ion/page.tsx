@@ -311,7 +311,7 @@ export default function MetalIonPage() {
           {/* 反応式カード */}
           <div className="retro-box space-y-4">
             <h3 className="font-bold border-b border-gray-300 pb-1.5 text-slate-800">
-              ■ {currentStepIdx === STEPS.length - 1 ? '最終確認' : '沈殿生成反応式'}
+              ■ {currentStepIdx === STEPS.length - 1 ? '最終確認' : '反応式・分離の確認'}
             </h3>
 
             <table className="classic-table text-[10px]">
@@ -335,7 +335,7 @@ export default function MetalIonPage() {
                   <td className="font-bold text-slate-800">{step.precipitateColor}</td>
                 </tr>
                 <tr>
-                  <td className="bg-gray-50 font-bold">{currentStepIdx === STEPS.length - 1 ? '観察内容' : 'イオン反応式'}</td>
+                  <td className="bg-gray-50 font-bold">{currentStepIdx === STEPS.length - 1 ? '観察内容' : '反応式'}</td>
                   <td className="font-mono text-slate-700 break-words">{step.reaction}</td>
                 </tr>
               </tbody>
