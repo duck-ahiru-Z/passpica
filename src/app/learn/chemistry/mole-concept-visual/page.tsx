@@ -64,7 +64,7 @@ export default function MoleConceptVisualPage() {
           </article>
           <article className="rounded-lg border border-violet-200 bg-violet-50 p-4 space-y-2">
             <h2 className="font-bold text-violet-900">元素別質量割合（{amountMol.toFixed(2)} mol 中）</h2>
-            <div className="flex h-4 overflow-hidden rounded border border-violet-200" role="img" aria-label={`${substance.formula} 1 mol の元素別質量割合：${state.elementalComposition.map(element => `${element.symbol} ${element.mass.toFixed(1)} g、${element.massPercent.toFixed(1)}%`).join('、')}`}>
+            <div className="flex h-4 overflow-hidden rounded border border-violet-200" role="img" aria-label={`${substance.formula} ${amountMol.toFixed(2)} mol 中の元素別質量割合：${state.elementalComposition.map(element => `${element.symbol} ${(element.mass * amountMol).toFixed(2)} g、${element.massPercent.toFixed(1)}%`).join('、')}`}>
               {state.elementalComposition.map((element, index) => <span key={element.symbol} aria-hidden="true" className={['bg-violet-500', 'bg-fuchsia-400', 'bg-amber-400'][index % 3]} style={{ width: `${element.massPercent}%` }} />)}
             </div>
             <ul className="space-y-1 text-xs text-slate-700">{state.elementalComposition.map(element => <li key={element.symbol} className="flex justify-between gap-2"><span>{element.symbol}：{element.massGrams.toFixed(2)} g</span><b>{element.massPercent.toFixed(1)}%</b></li>)}</ul>
