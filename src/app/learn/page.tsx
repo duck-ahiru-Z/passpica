@@ -235,6 +235,18 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/chemistry/concentration-visual',
     practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
+  {
+    slug: 'stoichiometry-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '化学反応と反応量比',
+    title: '制限試薬・過剰試薬ビジュアルシミュレーター',
+    description: '反応物の物質量を動かし、係数比から制限試薬・生成物の最大量・反応後の残量を図で確かめます。',
+    difficulty: '基礎',
+    type: '実験シミュレータ',
+    link: '/learn/chemistry/stoichiometry-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
 
   // 化学基礎・化学（新設含む）
   {

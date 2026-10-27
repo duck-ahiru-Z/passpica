@@ -36,7 +36,7 @@ const requiredVisuals = [
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual',
-  'mole-concept-visual', 'concentration-visual', 'crystal-lattice', 'titration-visual',
+  'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'crystal-lattice', 'titration-visual',
 ];
 
 const drillEntries = readPortalEntries(drill);
@@ -151,6 +151,15 @@ if (!learnEntries.some(entry => entry.link === acidBaseRoute)
   || !acidBaseVisual.includes(`href="${moleCalculationRoute}"`)
   || !moleCalculationPage.includes(`href="${acidBaseRoute}"`)) {
   throw new Error('Strong-acid/base pH calculation and acid-base visual must be linked from both directions.');
+}
+const stoichiometryVisualRoute = '/learn/chemistry/stoichiometry-visual';
+const stoichiometryVisualEntry = learnEntries.find(entry => entry.link === stoichiometryVisualRoute);
+const stoichiometryVisualPage = fs.readFileSync(routeFile(stoichiometryVisualRoute), 'utf8');
+if (!stoichiometryVisualEntry
+  || !new RegExp(`slug: '${stoichiometryVisualEntry.slug}'[\\s\\S]*?practiceLink: '${moleCalculationRoute}'`).test(learn)
+  || !stoichiometryVisualPage.includes(`href="${moleCalculationRoute}"`)
+  || !moleCalculationPage.includes(`href="${stoichiometryVisualRoute}"`)) {
+  throw new Error('Chemistry limiting-reagent visual and mole-calculation drill must link to each other from the portal and pages.');
 }
 const trigGraphDrillRoute = '/learn/math/trigonometry-graph-drill';
 const trigGraphVisualRoute = '/learn/math/trigonometry-graph';

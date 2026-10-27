@@ -24,6 +24,7 @@ export default function MoleCalculationDrillPage() {
     <Link href="/learn/chemistry/mole-concept-visual" className="retro-btn-classic inline-flex mb-2">mol と粒子数・質量・気体体積の関係をビジュアルで確認 →</Link>
     <Link href="/learn/chemistry/concentration-visual" className="retro-btn-classic inline-flex mb-4">モル濃度・希釈をビジュアルで確認 →</Link>
     <Link href="/learn/chemistry/acid-base" className="retro-btn-classic inline-flex mb-4">pHスケールと指示薬の色をビジュアルで確認 →</Link>
+    <Link href="/learn/chemistry/stoichiometry-visual" className="retro-btn-classic inline-flex mb-4">制限試薬・過剰試薬をビジュアルで確認 →</Link>
     <section className="retro-box space-y-5">
       <div className="flex flex-wrap items-center gap-2"><label htmlFor="mole-mode" className="font-bold">演習モード</label><select id="mole-mode" value={mode} onChange={event => { const selected = event.target.value as MoleMode; setMode(selected); next(selected); }} className="border p-1"><option value="mix">実戦練習：化学計算 全パターンランダム</option>{molePatterns.map(pattern => <option key={pattern} value={pattern}>基礎練習：{moleLabels[pattern]}だけ</option>)}</select></div>
       <div className="bg-white border p-8 text-center text-lg font-bold">{problem.question}</div>
