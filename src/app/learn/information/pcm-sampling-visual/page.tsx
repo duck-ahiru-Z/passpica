@@ -13,14 +13,15 @@ export default function PcmSamplingVisualPage() {
   const [channels, setChannels] = useState(2);
   const [seconds, setSeconds] = useState(1);
   const bytes = getPcmDataSize({ sampleRate, bitDepth, channels, seconds });
+  const formatCoordinate = (value: number) => (Math.round(value * 1000) / 1000).toString();
   const waveform = Array.from({ length: 15 }, (_, index) => {
-    const x = 34 + (index / 14) * 572;
-    const y = 105 - Math.sin((index / 14) * Math.PI * 4) * 57;
+    const x = formatCoordinate(34 + (index / 14) * 572);
+    const y = formatCoordinate(105 - Math.sin((index / 14) * Math.PI * 4) * 57);
     return `${x},${y}`;
   }).join(' ');
   const continuousWave = Array.from({ length: 121 }, (_, index) => {
-    const x = 30 + (index / 120) * 580;
-    const y = 105 - Math.sin((index / 120) * Math.PI * 4) * 57;
+    const x = formatCoordinate(30 + (index / 120) * 580);
+    const y = formatCoordinate(105 - Math.sin((index / 120) * Math.PI * 4) * 57);
     return `${x},${y}`;
   }).join(' ');
 
