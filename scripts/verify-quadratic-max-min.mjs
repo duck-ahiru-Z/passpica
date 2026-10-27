@@ -42,7 +42,8 @@ function verifyProblem(problem, requestedPattern) {
   assert.ok(problem.q >= -4 && problem.q <= 4);
   assert.equal(problem.isDownward, problem.a < 0);
   assert.ok(!problem.eq.includes('x0'), `zero-axis form must not render an extraneous 0: ${problem.eq}`);
-  if (problem.p === 0) assert.match(problem.eq, /^y = -?(?:[23])?x\^2 /, `zero-axis form should render as x²: ${problem.eq}`);
+  assert.ok(!problem.eq.includes('+ 0') && !problem.eq.includes('- 0'), `zero constant should be omitted: ${problem.eq}`);
+  if (problem.p === 0) assert.match(problem.eq, /^y = -?(?:[23])?x\^2(?: |$)/, `zero-axis form should render as x²: ${problem.eq}`);
   if (requestedPattern === 'pattern1') {
     assert.ok(problem.p > problem.alpha && problem.p < problem.beta);
     assert.notEqual(problem.p - problem.alpha, problem.beta - problem.p);
@@ -64,6 +65,19 @@ function verifyProblem(problem, requestedPattern) {
   assert.deepEqual(problem.maxX, candidates.filter(x => valueAt(x) === maxValue).sort((a, b) => a - b));
   assert.deepEqual(problem.minX, candidates.filter(x => valueAt(x) === minValue).sort((a, b) => a - b));
 }
+
+const zeroAxisZeroConstantRandomValues = [3 / 9, 0, 0.4, 4 / 9];
+const zeroAxisZeroConstant = generateQuadraticMaxMinProblem(
+  'pattern3',
+  () => zeroAxisZeroConstantRandomValues.shift() ?? 0.5,
+);
+assert.equal(zeroAxisZeroConstant.p, 0);
+assert.equal(zeroAxisZeroConstant.q, 0);
+assert.equal(zeroAxisZeroConstant.eq, 'y = 2x^2');
+assert.equal(zeroAxisZeroConstant.maxV, 2);
+assert.deepEqual(zeroAxisZeroConstant.maxX, [-1, 1]);
+assert.equal(zeroAxisZeroConstant.minV, 0);
+assert.deepEqual(zeroAxisZeroConstant.minX, [0]);
 
 for (const [index, pattern] of patterns.entries()) {
   const random = seeded(42_300 + index);
