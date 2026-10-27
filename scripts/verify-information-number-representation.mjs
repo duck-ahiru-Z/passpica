@@ -13,8 +13,9 @@ assert.equal(getByteContributions(255, 'twos-complement').reduce((sum, part) => 
 for (const invalid of [-1, 256, 1.5, Number.NaN]) assert.throws(() => byteToBinary(invalid), RangeError);
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/information/number-representation-visual/page.tsx'), 'utf8');
-assert.ok(page.includes("mode === 'twos-complement' ? 'ビット列の符号なし表現（0〜255）から設定'"), 'signed mode must explain that the slider sets the raw byte pattern');
-assert.ok(page.includes("mode === 'twos-complement' ? 'ビット列の符号なし表現値（0〜255）'"), 'signed mode slider needs an accessible raw-byte label');
+assert.ok(page.includes('min="4" max="16" step="1"') && page.includes('htmlFor="bit-width-slider"'), 'the visual must provide an accessible 4-to-16-bit width control');
+assert.ok(page.includes('符号なし：0〜{unsignedMaximum}') && page.includes('2の補数：{signedMinimum}〜{signedMaximum}'), 'both representable ranges must update with the selected bit width');
+assert.ok(page.includes('max={unsignedMaximum}') && page.includes('value.toString(2).padStart(bitWidth'), 'the bit pattern and unsigned slider must scale with the selected width');
 assert.ok(page.includes("mode === 'twos-complement' ? '2の補数の例を試す' : '選ぶと2の補数表示に切り替わります'"), 'presets shown in unsigned mode must explain that they switch to signed interpretation');
 assert.ok(page.includes("setMode('twos-complement'); setValue(preset.value)"), 'all signed presets, including the maximum positive value, must switch to signed interpretation');
 assert.ok(page.includes('href="/learn/information/number-representation-drill"'), 'visual must link directly to the related drill');
