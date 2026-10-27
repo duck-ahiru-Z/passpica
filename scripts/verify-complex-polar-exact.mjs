@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, polarAngleChoices, supportedPolarAngleLabels } from '../src/lib/complexPolarExact.ts';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect, polarAngleChoices, supportedPolarAngleLabels } from '../src/lib/complexPolarExact.ts';
 
 const cases = [
   [1, 0, '0'], [1, 1, '1'], [1, -1, '-1'],
@@ -25,6 +25,18 @@ for (const [radius, trigValue, expected] of cases) {
   assert.equal(formatExactTrigComponent(radius, trigValue), expected);
 }
 assert.throws(() => formatExactTrigComponent(1.5, 0.5), RangeError);
+for (const equivalent of ['√2', 'sqrt(2)', '\\sqrt{2}', '\\frac{2\\sqrt{2}}{2}', '1.4142135623730951']) {
+  assert.equal(isExactComponentAnswerCorrect(equivalent, '\\sqrt{2}'), true, `equivalent radical form should be accepted: ${equivalent}`);
+}
+for (const equivalent of ['3/2', '\\frac{3}{2}', '1.5']) {
+  assert.equal(isExactComponentAnswerCorrect(equivalent, '3/2'), true, `equivalent rational form should be accepted: ${equivalent}`);
+}
+for (const invalid of ['', 'sqrt(-2)', 'sqrt(2)+1', '2//3', 'NaN', 'Infinity']) {
+  assert.equal(isExactComponentAnswerCorrect(invalid, '\\sqrt{2}'), false, `invalid radical input must be rejected: ${invalid}`);
+}
+assert.equal(isExactComponentAnswerCorrect('√3/2', '\\sqrt{3}/2'), true);
+assert.equal(isExactComponentAnswerCorrect('-2√3/2', '-\\sqrt{3}'), true);
+assert.equal(isExactComponentAnswerCorrect('2', '\\sqrt{2}'), false, 'a different numeric value must not pass');
 
 for (const { val, label } of supportedPolarAngleLabels) assert.equal(formatPolarAngle(val), label);
 assert.throws(() => formatPolarAngle(5 * Math.PI / 12), RangeError);
@@ -38,6 +50,8 @@ for (const operation of ['sum', 'difference']) {
     for (const radius of operation === 'sum' ? [4, 6, 8, 9, 12, 16] : [1, 2, 3, 4, 6]) {
       const real = formatExactTrigComponent(radius, Math.cos(normalized));
       const imaginary = formatExactTrigComponent(radius, Math.sin(normalized));
+      assert.equal(isExactComponentAnswerCorrect(real, real), true, `canonical real component should parse: ${real}`);
+      assert.equal(isExactComponentAnswerCorrect(imaginary, imaginary), true, `canonical imaginary component should parse: ${imaginary}`);
       assert(Math.abs(parseExact(real) - radius * Math.cos(normalized)) < 1e-10,
         `real component mismatch for radius ${radius} at ${formatPolarAngle(normalized)}`);
       assert(Math.abs(parseExact(imaginary) - radius * Math.sin(normalized)) < 1e-10,
@@ -69,6 +83,7 @@ const page = await (await import('node:fs/promises')).readFile(
 );
 assert.match(page, /ansA = formatExactTrigComponent\(rRes, cosVal\)/);
 assert.match(page, /ansB = formatExactTrigComponent\(rRes, sinVal\)/);
+assert.match(page, /isExactComponentAnswerCorrect\(ansA, problem\.ansA!\)/, 'rectangular components should accept equivalent exact forms');
 assert.match(page, /const thStr = formatPolarAngle\(thRes\)/);
 assert.match(page, /getSupportedPolarAnglePairs\(isProduct \? 'sum' : 'difference'\)/);
 assert.match(page, /\\frac\{\$\{pts\[1\]\}\}\{\$\{pts\[0\]\}\}/, 'fractional polar angles must render numerator over denominator');

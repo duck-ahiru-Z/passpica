@@ -56,20 +56,34 @@ function expectedAnswer(problem) {
     case 'impedance': return Math.hypot(r, xl - xc);
     case 'current': return v / Math.hypot(r, xl - xc);
     case 'resonanceFrequency': return 1 / (2 * Math.PI * Math.sqrt(l * c));
+    case 'phaseAngle': return Math.atan2(2 * Math.PI * f * l - 1 / (2 * Math.PI * f * c), r) * 180 / Math.PI;
   }
 }
 
+const phaseSigns = new Set();
 for (const pattern of rlcCalculationPatterns) {
   for (let i = 0; i < 800; i += 1) {
     const problem = generateRlcCalculationProblem(pattern, stableRandom);
     if (problem.pattern !== pattern || Math.abs(problem.answer - expectedAnswer(problem)) > 1e-10 || !problem.explanation.includes(formatRlcCalculationAnswer(problem.answer))) {
       throw new Error(`formula, answer, or explanation mismatch for ${pattern}: ${JSON.stringify(problem)}`);
     }
+    if (pattern === 'phaseAngle') {
+      phaseSigns.add(Math.sign(problem.answer));
+      if (!problem.question.includes('誘導性を正、容量性を負')
+        || (problem.answer > 0 && !problem.explanation.includes('電流は遅れる'))
+        || (problem.answer < 0 && !problem.explanation.includes('電流が電圧より進む'))) {
+        throw new Error(`phase-angle sign/lead-lag explanation mismatch: ${JSON.stringify(problem)}`);
+      }
+    }
   }
 }
+if (!phaseSigns.has(-1) || !phaseSigns.has(1)) throw new Error(`phase-angle practice must include inductive and capacitive signs: ${JSON.stringify([...phaseSigns])}`);
+const inductivePhase = generateRlcCalculationProblem('phaseAngle', () => 0.9);
+const capacitivePhase = generateRlcCalculationProblem('phaseAngle', () => 0);
+if (inductivePhase.answer <= 0 || capacitivePhase.answer >= 0) throw new Error('phase-angle boundary fixtures must cover both lead/lag directions');
 
 const mixed = Array.from({ length: 1000 }, () => generateRlcCalculationProblem('mix', stableRandom));
-for (let start = 0; start < mixed.length; start += rlcCalculationPatterns.length) {
+for (let start = 0; start <= mixed.length - rlcCalculationPatterns.length; start += rlcCalculationPatterns.length) {
   if (new Set(mixed.slice(start, start + rlcCalculationPatterns.length).map(problem => problem.pattern)).size !== rlcCalculationPatterns.length) {
     throw new Error(`mixed set omitted an RLC pattern in batch ${start / rlcCalculationPatterns.length}`);
   }
@@ -84,4 +98,4 @@ if (!isRlcCalculationAnswerCorrect(formatRlcCalculationAnswer(2 / 3), 2 / 3)
   throw new Error('RLC answer validation must accept displayed rounding and reject empty, coarse, and non-finite values');
 }
 
-console.log('RLC calculation drill verified: 4,000 fixed and 1,000 mixed questions; reactance, impedance, current, resonance, answer formatting, balanced coverage, and portal links checked.');
+console.log('RLC calculation drill verified: 4,800 fixed and 1,000 mixed questions; reactance, impedance, current, resonance, signed phase angle in both inductive/capacitive cases, answer formatting, balanced coverage, and portal links checked.');

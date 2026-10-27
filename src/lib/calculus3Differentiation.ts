@@ -1,13 +1,13 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { isNumericAnswerCorrect } from './numericAnswer.ts';
 
-export type DifferentiationPattern = 'chain' | 'product' | 'logarithmic' | 'parametric' | 'ellipse-parametric' | 'implicit' | 'inverse' | 'higher';
+export type DifferentiationPattern = 'chain' | 'product' | 'quotient' | 'logarithmic' | 'parametric' | 'ellipse-parametric' | 'implicit' | 'inverse' | 'higher';
 export type DifferentiationMode = DifferentiationPattern | 'mix';
 export type DifferentiationProblem = { pattern: DifferentiationPattern; expression: string; answer: number; explanation: string };
 
-export const differentiationPatterns: readonly DifferentiationPattern[] = ['chain', 'product', 'logarithmic', 'parametric', 'ellipse-parametric', 'implicit', 'inverse', 'higher'];
+export const differentiationPatterns: readonly DifferentiationPattern[] = ['chain', 'product', 'quotient', 'logarithmic', 'parametric', 'ellipse-parametric', 'implicit', 'inverse', 'higher'];
 export const differentiationLabels: Record<DifferentiationPattern, string> = {
-  chain: '合成関数の微分', product: '積の微分', logarithmic: '対数微分', parametric: '媒介変数表示', 'ellipse-parametric': '楕円の媒介変数微分',
+  chain: '合成関数の微分', product: '積の微分', quotient: '商の微分', logarithmic: '対数微分', parametric: '媒介変数表示', 'ellipse-parametric': '楕円の媒介変数微分',
   implicit: '陰関数の微分', inverse: '逆関数の微分', higher: '高次導関数',
 };
 
@@ -19,6 +19,7 @@ const picker = new BalancedRandom(differentiationPatterns);
 const variants = {
   chain: new BalancedRandom(Array.from({ length: 9 }, (_, index) => ({ a: Math.floor(index / 3) + 1, n: (index % 3) + 2 }))),
   product: new BalancedRandom([2, 3, 4, 5]),
+  quotient: new BalancedRandom([2, 3, 4, 5]),
   logarithmic: new BalancedRandom([1, 2, 3, 4, 5]),
   parametric: new BalancedRandom([1, 2, 4, 5]),
   'ellipse-parametric': new BalancedRandom([{ label: '\\pi/6', value: Math.PI / 6 }, { label: '\\pi/4', value: Math.PI / 4 }, { label: '\\pi/3', value: Math.PI / 3 }, { label: '2\\pi/3', value: 2 * Math.PI / 3 }]),
@@ -31,6 +32,7 @@ export function generateDifferentiationProblem(mode: DifferentiationMode, random
   const pattern = mode === 'mix' ? picker.next(random) : mode;
   const chain = pattern === 'chain' ? variants.chain.next(random) : { a: 1, n: 2 };
   const productPower = pattern === 'product' ? variants.product.next(random) : 2;
+  const quotientPower = pattern === 'quotient' ? variants.quotient.next(random) : 2;
   const logPower = pattern === 'logarithmic' ? variants.logarithmic.next(random) : 1;
   const logExponent = `${logPower === 1 ? '' : logPower}x`;
   const logDerivativeCoefficient = logPower === 1 ? '' : `·${logPower}`;
@@ -53,6 +55,12 @@ export function generateDifferentiationProblem(mode: DifferentiationMode, random
       expression: `\\left.\\frac{dy}{dx}\\right|_{x=\\pi/2},\\quad y=x^{${productPower}}\\sin x`,
       answer: productPower * (Math.PI / 2) ** (productPower - 1),
       explanation: `積の微分で y′=${productPower}x^${productPower - 1} sin x+x^${productPower} cos x。x=π/2では sin(π/2)=1、cos(π/2)=0。よって y′=${productPower}(π/2)^${productPower - 1}=${(productPower * (Math.PI / 2) ** (productPower - 1)).toFixed(3)}。`,
+    },
+    quotient: {
+      pattern,
+      expression: `\\left.\\frac{dy}{dx}\\right|_{x=1},\\quad y=\\frac{x^{${quotientPower}}}{x+1}`,
+      answer: (2 * quotientPower - 1) / 4,
+      explanation: `商の微分より y′=[${quotientPower}x^${quotientPower - 1}(x+1)−x^${quotientPower}]/(x+1)²。x=1で (2×${quotientPower}−1)/4=${((2 * quotientPower - 1) / 4).toFixed(3)}。`,
     },
     logarithmic: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{x=1},\\quad y=x^{${logExponent}}\\ (x>0)`, answer: logPower, explanation: `対数微分で y′=x^(${logExponent})${logDerivativeCoefficient}(ln x+1)。x=1で ${logPower}。` },
     parametric: { pattern, expression: `\\left.\\frac{dy}{dx}\\right|_{t=1},\\quad x=t^2+1,\\ y=t^3-${parametricC}t`, answer: (3 - parametricC) / 2, explanation: `dy/dx=(3t²−${parametricC})/(2t)。t=1で ${((3 - parametricC) / 2).toFixed(3)}。` },

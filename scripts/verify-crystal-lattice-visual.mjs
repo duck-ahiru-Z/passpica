@@ -47,6 +47,9 @@ if (faceCenters.length !== 6 || new Set(faceCenters).size !== 6) {
 for (const formula of ['√3 a = 4r', '√2 a = 4r']) {
   if (!page.includes(`contactFormula: '${formula}'`)) throw new Error(`missing ${formula} contact relation`);
 }
+for (const wording of ['体対角線の長さは √3a', '面対角線の長さは √2a']) {
+  if (!page.includes(wording)) throw new Error(`missing precise diagonal explanation: ${wording}`);
+}
 if ((page.match(/\{info\.contactFormula\}/g) ?? []).length < 2) {
   throw new Error('the same contact relation must be rendered in both the diagram and the lattice data table');
 }

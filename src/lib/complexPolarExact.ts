@@ -105,3 +105,31 @@ export function formatExactTrigComponent(radius: number, trigValue: number): str
   if (coefficientDenominator > 1) coefficient += `/${coefficientDenominator}`;
   return `${sign}${coefficient}`;
 }
+
+/** Accept common equivalent exact forms for a single rational/radical component. */
+export function isExactComponentAnswerCorrect(input: string, expected: string): boolean {
+  const parse = (source: string): number | null => {
+    let normalized = source.trim().replace(/\s+/g, '');
+    if (!normalized) return null;
+    normalized = normalized
+      .replace(/\\sqrt\{(\d+)\}/g, 'sqrt($1)')
+      .replace(/√\s*(\d+)/g, 'sqrt($1)');
+    for (let pass = 0; pass < 3; pass += 1) {
+      normalized = normalized.replace(/\\frac\{([^{}]+)\}\{([^{}]+)\}/g, '$1/$2');
+    }
+    normalized = normalized.replace(/\\/g, '');
+    const match = normalized.match(/^([+-]?)(?:(\d+(?:\.\d*)?|\.\d+)?(?:sqrt\((\d+)\))?)(?:\/(\d+(?:\.\d*)?|\.\d+))?$/);
+    if (!match || (!match[2] && !match[3])) return null;
+    const coefficient = match[2] ? Number(match[2]) : 1;
+    const radicand = match[3] ? Number(match[3]) : 1;
+    const denominator = match[4] ? Number(match[4]) : 1;
+    if (!Number.isFinite(coefficient) || !Number.isFinite(radicand) || !Number.isFinite(denominator)
+      || radicand <= 0 || denominator <= 0) return null;
+    return (match[1] === '-' ? -1 : 1) * coefficient * Math.sqrt(radicand) / denominator;
+  };
+
+  const actualValue = parse(input);
+  const expectedValue = parse(expected);
+  return actualValue !== null && expectedValue !== null
+    && Math.abs(actualValue - expectedValue) <= 1e-10 * Math.max(1, Math.abs(expectedValue));
+}

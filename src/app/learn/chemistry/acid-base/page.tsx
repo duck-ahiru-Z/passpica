@@ -168,9 +168,10 @@ export default function AcidBasePage() {
 
       <section className="retro-box bg-slate-50 p-4 space-y-2">
         <h2 className="font-bold">関連する演習</h2>
-        <p className="text-slate-600">指示薬ごとの色判定を反復し、反応式の係数比を使う中和滴定の濃度計算にも挑戦できます。</p>
+        <p className="text-slate-600">指示薬ごとの色判定や中和滴定の濃度計算に加えて、強酸は pH=−log[H⁺]、強塩基は pOH=−log[OH⁻] と pH+pOH=14（25℃）を使う計算も練習できます。</p>
         <Link href="/learn/chemistry/indicator-drill" className="retro-btn-classic inline-flex mr-2">中和指示薬の色判定を練習する →</Link>
         <Link href="/learn/chemistry/titration-drill" className="retro-btn-classic inline-flex">中和滴定の濃度計算を練習する →</Link>
+        <Link href="/learn/chemistry/mole-calculation-drill" className="retro-btn-classic inline-flex">強酸・強塩基のpH計算を練習する →</Link>
       </section>
 
     </div>

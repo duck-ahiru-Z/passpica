@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { formatMotionAnswer, generateMotionProblem, getMotionExplanation, isMotionMethodValid, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
 import { calculateProjectileState } from '../src/lib/projectileMotion.ts';
+import { calculateSimpleHarmonicState } from '../src/lib/simpleHarmonicMotion.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes('onClick={() => setMethod(pattern)}')) {
@@ -20,6 +21,14 @@ const checks = {
     const [, distance, time] = problem.question.match(/([\d.]+) m を ([\d.]+) s/);
     return Math.abs(problem.answer - Number(distance) / Number(time)) < 1e-12 && problem.unit === 'm/s'
       && problem.question.includes('平均の速さ') && problem.explanation.startsWith('平均の速さ=');
+  },
+  averageVelocity: problem => {
+    const [, displacement, time] = problem.question.match(/変位は (-?[\d.]+) m、移動にかかった時間は ([\d.]+) s/);
+    const expected = Number(displacement) / Number(time);
+    return problem.answer === expected && problem.unit === 'm/s'
+      && problem.explanation.includes(`平均速度=変位/時間=(${displacement})/${time}=${formatMotionAnswer(expected)} m/s`)
+      && problem.question.includes('右向きを正')
+      && (expected >= 0 || problem.explanation.includes('負の値は左向き'));
   },
   acceleration: problem => {
     const [, initial, final, time] = problem.question.match(/([\d.]+) m\/s から ([\d.]+) m\/s に ([\d.]+) s/);
@@ -44,6 +53,14 @@ const checks = {
     const expected = Number(force) * Number(time);
     return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'N·s'
       && problem.explanation.includes(`I=FΔt=${force}×${time}=${formatMotionAnswer(expected)} N·s`);
+  },
+  impulseSigned: problem => {
+    const [, direction, magnitude, time] = problem.question.match(/を正とする。物体に (右向き|左向き) へ ([\d.]+) N の一定の力を ([\d.]+) s/);
+    const force = Number(magnitude) * (direction === '左向き' ? -1 : 1);
+    const expected = force * Number(time);
+    return problem.answer === expected && problem.unit === 'N·s'
+      && problem.explanation.includes(`I=FΔt=${force}×${time}=${formatMotionAnswer(expected)} N·s`)
+      && problem.explanation.includes('力積の符号は力の向きで決まる');
   },
   kineticEnergy: problem => {
     const [, mass, velocity] = problem.question.match(/質量 ([\d.]+) kg .*? ([\d.]+) m\/s/);
@@ -82,6 +99,18 @@ const checks = {
       && problem.explanation.includes(`(${displacement})²=${formatMotionAnswer(expected)} J`)
       && problem.explanation.includes('向きによらず0以上');
   },
+  springPeriod: problem => {
+    const [, mass, constant] = problem.question.match(/質量 ([\d.]+) kg .*ばね定数 ([\d.]+) N\/m/);
+    const expected = 2 * Math.PI * Math.sqrt(Number(mass) / Number(constant));
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 's'
+      && problem.explanation.includes(`T=2π√(m/k)=2π√(${mass}/${constant})=${formatMotionAnswer(expected)} s`);
+  },
+  springFrequency: problem => {
+    const [, mass, constant] = problem.question.match(/質量 ([\d.]+) kg .*ばね定数 ([\d.]+) N\/m/);
+    const expected = Math.sqrt(Number(constant) / Number(mass)) / (2 * Math.PI);
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'Hz'
+      && problem.explanation.includes(`f=ω/(2π)=√(${constant}/${mass})/(2π)=${formatMotionAnswer(expected)} Hz`);
+  },
 };
 
 if (formatMotionAnswer(30.000000000000007) !== '30' || formatMotionAnswer(2.4492935982947064e-15) !== '0') {
@@ -97,6 +126,29 @@ if (!drillPage.includes('href="/learn/physics/projectile-visual"')) throw new Er
 if (!drillPage.includes('href="/learn/physics/motion-visual"') || !drillPage.includes('等加速度運動ビジュアルへ')) {
   throw new Error('mechanics calculation drill must link back to the constant-acceleration visual');
 }
+if (!drillPage.includes('href="/learn/physics/simple-harmonic-visual"') || !drillPage.includes('単振動ビジュアルへ')) {
+  throw new Error('mechanics calculation drill must link back to the simple-harmonic visual');
+}
+const simpleHarmonicPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/simple-harmonic-visual/page.tsx'), 'utf8');
+if (!simpleHarmonicPage.includes('href="/learn/physics/motion-calculation-drill"')
+  || !simpleHarmonicPage.includes('aria-label="振動の位相"')
+  || !simpleHarmonicPage.includes('aria-label="振動する物体の質量"')
+  || !simpleHarmonicPage.includes('aria-label="ばね定数"')
+  || !simpleHarmonicPage.includes('aria-label="振幅"')) {
+  throw new Error('simple-harmonic visual must provide the linked drill and named interactive controls');
+}
+if (!simpleHarmonicPage.includes('変位 x(t)=A cos(ωt)')
+  || !simpleHarmonicPage.includes('GRAPH_LEFT - 8} y={GRAPH_TOP + 4')
+  || !simpleHarmonicPage.includes('>+A</text>')
+  || !simpleHarmonicPage.includes('>0</text>')
+  || !simpleHarmonicPage.includes('>−A</text>')) {
+  throw new Error('simple-harmonic displacement graph must label the formula, amplitude extrema and equilibrium axis');
+}
+if (!simpleHarmonicPage.includes('aria-label="エネルギー棒グラフの凡例"')
+  || !simpleHarmonicPage.includes('bg-amber-400" />弾性エネルギー')
+  || !simpleHarmonicPage.includes('bg-green-500" />運動エネルギー')) {
+  throw new Error('simple-harmonic energy bar must visually identify potential and kinetic energy colors');
+}
 const motionVisualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-visual/page.tsx'), 'utf8');
 if (!motionVisualPage.includes('href="/learn/physics/motion-calculation-drill"') || !motionVisualPage.includes('等加速度運動の計算演習へ')) {
   throw new Error('constant-acceleration visual must link directly to its calculation drill');
@@ -105,15 +157,44 @@ if (!motionVisualPage.includes('href="/learn/physics/motion-calculation-drill"')
 for (const pattern of motionPatterns) {
   if (pattern.startsWith('projectile')) continue;
   const questions = new Set();
+  const answers = new Set();
   for (let index = 0; index < 500; index += 1) {
     const problem = generateMotionProblem(pattern, stableRandom);
     if (problem.pattern !== pattern || !checks[pattern](problem) || !problem.explanation.trim()) throw new Error(`formula, unit, or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     questions.add(problem.question);
+    answers.add(formatMotionAnswer(problem.answer));
   }
   const expectedVariants = pattern === 'projectileComponents' ? 12
-    : pattern === 'energyConservation' ? 6
+    : ['energyConservation', 'springPeriod', 'springFrequency'].includes(pattern) ? (pattern === 'energyConservation' ? 6 : 5)
     : ['projectileMaxHeight', 'projectileFlightTime', 'projectileRange'].includes(pattern) ? 6 : 5;
   if (questions.size !== expectedVariants) throw new Error(`${pattern} generated ${questions.size}/${expectedVariants} expected variants`);
+  if (['averageVelocity', 'springPeriod', 'springFrequency'].includes(pattern) && answers.size !== expectedVariants) {
+    throw new Error(`${pattern} generated only ${answers.size}/${expectedVariants} distinct answer values`);
+  }
+}
+
+for (const mass of [0.5, 1, 1.5, 2]) {
+  for (const springConstant of [50, 100, 150, 200]) {
+    for (const amplitude of [0.1, 0.2, 0.3]) {
+      for (const phase of [0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 1]) {
+        const state = calculateSimpleHarmonicState({ mass, springConstant, amplitude, phase });
+        const omega = Math.sqrt(springConstant / mass);
+        const angle = 2 * Math.PI * phase;
+        const expectedPotential = 0.5 * springConstant * amplitude ** 2 * Math.cos(angle) ** 2;
+        const expectedKinetic = 0.5 * mass * amplitude ** 2 * omega ** 2 * Math.sin(angle) ** 2;
+        if (Math.abs(state.period - 2 * Math.PI / omega) > 1e-12
+          || Math.abs(state.frequency * state.period - 1) > 1e-12
+          || Math.abs(state.displacement - amplitude * Math.cos(angle)) > 1e-12
+          || Math.abs(state.velocity + amplitude * omega * Math.sin(angle)) > 1e-12
+          || Math.abs(state.acceleration + omega ** 2 * state.displacement) > 1e-12
+          || Math.abs(state.potentialEnergy - expectedPotential) > 1e-12
+          || Math.abs(state.kineticEnergy - expectedKinetic) > 1e-12
+          || Math.abs(state.totalEnergy - 0.5 * springConstant * amplitude ** 2) > 1e-12) {
+          throw new Error(`simple-harmonic state mismatch at m=${mass}, k=${springConstant}, A=${amplitude}, phase=${phase}: ${JSON.stringify(state)}`);
+        }
+      }
+    }
+  }
 }
 
 for (const pattern of ['projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange']) {
@@ -148,4 +229,4 @@ for (let start = 0; start <= mixed.length - motionPatterns.length; start += 1) {
   if (new Set(mixed.slice(start, start + motionPatterns.length)).size !== motionPatterns.length) throw new Error(`mixed set omitted a mechanics pattern in batch ${start / motionPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mechanics practice repeated adjacent patterns');
-console.log('Physics mechanics verified: fixed-pattern questions including magnitude, signed restoring force, elastic potential energy, and projectile variants; 900 mixed questions; formulas, units, answer keys, variants, balance, adjacency, and displayed rounding checked.');
+console.log('Physics mechanics verified: fixed-pattern questions including signed average velocity, impulse, restoring force, spring energy, period and frequency; 900 balanced mixed questions; formulas, units, answer keys, variants, adjacency, displayed rounding, and 432 simple-harmonic states checked.');

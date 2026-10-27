@@ -35,7 +35,7 @@ const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual',
+  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual',
   'mole-concept-visual', 'concentration-visual', 'crystal-lattice', 'titration-visual',
 ];
 
@@ -52,6 +52,7 @@ const practiceModeDescriptions = [
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
   'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill', 'trigonometry-graph-drill',
   'calculus3-integral-drill', 'indicator-drill',
+  'calculus3-differentiation-drill',
 ];
 for (const slug of practiceModeDescriptions) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);
@@ -61,6 +62,36 @@ for (const slug of practiceModeDescriptions) {
   if (!description.includes('個別') || !description.includes('ランダム')) {
     throw new Error(`A drill with focused and mixed modes must explain both in its portal card: ${slug}`);
   }
+}
+const updatedDrillCopy = {
+  'calculus3-differentiation-drill': '合成・積・商・対数・媒介変数・陰関数・逆関数・高次導関数',
+  'mole-calculation-drill': '元素の質量百分率',
+  'mole-calculation-drill': '過剰試薬の残量',
+  'titration-drill': '酸濃度から塩基濃度を求める逆向き計算',
+  'motion-calculation-drill': 'ばね振り子の周期と振動数',
+  'calculus3-limit-drill': 'tan(kx)/x',
+  'calculation-drill': '論理演算5種の個別練習',
+  'factorization-strategy-drill': '因数分解の完成まで',
+  'ac-circuit-drill': '位相差（進み・遅れ）',
+};
+const moleCardStart = drill.indexOf("slug: 'mole-calculation-drill'");
+const moleCardEnd = drill.indexOf('\n  },', moleCardStart);
+const moleCard = drill.slice(moleCardStart, moleCardEnd);
+if (!moleCard.includes('強酸／強塩基のpH')) {
+  throw new Error('Chemistry mole-calculation portal summary must distinguish strong-acid and strong-base pH practice.');
+}
+for (const [slug, phrase] of Object.entries(updatedDrillCopy)) {
+  const slugIndex = drill.indexOf(`slug: '${slug}'`);
+  const cardStart = drill.lastIndexOf('  {', slugIndex);
+  const cardEnd = drill.indexOf('\n  },', slugIndex);
+  if (slugIndex < 0 || !drill.slice(cardStart, cardEnd).includes(phrase)) {
+    throw new Error(`Drill portal summary is missing its current scope: ${slug} -> ${phrase}`);
+  }
+}
+const motionCardStart = drill.indexOf("slug: 'motion-calculation-drill'");
+const motionCardEnd = drill.indexOf('\n  },', motionCardStart);
+if (!drill.slice(motionCardStart, motionCardEnd).includes('符号付き平均速度')) {
+  throw new Error('Physics motion portal summary must distinguish signed average velocity from average speed.');
 }
 for (const filter of ['aria-label="科目で絞り込む"', 'aria-label="難易度で絞り込む"']) {
   if (!drill.includes(filter)) throw new Error(`Drill portal filter group must have an accessible name: ${filter}`);
@@ -112,6 +143,15 @@ const titrationDrillPage = fs.readFileSync(routeFile(titrationDrillRoute), 'utf8
 if (!titrationVisualPage.includes(`href="${titrationDrillRoute}"`) || !titrationDrillPage.includes(`href="${titrationVisualRoute}"`)) {
   throw new Error('Chemistry titration visual and calculation drill must link to each other');
 }
+const acidBaseRoute = '/learn/chemistry/acid-base';
+const moleCalculationRoute = '/learn/chemistry/mole-calculation-drill';
+const acidBaseVisual = fs.readFileSync(routeFile(acidBaseRoute), 'utf8');
+const moleCalculationPage = fs.readFileSync(routeFile(moleCalculationRoute), 'utf8');
+if (!learnEntries.some(entry => entry.link === acidBaseRoute)
+  || !acidBaseVisual.includes(`href="${moleCalculationRoute}"`)
+  || !moleCalculationPage.includes(`href="${acidBaseRoute}"`)) {
+  throw new Error('Strong-acid/base pH calculation and acid-base visual must be linked from both directions.');
+}
 const trigGraphDrillRoute = '/learn/math/trigonometry-graph-drill';
 const trigGraphVisualRoute = '/learn/math/trigonometry-graph';
 const trigGraphVisualEntry = learnEntries.find(entry => entry.link === trigGraphVisualRoute);
@@ -150,7 +190,7 @@ if (!volumeVisual.includes('πx⁴') || !volumeVisual.includes('πb⁵/5') || !v
 if (!learn.includes("practiceLink: '/learn/math/calculus3-area-volume-drill'")) {
   throw new Error('Calculus III volume visual must link to its related area and volume practice');
 }
-for (const slug of ['projectile-visual', 'motion-visual']) {
+for (const slug of ['projectile-visual', 'motion-visual', 'simple-harmonic-visual', 'impulse-momentum-visual']) {
   const entry = learnEntries.find(candidate => candidate.slug === slug);
   if (!entry || !new RegExp(`slug: '${slug}'[\\s\\S]*?practiceLink: '/learn/physics/motion-calculation-drill'`).test(learn)) {
     throw new Error(`Physics visual ${slug} must link to its related mechanics practice`);
@@ -163,6 +203,12 @@ if (!springVisualEntry || !new RegExp(`slug: 'spring-visual'[\\s\\S]*?practiceLi
   || !springVisual.includes('href="/learn/physics/motion-calculation-drill"')
   || !motionDrill.includes('href="/learn/physics/spring-visual"')) {
   throw new Error('The spring visual and its mechanics drill must link to each other.');
+}
+const harmonicVisual = fs.readFileSync(path.join(root, 'src/app/learn/physics/simple-harmonic-visual/page.tsx'), 'utf8');
+if (!harmonicVisual.includes('href="/learn/physics/motion-calculation-drill"')
+  || !motionDrill.includes('href="/learn/physics/simple-harmonic-visual"')
+  || !learn.includes("slug: 'simple-harmonic-visual'")) {
+  throw new Error('The simple-harmonic visual, mechanics drill and learning portal must link to each other.');
 }
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');

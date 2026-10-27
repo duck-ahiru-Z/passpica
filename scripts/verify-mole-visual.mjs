@@ -10,19 +10,25 @@ const drill = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/mole-calc
 
 assert.equal(AVOGADRO_CONSTANT, 6.02e23);
 assert.equal(STANDARD_MOLAR_VOLUME_L, 22.4);
-assert.equal(moleVisualSubstances.length, 3);
+assert.equal(moleVisualSubstances.length, 5);
 for (const item of moleVisualSubstances) {
+  assert.equal(item.elements.reduce((sum, element) => sum + element.mass, 0), item.molarMass, `${item.formula} elemental masses must sum to its molar mass`);
   for (const amount of [0.25, 0.5, 1, 1.5, 2]) {
     const state = getMoleVisualState(amount, item.id);
     assert.equal(state.particles, amount * 6.02e23);
     assert.equal(state.massGrams, amount * item.molarMass);
     assert.equal(state.gasVolumeLiters, amount * 22.4);
+    assert.ok(Math.abs(state.elementalComposition.reduce((sum, element) => sum + element.massPercent, 0) - 100) < 1e-12);
+    assert.deepEqual(state.elementalComposition.map(element => element.massGrams), item.elements.map(element => amount * element.mass));
     assert.ok(state.diagramDots >= 1 && state.diagramDots <= 12);
   }
 }
 assert.equal(getMoleVisualState(1, 'water').massGrams, 18);
 assert.equal(getMoleVisualState(1, 'carbon-dioxide').massGrams, 44);
 assert.equal(getMoleVisualState(1, 'sodium-chloride').massGrams, 58.5);
+assert.equal(getMoleVisualState(1, 'ammonia').massGrams, 17);
+assert.equal(getMoleVisualState(1, 'calcium-carbonate').massGrams, 100);
+assert.equal(getMoleVisualState(1, 'water').elementalComposition.find(element => element.symbol === 'O').massPercent, 16 / 18 * 100);
 assert.equal(moleVisualSubstances.find(item => item.id === 'water').entity, '水分子');
 assert.equal(moleVisualSubstances.find(item => item.id === 'carbon-dioxide').entity, '二酸化炭素分子');
 assert.equal(moleVisualSubstances.find(item => item.id === 'sodium-chloride').entity, 'NaClの式単位');
@@ -41,6 +47,10 @@ for (const content of [
   '1 mol は対象となる粒子を約 6.02×10²³ 個集めた量です',
   '1つの丸が1個の{substance.entity}という意味ではありません',
   '理想気体のモル体積 22.4 L/mol',
+  '気体と仮定した体積 V',
+  '水や NaCl は、気体と仮定した場合の対応量',
+  '1 mol の元素別質量割合',
+  '元素の質量割合 = 元素の質量 ÷ 化合物のモル質量 × 100',
   'formatParticleCount(state.particles)',
   'href="/learn/chemistry/mole-calculation-drill"',
   'href="/learn/chemistry/concentration-visual"',
@@ -51,4 +61,4 @@ assert.ok(portal.includes("slug: 'mole-concept-visual'"));
 assert.ok(portal.includes("practiceLink: '/learn/chemistry/mole-calculation-drill'"));
 assert.ok(drill.includes('href="/learn/chemistry/mole-concept-visual"'));
 
-console.log('Mole concept visual verified: Avogadro count, molar-mass and standard gas-volume scaling, three substances, slider endpoints, symbolic particle diagram, invalid inputs, and portal/drill links.');
+console.log('Mole concept visual verified: Avogadro count, molar mass, elemental composition, standard gas-volume scaling, five substances, slider endpoints, symbolic particle diagram, invalid inputs, and portal/drill links.');

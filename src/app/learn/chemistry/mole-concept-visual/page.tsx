@@ -21,8 +21,8 @@ export default function MoleConceptVisualPage() {
       <Link href="/learn" className="text-blue-600 hover:underline">← 学習室ポータルへ戻る</Link>
       <header className="space-y-2 border-b border-gray-300 pb-3">
         <p className="text-amber-700 font-bold">化学・物質量</p>
-        <h1 className="text-xl md:text-2xl font-bold">モルの正体：粒子数・質量・気体体積をつなぐ</h1>
-        <p className="text-slate-600">物質量 n を変えると、粒子数・質量・標準状態の気体体積が同じ比率で変わります。</p>
+        <h1 className="text-xl md:text-2xl font-bold">モルの正体：粒子数・質量・組成・気体体積をつなぐ</h1>
+        <p className="text-slate-600">物質量 n を変えると、粒子数・質量・標準状態の気体体積が同じ比率で変わります。元素別の質量割合から、化合物全体の組成も読み取れます。</p>
       </header>
 
       <section className="retro-box bg-white p-5 md:p-7 space-y-6">
@@ -51,7 +51,7 @@ export default function MoleConceptVisualPage() {
           </figure>
         </div>
 
-        <div className="grid sm:grid-cols-3 gap-3">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <article className="rounded-lg border border-amber-200 bg-amber-50 p-4 space-y-1">
             <h2 className="font-bold text-amber-900">粒子数 N</h2>
             <p className="text-xs text-slate-600">N = n × 6.02×10²³</p>
@@ -62,16 +62,24 @@ export default function MoleConceptVisualPage() {
             <p className="text-xs text-slate-600">m = n × {substance.molarMass} g/mol</p>
             <p className="text-lg font-bold tabular-nums">{state.massGrams.toFixed(2)} g</p>
           </article>
+          <article className="rounded-lg border border-violet-200 bg-violet-50 p-4 space-y-2">
+            <h2 className="font-bold text-violet-900">元素別質量割合（{amountMol.toFixed(2)} mol 中）</h2>
+            <div className="flex h-4 overflow-hidden rounded border border-violet-200" role="img" aria-label={`${substance.formula} 1 mol の元素別質量割合：${state.elementalComposition.map(element => `${element.symbol} ${element.mass.toFixed(1)} g、${element.massPercent.toFixed(1)}%`).join('、')}`}>
+              {state.elementalComposition.map((element, index) => <span key={element.symbol} aria-hidden="true" className={['bg-violet-500', 'bg-fuchsia-400', 'bg-amber-400'][index % 3]} style={{ width: `${element.massPercent}%` }} />)}
+            </div>
+            <ul className="space-y-1 text-xs text-slate-700">{state.elementalComposition.map(element => <li key={element.symbol} className="flex justify-between gap-2"><span>{element.symbol}：{element.massGrams.toFixed(2)} g</span><b>{element.massPercent.toFixed(1)}%</b></li>)}</ul>
+            <p className="text-xs text-slate-600">元素の質量割合 = 元素の質量 ÷ 化合物のモル質量 × 100</p>
+          </article>
           <article className="rounded-lg border border-sky-200 bg-sky-50 p-4 space-y-1">
-            <h2 className="font-bold text-sky-900">気体の体積 V</h2>
+            <h2 className="font-bold text-sky-900">気体と仮定した体積 V</h2>
             <p className="text-xs text-slate-600">V = n × 22.4 L/mol</p>
             <p className="text-lg font-bold tabular-nums">{state.gasVolumeLiters.toFixed(2)} L</p>
           </article>
         </div>
 
-        <p className="text-xs text-slate-600">気体体積は 0℃・1.013×10⁵ Pa での理想気体のモル体積 22.4 L/mol を用いた値です。気体以外の物質にも、この条件で気体になった場合の対応量として表示しています。</p>
+        <p className="text-xs text-slate-600">体積は 0℃・1.013×10⁵ Pa での理想気体のモル体積 22.4 L/mol を用いた参考値です。水や NaCl は、気体と仮定した場合の対応量として表示しています。</p>
         <div className="flex flex-wrap gap-3">
-          <Link href="/learn/chemistry/mole-calculation-drill" className="retro-btn-classic inline-flex">質量・気体・反応量の計算を練習 →</Link>
+          <Link href="/learn/chemistry/mole-calculation-drill" className="retro-btn-classic inline-flex">質量・組成百分率・気体の計算を練習 →</Link>
           <Link href="/learn/chemistry/concentration-visual" className="retro-btn-classic inline-flex">モル濃度・希釈のビジュアルへ →</Link>
         </div>
       </section>

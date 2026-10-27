@@ -39,9 +39,11 @@ export default function Calculus3LimitVisualPage() {
           <p className="text-slate-600 mt-1 leading-relaxed">xはラジアンで測ります。スライダーを動かして、左右から近づく点と y = 1 の関係を観察します。x = 0 では式を直接割れませんが、極限値は読み取れます。</p>
         </div>
         <div className="border border-slate-300 bg-slate-50 p-2">
-          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="block w-full h-auto" role="img" aria-label="sin x を x で割った関数のグラフ。x=0では関数は定義されず、極限値1に白抜きの点があります。">
+          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="block w-full h-auto" role="img" aria-label="sin x を x で割った関数のグラフ。x軸はラジアンで−π、−1、0、1、π。x=0では関数は定義されず、極限値1に白抜きの点があります。">
             <line x1={sx(-3.2)} y1={sy(0)} x2={sx(3.2)} y2={sy(0)} stroke="#64748b" strokeWidth="1" />
             <line x1={sx(0)} y1={sy(-0.2)} x2={sx(0)} y2={sy(1.2)} stroke="#64748b" strokeWidth="1" />
+            {[-Math.PI, -1, 1, Math.PI].map((value, index) => <g key={`x-tick-${index}`}><line x1={sx(value)} y1={sy(0) - 4} x2={sx(value)} y2={sy(0) + 4} stroke="#64748b" /><text x={sx(value)} y={sy(0) + 17} textAnchor="middle" fill="#475569" fontSize="11">{['−π', '−1', '1', 'π'][index]}</text></g>)}
+            <text x={sx(0) - 8} y={sy(0) + 17} textAnchor="end" fill="#475569" fontSize="11">0</text>
             <line x1={sx(-3.2)} y1={sy(1)} x2={sx(3.2)} y2={sy(1)} stroke="#dc2626" strokeDasharray="5 4" strokeWidth="1.5" />
             <path d={curvePath} fill="none" stroke="#2563eb" strokeWidth="2.5" />
             <line x1={sx(-x)} y1={sy(0)} x2={sx(-x)} y2={sy(mirrored)} stroke="#16a34a" strokeDasharray="3 3" />

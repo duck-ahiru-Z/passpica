@@ -2,9 +2,11 @@ export const AVOGADRO_CONSTANT = 6.02e23;
 export const STANDARD_MOLAR_VOLUME_L = 22.4;
 
 export const moleVisualSubstances = [
-  { id: 'water', formula: 'H₂O', name: '水', entity: '水分子', molarMass: 18 },
-  { id: 'carbon-dioxide', formula: 'CO₂', name: '二酸化炭素', entity: '二酸化炭素分子', molarMass: 44 },
-  { id: 'sodium-chloride', formula: 'NaCl', name: '塩化ナトリウム', entity: 'NaClの式単位', molarMass: 58.5 },
+  { id: 'water', formula: 'H₂O', name: '水', entity: '水分子', molarMass: 18, elements: [{ symbol: 'H', mass: 2 }, { symbol: 'O', mass: 16 }] },
+  { id: 'carbon-dioxide', formula: 'CO₂', name: '二酸化炭素', entity: '二酸化炭素分子', molarMass: 44, elements: [{ symbol: 'C', mass: 12 }, { symbol: 'O', mass: 32 }] },
+  { id: 'sodium-chloride', formula: 'NaCl', name: '塩化ナトリウム', entity: 'NaClの式単位', molarMass: 58.5, elements: [{ symbol: 'Na', mass: 23 }, { symbol: 'Cl', mass: 35.5 }] },
+  { id: 'ammonia', formula: 'NH₃', name: 'アンモニア', entity: 'アンモニア分子', molarMass: 17, elements: [{ symbol: 'N', mass: 14 }, { symbol: 'H', mass: 3 }] },
+  { id: 'calcium-carbonate', formula: 'CaCO₃', name: '炭酸カルシウム', entity: 'CaCO₃の式単位', molarMass: 100, elements: [{ symbol: 'Ca', mass: 40 }, { symbol: 'C', mass: 12 }, { symbol: 'O', mass: 48 }] },
 ] as const;
 
 export type MoleVisualSubstanceId = (typeof moleVisualSubstances)[number]['id'];
@@ -29,6 +31,11 @@ export function getMoleVisualState(amountMol: number, substanceId: MoleVisualSub
     particles: amountMol * AVOGADRO_CONSTANT,
     massGrams: amountMol * substance.molarMass,
     gasVolumeLiters: amountMol * STANDARD_MOLAR_VOLUME_L,
+    elementalComposition: substance.elements.map(element => ({
+      ...element,
+      massGrams: amountMol * element.mass,
+      massPercent: element.mass / substance.molarMass * 100,
+    })),
     // The dots are a visual aid scaled to the selected amount, not literal particles.
     diagramDots: Math.max(1, Math.round(amountMol * 6)),
   };

@@ -3,12 +3,14 @@ import { integralPatterns } from '../src/lib/calculus3Integrals.ts';
 import { geometryPatterns } from '../src/lib/calculus3Geometry.ts';
 import { curvePatterns } from '../src/lib/calculus3CurveAnalysis.ts';
 import { differentiationPatterns } from '../src/lib/calculus3Differentiation.ts';
+import { limitPatterns } from '../src/lib/calculus3Limits.ts';
+import { differentialEquationPatterns } from '../src/lib/calculus3DifferentialEquations.ts';
 import katex from 'katex';
 import fs from 'node:fs';
 import path from 'node:path';
 
 const areas = ['limit', 'differentiation', 'curve-analysis', 'integral', 'geometry', 'differential-equation'];
-const patternCounts = { limit: 7, differentiation: differentiationPatterns.length, 'curve-analysis': curvePatterns.length, integral: integralPatterns.length, geometry: geometryPatterns.length, 'differential-equation': 4 };
+const patternCounts = { limit: limitPatterns.length, differentiation: differentiationPatterns.length, 'curve-analysis': curvePatterns.length, integral: integralPatterns.length, geometry: geometryPatterns.length, 'differential-equation': differentialEquationPatterns.length };
 const areaLabels = { limit: '極限', differentiation: '微分法', 'curve-analysis': '曲線分析', integral: '積分法', geometry: '面積・体積', 'differential-equation': '微分方程式' };
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-mixed-drill/page.tsx'), 'utf8');
 for (const requirement of ['実戦練習：数学III 全体ランダム', 'type="radio" name="calculus3-mixed-answer"', 'disabled={!answer}', 'role="status"', 'MathEq math={question.expression}', 'acceptedAnswers.includes(answer)', 'question.alternativeExplanations?.[answer]']) {

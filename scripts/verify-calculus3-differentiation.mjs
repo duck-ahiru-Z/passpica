@@ -44,6 +44,14 @@ const checks = {
       && problem.explanation.includes('cos(π/2)=0')
       && problem.explanation.includes(problem.answer.toFixed(3));
   },
+  quotient: problem => {
+    const [, power] = problem.expression.match(/y=\\frac\{x\^\{(\d+)\}\}\{x\+1\}/);
+    const n = Number(power);
+    const expected = (2 * n - 1) / 4;
+    return close(problem.answer, expected)
+      && problem.explanation.includes('商の微分')
+      && problem.explanation.includes(`${expected.toFixed(3)}`);
+  },
   logarithmic: problem => {
     const [, aText] = problem.expression.match(/y=x\^\{(?:(\d+)x|x)\}/);
     const a = Number(aText ?? 1);
@@ -91,7 +99,7 @@ const checks = {
     return problem.answer === Number(a) ** 2 && problem.explanation.includes('y′′');
   },
 };
-const expectedVariants = { chain: 9, product: 4, logarithmic: 5, parametric: 4, 'ellipse-parametric': 4, implicit: 5, inverse: 5, higher: 5 };
+const expectedVariants = { chain: 9, product: 4, quotient: 4, logarithmic: 5, parametric: 4, 'ellipse-parametric': 4, implicit: 5, inverse: 5, higher: 5 };
 if (!isDifferentiationAnswerCorrect('0.250', 1 / 4)) throw new Error('three-decimal displayed answers should be accepted');
 if (!isDifferentiationAnswerCorrect(String(1 / 3), 1 / 3)) throw new Error('full-precision differentiation answers should be accepted');
 if (!isDifferentiationAnswerCorrect('0.333333', 1 / 3)) throw new Error('more precise differentiation answers should be accepted');

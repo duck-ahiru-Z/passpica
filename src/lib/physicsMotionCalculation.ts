@@ -2,18 +2,22 @@ import { BalancedRandom } from './balancedRandom.ts';
 import { mechanicalEnergyGravity } from './mechanicalEnergy.ts';
 import { calculateProjectileState, projectileGravity, projectileInitialHeight, projectileInitialSpeed } from './projectileMotion.ts';
 
-export type MotionPattern = 'speed' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'impulse' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring' | 'springSignedForce' | 'springEnergy' | 'projectileComponents' | 'projectileMaxHeight' | 'projectileFlightTime' | 'projectileRange';
+export type MotionPattern = 'speed' | 'averageVelocity' | 'acceleration' | 'freefall' | 'work' | 'momentum' | 'impulse' | 'impulseSigned' | 'kineticEnergy' | 'potentialEnergy' | 'energyConservation' | 'spring' | 'springSignedForce' | 'springEnergy' | 'springPeriod' | 'springFrequency' | 'projectileComponents' | 'projectileMaxHeight' | 'projectileFlightTime' | 'projectileRange';
 export type MotionMode = MotionPattern | 'mix';
 export type MotionProblem = { pattern: MotionPattern; question: string; answer: number; unit: string; explanation: string; alternativeExplanations?: Partial<Record<MotionPattern, string>> };
 
-export const motionPatterns: readonly MotionPattern[] = ['speed', 'acceleration', 'freefall', 'work', 'momentum', 'impulse', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring', 'springSignedForce', 'springEnergy', 'projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange'];
-export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', impulse: '力積', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの弾性力（大きさ）', springSignedForce: 'ばねの復元力（符号・向き）', springEnergy: 'ばねの弾性エネルギー', projectileComponents: '投射速度の分解', projectileMaxHeight: '斜方投射の最高点', projectileFlightTime: '斜方投射の飛行時間', projectileRange: '斜方投射の水平到達距離' };
+export const motionPatterns: readonly MotionPattern[] = ['speed', 'averageVelocity', 'acceleration', 'freefall', 'work', 'momentum', 'impulse', 'impulseSigned', 'kineticEnergy', 'potentialEnergy', 'energyConservation', 'spring', 'springSignedForce', 'springEnergy', 'springPeriod', 'springFrequency', 'projectileComponents', 'projectileMaxHeight', 'projectileFlightTime', 'projectileRange'];
+export const motionLabels: Record<MotionPattern, string> = { speed: '平均の速さ', averageVelocity: '平均の速度（符号付き）', acceleration: '加速度', freefall: '自由落下', work: '仕事', momentum: '運動量', impulse: '力積（大きさ）', impulseSigned: '力積（符号・向き）', kineticEnergy: '運動エネルギー', potentialEnergy: '位置エネルギー', energyConservation: '力学的エネルギー保存', spring: 'ばねの弾性力（大きさ）', springSignedForce: 'ばねの復元力（符号・向き）', springEnergy: 'ばねの弾性エネルギー', springPeriod: 'ばね振り子の周期', springFrequency: 'ばね振り子の振動数', projectileComponents: '投射速度の分解', projectileMaxHeight: '斜方投射の最高点', projectileFlightTime: '斜方投射の飛行時間', projectileRange: '斜方投射の水平到達距離' };
 
 const picker = new BalancedRandom(motionPatterns);
 const variants = {
   speed: new BalancedRandom([
     { distance: 180, time: 15 }, { distance: 240, time: 20 }, { distance: 450, time: 30 },
     { distance: 325, time: 25 }, { distance: 84, time: 7 },
+  ]),
+  averageVelocity: new BalancedRandom([
+    { displacement: 180, time: 15 }, { displacement: -240, time: 20 }, { displacement: 450, time: 30 },
+    { displacement: -325, time: 25 }, { displacement: 84, time: 6 },
   ]),
   acceleration: new BalancedRandom([
     { initial: 4, final: 10, time: 3 }, { initial: 4, final: 16, time: 4 }, { initial: 6, final: 18, time: 3 },
@@ -35,6 +39,10 @@ const variants = {
   impulse: new BalancedRandom([
     { force: 12, time: 0.5 }, { force: 20, time: 0.3 }, { force: 8, time: 1.5 },
     { force: 15, time: 0.8 }, { force: 25, time: 0.2 },
+  ]),
+  impulseSigned: new BalancedRandom([
+    { force: 12, time: 0.5 }, { force: -20, time: 0.3 }, { force: 8, time: 1.5 },
+    { force: -15, time: 0.8 }, { force: 25, time: 0.2 },
   ]),
   kineticEnergy: new BalancedRandom([
     { mass: 2, velocity: 3 }, { mass: 4, velocity: 5 }, { mass: 1.5, velocity: 4 },
@@ -62,6 +70,14 @@ const variants = {
     { constant: 200, displacement: 0.1 }, { constant: 150, displacement: -0.2 },
     { constant: 80, displacement: 0.25 }, { constant: 300, displacement: -0.05 },
     { constant: 500, displacement: 0.08 },
+  ]),
+  springPeriod: new BalancedRandom([
+    { mass: 1, constant: 100 }, { mass: 2, constant: 50 }, { mass: 0.5, constant: 200 },
+    { mass: 1.5, constant: 100 }, { mass: 0.8, constant: 50 },
+  ]),
+  springFrequency: new BalancedRandom([
+    { mass: 1, constant: 100 }, { mass: 2, constant: 50 }, { mass: 0.5, constant: 200 },
+    { mass: 1.5, constant: 100 }, { mass: 0.8, constant: 50 },
   ]),
   projectileComponents: new BalancedRandom([0, 15, 30, 45, 60, 75].flatMap(angle => [
     { angle, component: 'horizontal' as const }, { angle, component: 'vertical' as const },
@@ -97,6 +113,10 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
       const value = variants.speed.next(random); const answer = value.distance / value.time;
       return { pattern, question: `物体が ${value.distance} m を ${value.time} s で進んだ。平均の速さは？`, answer, unit: 'm/s', explanation: `平均の速さ=移動距離/時間=${value.distance}/${value.time}=${displayNumber(answer)} m/s。` };
     }
+    case 'averageVelocity': {
+      const value = variants.averageVelocity.next(random); const answer = value.displacement / value.time;
+      return { pattern, question: `右向きを正とする。物体の変位は ${value.displacement} m、移動にかかった時間は ${value.time} s である。平均速度は？`, answer, unit: 'm/s', explanation: `平均速度=変位/時間=(${value.displacement})/${value.time}=${displayNumber(answer)} m/s。負の値は左向きの平均速度を表す。` };
+    }
     case 'acceleration': {
       const value = variants.acceleration.next(random); const answer = (value.final - value.initial) / value.time;
       return { pattern, question: `速度が ${value.initial} m/s から ${value.final} m/s に ${value.time} s で変化した。平均加速度は？`, answer, unit: 'm/s²', explanation: `a=(v−u)/t=(${value.final}−${value.initial})/${value.time}=${displayNumber(answer)} m/s²。負の場合は速度が減る向きの加速度。` };
@@ -116,6 +136,11 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
     case 'impulse': {
       const value = variants.impulse.next(random); const answer = value.force * value.time;
       return { pattern, question: `物体に ${value.force} N の一定の力を ${value.time} s 加えた。力積の大きさは？`, answer, unit: 'N·s', explanation: `一定の力による力積 I=FΔt=${value.force}×${value.time}=${displayNumber(answer)} N·s。運動量の変化の大きさにも等しい。` };
+    }
+    case 'impulseSigned': {
+      const value = variants.impulseSigned.next(random); const answer = value.force * value.time;
+      const direction = value.force > 0 ? '右向き' : '左向き';
+      return { pattern, question: `右向きを正とする。物体に ${direction} へ ${Math.abs(value.force)} N の一定の力を ${value.time} s 加えた。符号付き力積はいくらか。`, answer, unit: 'N·s', explanation: `右向きを正とすると ${direction} の力は ${value.force} N。I=FΔt=${value.force}×${value.time}=${displayNumber(answer)} N·s。力積の符号は力の向きで決まる。` };
     }
     case 'kineticEnergy': {
       const value = variants.kineticEnergy.next(random); const answer = 0.5 * value.mass * value.velocity ** 2;
@@ -144,6 +169,16 @@ export function generateMotionProblem(mode: MotionMode, random = Math.random): M
       const answer = 0.5 * value.constant * value.displacement ** 2;
       const displacementText = `${Math.abs(value.displacement)} m ${value.displacement < 0 ? '縮めた' : '伸ばした'}`;
       return { pattern, question: `ばね定数 ${value.constant} N/m のばねを自然長から ${displacementText}。蓄えられる弾性エネルギーは？`, answer, unit: 'J', explanation: `弾性エネルギー U=½kx²=½×${value.constant}×(${displayNumber(value.displacement)})²=${displayNumber(answer)} J。変位を2乗するため、伸び・縮みの向きによらず0以上。` };
+    }
+    case 'springPeriod': {
+      const value = variants.springPeriod.next(random);
+      const answer = 2 * Math.PI * Math.sqrt(value.mass / value.constant);
+      return { pattern, question: `質量 ${value.mass} kg の物体をばね定数 ${value.constant} N/m の軽いばねにつなぐ。ばね振り子の周期 T は？（単位 s、小数第6位まで）`, answer, unit: 's', explanation: `単振動の周期 T=2π√(m/k)=2π√(${value.mass}/${value.constant})=${displayNumber(answer)} s。振幅によらず、質量が大きいほど周期は長く、ばね定数が大きいほど短い。` };
+    }
+    case 'springFrequency': {
+      const value = variants.springFrequency.next(random);
+      const answer = Math.sqrt(value.constant / value.mass) / (2 * Math.PI);
+      return { pattern, question: `質量 ${value.mass} kg の物体をばね定数 ${value.constant} N/m の軽いばねにつなぐ。ばね振り子の振動数 f は？（単位 Hz、小数第6位まで）`, answer, unit: 'Hz', explanation: `角振動数 ω=√(k/m)、振動数 f=ω/(2π)=√(${value.constant}/${value.mass})/(2π)=${displayNumber(answer)} Hz。周期との関係は f=1/T。` };
     }
     case 'projectileComponents': {
       const value = variants.projectileComponents.next(random);

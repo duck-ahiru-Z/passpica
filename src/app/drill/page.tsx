@@ -55,7 +55,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '微分法（解法選択）',
     title: '数学III 微分法・解法選択ドリル',
-    description: '合成関数・積・対数・媒介変数・陰関数の微分を、個別練習と全パターンランダムで反復します。',
+    description: '合成・積・商・対数・媒介変数・陰関数・逆関数・高次導関数を、個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-differentiation-drill'
@@ -66,7 +66,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '極限（解法選択）',
     title: '数学III 極限・解法選択ドリル',
-    description: '因数分解・有理化・最高次比較・はさみうち・数列の極限を、個別練習と全パターンランダムで反復します。',
+    description: '因数分解・有理化・最高次比較・はさみうち・数列に加え、sin(kx)/x・tan(kx)/x・sin(ax)/sin(bx)型の極限も個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-limit-drill'
@@ -121,7 +121,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '物質量・反応計算',
     title: '化学 物質量・反応計算ドリル',
-    description: '物質量・モル濃度・希釈・気体・反応量比・制限試薬・pH・収率を個別練習と全パターンランダムで反復します。',
+    description: '物質量・元素の質量百分率・モル濃度・希釈・気体・反応量比・制限試薬と過剰試薬の残量・強酸／強塩基のpH・収率を個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/mole-calculation-drill'
@@ -132,7 +132,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '酸と塩基・中和滴定',
     title: '化学 中和滴定・濃度計算ドリル',
-    description: '一価・二価の酸塩基や反応係数比を個別練習し、全パターンの混合問題で中和点から濃度を求めます。',
+    description: '一価・二価の酸塩基や反応係数比に加え、酸濃度から塩基濃度を求める逆向き計算も個別練習し、全パターンの混合問題で中和点と未知濃度を判断します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/titration-drill'
@@ -253,7 +253,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '力学・計算',
     title: '物理 力学・計算ドリル',
-    description: '平均の速さ・加速度・自由落下・仕事・運動量・エネルギー・ばねに加え、投射速度の分解・最高点・飛行時間・到達距離も個別練習と全パターンランダムで反復します。',
+    description: '平均の速さと符号付き平均速度を区別し、加速度・自由落下・仕事・運動量・力積・エネルギー・ばね・ばね振り子の周期と振動数・斜方投射も個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/physics/motion-calculation-drill'
@@ -264,7 +264,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '電磁気（交流回路）',
     title: '物理 交流回路・計算ドリル',
-    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数を個別練習し、実戦では全5パターンから方法を選びます。',
+    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数、符号付き位相差（進み・遅れ）を個別練習し、実戦では全6パターンから方法を選びます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/physics/ac-circuit-drill'
@@ -286,7 +286,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '情報I',
     field: '計算・処理',
     title: '情報I 計算・処理ドリル',
-    description: '2進数・データ量・通信時間・論理演算・標本化・圧縮率・補数表現を個別練習と全パターンランダムで反復します。',
+    description: '2進数・画像データ量・bit/byteや接頭語の単位換算・通信時間・論理演算5種の個別練習に加え、全パターンをランダムに混ぜて解法選択まで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/information/calculation-drill'
@@ -309,7 +309,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '数と式（因数分解）',
     title: '因数分解・解法選択ドリル',
-    description: '共通因数・展開公式・たすき掛け・置き換え・高次式を個別練習し、実戦では全パターンをバランスよく混ぜます。',
+    description: '共通因数・展開公式・たすき掛け・置き換え・高次式を個別練習し、実戦では解法選択から因数分解の完成まで全パターンで確認します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/factorization-strategy-drill'

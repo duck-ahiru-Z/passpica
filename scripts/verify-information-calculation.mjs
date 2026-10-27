@@ -1,19 +1,22 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateInformationProblem, informationPatterns, isInformationAnswerCorrect } from '../src/lib/informationCalculation.ts';
+import { generateInformationProblem, informationPatterns, informationStrategies, isInformationAnswerCorrect, logicOperations } from '../src/lib/informationCalculation.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/information/calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="information-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
   throw new Error('information method selection must be a single-choice radio group');
 }
-if (!drillPage.includes('onChange={() => { setMethod(pattern); setChecked(false); }}')
+if (!drillPage.includes('onChange={() => { setMethod(strategy); setChecked(false); }}')
   || !drillPage.includes('setAnswer(event.target.value); setChecked(false);')
   || !drillPage.includes('role="status" aria-live="polite"')) {
   throw new Error('changing an information answer must clear stale feedback and announce new feedback');
 }
-if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{informationLabels[mode]}に固定して繰り返します。')) {
+if (!drillPage.includes("selectedMode.startsWith('logic:')") || !drillPage.includes("mode === 'mix' ? <fieldset") || !drillPage.includes('基礎練習：{informationModeLabels[mode]}に固定して繰り返します。')) {
   throw new Error('fixed information practice must lock its method while mixed practice asks learners to identify it');
+}
+if (!drillPage.includes('(mode !== \'mix\' || method === problem.strategy)')) {
+  throw new Error('focused category practice must grade the answer without forcing a redundant method selection');
 }
 
 const stableRandom = () => 0.37;
@@ -36,6 +39,15 @@ const checks = {
     const [, width, height, bits] = problem.question.match(/(\d+)×(\d+)画素、(\d+) bit/);
     return Number(problem.answer) === (Number(width) * Number(height) * Number(bits)) / 8 && problem.unit === 'byte';
   },
+  storage: problem => {
+    const [, amount, from, to] = problem.question.match(/^([\d.]+) (Mbit|MB|kB|GiB|MiB|KiB|GB|byte) を (Mbit|MB|kB|MiB|byte) に換算/);
+    const multipliers = { 'Mbit:MB': 1 / 8, 'MB:kB': 1000, 'GiB:MiB': 1024, 'KiB:byte': 1024, 'GB:MB': 1000 };
+    const relation = problem.question.match(/\。（(.+)\）$/)?.[1];
+    const expected = Number(amount) * multipliers[`${from}:${to}`];
+    return Number(problem.answer) === expected && problem.unit === to
+      && relation !== undefined && problem.explanation.includes(relation)
+      && problem.explanation.includes('SI接頭語') && problem.explanation.includes('2進接頭語');
+  },
   transfer: problem => {
     const [, size, rate] = problem.question.match(/([\d.]+) MB .*? ([\d.]+) Mbps/);
     const seconds = (Number(size) * 8) / Number(rate);
@@ -45,12 +57,16 @@ const checks = {
   logic: problem => {
     const [, a, b, operation] = problem.question.match(/A=(\d)、B=(\d) のとき、(.+) の値/);
     const left = Number(a); const right = Number(b);
-    const expected = operation === 'A AND (NOT B)' ? Number(Boolean(left && !right))
-      : operation === 'A OR (NOT B)' ? Number(Boolean(left || !right))
-        : Number(Boolean(left !== right));
+    const expected = operation === 'A AND B' ? Number(Boolean(left && right))
+      : operation === 'A OR B' ? Number(Boolean(left || right))
+        : operation === 'A AND (NOT B)' ? Number(Boolean(left && !right))
+          : operation === 'A OR (NOT B)' ? Number(Boolean(left || !right))
+            : Number(Boolean(left !== right));
     const explanationMatches = operation === 'A XOR B'
       ? problem.explanation.includes(`A と B は${left === right ? '等しい' : '異なる'}ので、XOR（排他的論理和）は ${expected}。`)
-      : problem.explanation.includes(`NOT B=${1 - right}`) && problem.explanation.includes(`計算すると ${expected}`);
+      : operation.includes('NOT B')
+        ? problem.explanation.includes(`NOT B=${1 - right}`) && problem.explanation.includes(`計算すると ${expected}`)
+        : problem.explanation.includes(`${operation} を計算すると ${expected}。`);
     return Number(problem.answer) === expected && problem.unit === '' && explanationMatches;
   },
   sampling: problem => {
@@ -82,8 +98,20 @@ for (const pattern of informationPatterns) {
     if (problem.pattern !== pattern || !checks[pattern](problem)) throw new Error(`formula or answer mismatch in ${pattern}: ${JSON.stringify(problem)}`);
     questions.add(problem.question);
   }
-  const expectedVariants = pattern === 'compression' ? 7 : pattern === 'logic' ? 12 : 5;
+  const expectedVariants = pattern === 'compression' ? 7 : pattern === 'logic' ? 20 : 5;
   if (questions.size !== expectedVariants) throw new Error(`${pattern} generated ${questions.size}/${expectedVariants} expected variants`);
+}
+
+for (const operation of logicOperations) {
+  const seen = new Set();
+  for (let index = 0; index < 160; index += 1) {
+    const problem = generateInformationProblem(`logic:${operation}`, stableRandom);
+    if (problem.pattern !== 'logic' || problem.strategy !== operation || !checks.logic(problem)) {
+      throw new Error(`focused logic operation mismatch for ${operation}: ${JSON.stringify(problem)}`);
+    }
+    seen.add(problem.question);
+  }
+  if (seen.size !== 4) throw new Error(`${operation} focused practice generated ${seen.size}/4 truth-table cases`);
 }
 
 const compressionCases = new Map();
@@ -96,9 +124,15 @@ if (compressionCases.get('10:10') !== 100) throw new Error('unchanged data must 
 if (compressionCases.get('10:12') !== 120) throw new Error('expanded data must exceed 100% compression ratio');
 if (compressionCases.get('12:3') !== 25) throw new Error('compressed data must use compressed/original × 100');
 
-const mixed = Array.from({ length: 700 }, () => generateInformationProblem('mix', stableRandom).pattern);
-for (let start = 0; start < mixed.length; start += informationPatterns.length) {
+const mixed = Array.from({ length: 800 }, () => generateInformationProblem('mix', stableRandom).pattern);
+for (let start = 0; start <= mixed.length - informationPatterns.length; start += informationPatterns.length) {
   if (new Set(mixed.slice(start, start + informationPatterns.length)).size !== informationPatterns.length) throw new Error(`mixed set omitted a calculation pattern in batch ${start / informationPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed information practice repeated adjacent patterns');
-console.log('Information calculations verified: 3,500 fixed-pattern questions and 700 mixed questions; conversions, formulas, logic, signed values, variants, balance, and adjacency checked.');
+const mixedLogic = Array.from({ length: 1200 }, () => generateInformationProblem('mix', stableRandom)).filter(problem => problem.pattern === 'logic');
+for (const operation of logicOperations) {
+  const count = mixedLogic.filter(problem => problem.strategy === operation).length;
+  if (count < 20 || count > 40) throw new Error(`mixed logic operator ${operation} appeared ${count}/${mixedLogic.length} times`);
+}
+if (informationStrategies.filter(strategy => logicOperations.includes(strategy)).length !== 5) throw new Error('mixed strategy UI must expose each logic operator separately');
+console.log('Information calculations verified: 4,000 category-focused, 800 mixed, 800 operator-focused questions, and 1,200 mixed questions for logic-operator balance; conversions, formulas, answer parsing, variants, and no-repeat scheduling checked.');

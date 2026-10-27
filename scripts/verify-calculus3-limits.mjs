@@ -10,6 +10,10 @@ if (!visualPage.includes('xはラジアンで測ります') || !visualPage.inclu
   || !visualPage.includes('sineRatioForNonzeroRadians')) {
   throw new Error('the sin(x)/x visual must state the radian convention visibly, accessibly, and in its production calculation');
 }
+if (!visualPage.includes('x軸はラジアンで−π、−1、0、1、π')
+  || !visualPage.includes('[-Math.PI, -1, 1, Math.PI].map')) {
+  throw new Error('the limit graph must label its horizontal scale in radians');
+}
 if (!drillPage.includes("href=\"/learn/math/calculus3-limit-visual\"")) {
   throw new Error('the limit drill must link directly to its related limit-intuition visual');
 }
@@ -104,6 +108,19 @@ const checks = {
       && problem.explanation.includes(`sin(${n === 1 ? 'x' : `${n}x`})/x=${n}·sin u/u`)
       && problem.explanation.includes('sin u/u=1') && problem.explanation.includes(`極限値は ${n}`);
   },
+  tangent: problem => {
+    const [, coefficient] = problem.expression.match(/\\tan\((?:(\d+)x|x)\)/);
+    const n = Number(coefficient ?? 1);
+    return Number(problem.answer) === n && problem.expression.includes('ラジアン')
+      && problem.explanation.includes(`tan(${n === 1 ? 'x' : `${n}x`})/x=${n}·tan u/u`)
+      && problem.explanation.includes('tan u/u=1') && problem.explanation.includes(`極限値は ${n}`);
+  },
+  sineRatio: problem => {
+    const [, aText, bText] = problem.expression.match(/\\frac\{\\sin\((?:(\d+)x|x)\)\}\{\\sin\((?:(\d+)x|x)\)\}/);
+    const a = Number(aText ?? 1); const b = Number(bText ?? 1);
+    return close(Number(problem.answer), a / b) && problem.expression.includes('ラジアン')
+      && problem.explanation.includes(`(${a}/${b})·[sin(`) && problem.explanation.includes(`極限値は ${a}/${b}`);
+  },
   continuity: problem => {
     const [, squared, denominatorPoint, point] = problem.expression.match(/x\^2-(\d+)\}\{x-(\d+)\} & \(x\\ne (\d+)\)/);
     const n = Number(point);
@@ -111,7 +128,7 @@ const checks = {
       && problem.expression.includes(`x=${n}`) && problem.explanation.includes(`極限値=f(${n})=k`);
   },
 };
-const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 27, trigonometric: 5, continuity: 5 };
+const expectedVariants = { factor: 7, rationalize: 8, dominant: 9, squeeze: 5, sequence: 27, trigonometric: 5, tangent: 5, sineRatio: 5, continuity: 5 };
 
 for (const pattern of limitPatterns) {
   const seen = new Set();
@@ -130,7 +147,7 @@ for (const pattern of limitPatterns) {
   }
 }
 
-const mixed = Array.from({ length: 700 }, () => generateLimitProblem('mix', stableRandom).pattern);
+const mixed = Array.from({ length: 900 }, () => generateLimitProblem('mix', stableRandom).pattern);
 for (let start = 0; start < mixed.length; start += limitPatterns.length) {
   if (new Set(mixed.slice(start, start + limitPatterns.length)).size !== limitPatterns.length) throw new Error(`mixed set omitted a limit pattern in batch ${start / limitPatterns.length}`);
 }
@@ -142,7 +159,7 @@ for (let seed = 1; seed <= 20; seed += 1) {
     state = (state * 48271) % 2147483647;
     return (state - 1) / 2147483646;
   };
-  const sequence = Array.from({ length: 7_000 }, () => generateLimitProblem('mix', seededRandom).pattern);
+  const sequence = Array.from({ length: 9_000 }, () => generateLimitProblem('mix', seededRandom).pattern);
   for (let start = 0; start < sequence.length; start += limitPatterns.length) {
     const batch = sequence.slice(start, start + limitPatterns.length);
     if (new Set(batch).size !== limitPatterns.length) throw new Error(`seed ${seed} omitted a pattern in mixed batch ${start / limitPatterns.length}`);
@@ -150,4 +167,4 @@ for (let seed = 1; seed <= 20; seed += 1) {
   if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
 }
 
-console.log('Calculus III limits verified: fixed-pattern options, formulas, answers, and variants; 140,000 seeded mixed questions plus 700 deterministic balance cases checked.');
+console.log('Calculus III limits verified: nine fixed patterns, formulas, answers, and variants; 180,000 seeded mixed questions plus 900 deterministic balance cases checked.');

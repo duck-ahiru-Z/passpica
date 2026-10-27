@@ -9,7 +9,7 @@ if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage
 if (!drillPage.includes('setChoice(option); setChecked(false);')) {
   throw new Error('changing a factorization strategy must clear the previous feedback');
 }
-for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', '因数分解の結果を、因数の積の形で入力してください。', 'placeholder="因数の積（例：(x-3)(x+3)）"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
+for (const requirement of ["mode === 'mix' && <fieldset", 'aria-label="因数分解した式"', '因数の積の形で答えてください。', 'placeholder="例：(x-3)(x+3)"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', 'const correct = strategyCorrect && factorizationCorrect', "disabled={!factorAnswer.trim() || (mode === 'mix' && !choice)}", '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
   if (!drillPage.includes(requirement)) throw new Error(`factorization practice is missing fixed-answer behavior: ${requirement}`);
 }
 
@@ -82,7 +82,16 @@ for (const [patternIndex, pattern] of factorizationPatterns.entries()) {
   if (expressions.size < minimumDistinct) throw new Error(`${pattern} exercised only ${expressions.size} distinct expressions; expected at least ${minimumDistinct}`);
 }
 
-const mixed = Array.from({ length: 1000 }, () => generateFactorizationQuestion('mix', fixedRandom).pattern);
+const mixedQuestions = Array.from({ length: 1000 }, () => generateFactorizationQuestion('mix', fixedRandom));
+const mixed = mixedQuestions.map(question => question.pattern);
+for (const question of mixedQuestions) {
+  if (!question.options.includes(question.answer) || !areFactorizationsEquivalent(question.factorization, question.factorization)) {
+    throw new Error(`mixed practice must pair a strategy choice with a factorable answer: ${JSON.stringify(question)}`);
+  }
+  if (areFactorizationsEquivalent(`${question.factorization}x`, question.factorization)) {
+    throw new Error(`mixed practice accepted an incorrect factorization: ${question.factorization}`);
+  }
+}
 for (let start = 0; start < mixed.length; start += factorizationPatterns.length) {
   if (new Set(mixed.slice(start, start + factorizationPatterns.length)).size !== factorizationPatterns.length) throw new Error(`mixed batch ${start} omitted a pattern`);
 }

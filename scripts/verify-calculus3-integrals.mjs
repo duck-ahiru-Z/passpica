@@ -54,15 +54,30 @@ const checks = {
   },
   rational: problem => {
     const [, xCoefficient, constant] = problem.expression.match(/\\frac\{(\d+)x\+(\d+)\}/);
-    const a = Number(constant) - Number(xCoefficient);
-    const b = 2 * Number(xCoefficient) - Number(constant);
+    const x = Number(xCoefficient);
+    const c = Number(constant);
     const logTerm = (coefficient, argument) => `${coefficient === 1 ? '' : `${coefficient} `}ln ${argument}`;
-    return close(problem.answer, a * Math.log(2) + b * Math.log(1.5))
-      && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`)
-      && problem.explanation.includes(`${logTerm(a, '2')} + ${logTerm(b, '(3/2)')}`)
-      && !problem.explanation.includes('1 ln')
-      && (a + b) === Number(xCoefficient)
-      && (2 * a + b) === Number(constant);
+    if (problem.expression.includes('(x+1)(x+2)')) {
+      const a = c - x;
+      const b = 2 * x - c;
+      return close(problem.answer, a * Math.log(2) + b * Math.log(1.5))
+        && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`)
+        && problem.explanation.includes(`${logTerm(a, '2')} + ${logTerm(b, '(3/2)')}`)
+        && x === a + b && c === 2 * a + b;
+    }
+    if (problem.expression.includes('(x+1)^2')) {
+      const a = x;
+      const b = c - x;
+      return close(problem.answer, a * Math.log(2) + b / 2)
+        && problem.explanation.includes(`${a}/(x+1)+${b}/(x+1)²`)
+        && problem.explanation.includes(`${logTerm(a, '2')} + ${b}/2`)
+        && x === a && c === a + b;
+    }
+    const a = x;
+    const b = c;
+    return close(problem.answer, a * Math.log(2) / 2 + b * Math.PI / 4)
+      && problem.explanation.includes(`${a}x+${b}`)
+      && problem.explanation.includes(`${a}/2 ln 2 + ${b}π/4`);
   },
   trig: problem => {
     const [, exponent] = problem.expression.match(/\\sin\^\{(\d+)\}/);
@@ -87,7 +102,7 @@ const checks = {
   },
 };
 
-const expectedVariants = { 'power-area': 5, substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
+const expectedVariants = { 'power-area': 5, substitution: 4, parts: 3, rational: 21, trig: 4, radical: 5 };
 if (!isIntegralAnswerCorrect('1.718', Math.E - 1)) throw new Error('three-decimal displayed answers should be accepted');
 if (!isIntegralAnswerCorrect(String(Math.E - 1), Math.E - 1)) throw new Error('full-precision integral answers should be accepted');
 if (!isIntegralAnswerCorrect('1.718281', Math.E - 1)) throw new Error('more precise integral answers should be accepted');
@@ -125,6 +140,15 @@ const verifyMixed = (sequence, label) => {
 const deterministicPicker = createIntegralProblemPicker();
 verifyMixed(Array.from({ length: 600 }, () => deterministicPicker.next('mix', stableRandom).pattern), 'deterministic mixed practice');
 
+const rationalKinds = new Set();
+const rationalFixedPicker = createIntegralProblemPicker();
+for (let index = 0; index < 2_100; index += 1) {
+  const problem = rationalFixedPicker.next('rational', stableRandom);
+  if (!checks.rational(problem)) throw new Error(`rational fixed-pattern formula mismatch: ${JSON.stringify(problem)}`);
+  rationalKinds.add(problem.expression.includes('(x+1)(x+2)') ? 'distinct linear factors' : problem.expression.includes('(x+1)^2') ? 'repeated linear factor' : 'irreducible quadratic');
+}
+if (rationalKinds.size !== 3) throw new Error(`rational fixed practice omitted a partial-fraction form: ${[...rationalKinds]}`);
+
 for (let seed = 1; seed <= 20; seed += 1) {
   let state = seed;
   const seededRandom = () => {
@@ -132,8 +156,15 @@ for (let seed = 1; seed <= 20; seed += 1) {
     return (state - 1) / 2147483646;
   };
   const picker = createIntegralProblemPicker();
-  const sequence = Array.from({ length: 5_000 }, () => picker.next('mix', seededRandom).pattern);
+  const mixedKinds = new Set();
+  const sequence = Array.from({ length: 5_000 }, () => {
+    const problem = picker.next('mix', seededRandom);
+    if (!checks[problem.pattern](problem)) throw new Error(`mixed generator formula mismatch: ${JSON.stringify(problem)}`);
+    if (problem.pattern === 'rational') mixedKinds.add(problem.expression.includes('(x+1)(x+2)') ? 'distinct linear factors' : problem.expression.includes('(x+1)^2') ? 'repeated linear factor' : 'irreducible quadratic');
+    return problem.pattern;
+  });
   verifyMixed(sequence, `seed ${seed}`);
+  if (mixedKinds.size !== 3) throw new Error(`seed ${seed} mixed practice omitted a partial-fraction form: ${[...mixedKinds]}`);
 }
 
-console.log('Calculus III integration verified: fixed-pattern options, formulas, answers, and variants; 100,000 seeded mixed questions plus 600 deterministic balance cases checked.');
+console.log('Calculus III integration verified: fixed-pattern options, formulas, answers, 21 rational variants across three forms, 100,000 seeded mixed questions plus 600 deterministic balance cases checked.');

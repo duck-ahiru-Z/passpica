@@ -42,6 +42,18 @@ assert.equal(isNumberRepresentationAnswerCorrect(binary, `${binary.answer}₂₂
 assert.equal(isNumberRepresentationAnswerCorrect(binary, binary.answer.slice(1)), false, 'binary answers must retain all eight bits');
 assert.equal(isNumberRepresentationAnswerCorrect(binary, '00000002'), false, 'non-binary digits must be rejected');
 assert.equal(isNumberRepresentationAnswerCorrect(binary, ''), false, 'empty answers must be rejected');
+for (let byte = 0; byte <= 255; byte += 1) {
+  const bits = byte.toString(2).padStart(8, '0');
+  const unsignedProblem = { pattern: 'unsigned', answer: String(byte) };
+  const signedProblem = { pattern: 'twosComplement', answer: String(byte >= 128 ? byte - 256 : byte) };
+  const binaryProblem = { pattern: 'binaryDecimal', answer: bits };
+  assert.equal(isNumberRepresentationAnswerCorrect(unsignedProblem, String(byte)), true, `unsigned byte ${bits} should decode`);
+  assert.equal(isNumberRepresentationAnswerCorrect(signedProblem, String(byte >= 128 ? byte - 256 : byte)), true, `two's-complement byte ${bits} should decode`);
+  assert.equal(isNumberRepresentationAnswerCorrect(binaryProblem, bits), true, `decimal-to-binary byte ${byte} should retain 8 bits`);
+  assert.equal(isNumberRepresentationAnswerCorrect(binaryProblem, `0b${bits}`), true, `0b-prefixed byte ${byte} should be accepted`);
+  assert.equal(isNumberRepresentationAnswerCorrect(binaryProblem, `${bits}₂`), true, `subscripted byte ${byte} should be accepted`);
+  assert.equal(isNumberRepresentationAnswerCorrect(binaryProblem, bits.slice(1)), false, `short byte ${byte} must be rejected`);
+}
 assert.ok(page.includes('type="radio" name="number-representation-strategy"'), 'mixed practice must ask learners to identify the representation pattern');
 assert.ok(page.includes("disabled={!answer.trim() || (mode === 'mix' && !strategy)}"), 'mixed answers must require a method choice and an answer');
 assert.ok(page.includes('!strategyCorrect') && page.includes('!answerCorrect'), 'feedback must distinguish a wrong method from a wrong value');

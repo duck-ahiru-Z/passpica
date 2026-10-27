@@ -39,16 +39,20 @@ function validate(problem) {
 for (const pattern of organicStructurePatterns) {
   const next = createOrganicStructureProblemPicker();
   const random = seeded(pattern.length * 871);
+  const prompts = new Set();
   for (let i = 0; i < 400; i += 1) {
     const problem = next(pattern, random);
     if (problem.pattern !== pattern) throw new Error(`Fixed mode ${pattern} generated ${problem.pattern}.`);
     validate(problem);
+    prompts.add(problem.prompt);
   }
+  if (prompts.size !== 3) throw new Error(`Fixed mode ${pattern} generated only ${prompts.size}/3 distinct questions.`);
 }
 
 const next = createOrganicStructureProblemPicker();
 const random = seeded(20261022);
 const counts = new Map(organicStructurePatterns.map(pattern => [pattern, 0]));
+const promptCounts = new Map(organicStructurePatterns.map(pattern => [pattern, new Map()]));
 let previous;
 for (let i = 0; i < 900; i += 1) {
   const problem = next('mix', random);
@@ -56,11 +60,19 @@ for (let i = 0; i < 900; i += 1) {
   if (problem.pattern === previous) throw new Error(`Mixed mode repeated ${problem.pattern} consecutively.`);
   previous = problem.pattern;
   counts.set(problem.pattern, counts.get(problem.pattern) + 1);
+  const variants = promptCounts.get(problem.pattern);
+  variants.set(problem.prompt, (variants.get(problem.prompt) ?? 0) + 1);
   if (i % organicStructurePatterns.length === organicStructurePatterns.length - 1) {
     const batch = organicStructurePatterns.filter(pattern => counts.get(pattern) >= Math.floor((i + 1) / organicStructurePatterns.length));
     if (batch.length !== organicStructurePatterns.length) throw new Error(`Mixed batch ending at ${i + 1} omitted a pattern.`);
   }
 }
 if ([...counts.values()].some(count => count !== 100)) throw new Error(`Unbalanced mixed counts: ${JSON.stringify(Object.fromEntries(counts))}`);
+for (const pattern of organicStructurePatterns) {
+  const variants = [...promptCounts.get(pattern).values()];
+  if (variants.length !== 3 || Math.min(...variants) < 33 || Math.max(...variants) - Math.min(...variants) > 1) {
+    throw new Error(`Mixed question variants are missing or heavily skewed for ${pattern}: ${JSON.stringify(variants)}`);
+  }
+}
 
-console.log('Organic structure drill verified: 3,600 fixed questions, 900 balanced mixed questions, unique choices, no adjacent pattern repeats, and portal/visual links.');
+console.log('Organic structure drill verified: 3 question variants in each of 9 focused patterns (3,600 draws), 900 balanced mixed questions with variant-balance checks, unique choices, no adjacent pattern repeats, and portal/visual links.');

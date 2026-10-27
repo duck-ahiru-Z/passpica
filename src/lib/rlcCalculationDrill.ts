@@ -6,7 +6,8 @@ export type RlcCalculationPattern =
   | 'capacitiveReactance'
   | 'impedance'
   | 'current'
-  | 'resonanceFrequency';
+  | 'resonanceFrequency'
+  | 'phaseAngle';
 export type RlcCalculationMode = RlcCalculationPattern | 'mix';
 export type RlcCalculationProblem = {
   pattern: RlcCalculationPattern;
@@ -23,6 +24,7 @@ export const rlcCalculationPatterns: readonly RlcCalculationPattern[] = [
   'impedance',
   'current',
   'resonanceFrequency',
+  'phaseAngle',
 ];
 
 export const rlcCalculationLabels: Record<RlcCalculationPattern, string> = {
@@ -31,6 +33,7 @@ export const rlcCalculationLabels: Record<RlcCalculationPattern, string> = {
   impedance: 'インピーダンス',
   current: '回路電流',
   resonanceFrequency: '共振周波数',
+  phaseAngle: '位相差（進み・遅れ）',
 };
 
 const patternPicker = new BalancedRandom(rlcCalculationPatterns);
@@ -114,5 +117,19 @@ export function generateRlcCalculationProblem(
         unit: 'Hz',
         explanation: `C=${input.capacitanceMicrofarads}×10⁻⁶ F として、f₀=1/(2π√(LC))=${formatRlcCalculationAnswer(state.resonanceFrequency)} Hz。共振時は Xₗ=X꜀ です。`,
       };
+    case 'phaseAngle': {
+      const angle = state.voltageLeadAngleDegrees;
+      const relation = angle > 0 ? '誘導性で、電圧が電流より進む（電流は遅れる）'
+        : angle < 0 ? '容量性で、電流が電圧より進む'
+          : '共振状態で、電圧と電流は同相';
+      return {
+        pattern,
+        input,
+        question: `${parameters} のRLC直列回路で、電圧の電流に対する位相差 φ は？（誘導性を正、容量性を負とする）`,
+        answer: angle,
+        unit: '°',
+        explanation: `φ=tan⁻¹((Xₗ−X꜀)/R)=tan⁻¹((${formatRlcCalculationAnswer(state.inductiveReactance)}−${formatRlcCalculationAnswer(state.capacitiveReactance)})/${input.resistance})=${formatRlcCalculationAnswer(angle)}°。${relation}。`,
+      };
+    }
   }
 }

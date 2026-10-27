@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns } from '@/src/lib/complexPolarExact';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -283,12 +283,8 @@ export default function ComplexPolarDrill() {
     
     let isOk = false;
     if (problem.pattern.startsWith('pattern4-')) {
-      const uA = cleanAns(ansA);
-      const pA = cleanAns(problem.ansA!);
-      const uB = cleanAns(ansB);
-      const pB = cleanAns(problem.ansB!);
-      // handle simple numeric matches as well if no sqrt
-      if (uA === pA && uB === pB) isOk = true;
+      if (isExactComponentAnswerCorrect(ansA, problem.ansA!)
+        && isExactComponentAnswerCorrect(ansB, problem.ansB!)) isOk = true;
     } else {
       const uR = cleanAns(ansR);
       const pR = cleanAns(problem.ansR!);
@@ -439,6 +435,7 @@ export default function ComplexPolarDrill() {
               </h2>
               <select 
                 value={selectedPattern}
+                aria-label="複素数平面の演習パターン"
                 onChange={e => {
                   const nextPattern = e.target.value as Pattern | 'mix';
                   setSelectedPattern(nextPattern);
@@ -472,6 +469,7 @@ export default function ComplexPolarDrill() {
                   <div className="flex items-center gap-2 text-xl">
                     <input 
                       type="text" 
+                      aria-label="答えの実部 a"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansA} 
                       onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -480,6 +478,7 @@ export default function ComplexPolarDrill() {
                     <span>+</span>
                     <input 
                       type="text" 
+                      aria-label="答えの虚部 b"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansB} 
                       onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -487,7 +486,7 @@ export default function ComplexPolarDrill() {
                     />
                     <span>i</span>
                   </div>
-                  <span className="text-[10px] text-gray-400 mt-1">※ルートは \sqrt&#123;3&#125; と入力</span>
+                  <span className="text-[10px] text-gray-400 mt-1">※平方根は sqrt(2) のように入力</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center gap-4 font-bold border-t pt-4">
@@ -495,6 +494,7 @@ export default function ComplexPolarDrill() {
                     <span><MathEq math="r =" /></span>
                     <input 
                       type="text" 
+                      aria-label="極形式の絶対値 r"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansR} 
                       onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -505,6 +505,7 @@ export default function ComplexPolarDrill() {
                     <span><MathEq math="\theta =" /></span>
                     <input 
                       type="text" 
+                      aria-label="極形式の偏角 θ"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansTheta} 
                       onChange={e => { setAnsTheta(e.target.value); setHasChecked(false); setIsCorrect(false); }}
