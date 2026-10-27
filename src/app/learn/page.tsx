@@ -68,6 +68,18 @@ const CONTENTS: LearningContent[] = [
   },
 
   {
+    slug: 'conic-sections-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '式と曲線（円錐曲線）',
+    title: '楕円・双曲線・放物線ビジュアル',
+    description: '標準形の係数を動かし、曲線の形と焦点・準線・漸近線がどう変わるかを比べます。楕円、双曲線、放物線の各演習へ直接進めます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/conic-sections-visual',
+    practiceLink: '/learn/math/ellipse-drill'
+  },
+  {
     slug: 'calculus3-limit-visual',
     subject: 'math',
     subjectJp: '数学III',
@@ -471,7 +483,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '情報I',
     field: '2進数・デジタル表現',
     title: '2進数と2の補数ビジュアル',
-    description: '8ビットを一つずつ切り替え、符号なしと2の補数で値や各ビットの重みがどう変わるかを体験できます。',
+    description: '4〜16ビットを一つずつ切り替え、符号なしと2の補数で表現範囲・値・各ビットの重みがどう変わるかを体験できます。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/information/number-representation-visual',

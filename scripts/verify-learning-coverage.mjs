@@ -33,6 +33,7 @@ const aggregateDrills = new Set([
 ]);
 const requiredVisuals = [
   'unit-circle-complex',
+  'conic-sections-visual',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual',
@@ -115,6 +116,9 @@ const learnSlugs = new Set(learnEntries.map(entry => entry.slug));
 for (const slug of requiredVisuals) {
   if (!learnSlugs.has(slug)) throw new Error(`Missing learning portal visual: ${slug}`);
 }
+if (!learn.includes('4〜16ビットを一つずつ切り替え')) {
+  throw new Error('Number-representation visual portal summary must reflect its current 4-to-16-bit range.');
+}
 for (const entry of learnEntries) {
   const file = routeFile(entry.link);
   if (!file || !fs.existsSync(file)) throw new Error(`Missing learning page for ${entry.slug}: ${entry.link}`);
@@ -127,6 +131,7 @@ for (const link of practiceLinks) {
   }
 }
 const calculus3VisualPracticePairs = [
+  ['/learn/math/conic-sections-visual', '/learn/math/ellipse-drill'],
   ['/learn/math/calculus3-limit-visual', '/learn/math/calculus3-limit-drill'],
   ['/learn/math/calculus3-derivative-visual', '/learn/math/calculus3-differentiation-drill'],
   ['/learn/math/calculus3-integral-visual', '/learn/math/calculus3-integral-drill'],
@@ -206,6 +211,15 @@ for (const [visualRoute, drillRoute] of calculus3VisualPracticePairs) {
   if (!drillPage.includes(`href="${visualRoute}"`)) {
     throw new Error(`Calculus III practice must link back to its visual: ${drillRoute} -> ${visualRoute}`);
   }
+}
+const conicVisualRoute = '/learn/math/conic-sections-visual';
+const hyperbolaParabolaRoute = '/learn/math/hyperbola-parabola-drill';
+const conicVisualPage = fs.readFileSync(routeFile(conicVisualRoute), 'utf8');
+if (!conicVisualPage.includes('href="/learn/math/ellipse-drill"')
+  || !conicVisualPage.includes(`href="${hyperbolaParabolaRoute}"`)
+  || !fs.readFileSync(routeFile('/learn/math/ellipse-drill'), 'utf8').includes(`href="${conicVisualRoute}"`)
+  || !fs.readFileSync(routeFile(hyperbolaParabolaRoute), 'utf8').includes(`href="${conicVisualRoute}"`)) {
+  throw new Error('Conic visual and both equation-curve drills must link to each other.');
 }
 const organic3dPage = fs.readFileSync(routeFile(learnEntries.find(entry => entry.slug === 'organic-3d').link), 'utf8');
 if (!learn.includes("title: '有機・高分子3D分子モデルビューア（立体構造）'")
