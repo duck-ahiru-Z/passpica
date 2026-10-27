@@ -3,6 +3,7 @@ import path from 'node:path';
 import { formatMotionAnswer, generateMotionProblem, getMotionExplanation, isMotionMethodValid, motionPatterns } from '../src/lib/physicsMotionCalculation.ts';
 import { calculateProjectileState } from '../src/lib/projectileMotion.ts';
 import { calculateSimpleHarmonicState } from '../src/lib/simpleHarmonicMotion.ts';
+import { calculateCircularMotion } from '../src/lib/circularMotion.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/motion-calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="motion-method"/.test(drillPage) || drillPage.includes('onClick={() => setMethod(pattern)}')) {
@@ -111,6 +112,32 @@ const checks = {
     return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'Hz'
       && problem.explanation.includes(`f=ω/(2π)=√(${constant}/${mass})/(2π)=${formatMotionAnswer(expected)} Hz`);
   },
+  circularSpeed: problem => {
+    const [, radius, period] = problem.question.match(/半径 ([\d.]+) m の円周上を ([\d.]+) s/);
+    const expected = 2 * Math.PI * Number(radius) / Number(period);
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'm/s'
+      && problem.explanation.includes(`v=2πr/T=2π×${radius}/${period}=${formatMotionAnswer(expected)} m/s`);
+  },
+  centripetalAcceleration: problem => {
+    const [, speed, radius] = problem.question.match(/速さ ([\d.]+) m\/s、半径 ([\d.]+) m/);
+    const expected = Number(speed) ** 2 / Number(radius);
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'm/s²'
+      && problem.explanation.includes(`a=v²/r=${speed}²/${radius}=${formatMotionAnswer(expected)} m/s²`)
+      && problem.explanation.includes('円の中心向き');
+  },
+  centripetalForce: problem => {
+    const [, mass, speed, radius] = problem.question.match(/質量 ([\d.]+) kg、速さ ([\d.]+) m\/s、円運動の半径 ([\d.]+) m/);
+    const expected = Number(mass) * Number(speed) ** 2 / Number(radius);
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'N'
+      && problem.explanation.includes(`F=ma=mv²/r=${mass}×${speed}²/${radius}=${formatMotionAnswer(expected)} N`)
+      && problem.explanation.includes('合力の中心向き成分');
+  },
+  angularCentripetalAcceleration: problem => {
+    const [, radius, angularSpeed] = problem.question.match(/半径 ([\d.]+) m、角速度 ([\d.]+) rad\/s/);
+    const expected = Number(radius) * Number(angularSpeed) ** 2;
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'm/s²'
+      && problem.explanation.includes(`a=v²/r=(rω)²/r=rω²=${radius}×${angularSpeed}²=${formatMotionAnswer(expected)} m/s²`);
+  },
 };
 
 if (formatMotionAnswer(30.000000000000007) !== '30' || formatMotionAnswer(2.4492935982947064e-15) !== '0') {
@@ -128,6 +155,17 @@ if (!drillPage.includes('href="/learn/physics/motion-visual"') || !drillPage.inc
 }
 if (!drillPage.includes('href="/learn/physics/simple-harmonic-visual"') || !drillPage.includes('単振動ビジュアルへ')) {
   throw new Error('mechanics calculation drill must link back to the simple-harmonic visual');
+}
+if (!drillPage.includes('href="/learn/physics/circular-motion-visual"') || !drillPage.includes('等速円運動ビジュアルへ')) {
+  throw new Error('mechanics calculation drill must link back to its circular-motion visual');
+}
+const circularMotionPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/circular-motion-visual/page.tsx'), 'utf8');
+if (!circularMotionPage.includes('href="/learn/physics/motion-calculation-drill"')
+  || !circularMotionPage.includes('aria-label="円運動の半径"')
+  || !circularMotionPage.includes('aria-label="円運動の速さ"')
+  || !circularMotionPage.includes('向心加速度 a=v²/r=rω²')
+  || !circularMotionPage.includes('F=ma=mv²/r')) {
+  throw new Error('circular-motion visual must expose its diagram controls, core equations, and matching calculation drill');
 }
 const simpleHarmonicPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/simple-harmonic-visual/page.tsx'), 'utf8');
 if (!simpleHarmonicPage.includes('href="/learn/physics/motion-calculation-drill"')
@@ -224,9 +262,38 @@ if (!isMotionMethodValid(energyProblem, 'freefall')
   throw new Error('height-based drop problems must accept the equivalent free-fall kinematics method and show its derivation');
 }
 
-const mixed = Array.from({ length: 900 }, () => generateMotionProblem('mix', stableRandom).pattern);
+const mixedQuestionCount = motionPatterns.length * 50;
+const mixed = Array.from({ length: mixedQuestionCount }, () => generateMotionProblem('mix', stableRandom).pattern);
 for (let start = 0; start <= mixed.length - motionPatterns.length; start += 1) {
   if (new Set(mixed.slice(start, start + motionPatterns.length)).size !== motionPatterns.length) throw new Error(`mixed set omitted a mechanics pattern in batch ${start / motionPatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mechanics practice repeated adjacent patterns');
-console.log('Physics mechanics verified: fixed-pattern questions including signed average velocity, impulse, restoring force, spring energy, period and frequency; 900 balanced mixed questions; formulas, units, answer keys, variants, adjacency, displayed rounding, and 432 simple-harmonic states checked.');
+for (const mass of [0.5, 1, 2, 5]) {
+  for (const radius of [0.5, 1, 1.5, 3]) {
+    for (const speed of [0.5, 2, 5, 8]) {
+      for (const angleDegrees of [0, 45, 90, 135, 180, 225, 270, 315]) {
+        const state = calculateCircularMotion(mass, radius, speed, angleDegrees);
+        const speedMagnitude = Math.hypot(state.velocity.x, state.velocity.y);
+        const accelerationMagnitude = Math.hypot(state.acceleration.x, state.acceleration.y);
+        const dot = state.position.x * state.velocity.x + state.position.y * state.velocity.y;
+        if (Math.abs(state.angularSpeed - speed / radius) > 1e-12
+          || Math.abs(state.period * state.angularSpeed - 2 * Math.PI) > 1e-12
+          || Math.abs(state.centripetalAcceleration - speed ** 2 / radius) > 1e-12
+          || Math.abs(state.centripetalForce - mass * state.centripetalAcceleration) > 1e-12
+          || Math.abs(Math.hypot(state.position.x, state.position.y) - radius) > 1e-12
+          || Math.abs(speedMagnitude - speed) > 1e-12
+          || Math.abs(accelerationMagnitude - state.centripetalAcceleration) > 1e-12
+          || Math.abs(dot) > 1e-12) {
+          throw new Error(`circular-motion state mismatch for m=${mass}, r=${radius}, v=${speed}, angle=${angleDegrees}: ${JSON.stringify(state)}`);
+        }
+      }
+    }
+  }
+}
+for (const invalid of [[0, 1, 1, 0], [1, 0, 1, 0], [1, 1, 0, 0], [1, 1, 1, Number.NaN]]) {
+  let rejected = false;
+  try { calculateCircularMotion(...invalid); } catch (error) { rejected = error instanceof RangeError; }
+  if (!rejected) throw new Error(`invalid circular-motion parameters were not rejected: ${invalid}`);
+}
+
+console.log(`Physics mechanics verified: ${motionPatterns.length} focused patterns; ${mixed.length} balanced mixed questions; formula, unit, answer, variant, adjacency, display-rounding and visual-link checks; 432 SHM states and 512 circular-motion states.`);

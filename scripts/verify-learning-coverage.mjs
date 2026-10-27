@@ -35,7 +35,7 @@ const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual',
+  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual',
   'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'crystal-lattice', 'titration-visual',
 ];
 
@@ -133,6 +133,15 @@ const calculus3VisualPracticePairs = [
   ['/learn/math/calculus3-parametric-visual', '/learn/math/calculus3-differentiation-drill'],
   ['/learn/math/calculus3-differential-equation-visual', '/learn/math/calculus3-differential-equation-drill'],
 ];
+const circularMotionVisualRoute = '/learn/physics/circular-motion-visual';
+const motionCalculationRoute = '/learn/physics/motion-calculation-drill';
+const circularMotionVisual = fs.readFileSync(routeFile(circularMotionVisualRoute), 'utf8');
+const motionCalculationPage = fs.readFileSync(routeFile(motionCalculationRoute), 'utf8');
+if (!learnEntries.some(entry => entry.link === circularMotionVisualRoute)
+  || !circularMotionVisual.includes(`href="${motionCalculationRoute}"`)
+  || !motionCalculationPage.includes(`href="${circularMotionVisualRoute}"`)) {
+  throw new Error('Circular-motion visual and fixed-plus-mixed mechanics drill must link to each other and from the learning portal.');
+}
 const titrationVisualRoute = '/learn/chemistry/titration-visual';
 const titrationDrillRoute = '/learn/chemistry/titration-drill';
 const titrationVisualEntry = learnEntries.find(entry => entry.link === titrationVisualRoute);

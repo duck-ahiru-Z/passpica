@@ -253,7 +253,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '力学・計算',
     title: '物理 力学・計算ドリル',
-    description: '平均の速さと符号付き平均速度を区別し、加速度・自由落下・仕事・運動量・力積・エネルギー・ばね・ばね振り子の周期と振動数・斜方投射も個別練習と全パターンランダムで反復します。',
+    description: '平均の速さと符号付き平均速度を区別し、加速度・自由落下・仕事・運動量・力積・エネルギー・ばね・ばね振り子の周期と振動数・円運動の速さと向心加速度・向心力・斜方投射を個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/physics/motion-calculation-drill'

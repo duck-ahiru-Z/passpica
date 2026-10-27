@@ -224,6 +224,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
+    slug: 'circular-motion-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（等速円運動）',
+    title: '等速円運動と向心力のビジュアル',
+    description: '円周上の位置を動かし、接線方向の速度と中心向きの向心加速度・向心力、周期や角速度を対応づけます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/circular-motion-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
     slug: 'mole-concept-visual',
     subject: 'chemistry',
     subjectJp: '化学',
