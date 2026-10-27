@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { formatMoleAnswer, generateMoleProblem, isMoleAnswerCorrect, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
+import { calculateIdealGasAmount, calculateIdealGasVolume, idealGasConstantKPaLiters } from '../src/lib/idealGasLaw.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/mole-calculation-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="mole-method"/.test(drillPage) || drillPage.includes('aria-pressed={method === pattern}')) {
@@ -15,7 +16,7 @@ if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)")
 }
 
 const stableRandom = () => 0.37;
-const expectedUnits = { mass: 'mol', composition: '%', concentration: 'mol/L', dilution: 'mL', gas: 'mol', stoichiometry: 'mol', 'limiting-reagent': 'mol', 'excess-reagent': 'mol', ph: '', strongBasePh: '', yield: '%' };
+const expectedUnits = { mass: 'mol', composition: '%', concentration: 'mol/L', dilution: 'mL', gas: 'mol', idealGasAmount: 'mol', idealGasVolume: 'L', stoichiometry: 'mol', 'limiting-reagent': 'mol', 'excess-reagent': 'mol', ph: '', strongBasePh: '', yield: '%' };
 const toPlainSubscripts = value => value.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, digit => String('₀₁₂₃₄₅₆₇₈₉'.indexOf(digit)));
 function formulaAtoms(formula) {
   const plain = toPlainSubscripts(formula);
@@ -127,6 +128,18 @@ const checks = {
     const [, volume] = problem.question.match(/([\d.]+) L は何 mol/);
     return Math.abs(problem.answer - Number(volume) / 22.4) < 1e-12;
   },
+  idealGasAmount: problem => {
+    const [, pressure, volume, temperature] = problem.question.match(/圧力 ([\d.]+) kPa、体積 ([\d.]+) L、絶対温度 ([\d.]+) K/);
+    const expected = calculateIdealGasAmount(Number(pressure), Number(volume), Number(temperature));
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'mol'
+      && problem.explanation.includes(`n=PV/(RT)=${pressure}×${volume}/(${idealGasConstantKPaLiters}×${temperature})=${formatMoleAnswer(expected)} mol`);
+  },
+  idealGasVolume: problem => {
+    const [, amount, pressure, temperature] = problem.question.match(/理想気体 ([\d.]+) mol、圧力 ([\d.]+) kPa、絶対温度 ([\d.]+) K/);
+    const expected = calculateIdealGasVolume(Number(amount), Number(pressure), Number(temperature));
+    return Math.abs(problem.answer - expected) < 1e-12 && problem.unit === 'L'
+      && problem.explanation.includes(`V=nRT/P=${amount}×${idealGasConstantKPaLiters}×${temperature}/${pressure}=${formatMoleAnswer(expected)} L`);
+  },
   stoichiometry: problem => {
     const [, sourceCoefficient, targetCoefficient, amount] = problem.explanation.match(/係数比 .+=(\d+):(\d+) より、([\d.]+)×/);
     return Math.abs(problem.answer - (Number(amount) * Number(targetCoefficient)) / Number(sourceCoefficient)) < 1e-12;
@@ -222,8 +235,39 @@ if (!drillPage.includes('href="/learn/chemistry/acid-base"')
   || !acidBasePage.includes('pOH=−log[OH⁻] と pH+pOH=14（25℃）')) {
   throw new Error('strong-acid/base pH calculation practice and the indicator visual must cross-link and explain the pOH relation');
 }
+const idealGasVisual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/ideal-gas-visual/page.tsx'), 'utf8');
+const moleConceptVisual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/mole-concept-visual/page.tsx'), 'utf8');
+if (!drillPage.includes('href="/learn/chemistry/ideal-gas-visual"')
+  || !idealGasVisual.includes('href="/learn/chemistry/mole-calculation-drill"')
+  || !idealGasVisual.includes('href="/learn/chemistry/mole-concept-visual"')
+  || !moleConceptVisual.includes('href="/learn/chemistry/ideal-gas-visual"')
+  || !idealGasVisual.includes('aria-label="気体の圧力"')
+  || !idealGasVisual.includes('aria-label="気体の絶対温度"')
+  || !idealGasVisual.includes('PV=nRT')) {
+  throw new Error('ideal-gas visual must link to related calculations and mole visual, and expose named P/T controls and PV=nRT');
+}
 
-const mixedProblems = Array.from({ length: 900 }, () => generateMoleProblem('mix', stableRandom));
+for (const amount of [0.5, 1, 1.5]) {
+  for (const pressure of [80, 101.3, 120]) {
+    for (const temperature of [250, 273, 350]) {
+      const volume = calculateIdealGasVolume(amount, pressure, temperature);
+      const recoveredAmount = calculateIdealGasAmount(pressure, volume, temperature);
+      if (Math.abs(recoveredAmount - amount) > 1e-12) {
+        throw new Error(`PV=nRT round-trip mismatch at n=${amount}, P=${pressure}, T=${temperature}`);
+      }
+    }
+  }
+}
+if (Math.abs(calculateIdealGasVolume(1, 101.3, 273) - 22.4) > 0.02) {
+  throw new Error('ideal-gas equation at 0°C and 101.3 kPa should agree with the 22.4 L/mol standard-state approximation');
+}
+for (const invalid of [[0, 101, 273], [1, 0, 273], [1, 101, -1]]) {
+  let rejected = false;
+  try { calculateIdealGasVolume(...invalid); } catch (error) { rejected = error instanceof RangeError; }
+  if (!rejected) throw new Error(`invalid ideal-gas input was not rejected: ${invalid}`);
+}
+
+const mixedProblems = Array.from({ length: molePatterns.length * 100 }, () => generateMoleProblem('mix', stableRandom));
 for (const problem of mixedProblems) {
   if (!checks[problem.pattern](problem) || problem.unit !== expectedUnits[problem.pattern]) {
     throw new Error(`mixed chemistry question failed its pattern-specific formula check: ${JSON.stringify(problem)}`);
@@ -235,4 +279,4 @@ for (let start = 0; start + molePatterns.length <= mixed.length; start += molePa
   if (new Set(mixed.slice(start, start + molePatterns.length)).size !== molePatterns.length) throw new Error(`mixed set omitted a chemistry pattern in batch ${start / molePatterns.length}`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed chemistry practice repeated adjacent patterns');
-console.log('Chemistry mole calculations verified: 5,500 fixed-pattern and 900 mixed questions across eleven patterns; formulas, units, answer keys, atom-balanced reaction equations, displayed coefficient ratios, variant coverage, balanced batches, and adjacency checked.');
+console.log(`Chemistry mole calculations verified: ${molePatterns.length * 500} fixed-pattern and ${mixedProblems.length} mixed questions across ${molePatterns.length} patterns; formula, unit, answer, reaction-balance, gas-law round-trip, variant, batch-balance and adjacency checks passed.`);

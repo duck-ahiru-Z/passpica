@@ -1,12 +1,13 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { isNumericAnswerCorrect } from './numericAnswer.ts';
+import { calculateIdealGasAmount, calculateIdealGasVolume, idealGasConstantKPaLiters } from './idealGasLaw.ts';
 
-export type MolePattern = 'mass' | 'composition' | 'concentration' | 'dilution' | 'gas' | 'stoichiometry' | 'limiting-reagent' | 'excess-reagent' | 'ph' | 'strongBasePh' | 'yield';
+export type MolePattern = 'mass' | 'composition' | 'concentration' | 'dilution' | 'gas' | 'idealGasAmount' | 'idealGasVolume' | 'stoichiometry' | 'limiting-reagent' | 'excess-reagent' | 'ph' | 'strongBasePh' | 'yield';
 export type MoleMode = MolePattern | 'mix';
 export type MoleProblem = { pattern: MolePattern; question: string; answer: number; unit: string; explanation: string };
 
-export const molePatterns: readonly MolePattern[] = ['mass', 'composition', 'concentration', 'dilution', 'gas', 'stoichiometry', 'limiting-reagent', 'excess-reagent', 'ph', 'strongBasePh', 'yield'];
-export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', composition: '元素の質量百分率', concentration: 'モル濃度', dilution: '希釈', gas: '気体の物質量', stoichiometry: '反応量比', 'limiting-reagent': '制限試薬と生成量', 'excess-reagent': '過剰試薬の残量', ph: '強酸のpH', strongBasePh: '強塩基のpH', yield: '収率' };
+export const molePatterns: readonly MolePattern[] = ['mass', 'composition', 'concentration', 'dilution', 'gas', 'idealGasAmount', 'idealGasVolume', 'stoichiometry', 'limiting-reagent', 'excess-reagent', 'ph', 'strongBasePh', 'yield'];
+export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', composition: '元素の質量百分率', concentration: 'モル濃度', dilution: '希釈', gas: '標準状態の気体体積', idealGasAmount: '気体の状態方程式で物質量', idealGasVolume: '気体の状態方程式で体積', stoichiometry: '反応量比', 'limiting-reagent': '制限試薬と生成量', 'excess-reagent': '過剰試薬の残量', ph: '強酸のpH', strongBasePh: '強塩基のpH', yield: '収率' };
 
 const picker = new BalancedRandom(molePatterns);
 const variants = {
@@ -34,6 +35,20 @@ const variants = {
   gas: new BalancedRandom([
     { gas: '酸素 O₂', volume: 5.6 }, { gas: '窒素 N₂', volume: 11.2 }, { gas: '水素 H₂', volume: 16.8 },
     { gas: '酸素 O₂', volume: 22.4 }, { gas: '窒素 N₂', volume: 44.8 },
+  ]),
+  idealGasAmount: new BalancedRandom([
+    { pressure: 100, volume: 8.314, temperature: 200 },
+    { pressure: 100, volume: 24.942, temperature: 200 },
+    { pressure: 83.14, volume: 8.314, temperature: 100 },
+    { pressure: 200, volume: 8.314, temperature: 200 },
+    { pressure: 50, volume: 8.314, temperature: 100 },
+  ]),
+  idealGasVolume: new BalancedRandom([
+    { amount: 1, pressure: 101.3, temperature: 273 },
+    { amount: 0.5, pressure: 100, temperature: 200 },
+    { amount: 2, pressure: 200, temperature: 300 },
+    { amount: 0.75, pressure: 100, temperature: 400 },
+    { amount: 1.5, pressure: 150, temperature: 300 },
   ]),
   stoichiometry: new BalancedRandom([
     { equation: '2H₂ + O₂ → 2H₂O', source: 'H₂', sourceCoefficient: 2, amount: 3, target: 'O₂', targetCoefficient: 1 },
@@ -101,6 +116,16 @@ export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleP
       const value = variants.gas.next(random);
       const answer = value.volume / 22.4;
       return { pattern, question: `0℃、1.013×10⁵ Pa の標準状態で ${value.gas} ${value.volume} L は何 mol か。（モル体積 22.4 L/mol）`, answer, unit: 'mol', explanation: `この標準状態ではモル体積が22.4 L/molなので、n=V/22.4=${value.volume}/22.4=${displayNumber(answer)} mol。` };
+    }
+    case 'idealGasAmount': {
+      const value = variants.idealGasAmount.next(random);
+      const answer = calculateIdealGasAmount(value.pressure, value.volume, value.temperature);
+      return { pattern, question: `理想気体の圧力 ${value.pressure} kPa、体積 ${value.volume} L、絶対温度 ${value.temperature} K のとき、物質量 n は？`, answer, unit: 'mol', explanation: `状態方程式 PV=nRT より n=PV/(RT)=${value.pressure}×${value.volume}/(${idealGasConstantKPaLiters}×${value.temperature})=${displayNumber(answer)} mol。` };
+    }
+    case 'idealGasVolume': {
+      const value = variants.idealGasVolume.next(random);
+      const answer = calculateIdealGasVolume(value.amount, value.pressure, value.temperature);
+      return { pattern, question: `理想気体 ${value.amount} mol、圧力 ${value.pressure} kPa、絶対温度 ${value.temperature} K の体積 V は？`, answer, unit: 'L', explanation: `状態方程式 PV=nRT より V=nRT/P=${value.amount}×${idealGasConstantKPaLiters}×${value.temperature}/${value.pressure}=${displayNumber(answer)} L。` };
     }
     case 'stoichiometry': {
       const value = variants.stoichiometry.next(random);

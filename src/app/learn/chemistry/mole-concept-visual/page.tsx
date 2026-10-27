@@ -81,6 +81,8 @@ export default function MoleConceptVisualPage() {
         <div className="flex flex-wrap gap-3">
           <Link href="/learn/chemistry/mole-calculation-drill" className="retro-btn-classic inline-flex">質量・組成百分率・気体の計算を練習 →</Link>
           <Link href="/learn/chemistry/concentration-visual" className="retro-btn-classic inline-flex">モル濃度・希釈のビジュアルへ →</Link>
+          <Link href="/learn/chemistry/ideal-gas-visual" className="retro-btn-classic inline-flex">気体の圧力・体積・温度を確認 →</Link>
+          <Link href="/learn/chemistry/ideal-gas-visual" className="retro-btn-classic inline-flex">気体の圧力・体積・温度も見る →</Link>
         </div>
       </section>
     </main>

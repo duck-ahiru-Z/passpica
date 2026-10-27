@@ -248,6 +248,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
   {
+    slug: 'ideal-gas-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '気体（状態方程式）',
+    title: '理想気体の状態方程式 PV=nRT',
+    description: '物質量・圧力・絶対温度を動かし、状態方程式から求めた体積をピストン図で確かめます。気体の物質量と体積は個別／ランダム演習で練習できます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/ideal-gas-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
     slug: 'concentration-visual',
     subject: 'chemistry',
     subjectJp: '化学',

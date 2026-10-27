@@ -121,7 +121,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '物質量・反応計算',
     title: '化学 物質量・反応計算ドリル',
-    description: '物質量・元素の質量百分率・モル濃度・希釈・気体・反応量比・制限試薬と過剰試薬の残量・強酸／強塩基のpH・収率を個別練習と全パターンランダムで反復します。',
+    description: '物質量・元素の質量百分率・モル濃度・希釈・標準状態と状態方程式の気体計算・反応量比・制限試薬と過剰試薬の残量・強酸／強塩基のpH・収率を個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/mole-calculation-drill'

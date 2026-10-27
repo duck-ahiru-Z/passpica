@@ -22,6 +22,7 @@ export default function MoleCalculationDrillPage() {
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">化学 物質量・反応計算ドリル</h1>
     <p className="text-gray-500 mb-6">問題の条件から計算方法を選び、数値まで求めます。各分類だけの基礎練習と、全分類から出る実戦練習を切り替えられます。</p>
     <Link href="/learn/chemistry/mole-concept-visual" className="retro-btn-classic inline-flex mb-2">mol と粒子数・質量・気体体積の関係をビジュアルで確認 →</Link>
+    <Link href="/learn/chemistry/ideal-gas-visual" className="retro-btn-classic inline-flex mb-2">圧力・体積・温度の関係をビジュアルで確認 →</Link>
     <Link href="/learn/chemistry/concentration-visual" className="retro-btn-classic inline-flex mb-4">モル濃度・希釈をビジュアルで確認 →</Link>
     <Link href="/learn/chemistry/acid-base" className="retro-btn-classic inline-flex mb-4">pHスケールと指示薬の色をビジュアルで確認 →</Link>
     <Link href="/learn/chemistry/stoichiometry-visual" className="retro-btn-classic inline-flex mb-4">制限試薬・過剰試薬をビジュアルで確認 →</Link>
