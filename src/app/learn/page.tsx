@@ -140,6 +140,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
   {
+    slug: 'calculus3-differential-equation-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分方程式（変数分離・指数成長）',
+    title: '微分方程式の傾き場と指数関数の解',
+    description: 'dy/dx=ky の傾き場と初期値を通る解曲線を重ね、増加・一定・減少の違いを確認します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-differential-equation-visual',
+    practiceLink: '/learn/math/calculus3-differential-equation-drill'
+  },
+  {
     slug: 'projectile-visual',
     subject: 'physics',
     subjectJp: '物理',

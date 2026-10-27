@@ -35,7 +35,7 @@ const requiredVisuals = [
   'unit-circle-complex',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual',
+  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual',
   'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'crystal-lattice', 'titration-visual',
 ];
 
@@ -131,6 +131,7 @@ const calculus3VisualPracticePairs = [
   ['/learn/math/calculus3-volume-visual', '/learn/math/calculus3-area-volume-drill'],
   ['/learn/math/calculus3-curvature-visual', '/learn/math/calculus3-curve-analysis-drill'],
   ['/learn/math/calculus3-parametric-visual', '/learn/math/calculus3-differentiation-drill'],
+  ['/learn/math/calculus3-differential-equation-visual', '/learn/math/calculus3-differential-equation-drill'],
 ];
 const titrationVisualRoute = '/learn/chemistry/titration-visual';
 const titrationDrillRoute = '/learn/chemistry/titration-drill';
