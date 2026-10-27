@@ -68,6 +68,7 @@ const updatedDrillCopy = [
   ['mole-calculation-drill', '元素の質量百分率'],
   ['mole-calculation-drill', '過剰試薬の残量'],
   ['mole-calculation-drill', '状態方程式の気体計算'],
+  ['number-representation-drill', 'ビット幅ごとの表現範囲'],
   ['titration-drill', '酸濃度から塩基濃度を求める逆向き計算'],
   ['motion-calculation-drill', 'ばね振り子の周期と振動数'],
   ['calculus3-limit-drill', 'tan(kx)/x'],

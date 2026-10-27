@@ -275,7 +275,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '情報I',
     field: '2進数・デジタル表現',
     title: '情報I 2進数・2の補数ドリル',
-    description: '符号なし・2の補数・ビットの重み・10進数からの変換を個別練習し、実戦では全4パターンから見分けます。',
+    description: '符号なし・2の補数・ビットの重み・10進数からの変換・ビット幅ごとの表現範囲を個別練習し、実戦では全5パターンから見分けます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/information/number-representation-drill'

@@ -1,16 +1,31 @@
 import assert from 'node:assert/strict';
 import { generateNumberRepresentationProblem, isNumberRepresentationAnswerCorrect, numberRepresentationPatterns } from '../src/lib/informationNumberRepresentationDrill.ts';
 
+assert.deepEqual(numberRepresentationPatterns, ['unsigned', 'twosComplement', 'bitWeight', 'binaryDecimal', 'bitWidthRange'], 'focused choices and the balanced mixed scheduler must contain the complete pattern catalog');
+
 const expected = {
   unsigned: [0, 1, 13, 42, 85, 127, 128, 200, 254, 255],
   twosComplement: [-128, -127, -56, -2, -1, 0, 13, 42, 85, 127],
   bitWeight: [1, 2, 4, 8, 16, 32, 64, 128],
   binaryDecimal: ['00000000', '00000001', '00001101', '00101010', '01010101', '01111111', '10000000', '11001000', '11111110', '11111111'],
+  bitWidthRange: ['-8', '7', '0', '15', '5'],
 };
 for (const pattern of numberRepresentationPatterns) {
   const answers = new Set();
   for (let i = 0; i < 1000; i += 1) answers.add(generateNumberRepresentationProblem(pattern).answer);
   for (const answer of expected[pattern]) assert.ok(answers.has(String(answer)), `${pattern} never produced boundary/value ${answer}`);
+}
+
+const mixedPatterns = Object.fromEntries(numberRepresentationPatterns.map(pattern => [pattern, 0]));
+let previousPattern = '';
+for (let index = 0; index < 20_000; index += 1) {
+  const problem = generateNumberRepresentationProblem('mix');
+  mixedPatterns[problem.pattern] += 1;
+  assert.notEqual(problem.pattern, previousPattern, 'mixed practice must not repeat a pattern consecutively');
+  previousPattern = problem.pattern;
+}
+for (const pattern of numberRepresentationPatterns) {
+  assert.equal(mixedPatterns[pattern], 4_000, `${pattern} should appear once per five-pattern batch`);
 }
 const observedWeights = new Set();
 for (let index = 0; index < 8; index += 1) {
@@ -22,6 +37,41 @@ for (let index = 0; index < 8; index += 1) {
   observedWeights.add(problem.answer);
 }
 assert.deepEqual([...observedWeights].sort((a, b) => Number(a) - Number(b)), ['1', '2', '4', '8', '16', '32', '64', '128']);
+
+const boundaryQuestions = [
+  ['4 bitの符号付き2の補数で表せる整数の最小値はいくつか。', '-8'],
+  ['4 bitの符号付き2の補数で表せる整数の最大値はいくつか。', '7'],
+  ['4 bitの符号なしで表せる整数の最小値はいくつか。', '0'],
+  ['4 bitの符号なしで表せる整数の最大値はいくつか。', '15'],
+];
+for (const [question, answer] of boundaryQuestions) {
+  let found = false;
+  for (let index = 0; index < 5000; index += 1) {
+    const problem = generateNumberRepresentationProblem('bitWidthRange');
+    if (problem.question === question) {
+      assert.equal(problem.answer, answer);
+      assert.ok(problem.explanation.includes(answer));
+      found = true;
+      break;
+    }
+  }
+  assert.ok(found, `missing bit-width boundary question: ${question}`);
+}
+for (let index = 0; index < 1000; index += 1) {
+  const problem = generateNumberRepresentationProblem('bitWidthRange');
+  if (problem.question.includes('必要な最小ビット数')) {
+    const value = Number(problem.question.match(/−(\d+)〜/)?.[1]);
+    const bits = Number(problem.answer);
+    assert.ok(2 ** (bits - 1) >= value, `${bits} bits cannot hold ±${value}`);
+    assert.ok(bits === 2 || 2 ** (bits - 2) <= value, `${bits} bits are not minimal for ±${value}`);
+  } else {
+    const [, width, kind, bound] = problem.question.match(/(\d+) bitの(符号付き2の補数|符号なし)で表せる整数の(最小値|最大値)/) ?? [];
+    const expected = kind === '符号付き2の補数'
+      ? (bound === '最小値' ? -(2 ** (Number(width) - 1)) : 2 ** (Number(width) - 1) - 1)
+      : (bound === '最小値' ? 0 : 2 ** Number(width) - 1);
+    assert.equal(Number(problem.answer), expected, 'bit-width range endpoint must match the encoding');
+  }
+}
 
 const page = (await import('node:fs')).readFileSync('src/app/learn/information/number-representation-drill/page.tsx', 'utf8');
 const packageScripts = JSON.parse((await import('node:fs')).readFileSync('package.json', 'utf8')).scripts;
@@ -60,18 +110,16 @@ assert.ok(page.includes('!strategyCorrect') && page.includes('!answerCorrect'), 
 assert.ok(page.includes('isNumberRepresentationAnswerCorrect(problem, answer)'), 'the page must use pattern-aware answer normalization');
 assert.ok(page.includes("setStrategy(selectedMode === 'mix' ? '' : selectedMode)"), 'fixed practice should lock its method while mixed practice starts unselected');
 assert.ok(!page.includes('符号なし2進数として読み、各桁の重みの和'), 'mixed pattern choice must not ask learners to distinguish duplicate unsigned-decoding and bit-weight questions');
+assert.ok(page.includes('numberRepresentationPatterns.map(pattern => <option') && page.includes('numberRepresentationPatterns.map(pattern => <label'), 'focused and mixed mode must share the complete pattern catalog');
 
 const counts = Object.fromEntries(numberRepresentationPatterns.map(pattern => [pattern, 0]));
-let previous = '';
 for (let i = 0; i < 20_000; i += 1) {
   const problem = generateNumberRepresentationProblem('mix');
   counts[problem.pattern] += 1;
-  assert.notEqual(problem.pattern, previous, 'mixed mode repeated the same pattern consecutively');
   assert.ok(problem.answer.length > 0);
-  previous = problem.pattern;
 }
 for (const pattern of numberRepresentationPatterns) {
-  assert.ok(counts[pattern] >= 4_500, `${pattern} was underrepresented: ${counts[pattern]}`);
+  assert.equal(counts[pattern], 4_000, `${pattern} should appear once per five-pattern batch`);
 }
 
-console.log('Number representation drill passed: all focused patterns and signed/unsigned boundaries generated; 20,000 mixed problems balanced with no adjacent pattern repeats.', counts);
+console.log('Number representation drill passed: all focused patterns and encoding boundaries generated; 20,000 mixed problems balanced with no adjacent pattern repeats.', counts);
