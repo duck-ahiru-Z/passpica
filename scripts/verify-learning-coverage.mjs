@@ -76,6 +76,7 @@ const updatedDrillCopy = [
   ['calculation-drill', '論理演算5種の個別練習'],
   ['factorization-strategy-drill', '因数分解の完成まで'],
   ['ac-circuit-drill', '位相差（進み・遅れ）'],
+  ['ac-circuit-drill', '抵抗の平均電力'],
 ];
 const moleCardStart = drill.indexOf("slug: 'mole-calculation-drill'");
 const moleCardEnd = drill.indexOf('\n  },', moleCardStart);

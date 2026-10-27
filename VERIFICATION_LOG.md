@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Local browser follow-up (2026-10-28)
+- `/learn/physics/ac-circuit-drill`: Added resistance average power as the seventh focused mode and included it in balanced mixed practice. Browser check confirmed the mode menu and mixed strategy list include it, fixed mode generates peak-voltage questions in W, wrong answers show the correct value and derivation, and a correct answer shows `正解！` with `P=V₀I₀cosφ/2=I₀²R/2`. `npm run test:rlc-calculation-drill` passed 5,600 fixed and 1,000 mixed questions; `npm run test:rlc-circuit`, `npm run test:coverage`, TypeScript, targeted ESLint and `git diff --check` passed. The browser initially showed the expected feedback for two deliberately incorrect hand calculations, then confirmed successful grading on a third question.
+
 Keep this log so broad review work does not repeatedly spend time on the same already-passing pages. A page marked **passed** does not need another browser pass unless a relevant change, a serious bug report, or a reproducible contradiction gives a concrete reason to reopen it. Run focused automated tests for touched code; do not redo unrelated browser checks.
 
 ### Local browser follow-up (2026-10-27)

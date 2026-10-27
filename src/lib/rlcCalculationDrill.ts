@@ -7,7 +7,8 @@ export type RlcCalculationPattern =
   | 'impedance'
   | 'current'
   | 'resonanceFrequency'
-  | 'phaseAngle';
+  | 'phaseAngle'
+  | 'averagePower';
 export type RlcCalculationMode = RlcCalculationPattern | 'mix';
 export type RlcCalculationProblem = {
   pattern: RlcCalculationPattern;
@@ -25,6 +26,7 @@ export const rlcCalculationPatterns: readonly RlcCalculationPattern[] = [
   'current',
   'resonanceFrequency',
   'phaseAngle',
+  'averagePower',
 ];
 
 export const rlcCalculationLabels: Record<RlcCalculationPattern, string> = {
@@ -34,6 +36,7 @@ export const rlcCalculationLabels: Record<RlcCalculationPattern, string> = {
   current: '回路電流',
   resonanceFrequency: '共振周波数',
   phaseAngle: '位相差（進み・遅れ）',
+  averagePower: '抵抗で消費される平均電力',
 };
 
 const patternPicker = new BalancedRandom(rlcCalculationPatterns);
@@ -131,5 +134,14 @@ export function generateRlcCalculationProblem(
         explanation: `φ=tan⁻¹((Xₗ−X꜀)/R)=tan⁻¹((${formatRlcCalculationAnswer(state.inductiveReactance)}−${formatRlcCalculationAnswer(state.capacitiveReactance)})/${input.resistance})=${formatRlcCalculationAnswer(angle)}°。${relation}。`,
       };
     }
+    case 'averagePower':
+      return {
+        pattern,
+        input,
+        question: `電圧の最大値 V₀=${input.voltagePeak} V、${parameters} のRLC直列回路で、抵抗が消費する平均電力 P は？`,
+        answer: state.averagePower,
+        unit: 'W',
+        explanation: `I₀=V₀/Z=${input.voltagePeak}/${formatRlcCalculationAnswer(state.impedance)}=${formatRlcCalculationAnswer(state.currentPeak)} A。正弦波の平均電力は P=V₀I₀cosφ/2=I₀²R/2=${formatRlcCalculationAnswer(state.averagePower)} W。`,
+      };
   }
 }

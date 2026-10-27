@@ -55,6 +55,7 @@ function expectedAnswer(problem) {
     case 'capacitiveReactance': return xc;
     case 'impedance': return Math.hypot(r, xl - xc);
     case 'current': return v / Math.hypot(r, xl - xc);
+    case 'averagePower': return (v / Math.hypot(r, xl - xc)) ** 2 * r / 2;
     case 'resonanceFrequency': return 1 / (2 * Math.PI * Math.sqrt(l * c));
     case 'phaseAngle': return Math.atan2(2 * Math.PI * f * l - 1 / (2 * Math.PI * f * c), r) * 180 / Math.PI;
   }
@@ -98,4 +99,4 @@ if (!isRlcCalculationAnswerCorrect(formatRlcCalculationAnswer(2 / 3), 2 / 3)
   throw new Error('RLC answer validation must accept displayed rounding and reject empty, coarse, and non-finite values');
 }
 
-console.log('RLC calculation drill verified: 4,800 fixed and 1,000 mixed questions; reactance, impedance, current, resonance, signed phase angle in both inductive/capacitive cases, answer formatting, balanced coverage, and portal links checked.');
+console.log('RLC calculation drill verified: 5,600 fixed and 1,000 mixed questions; reactance, impedance, current, resonance, signed phase angle, average power, answer formatting, balanced coverage, and portal links checked.');

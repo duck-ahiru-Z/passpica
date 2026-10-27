@@ -264,7 +264,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '電磁気（交流回路）',
     title: '物理 交流回路・計算ドリル',
-    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数、符号付き位相差（進み・遅れ）を個別練習し、実戦では全6パターンから方法を選びます。',
+    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数、符号付き位相差（進み・遅れ）、抵抗の平均電力を個別練習し、実戦では全7パターンから方法を選びます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/physics/ac-circuit-drill'
