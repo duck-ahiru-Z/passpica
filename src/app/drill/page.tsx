@@ -66,7 +66,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '極限（解法選択）',
     title: '数学III 極限・解法選択ドリル',
-    description: '因数分解・有理化・最高次比較・はさみうち・数列に加え、sin(kx)/x・tan(kx)/x・sin(ax)/sin(bx)型の極限も個別練習と全パターンランダムで反復します。',
+    description: '因数分解・有理化・最高次比較・はさみうち・数列と指数型数列に加え、sin(kx)/x・tan(kx)/x・sin(ax)/sin(bx)型や連続条件も個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-limit-drill'

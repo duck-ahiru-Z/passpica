@@ -1,6 +1,6 @@
 import { BalancedRandom } from './balancedRandom.ts';
 
-export type LimitPattern = 'factor' | 'rationalize' | 'dominant' | 'squeeze' | 'sequence' | 'trigonometric' | 'tangent' | 'sineRatio' | 'continuity';
+export type LimitPattern = 'factor' | 'rationalize' | 'dominant' | 'squeeze' | 'sequence' | 'exponentialSequence' | 'trigonometric' | 'tangent' | 'sineRatio' | 'continuity';
 export type LimitMode = LimitPattern | 'mix';
 export type LimitProblem = { pattern: LimitPattern; expression: string; answer: string; explanation: string };
 type SequenceVariant =
@@ -8,9 +8,10 @@ type SequenceVariant =
   | { kind: 'quadratic-ratio'; a: number; c: number }
   | { kind: 'radical-difference'; a: number };
 
-export const limitPatterns: readonly LimitPattern[] = ['factor', 'rationalize', 'dominant', 'squeeze', 'sequence', 'trigonometric', 'tangent', 'sineRatio', 'continuity'];
+export const limitPatterns: readonly LimitPattern[] = ['factor', 'rationalize', 'dominant', 'squeeze', 'sequence', 'exponentialSequence', 'trigonometric', 'tangent', 'sineRatio', 'continuity'];
 export const limitLabels: Record<LimitPattern, string> = {
   factor: '因数分解・約分', rationalize: '有理化', dominant: '最高次の比較', squeeze: 'はさみうち', sequence: '数列の極限',
+  exponentialSequence: '指数型数列の極限',
   trigonometric: 'sin(kx)/x 型', tangent: 'tan(kx)/x 型', sineRatio: 'sin(ax)/sin(bx) 型', continuity: '連続条件',
 };
 
@@ -29,6 +30,7 @@ const variants = {
     ...leadingCoefficientPairs.map(({ a, c }) => ({ kind: 'quadratic-ratio' as const, a, c })),
     ...Array.from({ length: 9 }, (_, index) => ({ kind: 'radical-difference' as const, a: index + 1 })),
   ]),
+  exponentialSequence: new BalancedRandom([1, 2, 3]),
   trigonometric: new BalancedRandom([1, 2, 3, 4, 5]),
   tangent: new BalancedRandom([1, 2, 3, 4, 5]),
   sineRatio: new BalancedRandom([{ a: 1, b: 1 }, { a: 2, b: 1 }, { a: 3, b: 2 }, { a: 4, b: 3 }, { a: 5, b: 2 }]),
@@ -42,6 +44,7 @@ export function generateLimitProblem(mode: LimitMode, random = Math.random): Lim
   const dominant = pattern === 'dominant' ? variants.dominant.next(random) : { a: 1, c: 1 };
   const squeezeCoefficient = pattern === 'squeeze' ? variants.squeeze.next(random) : 1;
   const sequence = pattern === 'sequence' ? variants.sequence.next(random) : { kind: 'linear-ratio' as const, a: 1, c: 1 };
+  const exponentialCoefficient = pattern === 'exponentialSequence' ? variants.exponentialSequence.next(random) : 1;
   const trigCoefficient = pattern === 'trigonometric' ? variants.trigonometric.next(random) : 1;
   const trigArgument = trigCoefficient === 1 ? 'x' : `${trigCoefficient}x`;
   const tangentCoefficient = pattern === 'tangent' ? variants.tangent.next(random) : 1;
@@ -84,6 +87,12 @@ export function generateLimitProblem(mode: LimitMode, random = Math.random): Lim
     dominant: { pattern, expression: `\\lim_{x\\to\\infty}\\frac{${dominantNumerator}-x+1}{${dominantDenominator}+4}`, answer: String(dominant.a / dominant.c), explanation: `分子・分母をx²で割り、最高次係数の比 ${dominant.a}/${dominant.c} を得る。` },
     squeeze: { pattern, expression: `\\lim_{x\\to 0}x\\sin\\frac{${squeezeCoefficient}}{x}`, answer: '0', explanation: `−|x|≤x sin(${squeezeCoefficient}/x)≤|x| とはさめ、両端が0へ近づくことを使う。` },
     sequence: sequenceProblem,
+    exponentialSequence: {
+      pattern,
+      expression: `\\lim_{n\\to\\infty}\\left(1+\\frac{${exponentialCoefficient}}{n}\\right)^n`,
+      answer: String(Math.exp(exponentialCoefficient)),
+      explanation: `基本極限 (1+1/m)^m→e を使う。u=${exponentialCoefficient}/n とおくと (1+${exponentialCoefficient}/n)^n=[(1+u)^(1/u)]^${exponentialCoefficient}。u→0+ で (1+u)^(1/u)→e だから、極限値は e^${exponentialCoefficient}≈${Math.exp(exponentialCoefficient).toFixed(3)}。`,
+    },
     trigonometric: { pattern, expression: `\\lim_{x\\to 0}\\frac{\\sin(${trigArgument})}{x},\\quad \\text{（x はラジアン）}`, answer: String(trigCoefficient), explanation: `xはラジアンで考える。u=${trigArgument} と置くと sin(${trigArgument})/x=${trigCoefficient}·sin u/u。基本極限 lim(u→0) sin u/u=1 より、極限値は ${trigCoefficient}。` },
     tangent: { pattern, expression: `\\lim_{x\\to 0}\\frac{\\tan(${tangentArgument})}{x},\\quad \\text{（x はラジアン）}`, answer: String(tangentCoefficient), explanation: `xはラジアンで考える。u=${tangentArgument} と置くと tan(${tangentArgument})/x=${tangentCoefficient}·tan u/u。基本極限 lim(u→0) tan u/u=1 より、極限値は ${tangentCoefficient}。` },
     sineRatio: { pattern, expression: `\\lim_{x\\to 0}\\frac{\\sin(${sineNumeratorArgument})}{\\sin(${sineDenominatorArgument})},\\quad \\text{（x はラジアン）}`, answer: String(sineRatio.a / sineRatio.b), explanation: `xはラジアンで考える。sin(${sineNumeratorArgument})/sin(${sineDenominatorArgument})=(${sineRatio.a}/${sineRatio.b})·[sin(${sineNumeratorArgument})/${sineNumeratorArgument}]/[sin(${sineDenominatorArgument})/${sineDenominatorArgument}] と変形する。各 sin u/u は1に近づくので、極限値は ${sineRatio.a}/${sineRatio.b}。` },
