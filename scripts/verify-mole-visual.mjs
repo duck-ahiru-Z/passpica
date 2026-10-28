@@ -61,5 +61,6 @@ for (const content of [
 assert.ok(portal.includes("slug: 'mole-concept-visual'"));
 assert.ok(portal.includes("practiceLink: '/learn/chemistry/mole-calculation-drill'"));
 assert.ok(drill.includes('href="/learn/chemistry/mole-concept-visual"'));
+assert.equal((page.match(/href="\/learn\/chemistry\/ideal-gas-visual"/g) ?? []).length, 1, 'the ideal-gas visual should have one clear related-navigation link');
 
 console.log('Mole concept visual verified: Avogadro count, molar mass, elemental composition, standard gas-volume scaling, five substances, slider endpoints, symbolic particle diagram, invalid inputs, and portal/drill links.');
