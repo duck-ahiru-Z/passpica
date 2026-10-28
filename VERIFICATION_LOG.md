@@ -1,5 +1,9 @@
 # Passpica verification log
 
+### Titration drill and pH visual PR preview follow-up (2026-10-28)
+- `/learn/chemistry/titration-drill` on the Ready PR preview serving app source through `2d02f29` (subsequent commits only update this log): mixed practice generated 25 mL H₃PO₄ titrated by 0.12 mol/L Ca(OH)₂ to equivalence at 25 mL. Selected the differing-coefficients strategy and entered 0.080 mol/L; accepted with the balanced equation `2H₃PO₄ + 3Ca(OH)₂ → Ca₃(PO₄)₂ + 6H₂O` and the 2:3 mole ratio. Followed its pH-visual link.
+- `/learn/chemistry/titration-visual`: With 0.1 mol/L HCl and 0.1 mol/L NaOH, moving the slider to 25.0 mL showed pH 7.00 and the marked equivalence point. At 27.0 mL, the graph marker moved beyond equivalence; the screen showed pH 11.59, excess-base state, red-purple indicator, 2.500 mmol acid and 2.700 mmol base. Independently, the excess 0.200 mmol OH⁻ in 52 mL gives pOH≈2.415 and pH≈11.585, consistent with the display. The drill-return link was present. This completes answer-level and interactive visual checks beyond the earlier pass that only inspected the drill prompt.
+
 ### Simple harmonic frequency focused drill PR preview follow-up (2026-10-28)
 - `/learn/physics/motion-calculation-drill` on the PR preview for head `2d02f29`: Selected the independently focused spring-oscillator frequency pattern. The prompt gave m=0.5 kg and k=200 N/m; independently computed f=√(k/m)/(2π)=10/π=3.183098861… Hz. Entered 3.183099 Hz and the page accepted it, showing the matching angular-frequency calculation and `f=1/T`. The screenshot confirmed the selected fixed mode, prompt, unit, entered answer, and green correct feedback. This verifies the frequency answer path separately from the period check recorded above.
 
