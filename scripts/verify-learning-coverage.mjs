@@ -358,19 +358,49 @@ function importedSources(source, file) {
   });
 }
 function includesBalancedRandom(source, file) {
-  return source.includes('BalancedRandom') || importedSources(source, file).some(dependency => dependency.includes('BalancedRandom'));
+  const visited = new Set();
+  function find(sourceText, sourceFile) {
+    if (sourceText.includes('BalancedRandom')) return true;
+    const imports = [...sourceText.matchAll(/from\s+['"]([^'"]+)['"]/g)].map(match => match[1]);
+    for (const specifier of imports) {
+      if (!specifier.startsWith('@/') && !specifier.startsWith('.')) continue;
+      const base = specifier.startsWith('@/') ? path.join(root, specifier.slice(2)) : path.resolve(path.dirname(sourceFile), specifier);
+      const dependency = ['.ts', '.tsx', '.js', '.jsx'].map(extension => `${base}${extension}`).find(candidate => fs.existsSync(candidate));
+      if (!dependency || visited.has(dependency)) continue;
+      visited.add(dependency);
+      if (find(fs.readFileSync(dependency, 'utf8'), dependency)) return true;
+    }
+    return false;
+  }
+  return find(source, file);
 }
+const selfSelectedStrategyDrills = new Set(['circle-tangent-drill', 'vector-drill']);
 const patternPages = pages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
-  return /-drill[\\/]page\.tsx$/.test(file) && (/type\s+\w*Pattern\s*=/.test(source)
+  const declaresPatternMode = /\btype\s+\w*(?:Pattern|Mode)\s*=/.test(source);
+  const importsPatternMode = /\btype\s+\w*(?:Pattern|Mode)(?:\s+as\s+\w+)?\b/.test(source);
+  const isAggregateDrill = aggregateDrills.has(path.basename(path.dirname(file)));
+  return /-drill[\\/]page\.tsx$/.test(file) && !isAggregateDrill && (declaresPatternMode || importsPatternMode
     || importedSources(source, file).some(dependency => /export\s+const\s+\w*Patterns\b/.test(dependency)));
 });
 const incompletePatternPages = patternPages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
+  const slug = path.basename(path.dirname(file));
+  if (selfSelectedStrategyDrills.has(slug)) {
+    const hasStrategyChoices = slug === 'circle-tangent-drill'
+      ? /name="circle-tangent-strategy"/.test(source) && /disabled=\{strategyMode === 'mix' && selectedStrategy === ''\}/.test(source)
+      : /aria-pressed=\{selectedStrategy === 'menelaus'\}/.test(source)
+        && /aria-pressed=\{selectedStrategy === 'coefficient'\}/.test(source)
+        && /selectedStrategy === ''/.test(source);
+    return !/<select\b/.test(source) || !/value=['"]mix['"]/.test(source)
+      || !/selectedStrategy/.test(source) || !hasStrategyChoices;
+  }
+  const hasModeControl = /<select\b/.test(source) || /aria-pressed=\{selectedMode === m\.id\}/.test(source);
+  const hasMixedMode = /value=['"]mix['"]/.test(source) || /id:\s*['"]mix['"]/.test(source);
   return !includesBalancedRandom(source, file)
-    || !/<select\b/.test(source)
-    || !/value=['"]mix['"]/.test(source)
-    || !/全パターンランダム|全パターンをランダム|ミックスモード/.test(source);
+    || !hasModeControl
+    || !hasMixedMode
+    || !/ランダム|ミックスモード/.test(source);
 });
 if (incompletePatternPages.length > 0) {
   throw new Error(`Pattern drills must offer fixed-pattern and mixed modes with balanced selection: ${incompletePatternPages.join(', ')}`);
@@ -391,4 +421,4 @@ const unlistedDrills = pages
   .filter(route => !linkedDrillRoutes.has(route));
 if (unlistedDrills.length > 0) throw new Error(`Math drill pages missing from the portal: ${unlistedDrills.join(', ')}`);
 
-console.log(`Learning coverage verified: ${drillEntries.length} linked drills, ${practiceLinks.length} linked practice drills, ${learnEntries.length} linked learning pages (${requiredVisuals.length} required visuals), ${patternPages.length} fixed-plus-mixed pattern drills across all subjects, ${mathPages.length} math learning pages audited.`);
+console.log(`Learning coverage verified: ${drillEntries.length} linked drills, ${practiceLinks.length} linked practice drills, ${learnEntries.length} linked learning pages (${requiredVisuals.length} required visuals), ${patternPages.length} focused-plus-mixed or learner-selected strategy drills across all subjects, ${mathPages.length} math learning pages audited.`);

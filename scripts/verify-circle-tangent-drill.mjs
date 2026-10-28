@@ -43,6 +43,11 @@ assert.ok(page.includes('createCircleTangentProblem'), 'the page must use the te
 assert.ok(page.includes('value="mix"'), 'mixed strategy mode must remain available');
 assert.ok(page.includes('value="contact"'), 'contact-point strategy must be individually selectable');
 assert.ok(page.includes('value="distance"'), 'center-distance strategy must be individually selectable');
+assert.ok(page.includes('name="circle-tangent-strategy"'), 'mixed practice must require a learner-selected strategy');
+assert.ok(page.includes("disabled={strategyMode === 'mix' && selectedStrategy === ''}"), 'mixed answers must stay disabled until a strategy is selected');
+assert.ok(page.includes("strategyMode === 'mix' && selectedStrategy === ''"), 'submission must guard against missing mixed-mode strategy selection');
+assert.ok(!page.includes('今回の最初の方針'), 'mixed practice must not reveal a strategy before the learner chooses');
+assert.ok(page.includes('選んだ「${strategyLabel}」で'), 'accepted feedback must report the selected mixed-mode strategy');
 assert.ok(page.includes('aria-label={`中心O'), 'canvas must have a dynamic accessible description');
 for (const label of ['接線1のx係数 A', '接線1のy係数 B', '接線1の右辺 C', '接線2のx係数 A', '接線2のy係数 B', '接線2の右辺 C']) {
   assert.ok(page.includes(`aria-label="${label}"`), `${label} input must have an accessible name`);

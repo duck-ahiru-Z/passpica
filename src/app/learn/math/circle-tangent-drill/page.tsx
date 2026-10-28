@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { createCircleTangentProblem, gcd3, slopeLineDistanceFormula, type CircleTangentProblem } from '@/src/lib/circleTangent';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictInteger } from '@/src/lib/strictInteger';
@@ -15,11 +14,10 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 }
 
 type StrategyMode = 'mix' | 'contact' | 'distance';
-const strategyPicker = new BalancedRandom<'contact' | 'distance'>(['contact', 'distance']);
 
 export default function CircleTangentDrillPage() {
   const [strategyMode, setStrategyMode] = useState<StrategyMode>('mix');
-  const [strategy, setStrategy] = useClientGeneratedState<'contact' | 'distance'>(() => strategyPicker.next());
+  const [selectedStrategy, setSelectedStrategy] = useState<'contact' | 'distance' | ''>('');
   const [problem, setProblem] = useClientGeneratedState<CircleTangentProblem>(() => createCircleTangentProblem());
   
   // 入力状態
@@ -39,7 +37,7 @@ export default function CircleTangentDrillPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const generateProblem = (nextMode: StrategyMode = strategyMode) => {
-    setStrategy(nextMode === 'mix' ? strategyPicker.next() : nextMode);
+    setSelectedStrategy(nextMode === 'mix' ? '' : nextMode);
     setProblem(createCircleTangentProblem());
 
     setL1_A(''); setL1_B(''); setL1_C('');
@@ -143,6 +141,11 @@ export default function CircleTangentDrillPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!problem) return;
+    if (strategyMode === 'mix' && selectedStrategy === '') {
+      setIsCorrect(false);
+      setFeedbackMsg('最初に使う解法を選んでください。');
+      return;
+    }
 
     const normalizeUserLine = (a: string, b: string, c: string): [number, number, number] | null => {
       let va = parseStrictInteger(a, 0);
@@ -170,7 +173,10 @@ export default function CircleTangentDrillPage() {
 
     if (isMatch1 || isMatch2) {
       setIsCorrect(true);
-      setFeedbackMsg('大正解！完璧です。（順不同・自動約分済み）');
+      const strategyLabel = (strategyMode === 'mix' ? selectedStrategy : strategyMode) === 'contact'
+        ? '接点の座標を置く方法'
+        : '中心から接線までの距離を使う方法';
+      setFeedbackMsg(`大正解！${strategyMode === 'mix' ? `選んだ「${strategyLabel}」で` : `「${strategyLabel}」に固定して`}解けました。（順不同・自動約分済み）`);
     } else {
       setIsCorrect(false);
       setFeedbackMsg('不正解です。円外の点を通る直線の方程式から判別式を利用するか、接点の公式を使いましょう。');
@@ -190,7 +196,7 @@ export default function CircleTangentDrillPage() {
     return `${res} = ${c}`;
   };
 
-  if (!problem || !strategy) return <div className="p-8 text-center">生成中...</div>;
+  if (!problem) return <div className="p-8 text-center">生成中...</div>;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
@@ -211,11 +217,27 @@ export default function CircleTangentDrillPage() {
       <section className="retro-box bg-gray-50 p-4 space-y-2">
         <label className="font-bold block">■ 解法方針の練習モード</label>
         <select aria-label="円の接線の解法モード" value={strategyMode} onChange={event => { const nextMode = event.target.value as StrategyMode; setStrategyMode(nextMode); generateProblem(nextMode); }} className="border p-2 bg-white">
-          <option value="mix">実戦練習：接線の解法を全方針ランダム</option>
+          <option value="mix">実戦練習：2つの解法から選択</option>
           <option value="contact">基礎練習：接点の座標を置く方法だけ</option>
           <option value="distance">基礎練習：中心からの距離を使う方法だけ</option>
         </select>
-        <p className="text-gray-600">今回の最初の方針：<span className="font-bold text-blue-700">{strategy === 'contact' ? '接点の座標を置く' : '中心から接線までの距離を使う'}</span></p>
+        {strategyMode === 'mix' ? (
+          <fieldset className="space-y-2" aria-label="使う解法を選択">
+            <legend className="font-bold">問題を見て、最初に使う解法を選んでください。</legend>
+            <div className="flex flex-wrap gap-3">
+              <label className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${selectedStrategy === 'contact' ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>
+                <input type="radio" name="circle-tangent-strategy" value="contact" checked={selectedStrategy === 'contact'} onChange={() => { setSelectedStrategy('contact'); setFeedbackMsg(''); }} className="accent-blue-600" />
+                接点の座標を置く
+              </label>
+              <label className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${selectedStrategy === 'distance' ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>
+                <input type="radio" name="circle-tangent-strategy" value="distance" checked={selectedStrategy === 'distance'} onChange={() => { setSelectedStrategy('distance'); setFeedbackMsg(''); }} className="accent-blue-600" />
+                中心から接線までの距離を使う
+              </label>
+            </div>
+          </fieldset>
+        ) : (
+          <p role="status" aria-live="polite" className="text-gray-600">基礎練習：{strategyMode === 'contact' ? '接点の座標を置く方法' : '中心から接線までの距離を使う方法'}に固定して繰り返します。</p>
+        )}
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -260,7 +282,7 @@ export default function CircleTangentDrillPage() {
               </div>
               
               <div className="flex flex-wrap justify-center gap-2 w-full max-w-sm mt-2">
-                <button type="submit" className="retro-btn-classic bg-blue-100 border-blue-400 font-bold px-4 py-2 flex-grow">
+                <button type="submit" disabled={strategyMode === 'mix' && selectedStrategy === ''} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold px-4 py-2 flex-grow disabled:opacity-50 disabled:cursor-not-allowed">
                   解答する
                 </button>
                 <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
