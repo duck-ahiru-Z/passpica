@@ -11,6 +11,8 @@ for (const requiredMarkup of [
 ]) {
   assert.ok(drillPage.includes(requiredMarkup), `Menelaus/Ceva drill is missing accessible feedback/control markup: ${requiredMarkup}`);
 }
+const combinedRatioPrompt = 'math={`BD:DC = ${problem.a}:${problem.b},\\\\; CE:EA = ${problem.c}:${problem.d}`} />';
+assert.equal(drillPage.split(combinedRatioPrompt).length - 1, 2, 'Ceva and area-ratio prompts must keep punctuation attached to the combined ratios');
 
 function gcd(x, y) {
   while (y) [x, y] = [y, x % y];

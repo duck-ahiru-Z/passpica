@@ -126,7 +126,7 @@ export default function MenelausCevaDrill() {
     questionEl = (
       <>
         三角形ABCの内部の点Pを通る直線AD, BE, CFがある。<br/>
-        <MathEq math={`BD:DC = ${problem.a}:${problem.b}`} /> 、<MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
+        <MathEq math={`BD:DC = ${problem.a}:${problem.b},\\; CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
         <MathEq math="AF:FB" /> を求めよ。
       </>
     );
@@ -153,7 +153,7 @@ export default function MenelausCevaDrill() {
     questionEl = (
       <>
         三角形ABCの内部の点Pを通る直線AD, BE, CFがある。<br/>
-        <MathEq math={`BD:DC = ${problem.a}:${problem.b}`} /> 、<MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
+        <MathEq math={`BD:DC = ${problem.a}:${problem.b},\\; CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
         面積比 <MathEq math="\triangle PAB : \triangle ABC" /> を求めよ。
       </>
     );
