@@ -108,6 +108,8 @@ assert.match(page, /isExactComponentAnswerCorrect\(ansA, problem\.ansA!\)/, 'rec
 assert.match(page, /isExactComponentAnswerCorrect\(ansR, problem\.ansR!\)/, 'polar radii should accept equivalent exact forms');
 assert.match(page, /isPolarAngleAnswerCorrect\(ansTheta, problem\.ansTheta!\)/, 'polar angles should accept equivalent forms');
 assert.match(page, /r は sqrt\(2\).*θ は 5pi\/6.*2\.618（ラジアン）/, 'answer guidance should show equivalent radius and angle forms');
+assert.match(page, /aria-label="極形式の偏角 θ"[\s\S]*?className="w-36 max-w-\[40vw\]/,
+  'the angle field should leave room for exact LaTeX fractions');
 assert.match(page, /const thStr = formatPolarAngle\(thRes\)/);
 assert.match(page, /getSupportedPolarAnglePairs\(isProduct \? 'sum' : 'difference'\)/);
 assert.match(page, /\\frac\{\$\{pts\[1\]\}\}\{\$\{pts\[0\]\}\}/, 'fractional polar angles must render numerator over denominator');

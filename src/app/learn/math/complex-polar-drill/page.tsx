@@ -501,7 +501,7 @@ export default function ComplexPolarDrill() {
                     <input 
                       type="text" 
                       aria-label="極形式の偏角 θ"
-                      className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
+                      className="w-36 max-w-[40vw] bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500"
                       value={ansTheta} 
                       onChange={e => { setAnsTheta(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="偏角"
