@@ -430,7 +430,7 @@ export default function MenelausCevaDrill() {
                       <MathEq math={`m_A = ${problem.a * problem.c}, \\quad m_B = ${problem.b * problem.d}, \\quad m_C = ${problem.a * problem.d}`} block />
                     </div>
                     <p>
-                      交点Pは三角形全体の重心になります。<br/>
+                      交点Pは、3頂点に置いた質量の重心（質量中心）になります。<br/>
                       実は、内部の三角形の面積比は<strong>対向する頂点の質量</strong>に比例します！
                     </p>
                     <div className="text-center">
