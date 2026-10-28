@@ -13,6 +13,29 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+function ExplanationLine({ value }: { value: string }) {
+  const parts: Array<{ value: string; text: boolean }> = [];
+  const textPattern = /\\text\{([^{}]*)\}/g;
+  let lastIndex = 0;
+
+  for (const match of value.matchAll(textPattern)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) parts.push({ value: value.slice(lastIndex, index), text: false });
+    parts.push({ value: match[1], text: true });
+    lastIndex = index + match[0].length;
+  }
+  if (lastIndex < value.length) parts.push({ value: value.slice(lastIndex), text: false });
+
+  return <>
+    {parts.map((part, index) => {
+      if (part.text || /[^\x00-\x7F]/.test(part.value)) {
+        return <span key={index}>{part.value}</span>;
+      }
+      return part.value.trim() ? <MathEq key={index} math={part.value} /> : <span key={index}>{part.value}</span>;
+    })}
+  </>;
+}
+
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
@@ -20,10 +43,11 @@ interface ProblemData {
   pattern: Pattern;
   qStr: string;
   data: number[];
-  ans1?: string; // Mean
+  ans1?: string; // Mean, variance, or transformed mean by pattern
   ans2?: string; // Median or Variance
   ans3?: string; // Mode or New Mean
   ans4?: string; // New Variance
+  mean?: number;
   
   a?: number;
   b?: number;
@@ -89,7 +113,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         `\\text{最も多く現れる値（最頻値）は } ${modeVal} \\text{ です。}`
       ];
       
-      return { pattern: p, qStr, data, ans1: mean.toString(), ans2: median.toString(), ans3: modeVal.toString(), expLines };
+      return { pattern: p, qStr, data, ans1: mean.toString(), ans2: median.toString(), ans3: modeVal.toString(), mean, expLines };
     }
     else if (p === 'pattern2') {
       // Variance def. 5 items. Mean int. sum of sq diffs is multiple of 5.
@@ -123,7 +147,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         `\\text{分散 } s^2 = \\frac{${data.map(x => Math.pow(x - mean, 2)).join(' + ')}}{5} = \\frac{${sumSq}}{5} = ${variance}`
       ];
       
-      return { pattern: p, qStr, data, ans1: variance.toString(), expLines };
+      return { pattern: p, qStr, data, ans1: variance.toString(), mean, expLines };
     }
     else if (p === 'pattern3') {
       // Variance alt formula. Give slightly larger numbers
@@ -152,7 +176,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
         `\\text{分散 } s^2 = ${meanSq} - ${mean}^2 = ${meanSq} - ${mean*mean} = ${variance}`
       ];
       
-      return { pattern: p, qStr, data, ans1: variance.toString(), expLines };
+      return { pattern: p, qStr, data, ans1: variance.toString(), mean, expLines };
     }
     else if (p === 'pattern4') {
       // Data transform
@@ -265,11 +289,9 @@ export default function DataAnalysis1DDrill() {
       }
     }
     
-    if (hasChecked && (problem.pattern === 'pattern1' || problem.pattern === 'pattern2' || problem.pattern === 'pattern3')) {
+    if (hasChecked && problem.mean !== undefined) {
       // Draw mean line
-      let mean = parseFloat(problem.ans1!);
-      if (problem.pattern === 'pattern1') mean = parseFloat(problem.ans1!);
-      
+      const mean = problem.mean;
       const px = padX + ((mean - minX) / (maxX - minX)) * plotW;
       ctx.strokeStyle = '#ef4444';
       ctx.setLineDash([4, 4]);
@@ -293,7 +315,7 @@ export default function DataAnalysis1DDrill() {
       <div className="space-y-4">
         {problem.expLines.map((line, idx) => {
           if (line.includes('\\text{')) {
-            return <div key={idx} className="text-gray-600 mb-1 mt-4"><MathEq math={line} /></div>;
+            return <div key={idx} className="text-gray-600 mb-1 mt-4"><ExplanationLine value={line} /></div>;
           }
           return (
             <div key={idx} className="bg-white p-2 border rounded text-center">
@@ -454,7 +476,7 @@ export default function DataAnalysis1DDrill() {
 
             {problem.pattern !== 'pattern4' && (
               <div className="flex justify-center mb-4 bg-white border border-gray-300 shadow-sm relative pt-4">
-                <canvas ref={canvasRef} width={260} height={120} role="img" aria-label={`データのドットプロット。${problem.data.join('、')}。${hasChecked ? `平均値は${problem.ans1}` : '解答後に平均値の位置を表示'}`} className="w-full max-w-full h-auto" />
+                <canvas ref={canvasRef} width={260} height={120} role="img" aria-label={`データのドットプロット。${problem.data.join('、')}。${hasChecked && problem.mean !== undefined ? `平均値は${problem.mean}` : '解答後に平均値の位置を表示'}`} className="w-full max-w-full h-auto" />
               </div>
             )}
 

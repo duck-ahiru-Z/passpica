@@ -9,6 +9,11 @@ for (const label of ['1変量データ分析の演習パターン', '平均値�
   assert.ok(page.includes(`aria-label="${label}"`), `missing accessible name: ${label}`);
 }
 assert.ok(page.includes('role="img" aria-label={`データのドットプロット'), 'the dot plot must have a useful accessible description');
+assert.equal((page.match(/return \{ pattern: p, qStr, data, ans1: variance\.toString\(\), mean, expLines \};/g) ?? []).length, 2, 'both variance modes must retain the dataset mean separately from the variance answer');
+assert.ok(page.includes('if (hasChecked && problem.mean !== undefined)'), 'the graph mean line must use the retained mean');
+assert.ok(page.includes('平均値は${problem.mean}'), 'the graph description must announce the retained mean');
+assert.ok(!page.includes('parseFloat(problem.ans1!)'), 'variance answers must never be mistaken for the mean on the graph');
+assert.ok(page.includes('<ExplanationLine value={line} />'), 'Japanese explanation prose must stay outside KaTeX math mode');
 
 assert.equal(hasUniqueMode([3, 3, 1, 2, 4], 3), true);
 assert.equal(hasUniqueMode([3, 3, 1, 1, 4], 3), false, 'a tied mode must not be presented as unique');
