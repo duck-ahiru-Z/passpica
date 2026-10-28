@@ -5,7 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { checkRationalizationAnswer, generateRationalizationProblem, parseRationalizationInteger, type RationalizationMode } from '@/src/lib/rationalizationProblem';
+import { checkRationalizationAnswer, generateRationalizationProblem, isCorrectRationalizationConjugate, parseRationalizationInteger, type RationalizationMode } from '@/src/lib/rationalizationProblem';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -16,6 +16,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 export default function RationalizationDrillPage() {
   const [mode, setMode] = useState<RationalizationMode>('mix');
   const [problem, setProblem] = useClientGeneratedState(() => generateRationalizationProblem('mix'));
+  const [selectedConjugateSign, setSelectedConjugateSign] = useState<'+' | '-' | ''>('');
   
   // ユーザー入力
   const [ansA, setAnsA] = useState<string>('');
@@ -32,6 +33,7 @@ export default function RationalizationDrillPage() {
 
   const handleNext = (nextMode: RationalizationMode = mode) => {
     setProblem(generateRationalizationProblem(nextMode));
+    setSelectedConjugateSign('');
     setAnsA('');
     setAns_a('');
     setAnsB('');
@@ -59,7 +61,9 @@ export default function RationalizationDrillPage() {
     }
     
     // 正解は k\sqrt{a} と k\sqrt{b} の和または差
-    if (checkRationalizationAnswer(problem, { coefficientA: uA, radicandA: u_a, coefficientB: uB, radicandB: u_b })) {
+    const answerIsCorrect = checkRationalizationAnswer(problem, { coefficientA: uA, radicandA: u_a, coefficientB: uB, radicandB: u_b });
+    const conjugateIsCorrect = mode !== 'mix' || (selectedConjugateSign !== '' && isCorrectRationalizationConjugate(problem, selectedConjugateSign));
+    if (answerIsCorrect && conjugateIsCorrect) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -112,6 +116,25 @@ export default function RationalizationDrillPage() {
             </div>
             
             <div className="space-y-4">
+              {mode === 'mix' && (
+                <fieldset className="mb-5 rounded border border-gray-300 bg-white p-3 text-left">
+                  <legend className="px-1 font-bold text-slate-700">分母を有理化するために掛ける共役な式を選んでください</legend>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {(['-', '+'] as const).map(sign => (
+                      <label key={sign} className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 p-2">
+                        <input
+                          type="radio"
+                          name="rationalization-conjugate-sign"
+                          value={sign}
+                          checked={selectedConjugateSign === sign}
+                          onChange={() => { setSelectedConjugateSign(sign); setHasChecked(false); setIsCorrect(false); }}
+                        />
+                        <span>√a {sign} √b を分子・分母に掛ける</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
               <div className="text-center font-bold text-gray-700">
                 分母を有理化しなさい。
               </div>
@@ -148,7 +171,11 @@ export default function RationalizationDrillPage() {
 
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！素晴らしい！' : '不正解... 解説を見てみよう。'}
+                {isCorrect
+                  ? '正解！素晴らしい！'
+                  : mode === 'mix' && (selectedConjugateSign === '' || !isCorrectRationalizationConjugate(problem, selectedConjugateSign))
+                    ? `共役な式の選択を確認しましょう。分母には √a ${problem.answerSign} √b を掛けます。`
+                    : '不正解... 解説を見てみよう。'}
               </div>
             )}
           </div>
