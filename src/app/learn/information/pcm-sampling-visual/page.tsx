@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { formatBytes, getPcmDataSize } from '@/src/lib/informationPcm';
+import { formatBytes, getPcmDataSize, getPcmDiagramMarkerCount } from '@/src/lib/informationPcm';
 
 const sampleRates = [22050, 32000, 44100, 48000, 96000];
 const bitDepths = [8, 16, 24];
@@ -13,10 +13,12 @@ export default function PcmSamplingVisualPage() {
   const [channels, setChannels] = useState(2);
   const [seconds, setSeconds] = useState(1);
   const bytes = getPcmDataSize({ sampleRate, bitDepth, channels, seconds });
+  const markerCount = getPcmDiagramMarkerCount(sampleRate);
   const formatCoordinate = (value: number) => (Math.round(value * 1000) / 1000).toString();
-  const waveform = Array.from({ length: 15 }, (_, index) => {
-    const x = formatCoordinate(34 + (index / 14) * 572);
-    const y = formatCoordinate(105 - Math.sin((index / 14) * Math.PI * 4) * 57);
+  const waveform = Array.from({ length: markerCount }, (_, index) => {
+    const progress = index / (markerCount - 1);
+    const x = formatCoordinate(34 + progress * 572);
+    const y = formatCoordinate(105 - Math.sin(progress * Math.PI * 4) * 57);
     return `${x},${y}`;
   }).join(' ');
   const continuousWave = Array.from({ length: 121 }, (_, index) => {
@@ -38,8 +40,8 @@ export default function PcmSamplingVisualPage() {
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm" aria-labelledby="wave-heading">
           <h2 id="wave-heading" className="font-black">音の波を一定間隔で記録する（概念図）</h2>
           <svg viewBox="0 0 640 150" role="img" aria-labelledby="wave-title wave-desc" className="mt-3 w-full">
-            <title id="wave-title">連続した音の波と標本点</title>
-            <desc id="wave-desc">青い曲線が連続した音の波、丸い点が一定間隔で取り出した標本です。点の数は仕組みを示す概念図で、選択した標本化周波数の全標本数ではありません。</desc>
+            <title id="wave-title">連続した音の波と標本点（{(sampleRate / 1000).toLocaleString()} kHz）</title>
+            <desc id="wave-desc">青い曲線が連続した音の波、丸い点が一定間隔で取り出した標本です。選択中の標本化周波数に合わせて、説明用に{markerCount}点を縮尺して表示しています。1秒間の全標本数ではありません。</desc>
             <line x1="30" y1="105" x2="610" y2="105" stroke="#94a3b8" strokeWidth="1" />
             <polyline points={continuousWave} fill="none" stroke="#2563eb" strokeWidth="3" />
             <polyline points={waveform} fill="none" stroke="#f97316" strokeWidth="2" strokeDasharray="5 5" />
@@ -49,7 +51,7 @@ export default function PcmSamplingVisualPage() {
             })}
           </svg>
           <div className="flex flex-wrap gap-4 text-sm"><span><span className="mr-2 inline-block h-1 w-5 align-middle bg-blue-600" />連続した音の波</span><span><span className="mr-2 inline-block h-2 w-2 rounded-full bg-orange-500 align-middle" />一定間隔の標本</span></div>
-          <p className="mt-3 text-xs leading-5 text-slate-500">図の点は標本化の考え方だけを示しています。実際の音声では、たとえば44.1 kHzなら1秒間に44,100個の標本を記録します。</p>
+          <p aria-live="polite" className="mt-3 text-xs leading-5 text-slate-500">現在の設定は {(sampleRate / 1000).toLocaleString()} kHzで、実際の音声では1秒間に {sampleRate.toLocaleString()} 個の標本を記録します。図では周波数に応じて点の間隔が変わりますが、点の数は見やすく縮尺した概念図です。</p>
         </section>
 
         <section className="grid gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:grid-cols-2" aria-label="PCMの記録条件">

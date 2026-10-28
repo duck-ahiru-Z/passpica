@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { formatBytes, getPcmDataSize } from '../src/lib/informationPcm.ts';
+import { formatBytes, getPcmDataSize, getPcmDiagramMarkerCount } from '../src/lib/informationPcm.ts';
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/information/pcm-sampling-visual/page.tsx'), 'utf8');
 const drill = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/information/calculation-drill/page.tsx'), 'utf8');
@@ -12,9 +12,14 @@ assert.equal(getPcmDataSize({ sampleRate: 48000, bitDepth: 24, channels: 2, seco
 assert.equal(getPcmDataSize({ sampleRate: 32000, bitDepth: 16, channels: 1, seconds: 10 }), 640000);
 assert.equal(formatBytes(176400), '176.4 kB');
 assert.equal(formatBytes(1440000), '1.44 MB');
+const markerCounts = [22050, 32000, 44100, 48000, 96000].map(getPcmDiagramMarkerCount);
+assert.deepEqual(markerCounts, [8, 11, 15, 16, 33]);
+assert.ok(markerCounts.every((count, index) => index === 0 || count > markerCounts[index - 1]), 'higher sample rates should draw more closely spaced markers');
+assert.match(page, /length: markerCount/);
 assert.match(page, /標本化周波数 × 量子化ビット数 × チャンネル数 × 秒数 ÷ 8/);
 assert.match(page, /role="img" aria-labelledby="wave-title wave-desc"/);
-assert.match(page, /選択した標本化周波数の全標本数ではありません/);
+assert.match(page, /選択中の標本化周波数に合わせて、説明用に\{markerCount\}点を縮尺して表示しています。1秒間の全標本数ではありません/);
+assert.match(page, /<p aria-live="polite" className="mt-3 text-xs leading-5 text-slate-500">現在の設定は/);
 assert.match(page, /aria-label="標本化周波数"/);
 assert.match(page, /aria-label="量子化ビット数"/);
 assert.match(page, /name="pcm-channels"/);
