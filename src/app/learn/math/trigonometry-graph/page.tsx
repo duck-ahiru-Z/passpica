@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { getTrigonometryProbeStatus } from '@/src/lib/trigonometryGraphProbe';
+import { clampTrigonometryParameter } from '@/src/lib/trigonometryGraphParameters';
 
 type TrigonometricFunc = 'sin' | 'cos' | 'tan';
 
@@ -474,7 +475,7 @@ export default function TrigonometryGraphPage() {
                     min="-3.0"
                     max="3.0"
                     value={a}
-                    onChange={(e) => setA(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setA(clampTrigonometryParameter(parseFloat(e.target.value), -3, 3, 0))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setA(1.0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">1.0</button>
@@ -502,7 +503,7 @@ export default function TrigonometryGraphPage() {
                     min="0.2"
                     max="4.0"
                     value={b}
-                    onChange={(e) => setB(Math.max(0.1, parseFloat(e.target.value) || 1))}
+                    onChange={(e) => setB(clampTrigonometryParameter(parseFloat(e.target.value), 0.2, 4, 1))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setB(1.0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">1.0</button>
@@ -530,7 +531,7 @@ export default function TrigonometryGraphPage() {
                     min="-360"
                     max="360"
                     value={c}
-                    onChange={(e) => setC(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setC(clampTrigonometryParameter(parseInt(e.target.value, 10), -360, 360, 0))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setC(0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">0°</button>
@@ -565,7 +566,7 @@ export default function TrigonometryGraphPage() {
                     min="-3.0"
                     max="3.0"
                     value={d}
-                    onChange={(e) => setD(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setD(clampTrigonometryParameter(parseFloat(e.target.value), -3, 3, 0))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setD(0.0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">0.0</button>
