@@ -6,12 +6,6 @@ import {
   type ByteMode,
 } from '@/src/lib/informationNumberRepresentation';
 
-const presets = [
-  { label: '127（最大の正数）', value: 127 },
-  { label: '128（最小の負数）', value: 128 },
-  { label: '255（−1）', value: 255 },
-];
-
 export default function NumberRepresentationVisualPage() {
   const [value, setValue] = useState(13);
   const [mode, setMode] = useState<ByteMode>('unsigned');
@@ -19,6 +13,11 @@ export default function NumberRepresentationVisualPage() {
   const unsignedMaximum = 2 ** bitWidth - 1;
   const signedMinimum = -(2 ** (bitWidth - 1));
   const signedMaximum = 2 ** (bitWidth - 1) - 1;
+  const presets = [
+    { label: `${signedMaximum}（最大の正数）`, value: signedMaximum },
+    { label: `${2 ** (bitWidth - 1)}（最小の負数）`, value: 2 ** (bitWidth - 1) },
+    { label: `${unsignedMaximum}（−1）`, value: unsignedMaximum },
+  ];
   const bits = value.toString(2).padStart(bitWidth, '0');
   const weights = Array.from({ length: bitWidth }, (_, index) => mode === 'twos-complement' && index === 0 ? signedMinimum : 2 ** (bitWidth - index - 1));
   const contributions = [...bits].map((bit, index) => bit === '1' ? weights[index] : 0);
@@ -75,7 +74,7 @@ export default function NumberRepresentationVisualPage() {
           <div className="mt-4" aria-label="2の補数の例を試す">
             <p className="mb-2 text-sm text-slate-600">{mode === 'twos-complement' ? '2の補数の例を試す' : '選ぶと2の補数表示に切り替わります'}</p>
             <div className="flex flex-wrap gap-2">
-              {presets.map((preset) => <button key={preset.value} type="button" onClick={() => { setBitWidth(8); setMode('twos-complement'); setValue(preset.value); }} className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100">{preset.label}</button>)}
+              {presets.map((preset) => <button key={preset.value} type="button" onClick={() => { setMode('twos-complement'); setValue(preset.value); }} className="rounded-full border border-slate-300 px-3 py-2 text-sm font-semibold hover:bg-slate-100">{preset.label}</button>)}
             </div>
           </div>
         </section>
