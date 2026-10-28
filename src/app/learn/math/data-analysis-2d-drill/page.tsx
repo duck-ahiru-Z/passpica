@@ -5,7 +5,7 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
-import { getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
+import { generateCorrelationScatterPoints, getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
 import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
@@ -143,14 +143,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const trueR = (Math.random() * 1.8 - 0.9).toFixed(1); // -0.9 to 0.9
       const rNum = parseFloat(trueR);
       
-      // Generate scatter points with approx correlation rNum
-      const pts = [];
-      for (let i = 0; i < 30; i++) {
-        const x = Math.random() * 10;
-        const err = (Math.random() - 0.5) * 5 * Math.sqrt(1 - rNum*rNum);
-        const y = rNum > 0 ? (x * rNum + err) : ((10 - x) * Math.abs(rNum) + err);
-        pts.push({x, y: y + 5});
-      }
+      // Construct the sample so its measured Pearson correlation matches the target.
+      const pts = generateCorrelationScatterPoints(rNum);
       
       const choices = [
         rNum,
