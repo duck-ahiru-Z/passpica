@@ -74,6 +74,9 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       accessibleExpression: `y イコール x の 2 乗、x は 0 以上 ${volumeUpper} 以下`,
       answer: Math.PI * volumeUpper ** 5 / 5,
       explanation: `断面円板の半径は x²、面積は πx⁴。V=π∫₀^${volumeUpper}x⁴dx=π×${volumeUpper}⁵/5≈${(Math.PI * volumeUpper ** 5 / 5).toFixed(3)}。ビジュアルの上端 b=${volumeUpper} と同じ条件です。`,
+      alternativeExplanations: {
+        'x-axis-rotation': `円板法で半径 y=x² の円板を積分する。V=π∫₀^${volumeUpper}(x²)²dx=π∫₀^${volumeUpper}x⁴dx=π×${volumeUpper}⁵/5≈${(Math.PI * volumeUpper ** 5 / 5).toFixed(3)}。`,
+      },
     },
     'y-axis-rotation': {
       pattern,
