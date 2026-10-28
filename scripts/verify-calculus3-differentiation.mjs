@@ -70,8 +70,10 @@ const checks = {
     const values = { '\\pi/6': Math.PI / 6, '\\pi/4': Math.PI / 4, '\\pi/3': Math.PI / 3, '2\\pi/3': 2 * Math.PI / 3 };
     const t = values[angle];
     const expected = -Math.cos(t) / (2 * Math.sin(t));
+    const displayAngle = angle.replaceAll('\\pi', 'π');
     return close(problem.answer, expected) && problem.expression.includes('x=2\\cos t')
       && problem.expression.includes('y=\\sin t') && problem.explanation.includes('dx/dt=−2sin t')
+      && problem.explanation.includes(`t=${displayAngle} で`) && !problem.explanation.includes('\\pi')
       && problem.explanation.includes(expected.toFixed(3));
   },
   implicit: problem => {
