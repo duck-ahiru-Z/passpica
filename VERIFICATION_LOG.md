@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Simple harmonic frequency focused drill PR preview follow-up (2026-10-28)
+- `/learn/physics/motion-calculation-drill` on the PR preview for head `2d02f29`: Selected the independently focused spring-oscillator frequency pattern. The prompt gave m=0.5 kg and k=200 N/m; independently computed f=√(k/m)/(2π)=10/π=3.183098861… Hz. Entered 3.183099 Hz and the page accepted it, showing the matching angular-frequency calculation and `f=1/T`. The screenshot confirmed the selected fixed mode, prompt, unit, entered answer, and green correct feedback. This verifies the frequency answer path separately from the period check recorded above.
+
 ### Simple harmonic visual and linked drill PR preview follow-up (2026-10-28)
 - `/learn/physics/simple-harmonic-visual` on the Ready PR preview serving app source through `b8e926b` (head `7b5cdc9` adds only this verification log): the graph visibly includes `+A`, `0`, and `−A`. Moved phase to 75%: the plotted point crossed equilibrium, with x≈0 m, v=2.000 m/s, a≈0, elastic energy 0 J, kinetic energy 2 J, and total energy 2 J. Followed the visual's period/frequency practice link to `/learn/physics/motion-calculation-drill`; focused period mode displayed m=0.8 kg and k=50 N/m. Independently calculated T=2π√(0.8/50)=0.794767061… s, entered 0.794767 s, and received correct feedback with the same formula, units, and amplitude-independence explanation. This closes the preview-confirmation gap for the added graph labels and verifies the visual-to-drill route and a focused answer.
 
