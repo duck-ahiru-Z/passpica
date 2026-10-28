@@ -9,7 +9,7 @@ if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage
 if (!drillPage.includes('setChoice(option); setChecked(false);')) {
   throw new Error('changing a factorization strategy must clear the previous feedback');
 }
-for (const requirement of ["mode === 'mix' && <fieldset", 'aria-label="因数分解した式"', '因数の積の形で答えてください。', 'placeholder="例：(x-3)(x+3)"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', 'const correct = strategyCorrect && factorizationCorrect', "disabled={!factorAnswer.trim() || (mode === 'mix' && !choice)}", '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
+for (const requirement of ["mode === 'mix' && (", 'aria-label="因数分解した式"', '因数の積の形で答えてください。', 'placeholder="例：(x-3)(x+3)"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', 'const correct = strategyCorrect && factorizationCorrect', "disabled={!factorAnswer.trim() || (mode === 'mix' && !choice)}", '基礎練習：${labels[mode]}の型で因数分解しましょう', '解法選択：{strategyCorrect ?', '因数分解の式：{factorizationCorrect ?']) {
   if (!drillPage.includes(requirement)) throw new Error(`factorization practice is missing fixed-answer behavior: ${requirement}`);
 }
 
