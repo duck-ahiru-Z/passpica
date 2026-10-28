@@ -224,6 +224,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
+    slug: 'wave-superposition-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（重ね合わせ・干渉）',
+    title: '波の重ね合わせ・干渉ビジュアル',
+    description: '位相差を動かし、強め合い・打ち消し合いと合成振幅の変化を波形で確かめます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/wave-superposition-visual',
+    practiceLink: '/learn/physics/wave-calculation-drill'
+  },
+  {
     slug: 'impulse-momentum-visual',
     subject: 'physics',
     subjectJp: '物理',

@@ -85,6 +85,7 @@
     "test:circle-tangent-drill": "node --experimental-strip-types scripts/verify-circle-tangent-drill.mjs",
     "test:matha-mixed": "node --experimental-strip-types scripts/verify-matha-mixed-questions.mjs",
     "test:physics-motion": "node --experimental-strip-types scripts/verify-physics-motion-calculation.mjs",
+    "test:physics-waves": "node --experimental-strip-types scripts/verify-physics-waves.mjs",
     "test:motion-visual": "node --experimental-strip-types scripts/verify-motion-visual.mjs",
     "test:spring-visual": "node --experimental-strip-types scripts/verify-spring-visual.mjs",
     "test:projectile-visual": "node --experimental-strip-types scripts/verify-projectile-motion.mjs",

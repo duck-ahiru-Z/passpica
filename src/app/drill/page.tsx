@@ -270,6 +270,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/physics/ac-circuit-drill'
   },
   {
+    slug: 'wave-calculation-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（解法選択）',
+    title: '物理 波動・計算ドリル',
+    description: '波の速さ・周期・振動数・経路差と位相差・合成振幅を個別練習し、実戦では全5パターンをランダムに混ぜて公式選択から答えまで練習します。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/physics/wave-calculation-drill'
+  },
+  {
     slug: 'number-representation-drill',
     subject: 'information',
     subjectJp: '情報I',

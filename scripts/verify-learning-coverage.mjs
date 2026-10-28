@@ -23,7 +23,7 @@ function routeFile(link) {
 const requiredDrills = [
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill',
   'mathbc-mixed-drill', 'calculus3-mixed-drill', 'quadratic-equation-drill',
-  'motion-calculation-drill', 'mole-calculation-drill', 'calculation-drill',
+  'motion-calculation-drill', 'wave-calculation-drill', 'mole-calculation-drill', 'calculation-drill',
   'titration-drill', 'indicator-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
   'number-representation-drill',
   'trigonometry-graph-drill',
@@ -36,7 +36,7 @@ const requiredVisuals = [
   'conic-sections-visual',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual',
+  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual', 'wave-superposition-visual',
   'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'ideal-gas-visual', 'crystal-lattice', 'titration-visual', 'weak-electrolyte-visual',
 ];
 
@@ -62,7 +62,7 @@ const practiceModeDescriptions = [
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
   'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill', 'trigonometry-graph-drill',
   'calculus3-integral-drill', 'indicator-drill',
-  'calculus3-differentiation-drill',
+  'calculus3-differentiation-drill', 'wave-calculation-drill',
 ];
 for (const slug of practiceModeDescriptions) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);
@@ -272,6 +272,16 @@ if (!harmonicVisual.includes('href="/learn/physics/motion-calculation-drill"')
   || !motionDrill.includes('href="/learn/physics/simple-harmonic-visual"')
   || !learn.includes("slug: 'simple-harmonic-visual'")) {
   throw new Error('The simple-harmonic visual, mechanics drill and learning portal must link to each other.');
+}
+const waveVisualRoute = '/learn/physics/wave-superposition-visual';
+const waveDrillRoute = '/learn/physics/wave-calculation-drill';
+const waveVisualPage = fs.readFileSync(routeFile(waveVisualRoute), 'utf8');
+const waveDrillPage = fs.readFileSync(routeFile(waveDrillRoute), 'utf8');
+const waveVisualEntry = learnEntries.find(entry => entry.link === waveVisualRoute);
+if (!waveVisualEntry || !new RegExp(`slug: 'wave-superposition-visual'[\\s\\S]*?practiceLink: '${waveDrillRoute}'`).test(learn)
+  || !waveVisualPage.includes(`href="${waveDrillRoute}"`)
+  || !waveDrillPage.includes(`href="${waveVisualRoute}"`)) {
+  throw new Error('The wave visual and fixed/mixed wave calculation drill must link to each other and from the learning portal.');
 }
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');

@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Physics wave visual and calculation drill implementation (2026-10-28)
+- Added `/learn/physics/wave-superposition-visual` and `/learn/physics/wave-calculation-drill`: Five focused patterns cover wave speed, period→frequency, frequency→period, path difference→phase difference, and phase difference→resultant amplitude; mixed mode uses `BalancedRandom`. `npm run test:physics-waves` generated 20,000 seeded mixed questions with exactly 4,000 per pattern and no adjacent pattern repeats, and checked fixed-mode generation, numeric answer formatting, constructive/destructive interference, accessibility labels and reciprocal page links. `node scripts/verify-learning-coverage.mjs` reports 68 linked drills, 42 learning pages, 24 required visuals and 54 fixed-plus-mixed pattern drills; `npx tsc --noEmit`, targeted ESLint and `git diff --check` pass. Browser screen interaction remains pending: the existing development server is listening on 3025, but the browser session cannot reach localhost ports in this environment; verify both screens on the refreshed Vercel preview before considering the UI check complete.
+
 ### Physics and chemistry learning portal preview follow-up (2026-10-28)
 - On the Ready PR branch preview, the learning-room portal's Physics filter showed 8 entries; all 8 had an associated practice link, and the rendered screenshot matched the filtered count and visible rows. The Chemistry filter showed 18 entries across visuals, simulators, analysis flows, and one calculation drill; screenshot and settled DOM state agreed on the count and current filter. This supplements the Math III portal check above with physics/chemistry discovery and cross-links.
 
