@@ -28,6 +28,12 @@ function gcd(x: number, y: number): number {
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+const strategyLabels: Record<Pattern, string> = {
+  pattern1: 'チェバの定理',
+  pattern2: 'メネラウスの定理（内側の比）',
+  pattern3: 'メネラウスの定理（外側の比）',
+  pattern4: '面積比を質量点で求める',
+};
 
 interface ProblemData {
   pattern: Pattern;
@@ -87,19 +93,25 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 export default function MenelausCevaDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
   const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [selectedStrategy, setSelectedStrategy] = useState<Pattern | ''>('');
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [isRatioCorrect, setIsRatioCorrect] = useState(false);
+  const [isStrategyCorrect, setIsStrategyCorrect] = useState(true);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
+    setSelectedStrategy(selectedPattern === 'mix' ? '' : selectedPattern);
     setAnsX('');
     setAnsY('');
     setHasChecked(false);
     setIsCorrect(false);
+    setIsRatioCorrect(false);
+    setIsStrategyCorrect(true);
   };
 
   const handleCheck = () => {
@@ -110,11 +122,11 @@ export default function MenelausCevaDrill() {
     
     // allow multiples (e.g. 2:4 for 1:2 is correct geometrically, though we usually want simplest form)
     // we'll enforce simplest form or proportional. Let's do proportional.
-    if (ux !== null && uy !== null && arePositiveIntegerRatiosEquivalent(ux, uy, problem.ansX, problem.ansY)) {
-      setIsCorrect(true);
-    } else {
-      setIsCorrect(false);
-    }
+    const ratioCorrect = ux !== null && uy !== null && arePositiveIntegerRatiosEquivalent(ux, uy, problem.ansX, problem.ansY);
+    const strategyCorrect = selectedPattern !== 'mix' || selectedStrategy === problem.pattern;
+    setIsRatioCorrect(ratioCorrect);
+    setIsStrategyCorrect(strategyCorrect);
+    setIsCorrect(ratioCorrect && strategyCorrect);
     setHasChecked(true);
   };
 
@@ -321,7 +333,7 @@ export default function MenelausCevaDrill() {
               <select 
                 aria-label="練習する定理パターン"
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setSelectedStrategy(pattern === 'mix' ? '' : pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); setIsRatioCorrect(false); setIsStrategyCorrect(true); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -335,6 +347,22 @@ export default function MenelausCevaDrill() {
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[100px] gap-2 text-base font-bold text-slate-700 leading-relaxed">
               {questionEl}
             </div>
+
+            {selectedPattern === 'mix' ? (
+              <fieldset className="mb-6 rounded border border-gray-300 bg-white p-3 space-y-2">
+                <legend className="px-1 font-bold text-slate-700">問題の形から使う定理・方針を選んでください</legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {(Object.keys(strategyLabels) as Pattern[]).map(pattern => (
+                    <label key={pattern} className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${selectedStrategy === pattern ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>
+                      <input type="radio" name="menelaus-ceva-strategy" value={pattern} checked={selectedStrategy === pattern} onChange={() => { setSelectedStrategy(pattern); setHasChecked(false); }} className="accent-blue-600" />
+                      {strategyLabels[pattern]}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : (
+              <p role="status" aria-live="polite" className="mb-6 text-center font-bold text-blue-800">基礎練習：{strategyLabels[selectedPattern]}に固定して繰り返します。</p>
+            )}
             
             <div className="space-y-4">
               <div className="flex items-center justify-center gap-2 text-xl font-bold">
@@ -359,6 +387,7 @@ export default function MenelausCevaDrill() {
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={selectedPattern === 'mix' && selectedStrategy === ''}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -373,7 +402,11 @@ export default function MenelausCevaDrill() {
 
             {hasChecked && (
               <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！見事な図形的直感です。' : '不正解... 定理の経路「頂点→分点→頂点」を確認しましょう。'}
+                {isCorrect ? '正解！定理の選択も比の計算も合っています。' : <>
+                  {selectedPattern === 'mix' && !isStrategyCorrect && <>方針が不正解です。使うのは「{strategyLabels[problem.pattern]}」です。 </>}
+                  {!isRatioCorrect && <>比の答えは {problem.ansX}:{problem.ansY} です。</>}
+                  {isStrategyCorrect && isRatioCorrect && '正解です。'}
+                </>}
               </div>
             )}
           </div>

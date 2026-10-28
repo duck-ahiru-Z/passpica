@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { getCevaMasses } from '../src/lib/menelausCeva.ts';
+import { BalancedRandom } from '../src/lib/balancedRandom.ts';
 
 const drillPage = fs.readFileSync('src/app/learn/math/menelaus-ceva-drill/page.tsx', 'utf8');
 for (const requiredMarkup of [
@@ -8,9 +9,28 @@ for (const requiredMarkup of [
   'aria-label="求める比の左側"',
   'aria-label="求める比の右側"',
   'role="status" aria-live="polite"',
+  '問題の形から使う定理・方針を選んでください',
+  'name="menelaus-ceva-strategy"',
+  "new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4'])",
+  "selectedStrategy === problem.pattern",
+  "disabled={selectedPattern === 'mix' && selectedStrategy === ''}",
+  '基礎練習：{strategyLabels[selectedPattern]}に固定して繰り返します。',
+  '方針が不正解です。使うのは',
+  '比の答えは {problem.ansX}:{problem.ansY} です。',
 ]) {
   assert.ok(drillPage.includes(requiredMarkup), `Menelaus/Ceva drill is missing accessible feedback/control markup: ${requiredMarkup}`);
 }
+
+const mixedPicker = new BalancedRandom(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+const mixedCounts = new Map([['pattern1', 0], ['pattern2', 0], ['pattern3', 0], ['pattern4', 0]]);
+let previousPattern;
+for (let i = 0; i < 40_000; i += 1) {
+  const pattern = mixedPicker.next();
+  mixedCounts.set(pattern, mixedCounts.get(pattern) + 1);
+  assert.notEqual(pattern, previousPattern, 'mixed practice must not repeat a pattern consecutively');
+  previousPattern = pattern;
+}
+assert.deepEqual([...mixedCounts.values()], [10_000, 10_000, 10_000, 10_000], 'mixed practice must schedule each pattern equally');
 const combinedRatioPrompt = 'math={`BD:DC = ${problem.a}:${problem.b},\\\\; CE:EA = ${problem.c}:${problem.d}`} />';
 assert.equal(drillPage.split(combinedRatioPrompt).length - 1, 2, 'Ceva and area-ratio prompts must keep punctuation attached to the combined ratios');
 
