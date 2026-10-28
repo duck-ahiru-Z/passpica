@@ -240,6 +240,7 @@ export default function DataAnalysis2DDrill() {
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
   const [isMethodCorrect, setIsMethodCorrect] = useState<boolean | null>(null);
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleNext = () => {
@@ -249,6 +250,7 @@ export default function DataAnalysis2DDrill() {
     setHasChecked(false);
     setIsCorrect(false);
     setIsMethodCorrect(null);
+    setIsAnswerCorrect(null);
   };
 
   const handleCheck = () => {
@@ -257,6 +259,7 @@ export default function DataAnalysis2DDrill() {
     const answerOk = isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? '');
     
     setIsMethodCorrect(selectedPattern === 'mix' ? methodOk : null);
+    setIsAnswerCorrect(answerOk);
     setIsCorrect(methodOk && answerOk);
     setHasChecked(true);
   };
@@ -365,7 +368,7 @@ export default function DataAnalysis2DDrill() {
                   const nextPattern = e.target.value as Pattern | 'mix';
                   setSelectedPattern(nextPattern);
                   setProblem(generateProblem(nextPattern));
-                  setAns1(''); setMethodChoice(''); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null);
+                  setAns1(''); setMethodChoice(''); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null); setIsAnswerCorrect(null);
                 }}
                 className="border p-1 text-xs"
               >
@@ -433,7 +436,7 @@ export default function DataAnalysis2DDrill() {
                           name="data-analysis-method-choice"
                           value={pattern}
                           checked={methodChoice === pattern}
-                          onChange={() => { setMethodChoice(pattern); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null); }}
+                          onChange={() => { setMethodChoice(pattern); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null); setIsAnswerCorrect(null); }}
                         />
                         <span>{patternLabels[pattern]}</span>
                       </label>
@@ -454,7 +457,7 @@ export default function DataAnalysis2DDrill() {
                             name="scatter-correlation-choice"
                             value={value}
                             checked={ans1 === value}
-                            onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
+                            onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); setIsAnswerCorrect(null); }}
                           />
                           <MathEq math={`r = ${value}`} />
                         </label>
@@ -469,7 +472,7 @@ export default function DataAnalysis2DDrill() {
                       aria-label="解答"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500"
                       value={ans1}
-                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); setIsAnswerCorrect(null); }}
                     />
                   </div>
                 )}
@@ -495,11 +498,16 @@ export default function DataAnalysis2DDrill() {
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {selectedPattern === 'mix' && (
+                  <>
                   <p className="mb-2">
                     {isMethodCorrect
                       ? `分析方法の選択も正解です（${patternLabels[problem.pattern]}）。`
                       : `分析方法は「${patternLabels[problem.pattern]}」です。問題の形を見直しましょう。`}
                   </p>
+                  <p className="mb-2">
+                    {isAnswerCorrect ? '計算・読み取り結果も正解です。' : '計算・読み取り結果も確認しましょう。'}
+                  </p>
+                  </>
                 )}
                 {isCorrect ? '正解！2変量の分析も完璧です。' : '解説やグラフを見て、分析方法と計算を確認しましょう。'}
               </div>

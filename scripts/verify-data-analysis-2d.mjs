@@ -9,6 +9,7 @@ assert.ok(page.includes('aria-label="2変量データ分析の演習パターン
 assert.ok(page.includes('isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? \'\')'), 'grading must use strict numeric answer validation');
 assert.ok(page.includes('selectedPattern === \'mix\' && ('), 'mixed mode must require learners to identify the method');
 assert.ok(page.includes('disabled={selectedPattern === \'mix\' && !methodChoice}'), 'mixed-mode submission must stay disabled until a method is chosen');
+assert.ok(page.includes('計算・読み取り結果も正解です。'), 'mixed-mode feedback must report answer correctness separately from method choice');
 for (const label of ['共分散の計算', '相関係数の計算', '散布図から相関を推定', 'クロス集計表']) {
   assert.ok(page.includes(label), `mixed mode is missing method choice: ${label}`);
 }
