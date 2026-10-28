@@ -382,6 +382,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/chemistry/titration-drill'
   },
   {
+    slug: 'weak-electrolyte-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基（電離平衡）',
+    title: '弱酸・弱塩基の電離平衡ビジュアル',
+    description: '初濃度と電離定数を動かし、平衡時の電離度・粒子の割合・pHがどう変わるかをグラフと模型で確認します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/weak-electrolyte-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
     slug: 'titration-drill',
     subject: 'chemistry',
     subjectJp: '化学',

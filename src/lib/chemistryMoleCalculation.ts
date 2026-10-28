@@ -1,13 +1,14 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { isNumericAnswerCorrect } from './numericAnswer.ts';
 import { calculateIdealGasAmount, calculateIdealGasVolume, idealGasConstantKPaLiters } from './idealGasLaw.ts';
+import { calculateWeakAcidPh, calculateWeakBasePh, solveWeakElectrolyteIonConcentration } from './chemistryWeakElectrolyte.ts';
 
-export type MolePattern = 'mass' | 'composition' | 'concentration' | 'dilution' | 'gas' | 'idealGasAmount' | 'idealGasVolume' | 'stoichiometry' | 'limiting-reagent' | 'excess-reagent' | 'ph' | 'strongBasePh' | 'yield';
+export type MolePattern = 'mass' | 'composition' | 'concentration' | 'dilution' | 'gas' | 'idealGasAmount' | 'idealGasVolume' | 'stoichiometry' | 'limiting-reagent' | 'excess-reagent' | 'ph' | 'strongBasePh' | 'weakAcidPh' | 'weakBasePh' | 'yield';
 export type MoleMode = MolePattern | 'mix';
 export type MoleProblem = { pattern: MolePattern; question: string; answer: number; unit: string; explanation: string };
 
-export const molePatterns: readonly MolePattern[] = ['mass', 'composition', 'concentration', 'dilution', 'gas', 'idealGasAmount', 'idealGasVolume', 'stoichiometry', 'limiting-reagent', 'excess-reagent', 'ph', 'strongBasePh', 'yield'];
-export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', composition: '元素の質量百分率', concentration: 'モル濃度', dilution: '希釈', gas: '標準状態の気体体積', idealGasAmount: '気体の状態方程式で物質量', idealGasVolume: '気体の状態方程式で体積', stoichiometry: '反応量比', 'limiting-reagent': '制限試薬と生成量', 'excess-reagent': '過剰試薬の残量', ph: '強酸のpH', strongBasePh: '強塩基のpH', yield: '収率' };
+export const molePatterns: readonly MolePattern[] = ['mass', 'composition', 'concentration', 'dilution', 'gas', 'idealGasAmount', 'idealGasVolume', 'stoichiometry', 'limiting-reagent', 'excess-reagent', 'ph', 'strongBasePh', 'weakAcidPh', 'weakBasePh', 'yield'];
+export const moleLabels: Record<MolePattern, string> = { mass: '質量から物質量', composition: '元素の質量百分率', concentration: 'モル濃度', dilution: '希釈', gas: '標準状態の気体体積', idealGasAmount: '気体の状態方程式で物質量', idealGasVolume: '気体の状態方程式で体積', stoichiometry: '反応量比', 'limiting-reagent': '制限試薬と生成量', 'excess-reagent': '過剰試薬の残量', ph: '強酸のpH', strongBasePh: '強塩基のpH', weakAcidPh: '弱酸のpH（Ka）', weakBasePh: '弱塩基のpH（Kb）', yield: '収率' };
 
 const picker = new BalancedRandom(molePatterns);
 const variants = {
@@ -75,6 +76,16 @@ const variants = {
   ]),
   ph: new BalancedRandom([1, 2, 3, 4, 5]),
   strongBasePh: new BalancedRandom([1, 2, 3, 4, 5]),
+  weakAcidPh: new BalancedRandom([
+    { acid: '酢酸 CH₃COOH', concentration: 0.1, concentrationText: '0.10', ka: 1.8e-5, kaText: '1.8×10⁻⁵' },
+    { acid: 'フッ化水素 HF', concentration: 0.1, concentrationText: '0.10', ka: 6.8e-4, kaText: '6.8×10⁻⁴' },
+    { acid: 'シアン化水素 HCN', concentration: 0.2, concentrationText: '0.20', ka: 4.9e-10, kaText: '4.9×10⁻¹⁰' },
+  ]),
+  weakBasePh: new BalancedRandom([
+    { base: 'アンモニア NH₃', concentration: 0.1, concentrationText: '0.10', kb: 1.8e-5, kbText: '1.8×10⁻⁵' },
+    { base: 'メチルアミン CH₃NH₂', concentration: 0.1, concentrationText: '0.10', kb: 4.4e-4, kbText: '4.4×10⁻⁴' },
+    { base: 'アンモニア NH₃', concentration: 0.01, concentrationText: '0.010', kb: 1.8e-5, kbText: '1.8×10⁻⁵' },
+  ]),
   yield: new BalancedRandom([
     { actual: 8, theoretical: 10 }, { actual: 9, theoretical: 12 }, { actual: 14, theoretical: 20 },
     { actual: 18, theoretical: 30 }, { actual: 10, theoretical: 16 },
@@ -178,6 +189,31 @@ export function generateMoleProblem(mode: MoleMode, random = Math.random): MoleP
       const concentration = `10⁻${superscriptDigits(value)}`;
       const answer = 14 - value;
       return { pattern, question: `25℃で、水酸化物イオン濃度が ${concentration} mol/L の強塩基水溶液の pH は？`, answer, unit: '', explanation: `[OH⁻]=${concentration} mol/L だから pOH=−log₁₀[OH⁻]=${value}。25℃では pH+pOH=14 より pH=14−${value}=${answer}。` };
+    }
+    case 'weakAcidPh': {
+      const value = variants.weakAcidPh.next(random);
+      const hydrogenConcentration = solveWeakElectrolyteIonConcentration(value.concentration, value.ka);
+      const answer = calculateWeakAcidPh(value.concentration, value.ka);
+      return {
+        pattern,
+        question: `25℃で、${value.concentrationText} mol/L の${value.acid}の水溶液の pH を求めよ。（Ka=${value.kaText}）`,
+        answer,
+        unit: '',
+        explanation: `HA ⇄ H⁺ + A⁻。電離した濃度を x mol/L とすると Ka=x²/(C−x)。二次方程式を解いて x=[H⁺]=${displayNumber(hydrogenConcentration)} mol/L。したがって pH=−log₁₀[H⁺]=${displayNumber(answer)}。`,
+      };
+    }
+    case 'weakBasePh': {
+      const value = variants.weakBasePh.next(random);
+      const hydroxideConcentration = solveWeakElectrolyteIonConcentration(value.concentration, value.kb);
+      const answer = calculateWeakBasePh(value.concentration, value.kb);
+      const pOH = -Math.log10(hydroxideConcentration);
+      return {
+        pattern,
+        question: `25℃で、${value.concentrationText} mol/L の${value.base}の水溶液の pH を求めよ。（Kb=${value.kbText}）`,
+        answer,
+        unit: '',
+        explanation: `B + H₂O ⇄ BH⁺ + OH⁻。電離した濃度を x mol/L とすると Kb=x²/(C−x)。二次方程式を解いて x=[OH⁻]=${displayNumber(hydroxideConcentration)} mol/L。pOH=−log₁₀[OH⁻]=${displayNumber(pOH)}、25℃では pH=14−pOH=${displayNumber(answer)}。`,
+      };
     }
     case 'yield': {
       const value = variants.yield.next(random);

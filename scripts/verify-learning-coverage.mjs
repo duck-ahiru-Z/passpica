@@ -37,7 +37,7 @@ const requiredVisuals = [
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
   'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual',
-  'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'ideal-gas-visual', 'crystal-lattice', 'titration-visual',
+  'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'ideal-gas-visual', 'crystal-lattice', 'titration-visual', 'weak-electrolyte-visual',
 ];
 
 const drillEntries = readPortalEntries(drill);
@@ -81,8 +81,8 @@ const updatedDrillCopy = [
 const moleCardStart = drill.indexOf("slug: 'mole-calculation-drill'");
 const moleCardEnd = drill.indexOf('\n  },', moleCardStart);
 const moleCard = drill.slice(moleCardStart, moleCardEnd);
-if (!moleCard.includes('強酸／強塩基のpH')) {
-  throw new Error('Chemistry mole-calculation portal summary must distinguish strong-acid and strong-base pH practice.');
+if (!moleCard.includes('強酸／強塩基／弱酸／弱塩基のpH')) {
+  throw new Error('Chemistry mole-calculation portal summary must distinguish strong- and weak-electrolyte pH practice.');
 }
 for (const [slug, phrase] of updatedDrillCopy) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);
@@ -169,6 +169,15 @@ if (!learnEntries.some(entry => entry.link === acidBaseRoute)
   || !acidBaseVisual.includes(`href="${moleCalculationRoute}"`)
   || !moleCalculationPage.includes(`href="${acidBaseRoute}"`)) {
   throw new Error('Strong-acid/base pH calculation and acid-base visual must be linked from both directions.');
+}
+const weakElectrolyteRoute = '/learn/chemistry/weak-electrolyte-visual';
+const weakElectrolyteEntry = learnEntries.find(entry => entry.link === weakElectrolyteRoute);
+const weakElectrolytePage = fs.readFileSync(routeFile(weakElectrolyteRoute), 'utf8');
+if (!weakElectrolyteEntry || !new RegExp(`slug: 'weak-electrolyte-visual'[\\s\\S]*?practiceLink: '${moleCalculationRoute}'`).test(learn)
+  || !weakElectrolytePage.includes(`href="${moleCalculationRoute}"`)
+  || !moleCalculationPage.includes(`href="${weakElectrolyteRoute}"`)
+  || !acidBaseVisual.includes(`href="${weakElectrolyteRoute}"`)) {
+  throw new Error('Weak-electrolyte equilibrium visual and focused/mixed pH practice must be linked from the portal and related pages.');
 }
 const stoichiometryVisualRoute = '/learn/chemistry/stoichiometry-visual';
 const stoichiometryVisualEntry = learnEntries.find(entry => entry.link === stoichiometryVisualRoute);

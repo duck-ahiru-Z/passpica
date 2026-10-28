@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { formatMoleAnswer, generateMoleProblem, isMoleAnswerCorrect, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
+import { formatMoleAnswer, generateMoleProblem, isMoleAnswerCorrect, moleLabels, molePatterns } from '../src/lib/chemistryMoleCalculation.ts';
+import { calculateWeakAcidPh, calculateWeakBasePh, solveWeakElectrolyteIonConcentration } from '../src/lib/chemistryWeakElectrolyte.ts';
 import { calculateIdealGasAmount, calculateIdealGasVolume, idealGasConstantKPaLiters } from '../src/lib/idealGasLaw.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/mole-calculation-drill/page.tsx'), 'utf8');
@@ -16,7 +17,7 @@ if (!drillPage.includes("setMethod(selectedMode === 'mix' ? '' : selectedMode)")
 }
 
 const stableRandom = () => 0.37;
-const expectedUnits = { mass: 'mol', composition: '%', concentration: 'mol/L', dilution: 'mL', gas: 'mol', idealGasAmount: 'mol', idealGasVolume: 'L', stoichiometry: 'mol', 'limiting-reagent': 'mol', 'excess-reagent': 'mol', ph: '', strongBasePh: '', yield: '%' };
+const expectedUnits = { mass: 'mol', composition: '%', concentration: 'mol/L', dilution: 'mL', gas: 'mol', idealGasAmount: 'mol', idealGasVolume: 'L', stoichiometry: 'mol', 'limiting-reagent': 'mol', 'excess-reagent': 'mol', ph: '', strongBasePh: '', weakAcidPh: '', weakBasePh: '', yield: '%' };
 const toPlainSubscripts = value => value.replace(/[₀₁₂₃₄₅₆₇₈₉]/g, digit => String('₀₁₂₃₄₅₆₇₈₉'.indexOf(digit)));
 function formulaAtoms(formula) {
   const plain = toPlainSubscripts(formula);
@@ -196,6 +197,34 @@ const checks = {
       && problem.explanation.includes(`pOH=−log₁₀[OH⁻]=${pOH}`)
       && problem.explanation.includes(`pH=14−${pOH}=${expected}`);
   },
+  weakAcidPh: problem => {
+    const [, concentrationText, acid, kaText] = problem.question.match(/([\d.]+) mol\/L の(.+?)水溶液の pH を求めよ。[(（]Ka=([\d.]+×10⁻[⁰¹²³⁴⁵⁶⁷⁸⁹]+)[)）]/);
+    const coefficient = Number(kaText.match(/^([\d.]+)/)[1]);
+    const exponent = Number(kaText.match(/10⁻([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/)[1].replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, digit => String('⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(digit))));
+    const ka = coefficient * 10 ** -exponent;
+    const expected = calculateWeakAcidPh(Number(concentrationText), ka);
+    const ion = solveWeakElectrolyteIonConcentration(Number(concentrationText), ka);
+    return acid.length > 0 && Math.abs(problem.answer - expected) < 1e-12
+      && problem.question.includes('25℃')
+      && problem.explanation.includes(`Ka=x²/(C−x)`)
+      && problem.explanation.includes(`x=[H⁺]=${formatMoleAnswer(ion)} mol/L`)
+      && problem.explanation.includes(`pH=−log₁₀[H⁺]=${formatMoleAnswer(expected)}`);
+  },
+  weakBasePh: problem => {
+    const [, concentrationText, base, kbText] = problem.question.match(/([\d.]+) mol\/L の(.+?)水溶液の pH を求めよ。[(（]Kb=([\d.]+×10⁻[⁰¹²³⁴⁵⁶⁷⁸⁹]+)[)）]/);
+    const coefficient = Number(kbText.match(/^([\d.]+)/)[1]);
+    const exponent = Number(kbText.match(/10⁻([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/)[1].replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, digit => String('⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(digit))));
+    const kb = coefficient * 10 ** -exponent;
+    const expected = calculateWeakBasePh(Number(concentrationText), kb);
+    const ion = solveWeakElectrolyteIonConcentration(Number(concentrationText), kb);
+    const pOH = -Math.log10(ion);
+    return base.length > 0 && Math.abs(problem.answer - expected) < 1e-12
+      && problem.question.includes('25℃')
+      && problem.explanation.includes(`Kb=x²/(C−x)`)
+      && problem.explanation.includes(`x=[OH⁻]=${formatMoleAnswer(ion)} mol/L`)
+      && problem.explanation.includes(`pOH=−log₁₀[OH⁻]=${formatMoleAnswer(pOH)}`)
+      && problem.explanation.includes(`pH=14−pOH=${formatMoleAnswer(expected)}`);
+  },
   yield: problem => {
     const [, theoretical, actual] = problem.question.match(/理論上 ([\d.]+) g .*? ([\d.]+) g 得た/);
     return Math.abs(problem.answer - (Number(actual) / Number(theoretical)) * 100) < 1e-12;
@@ -210,7 +239,8 @@ for (const pattern of molePatterns) {
     verifyDisplayedReactionMatchesCalculation(problem);
     variants.add(problem.question);
   }
-  const expectedVariants = ['limiting-reagent', 'excess-reagent'].includes(pattern) ? 6 : 5;
+  const expectedVariants = ['limiting-reagent', 'excess-reagent'].includes(pattern) ? 6
+    : ['weakAcidPh', 'weakBasePh'].includes(pattern) ? 3 : 5;
   if (variants.size !== expectedVariants) throw new Error(`${pattern} generated ${variants.size}/${expectedVariants} expected variants`);
 }
 
@@ -231,6 +261,10 @@ if (!drillPage.includes('href="/learn/chemistry/concentration-visual"')
 }
 const acidBasePage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/acid-base/page.tsx'), 'utf8');
 if (!drillPage.includes('href="/learn/chemistry/acid-base"')
+  || !drillPage.includes('href="/learn/chemistry/weak-electrolyte-visual"')
+  || moleLabels.weakAcidPh !== '弱酸のpH（Ka）' || moleLabels.weakBasePh !== '弱塩基のpH（Kb）'
+  || !drillPage.includes('molePatterns.map(pattern => <option')
+  || !drillPage.includes('molePatterns.map(pattern => <label')
   || !acidBasePage.includes('href="/learn/chemistry/mole-calculation-drill"')
   || !acidBasePage.includes('pOH=−log[OH⁻] と pH+pOH=14（25℃）')) {
   throw new Error('strong-acid/base pH calculation practice and the indicator visual must cross-link and explain the pOH relation');
@@ -246,7 +280,28 @@ if (!drillPage.includes('href="/learn/chemistry/ideal-gas-visual"')
   || !idealGasVisual.includes('PV=nRT')) {
   throw new Error('ideal-gas visual must link to related calculations and mole visual, and expose named P/T controls and PV=nRT');
 }
+const weakElectrolyteVisual = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/weak-electrolyte-visual/page.tsx'), 'utf8');
+if (!weakElectrolyteVisual.includes('Ka = [H⁺][A⁻]/[HA]')
+  || !weakElectrolyteVisual.includes('Kb = [BH⁺][OH⁻]/[B]')
+  || !weakElectrolyteVisual.includes('aria-label="弱電解質の初濃度 C"')
+  || !weakElectrolyteVisual.includes('p{kind === \'acid\' ? \'Ka\' : \'Kb\'}')
+  || !weakElectrolyteVisual.includes('ionizationFraction * 100')) {
+  throw new Error('weak-electrolyte visual must expose both equilibrium models, accessible controls and live ionization results');
+}
 
+for (const concentration of [0.01, 0.1, 1]) {
+  for (const constant of [1e-10, 1.8e-5, 6.8e-4]) {
+    const x = solveWeakElectrolyteIonConcentration(concentration, constant);
+    if (!(x > 0 && x < concentration) || Math.abs(x * x / (concentration - x) - constant) > constant * 1e-10) {
+      throw new Error(`weak-electrolyte equilibrium solution does not satisfy K=x²/(C−x): C=${concentration}, K=${constant}, x=${x}`);
+    }
+  }
+}
+for (const invalid of [[0, 1e-5], [0.1, 0], [Infinity, 1e-5], [0.1, NaN]]) {
+  let rejected = false;
+  try { solveWeakElectrolyteIonConcentration(invalid[0], invalid[1]); } catch (error) { rejected = error instanceof RangeError; }
+  if (!rejected) throw new Error(`invalid weak-electrolyte input must be rejected: ${invalid}`);
+}
 for (const amount of [0.5, 1, 1.5]) {
   for (const pressure of [80, 101.3, 120]) {
     for (const temperature of [250, 273, 350]) {
