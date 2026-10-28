@@ -13,11 +13,41 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+function ExplanationLine({ value }: { value: string }) {
+  const parts: Array<{ value: string; text: boolean }> = [];
+  const textPattern = /\\text\{([^{}]*)\}/g;
+  let lastIndex = 0;
+
+  for (const match of value.matchAll(textPattern)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) parts.push({ value: value.slice(lastIndex, index), text: false });
+    parts.push({ value: match[1], text: true });
+    lastIndex = index + match[0].length;
+  }
+  if (lastIndex < value.length) parts.push({ value: value.slice(lastIndex), text: false });
+
+  return <>
+    {parts.map((part, index) => {
+      if (part.text || /[^\x00-\x7F]/.test(part.value)) {
+        return <span key={index}>{part.value}</span>;
+      }
+      return part.value.trim() ? <MathEq key={index} math={part.value} /> : <span key={index}>{part.value}</span>;
+    })}
+  </>;
+}
+
 type Pattern = LogarithmPattern;
+const strategyOptions: Array<{ pattern: Pattern; label: string }> = [
+  { pattern: 'pattern1', label: '底の変換公式で底をそろえる' },
+  { pattern: 'pattern2', label: '連鎖する対数の積を整理する' },
+  { pattern: 'pattern3', label: '逆数の関係を使う' },
+  { pattern: 'pattern4', label: '指数と対数の逆関係を使う' },
+];
 
 export default function LogarithmDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
   const [problem, setProblem] = useClientGeneratedState(() => generateLogarithmProblem('mix'));
+  const [selectedStrategy, setSelectedStrategy] = useState<Pattern | ''>('');
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -26,6 +56,7 @@ export default function LogarithmDrill() {
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateLogarithmProblem(pattern));
+    setSelectedStrategy('');
     setAnsVal('');
     setHasChecked(false);
     setIsCorrect(false);
@@ -35,7 +66,8 @@ export default function LogarithmDrill() {
     if (!problem) return;
     
     const answer = parseRationalAnswer(ansVal);
-    if (rationalEquals(answer, { numerator: problem.ansNum, denominator: problem.ansDen })) {
+    if (rationalEquals(answer, { numerator: problem.ansNum, denominator: problem.ansDen })
+      && (selectedPattern !== 'mix' || selectedStrategy === problem.pattern)) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -51,7 +83,7 @@ export default function LogarithmDrill() {
       <div className="space-y-4">
         {problem.expLines.map((line, idx) => {
           if (line.includes('\\text{')) {
-            return <div key={idx} className="text-gray-600 mb-1 mt-4"><MathEq math={line} /></div>;
+            return <div key={idx} className="text-gray-600 mb-1 mt-4"><ExplanationLine value={line} /></div>;
           }
           return (
             <div key={idx} className="bg-white p-2 border rounded text-center">
@@ -93,6 +125,7 @@ export default function LogarithmDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="対数計算の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -109,6 +142,27 @@ export default function LogarithmDrill() {
               次の式の値を求めよ。<br/>
               <span className="text-3xl text-blue-700 my-2"><MathEq math={problem.qStr} /></span>
             </div>
+
+            {selectedPattern === 'mix' && (
+              <fieldset className="mb-6 border border-gray-300 rounded p-3">
+                <legend className="px-1 font-bold text-slate-700">使う解法を選んでください</legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {strategyOptions.map(({ pattern, label }) => (
+                    <label key={pattern} className="flex items-center gap-2 rounded border border-gray-200 bg-white p-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="logarithm-strategy"
+                        aria-label={label}
+                        value={pattern}
+                        checked={selectedStrategy === pattern}
+                        onChange={() => { setSelectedStrategy(pattern); setHasChecked(false); setIsCorrect(false); }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             
             <div className="space-y-4">
               <div className="flex flex-col items-center justify-center gap-2 font-bold">
@@ -143,7 +197,11 @@ export default function LogarithmDrill() {
 
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！対数の性質を見事に使いこなしています。' : '不正解... 解説を見て底をそろえるステップを確認しましょう。'}
+                {isCorrect
+                  ? '正解！対数の性質を見事に使いこなしています。'
+                  : selectedPattern === 'mix' && selectedStrategy !== problem.pattern
+                    ? '解法の選択を確認しましょう。問題に合う性質を見直してください。'
+                    : '不正解... 解説を見て計算のステップを確認しましょう。'}
               </div>
             )}
           </div>
