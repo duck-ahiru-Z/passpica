@@ -7,9 +7,17 @@ import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseRationalParts, rationalEquals } from '@/src/lib/rationalInput';
+import { getCalculusAreaStrategy, type CalculusAreaProblemType, type CalculusAreaStrategy } from '@/src/lib/calculusAreaStrategy';
 
 const formulaTypes = ['1/6_line', '1/6_para', '1/12', '1/20', '1/30'] as const;
-const mixedFormulaPicker = new BalancedRandom<string>(formulaTypes);
+type AreaPracticeMode = CalculusAreaProblemType | 'mix';
+const mixedFormulaPicker = new BalancedRandom<CalculusAreaProblemType>(formulaTypes);
+const areaStrategyOptions: Array<{ strategy: CalculusAreaStrategy; label: string }> = [
+  { strategy: 'one-sixth', label: '1/6公式（放物線と直線、または2つの放物線）' },
+  { strategy: 'one-twelfth', label: '1/12公式（3次関数と接線）' },
+  { strategy: 'one-twentieth', label: '1/20公式（4次関数と変曲点の接線）' },
+  { strategy: 'one-thirtieth', label: '1/30公式（4次関数と二重接線）' },
+];
 
 // --- 数学ユーティリティ ---
 function gcd(x: number, y: number): number {
@@ -100,7 +108,7 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 
 // 問題データの型
 interface ProblemData {
-  type: string;
+  type: CalculusAreaProblemType;
   a: number;
   r1: number;
   r2: number;
@@ -117,9 +125,8 @@ interface ProblemData {
   power: number;
 }
 
-function createCalculusProblem(mode: string): ProblemData {
-  let type = mode;
-  if (type === 'mix') type = mixedFormulaPicker.next();
+function createCalculusProblem(mode: AreaPracticeMode): ProblemData {
+  const type = mode === 'mix' ? mixedFormulaPicker.next() : mode;
   const aChoices = [-3, -2, -1, 1, 2, 3];
   const a = aChoices[Math.floor(Math.random() * aChoices.length)];
   let r1 = 0, r2 = 0;
@@ -151,8 +158,9 @@ function createCalculusProblem(mode: string): ProblemData {
 }
 
 export default function CalculusDrillPage() {
-  const [selectedMode, setSelectedMode] = useState<string>('mix');
+  const [selectedMode, setSelectedMode] = useState<AreaPracticeMode>('mix');
   const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => createCalculusProblem('mix'));
+  const [selectedAreaStrategy, setSelectedAreaStrategy] = useState<CalculusAreaStrategy | ''>('');
   
   // 入力状態
   const [inputNum, setInputNum] = useState<string>('');
@@ -171,8 +179,9 @@ export default function CalculusDrillPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // 問題生成ロジック
-  const generateProblem = (mode: string) => {
+  const generateProblem = (mode: AreaPracticeMode) => {
     setProblem(createCalculusProblem(mode));
+    setSelectedAreaStrategy('');
     setInputNum('');
     setInputDen('');
     setIsAnswered(false);
@@ -299,8 +308,10 @@ export default function CalculusDrillPage() {
 
     const parsedAnswer = parseRationalParts(inputNum, inputDen);
     const answerIsCorrect = rationalEquals(parsedAnswer, { numerator: problem.S_num, denominator: problem.S_den });
+    const strategyIsCorrect = selectedMode !== 'mix'
+      || selectedAreaStrategy === getCalculusAreaStrategy(problem.type);
 
-    if (answerIsCorrect) {
+    if (answerIsCorrect && strategyIsCorrect) {
       setIsCorrect(true);
       const enteredDenominator = inputDen.trim() === '' ? 1 : Number(inputDen);
       if (enteredDenominator !== problem.S_den) {
@@ -310,7 +321,9 @@ export default function CalculusDrillPage() {
       }
     } else {
       setIsCorrect(false);
-      setFeedbackMsg('不正解です。式を見直して再挑戦するか、「解説を見る」を押してください。');
+      setFeedbackMsg(!strategyIsCorrect
+        ? `公式の選択を確認しましょう。適切なのは ${problem.formulaName} です。`
+        : '不正解です。式を見直して再挑戦するか、「解説を見る」を押してください。');
     }
     setIsAnswered(true);
   };
@@ -347,7 +360,11 @@ export default function CalculusDrillPage() {
           ].map(m => (
             <button
               key={m.id}
-              onClick={() => { setSelectedMode(m.id); generateProblem(m.id); }}
+              onClick={() => {
+                const mode = m.id as AreaPracticeMode;
+                setSelectedMode(mode);
+                generateProblem(mode);
+              }}
               aria-pressed={selectedMode === m.id}
               className={`retro-btn-classic ${selectedMode === m.id ? 'bg-blue-200 border-blue-400 font-bold' : ''}`}
             >
@@ -378,6 +395,30 @@ export default function CalculusDrillPage() {
             <h2 className="font-bold border-b border-gray-300 pb-1.5 mb-4 text-slate-800">
               ■ 解答を入力
             </h2>
+            {selectedMode === 'mix' && (
+              <fieldset className="mb-5 rounded border border-gray-300 bg-white p-3">
+                <legend className="px-1 font-bold text-slate-700">使う面積公式を選んでください</legend>
+                <div className="grid grid-cols-1 gap-2">
+                  {areaStrategyOptions.map(({ strategy, label }) => (
+                    <label key={strategy} className="flex cursor-pointer items-center gap-2 rounded border border-gray-200 p-2">
+                      <input
+                        type="radio"
+                        name="calculus-area-strategy"
+                        value={strategy}
+                        checked={selectedAreaStrategy === strategy}
+                        onChange={() => {
+                          setSelectedAreaStrategy(strategy);
+                          setIsAnswered(false);
+                          setIsCorrect(false);
+                          setFeedbackMsg('');
+                        }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             <form onSubmit={handleSubmit} className="flex flex-col items-center gap-4">
               <div className="flex items-center gap-3 text-lg font-bold">
                 <span>S =</span>
