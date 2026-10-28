@@ -118,7 +118,7 @@ export default function IndustrialProcessPage() {
                     {selectedProcess === 'contact' ? '原料: S / FeS2' : '原料: アンモニア NH3'}
                   </text>
                   <text x="55" y="93" fill="#64748b" fontSize="7" textAnchor="middle">
-                    {selectedProcess === 'contact' ? '燃焼・焙焼 → SO2' : '4NH3 + 5O2 ➔ 4NO'}
+                    {selectedProcess === 'contact' ? '燃焼・焙焼 → SO2' : '4NH3 + 5O2 ➔ 4NO + 6H2O'}
                   </text>
 
                   {/* 矢印 1 */}

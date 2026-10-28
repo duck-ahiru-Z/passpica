@@ -75,7 +75,7 @@ export function generateGeometryProblem(mode: GeometryMode, random = Math.random
       answer: Math.PI * volumeUpper ** 5 / 5,
       explanation: `断面円板の半径は x²、面積は πx⁴。V=π∫₀^${volumeUpper}x⁴dx=π×${volumeUpper}⁵/5≈${(Math.PI * volumeUpper ** 5 / 5).toFixed(3)}。ビジュアルの上端 b=${volumeUpper} と同じ条件です。`,
       alternativeExplanations: {
-        'x-axis-rotation': `円板法で半径 x² の断面を積み上げる。V=π∫₀^${volumeUpper}(x²)²dx=π×${volumeUpper}⁵/5。`,
+        'x-axis-rotation': `円板法で半径 x² の円板を積み上げる。V=π∫₀^${volumeUpper}(x²)²dx=π∫₀^${volumeUpper}x⁴dx=π×${volumeUpper}⁵/5≈${(Math.PI * volumeUpper ** 5 / 5).toFixed(3)}。`,
       },
     },
     'y-axis-rotation': {

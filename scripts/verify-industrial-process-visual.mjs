@@ -81,5 +81,8 @@ for (const [needle, label] of [
 for (const id of ['contact', 'ostwald', 'solvay']) {
   if (!page.includes(`${id}: {`)) throw new Error(`industrial process visual is missing ${id}`);
 }
+if (!page.includes("'4NH3 + 5O2 ➔ 4NO + 6H2O'")) {
+  throw new Error('Ostwald flow diagram must include the water product in the balanced ammonia oxidation equation.');
+}
 
 console.log('Industrial process visual verified: all three selectable processes, accessible flow summaries, and mobile-readable horizontal scrolling are present.');

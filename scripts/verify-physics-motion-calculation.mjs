@@ -82,7 +82,16 @@ const checks = {
   },
   spring: problem => {
     const [, constant, extension] = problem.question.match(/ばね定数 ([\d.]+) N\/m のばねを ([\d.]+) m/);
-    return Math.abs(problem.answer - Number(constant) * Number(extension)) < 1e-12 && problem.unit === 'N';
+    const k = Number(constant);
+    const x = Number(extension);
+    const forceFromHooke = k * x;
+    const elasticEnergy = 0.5 * k * x ** 2;
+    const forceFromEnergy = 2 * elasticEnergy / x;
+    return Math.abs(problem.answer - forceFromHooke) < 1e-12
+      && Math.abs(problem.answer - forceFromEnergy) < 1e-12
+      && problem.unit === 'N'
+      && problem.question.includes('弾性力の大きさ')
+      && problem.explanation.includes('向きは伸びと反対');
   },
   springSignedForce: problem => {
     const [, constant, magnitude, direction] = problem.question.match(/ばね定数 ([\d.]+) N\/m のばねを自然長から ([\d.]+) m (伸ばした|縮めた)/);

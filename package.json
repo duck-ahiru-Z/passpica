@@ -48,6 +48,7 @@
     "test:chemistry-titration": "node --experimental-strip-types scripts/verify-chemistry-titration.mjs",
     "test:chemistry-titration-visual": "node --experimental-strip-types scripts/verify-chemistry-titration-visual.mjs",
     "test:reaction-safety": "node --experimental-strip-types scripts/verify-reaction-safety.mjs",
+    "test:industrial-process": "node --experimental-strip-types scripts/verify-industrial-process-drill.mjs",
     "test:information-calculation": "node --experimental-strip-types scripts/verify-information-calculation.mjs",
     "test:information-pcm-visual": "node --experimental-strip-types scripts/verify-information-pcm-visual.mjs",
     "test:organic-3d-content": "node scripts/verify-organic-3d-content.mjs",
