@@ -49,6 +49,19 @@ assert.equal(calculateProjectileState(90, 0.5).angleDeg, 75, 'angle upper bound'
 close(calculateProjectileState(30, -1).time, 0, 'time-fraction lower bound');
 close(calculateProjectileState(30, 2).time, calculateProjectileState(30, 1).flightTime, 'time-fraction upper bound');
 
+for (const [angleDeg, speed, height] of [[0, 5, 2], [45, 20, 5], [75, 30, 30]]) {
+  const angle = angleDeg * Math.PI / 180;
+  const launch = calculateProjectileState(angleDeg, 0, speed, height);
+  const landing = calculateProjectileState(angleDeg, 1, speed, height);
+  close(launch.y, height, `custom launch height at ${angleDeg}°`);
+  close(launch.vx0, speed * Math.cos(angle), `custom horizontal launch speed at ${angleDeg}°`);
+  close(launch.vy0, speed * Math.sin(angle), `custom vertical launch speed at ${angleDeg}°`);
+  close(landing.flightTime, (launch.vy0 + Math.sqrt(launch.vy0 ** 2 + 2 * projectileGravity * height)) / projectileGravity, `custom flight time at ${angleDeg}°`);
+  close(landing.y, 0, `custom landing height at ${angleDeg}°`);
+  close(landing.range, launch.vx0 * landing.flightTime, `custom range at ${angleDeg}°`);
+}
+close(calculateProjectileState(45, 0.5, 40, 0).vx0, 30 * Math.cos(Math.PI / 4), 'custom speed should clamp to 30 m/s and height to 2 m');
+
 assert.equal(calculateProjectileState(0, 0.5).vy, -projectileGravity * calculateProjectileState(0, 0.5).time, 'horizontal launch vertical velocity');
 assert.ok(projectileInitialSpeed > 0 && projectileInitialHeight > 0);
 const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/physics/projectile-visual/page.tsx'), 'utf8');
@@ -69,4 +82,7 @@ assert.ok(visualPage.includes('id="vertical-arrow" markerWidth="8" markerHeight=
 assert.ok(visualPage.includes('↓ 重力加速度 g = {projectileGravity} m/s²'), 'zero-speed state should label the acceleration separately from velocity');
 assert.ok(visualPage.includes('重力加速度は下向き'), 'the accessible diagram description should distinguish zero velocity from downward acceleration');
 assert.ok(visualPage.includes('setAngleDeg(Number(event.target.value)); setTimeFraction(1);'), 'changing launch angle should reset the timeline to the new trajectory landing point');
-console.log('Projectile motion verified: 16 launch angles × 101 timeline positions, launch/apex/landing conditions, and input bounds.');
+assert.ok(visualPage.includes('aria-label="初速度（メートル毎秒）"') && visualPage.includes('aria-label="初期高さ（メートル）"'), 'initial speed and height controls should be labeled for assistive technology');
+assert.ok(visualPage.includes('setInitialSpeed(Number(event.target.value)); setTimeFraction(1);') && visualPage.includes('setInitialHeight(Number(event.target.value)); setTimeFraction(1);'), 'changing launch conditions should reset the timeline to the new trajectory landing point');
+assert.ok(visualPage.includes('initialHeight + vy0 * t - 0.5 * projectileGravity * t * t'), 'the plotted trajectory must use the selected initial height');
+console.log('Projectile motion verified: 16 launch angles × 101 timeline positions, three variable initial conditions, launch/apex/landing states, and input bounds.');
