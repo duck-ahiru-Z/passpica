@@ -23,7 +23,7 @@ function routeFile(link) {
 const requiredDrills = [
   'math1-mixed-drill', 'matha-mixed-drill', 'math2-mixed-drill',
   'mathbc-mixed-drill', 'calculus3-mixed-drill', 'quadratic-equation-drill',
-  'motion-calculation-drill', 'wave-calculation-drill', 'standing-wave-drill', 'mole-calculation-drill', 'calculation-drill',
+  'motion-calculation-drill', 'wave-calculation-drill', 'standing-wave-drill', 'doppler-drill', 'mole-calculation-drill', 'calculation-drill',
   'titration-drill', 'indicator-drill', 'crystal-lattice-drill', 'gas-collection-drill', 'flame-reaction-drill', 'metal-ion-drill', 'industrial-process-drill', 'organic-separation-drill', 'inorganic-colors-drill', 'phase-diagram-drill',
   'number-representation-drill',
   'trigonometry-graph-drill',
@@ -36,7 +36,7 @@ const requiredVisuals = [
   'conic-sections-visual',
   'calculus3-limit-visual', 'calculus3-derivative-visual',
   'calculus3-integral-visual', 'calculus3-volume-visual', 'calculus3-curvature-visual',
-  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual', 'wave-superposition-visual', 'standing-wave-visual',
+  'calculus3-parametric-visual', 'calculus3-differential-equation-visual', 'projectile-visual', 'energy-visual', 'motion-visual', 'spring-visual', 'simple-harmonic-visual', 'impulse-momentum-visual', 'circular-motion-visual', 'wave-superposition-visual', 'standing-wave-visual', 'doppler-visual',
   'mole-concept-visual', 'concentration-visual', 'stoichiometry-visual', 'ideal-gas-visual', 'crystal-lattice', 'titration-visual', 'weak-electrolyte-visual',
 ];
 
@@ -62,7 +62,7 @@ const practiceModeDescriptions = [
   'inscribed-circle-drill', 'linear-diophantine-drill', 'menelaus-ceva-drill',
   'roots-coefficients-drill', 'point-line-distance-drill', 'trig-synthesis-drill', 'trigonometry-graph-drill',
   'calculus3-integral-drill', 'indicator-drill',
-  'calculus3-differentiation-drill', 'wave-calculation-drill', 'standing-wave-drill',
+  'calculus3-differentiation-drill', 'wave-calculation-drill', 'standing-wave-drill', 'doppler-drill',
 ];
 for (const slug of practiceModeDescriptions) {
   const slugIndex = drill.indexOf(`slug: '${slug}'`);
@@ -294,6 +294,16 @@ if (!standingWaveEntry || !new RegExp(`slug: 'standing-wave-visual'[\\s\\S]*?pra
   || !standingWaveVisual.includes('href="/learn/physics/wave-superposition-visual"')) {
   throw new Error('The standing-wave visual and fixed/mixed drill must link to each other and connect to the wave-superposition lesson.');
 }
+const dopplerVisualRoute = '/learn/physics/doppler-visual';
+const dopplerDrillRoute = '/learn/physics/doppler-drill';
+const dopplerVisual = fs.readFileSync(routeFile(dopplerVisualRoute), 'utf8');
+const dopplerDrill = fs.readFileSync(routeFile(dopplerDrillRoute), 'utf8');
+if (!learnEntries.some(entry => entry.link === dopplerVisualRoute)
+  || !new RegExp(`slug: 'doppler-visual'[\\s\\S]*?practiceLink: '${dopplerDrillRoute}'`).test(learn)
+  || !dopplerVisual.includes(`href="${dopplerDrillRoute}"`)
+  || !dopplerDrill.includes(`href="${dopplerVisualRoute}"`)) {
+  throw new Error('Doppler visual and fixed/mixed calculation drill must link to each other and from the learning portal.');
+}
 
 const phaseDiagram = fs.readFileSync(path.join(root, 'src/app/learn/chemistry/phase-diagram/page.tsx'), 'utf8');
 if (!/role="img" aria-label=\{`\$\{info\.name\}の模式的な状態図/.test(phaseDiagram)) {
@@ -352,8 +362,8 @@ function includesBalancedRandom(source, file) {
 }
 const patternPages = pages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');
-  return /type\s+\w*Pattern\s*=/.test(source)
-    || importedSources(source, file).some(dependency => /export\s+const\s+\w*Patterns\b/.test(dependency));
+  return /-drill[\\/]page\.tsx$/.test(file) && (/type\s+\w*Pattern\s*=/.test(source)
+    || importedSources(source, file).some(dependency => /export\s+const\s+\w*Patterns\b/.test(dependency)));
 });
 const incompletePatternPages = patternPages.filter(file => {
   const source = fs.readFileSync(file, 'utf8');

@@ -248,6 +248,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/standing-wave-drill'
   },
   {
+    slug: 'doppler-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（ドップラー効果）',
+    title: 'ドップラー効果・音源と観測者',
+    description: '音源と観測者の動く向きを切り替え、波面間隔と観測振動数の変化を図と式で確かめます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/doppler-visual',
+    practiceLink: '/learn/physics/doppler-drill'
+  },
+  {
     slug: 'impulse-momentum-visual',
     subject: 'physics',
     subjectJp: '物理',

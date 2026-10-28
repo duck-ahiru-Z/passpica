@@ -292,6 +292,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/physics/standing-wave-drill'
   },
   {
+    slug: 'doppler-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（ドップラー効果）',
+    title: '物理 ドップラー効果・計算ドリル',
+    description: '観測者だけ・音源だけ・両方が動く場合と静止の場合を個別練習し、実戦では全4パターンをランダムに混ぜて向きと式を選びます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/physics/doppler-drill'
+  },
+  {
     slug: 'number-representation-drill',
     subject: 'information',
     subjectJp: '情報I',
