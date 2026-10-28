@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Number representation mixed-mode preview follow-up (2026-10-28)
+- `/learn/information/number-representation-drill` on the Ready preview for commit `6ebdf38`: Screen showed five focused practice modes plus all-pattern mixed practice, with the mixed prompt requiring a method choice. For `8 bitの2の補数表現 11111110₂`, choosing unsigned decoding was rejected with feedback identifying “2の補数の読み取り” as the required method. Choosing that method with answer −2 was accepted; the explanation stated unsigned 254 and two's-complement `254−256=−2`. This confirms the live mixed method grading and explanation. The tab showed no browser console errors or warnings.
+
 ### Menelaus-Ceva browser follow-up (2026-10-28)
 - `/learn/math/menelaus-ceva-drill`: Rechecked the corrected internal area-ratio pattern on the current local branch. The screen showed BD:DC=3:4 and CE:EA=5:3; independently computed masses were mA=15, mB=12, mC=9, giving △PAB:△ABC=9:36=1:4. Entering 1:4 was accepted, and the rendered worked explanation showed the same masses and reduction. Browser console had no errors or warnings. This completes the local browser recheck; the historical pending note for a deployed-preview recheck remains applicable.
 
