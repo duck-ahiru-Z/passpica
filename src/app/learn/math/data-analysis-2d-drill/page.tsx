@@ -14,6 +14,29 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+function ExplanationLine({ value }: { value: string }) {
+  const parts: Array<{ value: string; text: boolean }> = [];
+  const textPattern = /\\text\{([^{}]*)\}/g;
+  let lastIndex = 0;
+
+  for (const match of value.matchAll(textPattern)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) parts.push({ value: value.slice(lastIndex, index), text: false });
+    parts.push({ value: match[1], text: true });
+    lastIndex = index + match[0].length;
+  }
+  if (lastIndex < value.length) parts.push({ value: value.slice(lastIndex), text: false });
+
+  return <>
+    {parts.map((part, index) => {
+      if (part.text || /[^\x00-\x7F]/.test(part.value)) {
+        return <span key={index}>{part.value}</span>;
+      }
+      return part.value.trim() ? <MathEq key={index} math={part.value} /> : <span key={index}>{part.value}</span>;
+    })}
+  </>;
+}
+
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
@@ -288,12 +311,10 @@ export default function DataAnalysis2DDrill() {
     explanationEl = (
       <div className="space-y-4">
         {problem.expLines.map((line, idx) => {
-          if (line.includes('\\text{')) {
-            return <div key={idx} className="text-gray-600 mb-1 mt-4"><MathEq math={line} /></div>;
-          }
+          const hasText = line.includes('\\text{');
           return (
-            <div key={idx} className="bg-white p-2 border rounded text-center overflow-x-auto whitespace-nowrap">
-              <MathEq math={line} block />
+            <div key={idx} className={hasText ? 'text-gray-600 mb-1 mt-4' : 'bg-white p-2 border rounded text-center overflow-x-auto whitespace-nowrap'}>
+              {hasText ? <ExplanationLine value={line} /> : <MathEq math={line} block />}
             </div>
           );
         })}
