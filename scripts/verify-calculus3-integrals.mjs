@@ -96,7 +96,9 @@ const checks = {
     const expectedUpper = r % 2 === 0 ? String(r / 2) : `\\frac{${r}}{2}`;
     const expected = r ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8);
     return upper === expectedUpper && close(problem.answer, expected)
-      && problem.hint.includes('上端が R/2') && problem.explanation.includes('sin θ=1/2 より θ=π/6')
+      && problem.hint.includes('上端が R/2') && problem.explanation.includes('=1/2 より θ=π/6')
+      && problem.explanation.startsWith('三角置換 x=')
+      && problem.explanation.includes(`上端 x=${r % 2 === 0 ? r / 2 : `${r}/2`}=${r}/2 では sin θ=x/${r}=1/2`)
       && !problem.explanation.includes('\\frac')
       && problem.explanation.includes(expected.toFixed(3));
   },
