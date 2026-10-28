@@ -99,7 +99,7 @@ const checks = {
       && problem.hint.includes('R²−x²') && !problem.hint.includes('上端')
       && problem.explanation.includes('=1/2 より θ=π/6')
       && problem.explanation.startsWith('三角置換 x=')
-      && problem.explanation.includes(`上端 x=${r % 2 === 0 ? r / 2 : `${r}/2`}=${r}/2 では sin θ=x/${r}=1/2`)
+      && problem.explanation.includes(`上端 x=${r % 2 === 0 ? r / 2 : `${r}/2`} では x/${r}=1/2`)
       && !problem.explanation.includes('\\frac')
       && problem.explanation.includes(expected.toFixed(3));
   },

@@ -86,7 +86,7 @@ export function generateIntegralProblem(mode: IntegralMode, random = Math.random
       expression: `\\int_0^{${radicalUpper}} \\sqrt{${radius}^2-x^2}\\,dx`,
       answer: radius ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8),
       hint: '平方根の中身が R²−x² の形であることに注目',
-      explanation: `三角置換 x=${radius} sin θ を使う。x=0ではθ=0、上端 x=${radicalUpperText}=${radius}/2 では sin θ=x/${radius}=1/2 より θ=π/6。√(${radius}²−x²)=${radius} cos θ、dx=${radius} cos θ dθ となるから、積分は ${radius}²∫₀^{π/6}cos²θ dθ=${radius}²(π/12+√3/8)≈${(radius ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8)).toFixed(3)}。`,
+      explanation: `三角置換 x=${radius} sin θ を使う。x=0ではθ=0、上端 x=${radicalUpperText} では x/${radius}=1/2 より θ=π/6。√(${radius}²−x²)=${radius} cos θ、dx=${radius} cos θ dθ となるから、積分は ${radius}²∫₀^{π/6}cos²θ dθ=${radius}²(π/12+√3/8)≈${(radius ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8)).toFixed(3)}。`,
     },
   };
   return problems[pattern];
