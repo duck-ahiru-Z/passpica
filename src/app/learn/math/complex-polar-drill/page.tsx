@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect } from '@/src/lib/complexPolarExact';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect, isPolarAngleAnswerCorrect } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -276,8 +276,6 @@ export default function ComplexPolarDrill() {
     setIsCorrect(false);
   };
 
-  const cleanAns = (s: string) => s.trim().replace(/\s+/g, '').replace(/\\/g, '');
-
   const handleCheck = () => {
     if (!problem) return;
     
@@ -286,11 +284,8 @@ export default function ComplexPolarDrill() {
       if (isExactComponentAnswerCorrect(ansA, problem.ansA!)
         && isExactComponentAnswerCorrect(ansB, problem.ansB!)) isOk = true;
     } else {
-      const uR = cleanAns(ansR);
-      const pR = cleanAns(problem.ansR!);
-      const uTh = cleanAns(ansTheta).toLowerCase();
-      const pTh = cleanAns(problem.ansTheta!);
-      if (uR === pR && (uTh === pTh || (uTh === "0" && pTh === "2pi") || (uTh === "2pi" && pTh === "0"))) {
+      if (isExactComponentAnswerCorrect(ansR, problem.ansR!)
+        && isPolarAngleAnswerCorrect(ansTheta, problem.ansTheta!)) {
         isOk = true;
       }
     }
@@ -512,7 +507,7 @@ export default function ComplexPolarDrill() {
                       placeholder="偏角"
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400">※ \sqrt&#123;2&#125; や 5pi/6 などを入力</span>
+                  <span className="text-[10px] text-gray-400">※ r は sqrt(2)・3sqrt(2)、θ は 5pi/6 や 2.618（ラジアン）などを入力</span>
                 </div>
               )}
             </div>

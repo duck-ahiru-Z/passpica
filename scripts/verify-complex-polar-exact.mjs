@@ -1,5 +1,5 @@
 import assert from 'node:assert/strict';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect, polarAngleChoices, supportedPolarAngleLabels } from '../src/lib/complexPolarExact.ts';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect, isPolarAngleAnswerCorrect, polarAngleChoices, supportedPolarAngleLabels } from '../src/lib/complexPolarExact.ts';
 
 const cases = [
   [1, 0, '0'], [1, 1, '1'], [1, -1, '-1'],
@@ -28,6 +28,9 @@ assert.throws(() => formatExactTrigComponent(1.5, 0.5), RangeError);
 for (const equivalent of ['√2', 'sqrt(2)', '\\sqrt{2}', '\\frac{2\\sqrt{2}}{2}', '1.4142135623730951']) {
   assert.equal(isExactComponentAnswerCorrect(equivalent, '\\sqrt{2}'), true, `equivalent radical form should be accepted: ${equivalent}`);
 }
+for (const equivalent of ['3sqrt(2)', '3√2', '\\frac{6\\sqrt{2}}{2}', '4.242640687119286']) {
+  assert.equal(isExactComponentAnswerCorrect(equivalent, '3\\sqrt{2}'), true, `equivalent radius should be accepted: ${equivalent}`);
+}
 for (const equivalent of ['3/2', '\\frac{3}{2}', '1.5']) {
   assert.equal(isExactComponentAnswerCorrect(equivalent, '3/2'), true, `equivalent rational form should be accepted: ${equivalent}`);
 }
@@ -39,6 +42,24 @@ assert.equal(isExactComponentAnswerCorrect('-2√3/2', '-\\sqrt{3}'), true);
 assert.equal(isExactComponentAnswerCorrect('2', '\\sqrt{2}'), false, 'a different numeric value must not pass');
 
 for (const { val, label } of supportedPolarAngleLabels) assert.equal(formatPolarAngle(val), label);
+for (const { val, label } of supportedPolarAngleLabels) {
+  const latexPi = label.replace(/pi/g, '\\pi');
+  assert.equal(isPolarAngleAnswerCorrect(label, label), true, `canonical angle should be accepted: ${label}`);
+  assert.equal(isPolarAngleAnswerCorrect(latexPi, label), true, `LaTeX pi should be accepted: ${latexPi}`);
+  assert.equal(isPolarAngleAnswerCorrect(val.toString(), label), true, `decimal radians should be accepted for ${label}`);
+  if (label.includes('/')) {
+    const [numerator, denominator] = label.split('/');
+    const numeratorLatex = numerator.replace(/pi/g, '\\pi');
+    assert.equal(isPolarAngleAnswerCorrect(`\\frac{${numeratorLatex}}{${denominator}}`, label), true,
+      `LaTeX fraction should be accepted for ${label}`);
+  }
+}
+assert.equal(isPolarAngleAnswerCorrect('0', '2pi'), true, 'zero and one full turn are equivalent');
+assert.equal(isPolarAngleAnswerCorrect('2pi', '0'), true, 'one full turn and zero are equivalent');
+for (const invalid of ['', '5pi/', 'NaN', 'Infinity', '-3pi/4']) {
+  assert.equal(isPolarAngleAnswerCorrect(invalid, '5pi/4'), false, `invalid/non-principal angle must be rejected: ${invalid}`);
+}
+assert.equal(isPolarAngleAnswerCorrect('5pi/6', '5pi/4'), false, 'a different principal angle must be rejected');
 assert.throws(() => formatPolarAngle(5 * Math.PI / 12), RangeError);
 for (const operation of ['sum', 'difference']) {
   const pairs = getSupportedPolarAnglePairs(operation);
@@ -84,6 +105,9 @@ const page = await (await import('node:fs/promises')).readFile(
 assert.match(page, /ansA = formatExactTrigComponent\(rRes, cosVal\)/);
 assert.match(page, /ansB = formatExactTrigComponent\(rRes, sinVal\)/);
 assert.match(page, /isExactComponentAnswerCorrect\(ansA, problem\.ansA!\)/, 'rectangular components should accept equivalent exact forms');
+assert.match(page, /isExactComponentAnswerCorrect\(ansR, problem\.ansR!\)/, 'polar radii should accept equivalent exact forms');
+assert.match(page, /isPolarAngleAnswerCorrect\(ansTheta, problem\.ansTheta!\)/, 'polar angles should accept equivalent forms');
+assert.match(page, /r は sqrt\(2\).*θ は 5pi\/6.*2\.618（ラジアン）/, 'answer guidance should show equivalent radius and angle forms');
 assert.match(page, /const thStr = formatPolarAngle\(thRes\)/);
 assert.match(page, /getSupportedPolarAnglePairs\(isProduct \? 'sum' : 'difference'\)/);
 assert.match(page, /\\frac\{\$\{pts\[1\]\}\}\{\$\{pts\[0\]\}\}/, 'fractional polar angles must render numerator over denominator');
