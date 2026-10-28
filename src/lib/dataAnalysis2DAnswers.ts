@@ -7,6 +7,10 @@ export function isDataAnalysis2DAnswerCorrect(answer: string, expected: string):
   return Number.isFinite(actual) && Number.isFinite(target) && Math.abs(actual - target) < 1e-9;
 }
 
+export function isDataAnalysis2DMethodCorrect(selectedMethod: string, correctMethod: string, isMixedMode: boolean): boolean {
+  return !isMixedMode || selectedMethod === correctMethod;
+}
+
 type CrossTable = {
   a: number;
   b: number;

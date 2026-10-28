@@ -1,12 +1,17 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { generateCorrelationScatterPoints, getCorrelationDirectionLabel } from '../src/lib/dataAnalysis2D.ts';
-import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect } from '../src/lib/dataAnalysis2DAnswers.ts';
+import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect, isDataAnalysis2DMethodCorrect } from '../src/lib/dataAnalysis2DAnswers.ts';
 
 const page = fs.readFileSync('src/app/learn/math/data-analysis-2d-drill/page.tsx', 'utf8');
 assert.ok(page.includes('getCorrelationDirectionLabel(rNum)'), 'scatter explanation must use the tested correlation classification');
 assert.ok(page.includes('aria-label="2変量データ分析の演習パターン"'), 'pattern selector must have an accessible name');
 assert.ok(page.includes('isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? \'\')'), 'grading must use strict numeric answer validation');
+assert.ok(page.includes('selectedPattern === \'mix\' && ('), 'mixed mode must require learners to identify the method');
+assert.ok(page.includes('disabled={selectedPattern === \'mix\' && !methodChoice}'), 'mixed-mode submission must stay disabled until a method is chosen');
+for (const label of ['共分散の計算', '相関係数の計算', '散布図から相関を推定', 'クロス集計表']) {
+  assert.ok(page.includes(label), `mixed mode is missing method choice: ${label}`);
+}
 assert.ok(page.includes('role="img"'), 'scatter canvas must be exposed as an image to assistive technology');
 assert.ok(page.includes('aria-label={buildScatterPlotDescription(problem.scatterPoints)}'), 'scatter description must follow the current problem data');
 
@@ -22,6 +27,12 @@ for (const [answer, expected, result] of [
   ['Infinity', 'Infinity', false], ['NaN', 'NaN', false], ['.5', '0.5', true],
 ]) {
   assert.equal(isDataAnalysis2DAnswerCorrect(answer, expected), result, `answer validation failed for ${JSON.stringify(answer)}`);
+}
+
+for (const pattern of ['pattern1', 'pattern2', 'pattern3', 'pattern4']) {
+  assert.equal(isDataAnalysis2DMethodCorrect(pattern, pattern, true), true, `${pattern} must accept its matching method`);
+  assert.equal(isDataAnalysis2DMethodCorrect(`wrong-${pattern}`, pattern, true), false, `${pattern} must reject another method in mixed mode`);
+  assert.equal(isDataAnalysis2DMethodCorrect('', pattern, false), true, `focused ${pattern} mode must not ask for a redundant method choice`);
 }
 
 for (const [targetCell, expected] of [

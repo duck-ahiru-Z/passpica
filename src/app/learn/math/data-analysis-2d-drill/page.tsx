@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { generateCorrelationScatterPoints, getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
-import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect } from '@/src/lib/dataAnalysis2DAnswers';
+import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect, isDataAnalysis2DMethodCorrect } from '@/src/lib/dataAnalysis2DAnswers';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -38,6 +38,12 @@ function ExplanationLine({ value }: { value: string }) {
 }
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const patternLabels: Record<Pattern, string> = {
+  pattern1: '共分散の計算',
+  pattern2: '相関係数の計算',
+  pattern3: '散布図から相関を推定',
+  pattern4: 'クロス集計表',
+};
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface DBEntry {
@@ -229,23 +235,29 @@ export default function DataAnalysis2DDrill() {
   const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<string>('');
+  const [methodChoice, setMethodChoice] = useState<Pattern | ''>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [isMethodCorrect, setIsMethodCorrect] = useState<boolean | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
     setAns1('');
+    setMethodChoice('');
     setHasChecked(false);
     setIsCorrect(false);
+    setIsMethodCorrect(null);
   };
 
   const handleCheck = () => {
     if (!problem) return;
-    const isOk = isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? '');
+    const methodOk = isDataAnalysis2DMethodCorrect(methodChoice, problem.pattern, selectedPattern === 'mix');
+    const answerOk = isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? '');
     
-    setIsCorrect(isOk);
+    setIsMethodCorrect(selectedPattern === 'mix' ? methodOk : null);
+    setIsCorrect(methodOk && answerOk);
     setHasChecked(true);
   };
 
@@ -353,7 +365,7 @@ export default function DataAnalysis2DDrill() {
                   const nextPattern = e.target.value as Pattern | 'mix';
                   setSelectedPattern(nextPattern);
                   setProblem(generateProblem(nextPattern));
-                  setAns1(''); setHasChecked(false); setIsCorrect(false);
+                  setAns1(''); setMethodChoice(''); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null);
                 }}
                 className="border p-1 text-xs"
               >
@@ -409,6 +421,26 @@ export default function DataAnalysis2DDrill() {
             </div>
             
             <div className="space-y-4">
+              {selectedPattern === 'mix' && (
+                <fieldset className="border-t pt-4 space-y-2">
+                  <legend className="font-bold text-center px-2">実戦練習：先に分析方法を選んでください</legend>
+                  <p className="text-center text-gray-600">問題の形から、使う分析方法を判断します。</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {(Object.keys(patternLabels) as Pattern[]).map(pattern => (
+                      <label key={pattern} className={`flex items-center gap-2 border p-3 cursor-pointer ${methodChoice === pattern ? 'bg-blue-50 border-blue-400' : 'bg-white border-slate-300'}`}>
+                        <input
+                          type="radio"
+                          name="data-analysis-method-choice"
+                          value={pattern}
+                          checked={methodChoice === pattern}
+                          onChange={() => { setMethodChoice(pattern); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null); }}
+                        />
+                        <span>{patternLabels[pattern]}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
               <div className="flex flex-col items-center justify-center gap-4 font-bold border-t pt-4">
                 {problem.pattern === 'pattern3' && problem.scatterChoices ? (
                   <fieldset className="w-full max-w-sm space-y-2">
@@ -447,6 +479,7 @@ export default function DataAnalysis2DDrill() {
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={selectedPattern === 'mix' && !methodChoice}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -461,7 +494,14 @@ export default function DataAnalysis2DDrill() {
 
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！2変量の分析も完璧です。' : '不正解... 解説やグラフを見て確認しましょう。'}
+                {selectedPattern === 'mix' && (
+                  <p className="mb-2">
+                    {isMethodCorrect
+                      ? `分析方法の選択も正解です（${patternLabels[problem.pattern]}）。`
+                      : `分析方法は「${patternLabels[problem.pattern]}」です。問題の形を見直しましょう。`}
+                  </p>
+                )}
+                {isCorrect ? '正解！2変量の分析も完璧です。' : '解説やグラフを見て、分析方法と計算を確認しましょう。'}
               </div>
             )}
           </div>
