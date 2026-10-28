@@ -281,6 +281,17 @@ const CONTENTS: LearningContent[] = [
     link: '/learn/physics/wave-calculation-drill'
   },
   {
+    slug: 'standing-wave-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（定常波・固有振動）',
+    title: '物理 定常波・固有振動ドリル',
+    description: '弦の倍振動・波長・波速と両端開管／片端閉管の固有振動数を個別練習し、実戦では全5パターンをランダムに混ぜて境界条件から式を選びます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/physics/standing-wave-drill'
+  },
+  {
     slug: 'number-representation-drill',
     subject: 'information',
     subjectJp: '情報I',

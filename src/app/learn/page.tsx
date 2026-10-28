@@ -236,6 +236,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/wave-calculation-drill'
   },
   {
+    slug: 'standing-wave-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（定常波・弦と気柱）',
+    title: '定常波・弦と気柱の固有振動',
+    description: '弦・両端開管・片端閉管の端の条件を切り替え、節・腹・波長・固有振動数を図で比べます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/standing-wave-visual',
+    practiceLink: '/learn/physics/standing-wave-drill'
+  },
+  {
     slug: 'impulse-momentum-visual',
     subject: 'physics',
     subjectJp: '物理',
