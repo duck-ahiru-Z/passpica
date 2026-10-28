@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Menelaus-Ceva browser follow-up (2026-10-28)
+- `/learn/math/menelaus-ceva-drill`: Rechecked the corrected internal area-ratio pattern on the current local branch. The screen showed BD:DC=3:4 and CE:EA=5:3; independently computed masses were mA=15, mB=12, mC=9, giving △PAB:△ABC=9:36=1:4. Entering 1:4 was accepted, and the rendered worked explanation showed the same masses and reduction. Browser console had no errors or warnings. This completes the local browser recheck; the historical pending note for a deployed-preview recheck remains applicable.
+
 ### Number representation drill follow-up (2026-10-28)
 - `/learn/information/number-representation-drill`: In browser mixed mode, intentionally chose the wrong method for a bit-width question; the page identified “ビット幅と表現範囲” and did not accept the answer. Selecting the right method and entering 0 was accepted for a 6-bit unsigned minimum question. This screen check exposed a content bug: the explanation for an unsigned minimum asked “最小値” but said “最大値は63.” Fixed endpoint wording for signed and unsigned bounds. Rechecked focused range mode in the browser: “16 bitの符号なしで表せる整数の最小値” accepted 0 and explained “最小値は0.” Expanded the verifier to assert that each boundary explanation names the endpoint asked. `npm run test:information-number-representation-drill` passed 20,000 mixed draws (4,000 per pattern, no adjacent repeats); targeted ESLint, TypeScript, and `git diff --check` passed. No browser console errors or warnings.
 
