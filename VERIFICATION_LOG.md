@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Math III learning and drill portal preview follow-up (2026-10-28)
+- On the Ready PR branch preview, `/learn` rendered 41 learning entries. Selecting the Math III subject filter showed 10 entries, all visual materials; every row exposed both an open-material link and a related-drill link. The screenshot confirmed the filter, table layout, labels, and links. On `/drill`, the fixed-pattern versus all-pattern-random guidance was visible; selecting Math III showed the seven unit-specific or higher-level drills, including the Math III overall mixed drill. This confirms the Math III visual-to-practice discovery flow in the learning-room portal and the fixed/mixed structure in the practice portal.
+
 ### Menelaus-Ceva area-ratio PR preview follow-up (2026-10-28)
 - On the Ready PR preview at `/learn/math/menelaus-ceva-drill`, selected focused pattern 4 (area-ratio application). For `BD:DC=4:2` and `CE:EA=5:5`, independently derived relative vertex masses `mA:mB:mC=20:10:20`, so `△PAB:△ABC=mC:(mA+mB+mC)=20:50=2:5`. Entering 2:5 was accepted; the rendered explanation showed the same masses and reduction. The browser screenshot confirmed P inside ABC, the three cevians meeting at P, the highlighted △PAB region, and the matching accepted answer. This closes the earlier pending deployed-preview check for the mass-point area-ratio correction.
 
