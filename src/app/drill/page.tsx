@@ -165,7 +165,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '無機化学（イオン反応・沈殿）',
     title: '化学 無機イオン反応・色の判定ドリル',
-    description: '少量・過剰や酸性・塩基性で変わる沈殿・錯イオン・酸化還元を個別練習し、全14パターンを混ぜて判断します。',
+    description: '少量・過剰や酸性・塩基性で変わる沈殿・錯イオン・酸化還元を個別練習し、全15パターンを混ぜて判断します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/chemistry/inorganic-colors-drill'

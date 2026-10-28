@@ -41,6 +41,15 @@ const requiredVisuals = [
 ];
 
 const drillEntries = readPortalEntries(drill);
+const inorganicReactionSource = fs.readFileSync(path.join(root, 'src/lib/inorganicReactionDrill.ts'), 'utf8');
+const inorganicPatternList = inorganicReactionSource.match(/export const inorganicPatterns:[\s\S]*?=\s*\[([\s\S]*?)\];/);
+const inorganicCardStart = drill.indexOf("slug: 'inorganic-colors-drill'");
+const inorganicCardEnd = drill.indexOf('\n  },', inorganicCardStart);
+const inorganicCard = drill.slice(inorganicCardStart, inorganicCardEnd);
+const inorganicPatternCount = inorganicPatternList?.[1].match(/'[^']+'/g)?.length ?? 0;
+if (inorganicPatternCount === 0 || !inorganicCard.includes(`全${inorganicPatternCount}パターン`)) {
+  throw new Error(`Inorganic reaction drill portal summary must advertise all ${inorganicPatternCount} fixed patterns.`);
+}
 const mathBcCardIndex = drill.indexOf("slug: 'mathbc-mixed-drill'");
 const mathBcCardEnd = drill.indexOf('\n  },', mathBcCardIndex);
 const mathBcCard = drill.slice(drill.lastIndexOf('  {', mathBcCardIndex), mathBcCardEnd);
