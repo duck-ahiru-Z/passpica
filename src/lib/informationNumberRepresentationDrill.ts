@@ -90,13 +90,14 @@ export function generateNumberRepresentationProblem(
     const isMinimum = questionType === 'minSigned' || questionType === 'minUnsigned';
     const expected = isMinimum ? minimum : maximum;
     const label = signed ? '符号付き2の補数' : '符号なし';
+    const endpoint = isMinimum ? '最小値' : '最大値';
     return {
       pattern,
       question: `${width} bitの${label}で表せる整数の${isMinimum ? '最小値' : '最大値'}はいくつか。`,
       answer: String(expected),
       explanation: signed
-        ? `${width} bitの2の補数の範囲は −2^(${width}−1)〜2^(${width}−1)−1。したがって ${minimum}〜${maximum}。`
-        : `${width} bitの符号なし整数は0〜2^${width}−1。したがって最大値は ${maximum}。`,
+        ? `${width} bitの2の補数の範囲は −2^(${width}−1)〜2^(${width}−1)−1。したがって ${minimum}〜${maximum}、${endpoint}は ${expected}。`
+        : `${width} bitの符号なし整数は0〜2^${width}−1。したがって${endpoint}は ${expected}。`,
     };
   }
 

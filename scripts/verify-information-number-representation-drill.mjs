@@ -51,6 +51,7 @@ for (const [question, answer] of boundaryQuestions) {
     if (problem.question === question) {
       assert.equal(problem.answer, answer);
       assert.ok(problem.explanation.includes(answer));
+      assert.ok(problem.explanation.includes(question.includes('最小値') ? '最小値' : '最大値'), 'range explanation must identify the endpoint the question asks for');
       found = true;
       break;
     }

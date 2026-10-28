@@ -1,5 +1,8 @@
 # Passpica verification log
 
+### Number representation drill follow-up (2026-10-28)
+- `/learn/information/number-representation-drill`: In browser mixed mode, intentionally chose the wrong method for a bit-width question; the page identified “ビット幅と表現範囲” and did not accept the answer. Selecting the right method and entering 0 was accepted for a 6-bit unsigned minimum question. This screen check exposed a content bug: the explanation for an unsigned minimum asked “最小値” but said “最大値は63.” Fixed endpoint wording for signed and unsigned bounds. Rechecked focused range mode in the browser: “16 bitの符号なしで表せる整数の最小値” accepted 0 and explained “最小値は0.” Expanded the verifier to assert that each boundary explanation names the endpoint asked. `npm run test:information-number-representation-drill` passed 20,000 mixed draws (4,000 per pattern, no adjacent repeats); targeted ESLint, TypeScript, and `git diff --check` passed. No browser console errors or warnings.
+
 ### PCM sampling visual follow-up (2026-10-28)
 - `/learn/information/pcm-sampling-visual`: The orange sample markers now respond to the selected sampling frequency. Browser checks showed 8 illustrative markers at 22.05 kHz, 15 at 44.1 kHz, and 33 at 96 kHz; the exact full one-second sample counts (22,050 / 44,100 / 96,000) remain explicit. Fixed the SVG title to stable text and specified `ja-JP` for displayed rates; a fresh browser load then showed no hydration errors or warnings. The live accessible description still exposes the selected rate and scaled marker count. `npm run test:information-pcm-visual`, targeted ESLint, TypeScript (`npx tsc --noEmit`), and `git diff --check` passed.
 
