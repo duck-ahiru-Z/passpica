@@ -7,8 +7,11 @@ const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/
 if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}') || !/disabled=\{!strategy \|\| answer\.trim\(\) === ''\}/.test(drillPage)) {
   throw new Error('geometry drill must expose a single-choice strategy group and require strategy plus answer before checking');
 }
-if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
+if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('valueIsCorrect ?')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
+}
+if (!drillPage.includes('方針は合っています。') || !drillPage.includes('数値は合っています。')) {
+  throw new Error('geometry feedback must acknowledge a correct answer dimension when the other dimension is wrong');
 }
 if (!drillPage.includes('isGeometryStrategyValid(problem, strategy)') || !drillPage.includes('getGeometryExplanation(problem, strategy)')) {
   throw new Error('geometry feedback must accept and explain mathematically equivalent y-axis washer and shell methods');
