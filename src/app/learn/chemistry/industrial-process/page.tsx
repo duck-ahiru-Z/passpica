@@ -75,6 +75,9 @@ export default function IndustrialProcessPage() {
         <p className="text-xs text-gray-500 mt-1">
           接触法・オストワルト法・アンモニアソーダ法の工業的生産フローチャート。原料から最終化合物に至るパイプラインと反応式を学習します。
         </p>
+        <Link href="/learn/chemistry/industrial-process-drill" className="retro-btn-classic inline-flex mt-3">
+          工業的製法の問題で練習する →
+        </Link>
       </div>
 
       {/* タブ切り替え */}

@@ -7,6 +7,7 @@ import {
   curvatureInflectionPoints,
   curvatureInflectionX,
   curvatureSecondDerivative,
+  snapCurvatureXToInflection,
 } from '../src/lib/calculus3CurvatureVisual.ts';
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-curvature-visual/page.tsx'), 'utf8');
@@ -43,6 +44,14 @@ for (const critical of curvatureExtrema) {
 
 if (curvatureInflectionPoints.length !== 2 || !close(curvatureInflectionX, 1 / Math.sqrt(3))) {
   throw new Error('both inflection points must be marked at ±1/√3');
+}
+for (const point of curvatureInflectionPoints) {
+  const nearestSliderTick = Math.round(point * 1000) / 1000;
+  if (snapCurvatureXToInflection(nearestSliderTick) !== point) throw new Error(`slider should snap to x=${point}`);
+  if (curvatureSecondDerivative(point) !== 0) throw new Error(`second derivative should be exactly zero at x=${point}`);
+  if (snapCurvatureXToInflection(nearestSliderTick + 0.001) !== nearestSliderTick + 0.001) {
+    throw new Error('nearby non-inflection slider ticks must remain selectable');
+  }
 }
 for (const x of curvatureInflectionPoints) {
   if (!close(curvatureSecondDerivative(x), 0) || !close(curvatureFunction(x), -5 / 9)) {

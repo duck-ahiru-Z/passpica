@@ -7,6 +7,7 @@ import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseRationalRoot } from '@/src/lib/absoluteValueEquationAnswer';
+import { getAbsoluteValueEquationStrategy, type AbsoluteValueEquationPattern, type AbsoluteValueEquationStrategy } from '@/src/lib/absoluteValueEquationStrategy';
 
 // --- 数学ユーティリティ ---
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -42,8 +43,13 @@ function simplifyFraction(n: number, d: number): Root {
   return { num, den };
 }
 
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+type Pattern = AbsoluteValueEquationPattern;
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+const strategyOptions: Array<{ strategy: AbsoluteValueEquationStrategy; label: string }> = [
+  { strategy: 'split-sign', label: '絶対値を±に分けて、2つの方程式を解く' },
+  { strategy: 'check-sign-case', label: '中身の符号で場合分けし、不適な根を除く' },
+  { strategy: 'split-number-line', label: '境界点で数直線を区切って場合分けする' },
+];
 
 interface ProblemData {
   pattern: Pattern;
@@ -156,6 +162,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 export default function AbsoluteValueEqDrillPage() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
   const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [selectedStrategy, setSelectedStrategy] = useState<AbsoluteValueEquationStrategy | ''>('');
   
   // ユーザー入力 (分数対応のため分子・分母で管理)
   const [ans1Num, setAns1Num] = useState<string>('');
@@ -323,6 +330,7 @@ export default function AbsoluteValueEqDrillPage() {
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));
+    setSelectedStrategy('');
     setAns1Num(''); setAns1Den('');
     setAns2Num(''); setAns2Den('');
     setHasChecked(false);
@@ -356,7 +364,8 @@ export default function AbsoluteValueEqDrillPage() {
       }
     }
 
-    setIsCorrect(matchCount === problem.roots.length);
+    setIsCorrect(matchCount === problem.roots.length
+      && (selectedPattern !== 'mix' || selectedStrategy === getAbsoluteValueEquationStrategy(problem.pattern)));
     setHasChecked(true);
   };
 
@@ -403,6 +412,27 @@ export default function AbsoluteValueEqDrillPage() {
             <div className="text-center my-8 text-2xl font-bold bg-white p-4 border border-gray-300 rounded shadow-sm">
               <MathEq math={problem.eqStr} />
             </div>
+
+            {selectedPattern === 'mix' && (
+              <fieldset className="mb-6 border border-gray-300 rounded p-3">
+                <legend className="px-1 font-bold text-slate-700">使う解き方を選んでください</legend>
+                <div className="grid grid-cols-1 gap-2">
+                  {strategyOptions.map(({ strategy, label }) => (
+                    <label key={strategy} className="flex items-center gap-2 rounded border border-gray-200 bg-white p-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="absolute-value-strategy"
+                        aria-label={label}
+                        value={strategy}
+                        checked={selectedStrategy === strategy}
+                        onChange={() => { setSelectedStrategy(strategy); setHasChecked(false); setIsCorrect(false); }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             
             <div className="space-y-4">
               <div className="text-center font-bold text-gray-700">
@@ -454,7 +484,11 @@ export default function AbsoluteValueEqDrillPage() {
 
             {hasChecked && (
               <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！素晴らしい！' : '不正解... 解説を見てみよう。'}
+                {isCorrect
+                  ? '正解！素晴らしい！'
+                  : selectedPattern === 'mix' && selectedStrategy !== getAbsoluteValueEquationStrategy(problem.pattern)
+                    ? '解き方の選択を確認しましょう。問題に合う場合分けを見直してください。'
+                    : '不正解... 解説を見てみよう。'}
               </div>
             )}
           </div>

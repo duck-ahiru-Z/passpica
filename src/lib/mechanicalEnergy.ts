@@ -12,19 +12,25 @@ export type MechanicalEnergyState = {
   kineticFraction: number;
 };
 
-export function calculateFallingEnergy(heightInput: number): MechanicalEnergyState {
-  const height = Math.max(0, Math.min(fallingObjectInitialHeight, heightInput));
-  const total = fallingObjectMass * mechanicalEnergyGravity * fallingObjectInitialHeight;
-  const potential = fallingObjectMass * mechanicalEnergyGravity * height;
+export function calculateFallingEnergy(
+  heightInput: number,
+  mass = fallingObjectMass,
+  initialHeight = fallingObjectInitialHeight,
+): MechanicalEnergyState {
+  const safeInitialHeight = Math.max(0, initialHeight);
+  const safeMass = Math.max(0, mass);
+  const height = Math.max(0, Math.min(safeInitialHeight, heightInput));
+  const total = safeMass * mechanicalEnergyGravity * safeInitialHeight;
+  const potential = safeMass * mechanicalEnergyGravity * height;
   const kinetic = total - potential;
 
   return {
     height,
-    dropDistance: fallingObjectInitialHeight - height,
+    dropDistance: safeInitialHeight - height,
     potential,
     kinetic,
     total,
-    potentialFraction: potential / total,
-    kineticFraction: kinetic / total,
+    potentialFraction: safeInitialHeight === 0 ? 1 : height / safeInitialHeight,
+    kineticFraction: safeInitialHeight === 0 ? 0 : 1 - height / safeInitialHeight,
   };
 }

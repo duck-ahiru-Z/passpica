@@ -20,6 +20,8 @@ export default function TrigonometryVisualizerPage() {
   const cosVal = Math.cos(rad);
   const tanUndefined = angle % 180 === 90;
   const tanVal = tanUndefined ? Infinity : Math.tan(rad);
+  const formatRatio = (value: number, digits = 4) =>
+    Math.abs(value) < 0.5 * 10 ** -digits ? (0).toFixed(digits) : value.toFixed(digits);
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6 text-slate-800 font-sans text-xs">
@@ -48,7 +50,7 @@ export default function TrigonometryVisualizerPage() {
 
           {/* SVG描画 */}
           <div className="flex items-center justify-center flex-grow">
-            <svg width="220" height="220" viewBox="0 0 200 200" className="overflow-visible font-mono" role="img" aria-label={`角度${angle}度の単位円。点Pの座標は(${cosVal.toFixed(3)}, ${sinVal.toFixed(3)})。cosは横座標${cosVal.toFixed(3)}、sinは縦座標${sinVal.toFixed(3)}、tanは${tanUndefined ? '定義されない' : tanVal.toFixed(3)}。`}>
+            <svg width="220" height="220" viewBox="0 0 200 200" className="overflow-visible font-mono" role="img" aria-label={`角度${angle}度の単位円。点Pの座標は(${formatRatio(cosVal, 3)}, ${formatRatio(sinVal, 3)})。cosは横座標${formatRatio(cosVal, 3)}、sinは縦座標${formatRatio(sinVal, 3)}、tanは${tanUndefined ? '定義されない' : formatRatio(tanVal, 3)}。`}>
               {/* x軸・y軸の境界線 */}
               <line x1="10" y1="100" x2="190" y2="100" stroke="#94a3b8" strokeWidth="1" />
               <line x1="100" y1="10" x2="100" y2="190" stroke="#94a3b8" strokeWidth="1" />
@@ -118,7 +120,7 @@ export default function TrigonometryVisualizerPage() {
             <div className="border border-gray-200 p-2.5 bg-gray-50">
               <div className="flex justify-between items-center font-bold">
                 <span className="text-blue-700">sin θ (高さ y)</span>
-                <span className="font-mono">{sinVal.toFixed(4)}</span>
+                <span className="font-mono">{formatRatio(sinVal)}</span>
               </div>
               <div className="w-full bg-gray-200 h-1.5 mt-2 overflow-hidden border border-gray-300">
                 <div 
@@ -132,7 +134,7 @@ export default function TrigonometryVisualizerPage() {
             <div className="border border-gray-200 p-2.5 bg-gray-50">
               <div className="flex justify-between items-center font-bold">
                 <span className="text-red-700">cos θ (底辺 x)</span>
-                <span className="font-mono">{cosVal.toFixed(4)}</span>
+                <span className="font-mono">{formatRatio(cosVal)}</span>
               </div>
               <div className="w-full bg-gray-200 h-1.5 mt-2 overflow-hidden border border-gray-300">
                 <div 
@@ -147,7 +149,7 @@ export default function TrigonometryVisualizerPage() {
               <div className="flex justify-between items-center font-bold">
                 <span className="text-amber-700">tan θ (傾き y/x)</span>
                 <span className="font-mono">
-                  {tanUndefined ? '未定義' : tanVal.toFixed(4)}
+                  {tanUndefined ? '未定義' : formatRatio(tanVal)}
                 </span>
               </div>
               <div className="w-full bg-gray-200 h-1.5 mt-2 overflow-hidden border border-gray-300">
@@ -169,7 +171,7 @@ export default function TrigonometryVisualizerPage() {
               半径が1の円（単位円）の上を動く点Pの座標(x, y)は、定義からそのまま <strong>(cos θ, sin θ)</strong> に対応します。
             </p>
             <p>
-              角度θが90°を超えると、x座標（cos）が負になり、180°を超えるとy座標（sin）も負になります。tanは直線の「傾き」を示すため、90°のときと270°のときは定義されません。
+              90°＜θ＜270°ではx座標（cos）が負、180°＜θ＜360°ではy座標（sin）が負になります。tanは直線の「傾き」を示すため、90°と270°では定義されません。
             </p>
           </div>
 

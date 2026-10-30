@@ -291,7 +291,7 @@ const MOLECULES: Record<MoleculeId, MoleculeData> = {
       { u: 'C4', v: 'H42', type: 'single' },
       { u: 'C4', v: 'H43', type: 'single' }
     ],
-    description: '二重結合の同じ側にメチル基（-CH₃）が配置され、分子がC型に折れ曲がっています。このシス配置の折れ曲がり構造は、天然ゴム（ポリイソプレン）の分子鎖でも繰り返され、分子間に隙間を作りゴムに「弾性（伸びる性質）」をもたらします。'
+    description: 'このモデルはシス-2-ブテンです。二重結合の同じ側にメチル基（-CH₃）があり、分子がC型に折れ曲がっています。高分子との関連では、天然ゴムの主成分であるシス-1,4-ポリイソプレンもシス型の二重結合をもち、折れ曲がった鎖が結晶化しにくいことがゴムらしい弾性につながります。'
   },
   trans_butene: {
     id: 'trans_butene',
@@ -329,7 +329,7 @@ const MOLECULES: Record<MoleculeId, MoleculeData> = {
       { u: 'C4', v: 'H42', type: 'single' },
       { u: 'C4', v: 'H43', type: 'single' }
     ],
-    description: '二重結合の対角線上にメチル基が配置され、分子が全体として直線的な階段状になっています。トランス配置（トランス-ポリイソプレン等）は分子鎖が規則正しく並びやすく結晶化するため、弾性を失い「プラスチック様の硬い樹脂（グッタペルカ）」となります。'
+    description: 'このモデルはトランス-2-ブテンです。二重結合をはさんでメチル基（-CH₃）が反対側にあり、シス型より直線的な形です。高分子との関連では、トランス-1,4-ポリイソプレン（グッタペルカ）は鎖が規則的に並んで結晶化しやすく、天然ゴムより硬い性質を示します。'
   }
 };
 
@@ -571,8 +571,9 @@ export default function Organic3DPage() {
           有機・高分子3D分子モデルビューア（立体構造）
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          メタンやベンゼンといった代表的な有機分子、シクロヘキサンの「椅子型」「舟型」配座、高分子のシス・トランスによる折れ曲がり構造を3D回転モデルで直感的に学びます。
+          メタンやベンゼンなどの有機分子、シクロヘキサンの椅子型・舟型、2-ブテンのシス・トランスを3D回転モデルで比べ、高分子の性質との関係も学びます。
         </p>
+        <Link href="/learn/chemistry/organic-structure-drill" className="inline-block mt-2 text-blue-700 underline">有機化学・立体構造の個別／ランダム演習へ →</Link>
       </div>
 
       {/* 分子選択パネル */}
@@ -613,7 +614,7 @@ export default function Organic3DPage() {
 
         {/* グループ3：高分子シス・トランス */}
         <div className="space-y-1 pt-1.5 border-t border-dashed border-gray-300">
-          <span className="text-[10px] text-gray-400 block font-semibold">【幾何異性体・高分子鎖の折れ曲がり】</span>
+          <span className="text-[10px] text-gray-400 block font-semibold">【幾何異性体と高分子への関連】</span>
           <div className="flex flex-wrap gap-1">
             {(['cis_butene', 'trans_butene'] as MoleculeId[]).map(id => (
               <button
@@ -683,6 +684,7 @@ export default function Organic3DPage() {
                 </div>
                 <input
                   type="range"
+                  aria-label="左右回転 (Yaw)"
                   min="-180"
                   max="180"
                   value={yaw}
@@ -698,6 +700,7 @@ export default function Organic3DPage() {
                 </div>
                 <input
                   type="range"
+                  aria-label="上下回転 (Pitch)"
                   min="-90"
                   max="90"
                   value={pitch}

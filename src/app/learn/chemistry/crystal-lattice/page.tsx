@@ -23,7 +23,7 @@ const LATTICES: Record<'bcc' | 'fcc', LatticeInfo> = {
     atomsPerCell: 2,
     packingEfficiency: '約 68 %',
     contactFormula: '√3 a = 4r',
-    contactFormulaExplain: '立方体の「対角線（中心を通る斜め線）」のルート3a の上で、3つの原子が接しています。(r + 2r + r = 4r)',
+    contactFormulaExplain: '立方体の体対角線の長さは √3a です。この線上で頂点・体心・反対側の頂点の原子が接するため、r + 2r + r = 4r となります。',
     metals: 'Na（ナトリウム）, K（カリウム）, Fe（鉄/常温）など',
     explain: '単位格子の中心に原子が1個、各頂点に1/8個の原子が8個配置されています。原子は立方体の対角線に沿って中心の原子と接しており、x, y, z方向のそれぞれの面同士では接していません。比較的隙間の多い構造（充填率68%）です。'
   },
@@ -34,7 +34,7 @@ const LATTICES: Record<'bcc' | 'fcc', LatticeInfo> = {
     atomsPerCell: 4,
     packingEfficiency: '約 74 %',
     contactFormula: '√2 a = 4r',
-    contactFormulaExplain: '各正方形の面の「対角線」のルート2a の上で、3つの原子が接しています。(r + 2r + r = 4r)',
+    contactFormulaExplain: '各正方形の面対角線の長さは √2a です。この線上で頂点・面心・反対側の頂点の原子が接するため、r + 2r + r = 4r となります。',
     metals: 'Al（アルミニウム）, Cu（銅）, Ag（銀）など',
     explain: '単位格子の各頂点に1/8個の原子が8個、各面の中心に1/2個の原子が6個配置されています。原子は各面の対角線に沿って接しており、この配列は空間を最も効率的に埋める最密充填構造（充填率74%）の一つです。'
   }
@@ -58,6 +58,9 @@ export default function CrystalLatticePage() {
         <p className="text-xs text-gray-500 mt-1">
           金属結晶の代表的な単位格子（体心立方・面心立方）の立体配置と、計算問題の第一歩となる原子の接触断面図を示します。
         </p>
+        <Link href="/learn/chemistry/crystal-lattice-drill" className="retro-btn-classic inline-flex mt-3">
+          結晶格子の計算問題で練習する →
+        </Link>
       </div>
 
       {/* タブ切り替え */}

@@ -15,8 +15,24 @@ for (const activationEnergy of [40, 150]) {
   }
 }
 
-const page = await readFile(new URL('../src/app/learn/chemistry/reaction-safety/page.tsx', import.meta.url), 'utf8');
+const energyPage = await readFile(new URL('../src/app/learn/chemistry/reaction-safety/page.tsx', import.meta.url), 'utf8');
+assert.match(energyPage, /aria-label=\{`発熱反応の模式図。活性化エネルギー \$\{activationEnergy\} kJ、エンタルピー変化 ΔH −\$\{reactionHeat\} kJ`\}/);
+assert.match(energyPage, /const energyPath = `M \$\{rx\} \$\{ry\} C 120 \$\{ry\}, 150 \$\{ty\}, \$\{tx\} \$\{ty\} C 250 \$\{ty\}, 280 \$\{py\}, \$\{px\} \$\{py\} L \$\{px \+ 50\} \$\{py\}`/);
+for (const [activationEnergy, heatReleased] of [[40, 20], [150, 120]]) {
+  const { reactantY, transitionY, productY } = reactionEnergyProfile(activationEnergy, heatReleased);
+  assert.ok(transitionY < reactantY, 'activation barrier must rise above the reactants');
+  assert.ok(productY > reactantY, 'products must lie below reactants for exothermic ΔH');
+  assert.equal(reactantY - transitionY, activationEnergy * 0.45);
+  assert.equal(productY - reactantY, heatReleased * 0.45);
+}
+
+const page = energyPage;
 assert.match(page, /C₆H₇O₂\(ONO₂\)₃/);
+assert.match(page, /置換数1〜3の理想化した単位モデル/);
+assert.match(page, /セルロイドに使われる硝酸セルロースは一般に窒素含有率約10\.5〜11\.5%で、この1置換モデル（約6\.8%）とは異なります/);
+assert.match(page, /外部酸素が乏しい条件でも自己燃焼することがあります/);
+assert.match(page, /燃焼性は硝化度だけでなく組成・含水率・状態にも依存します/);
+assert.doesNotMatch(page, /外部の空気から酸素を供給されなくても、分子内の窒素・酸素を利用して自己燃焼/);
 assert.match(page, /ΔH = −\{reactionHeat\} kJ/);
 assert.match(page, /硝酸エステル基/);
 assert.match(page, /過酸化物・超酸化物の危険な皮膜/);

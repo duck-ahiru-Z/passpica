@@ -2,6 +2,12 @@ import { BalancedRandom } from './balancedRandom.ts';
 
 export type BinomialPattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 export type BinomialMode = BinomialPattern | 'mix';
+export type BinomialStrategy = 'exact-successes' | 'complement' | 'decisive-final-game';
+
+export function getBinomialStrategy(pattern: BinomialPattern): BinomialStrategy {
+  if (pattern === 'pattern1' || pattern === 'pattern2') return 'exact-successes';
+  return pattern === 'pattern3' ? 'complement' : 'decisive-final-game';
+}
 
 export interface BinomialProblem {
   pattern: BinomialPattern;

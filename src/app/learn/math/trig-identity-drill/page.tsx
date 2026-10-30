@@ -298,6 +298,13 @@ export default function TrigIdentityDrillPage() {
 
   const target1 = problem.givenType === 'sin' ? 'cos' : 'sin';
   const target2 = problem.givenType === 'tan' ? 'cos' : 'tan';
+  const formatRoot = (value: number) => {
+    const root = Math.sqrt(value);
+    return Number.isInteger(root) ? `${root}` : `√${value}`;
+  };
+  const graphDescription = problem.pattern === 'pattern4'
+    ? `三角比の図は省略しています。与式はsin θ + cos θ = ${formatTerm(problem.givenVal)}で、求めるのはsin θ cos θです。`
+    : `三角比の座標図。円周上の点Pは(${problem.signX < 0 ? '-' : ''}${formatRoot(problem.X2)}, ${formatRoot(problem.Y2)})。半径は${formatRoot(problem.R2)}。θは${problem.isObtuse ? '鈍角でx座標は負' : '鋭角でx座標は正'}です。`;
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
@@ -419,6 +426,8 @@ export default function TrigIdentityDrillPage() {
                 ref={canvasRef} 
                 width={200} 
                 height={200} 
+                role="img"
+                aria-label={graphDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>

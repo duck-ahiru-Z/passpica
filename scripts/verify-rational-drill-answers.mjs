@@ -1,6 +1,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseRationalParts, rationalEquals } from '../src/lib/rationalInput.ts';
+import { getCalculusAreaStrategy } from '../src/lib/calculusAreaStrategy.ts';
+
+if (JSON.stringify(['1/6_line', '1/6_para', '1/12', '1/20', '1/30'].map(getCalculusAreaStrategy))
+  !== JSON.stringify(['one-sixth', 'one-sixth', 'one-twelfth', 'one-twentieth', 'one-thirtieth'])) {
+  throw new Error('calculus-drill must map each curve pattern to its matching area formula');
+}
 
 const routes = [
   ['roots-coefficients-drill', 'parseRationalParts(ansNumStr.trim() === \'\' ? \'0\' : ansNumStr, ansDenStr)'],
@@ -11,6 +17,16 @@ for (const [slug, expectedCall] of routes) {
   const page = fs.readFileSync(path.join(process.cwd(), `src/app/learn/math/${slug}/page.tsx`), 'utf8');
   if (!page.includes(expectedCall) || !page.includes('rationalEquals(')) {
     throw new Error(`${slug} must use strict rational parsing and exact rational equality`);
+  }
+  if (slug === 'calculus-drill'
+    && (!page.includes('aria-label="面積 S の分子"')
+      || !page.includes('aria-label="面積 S の分母。整数の場合は空欄でも可"')
+      || !page.includes('aria-label={`面積グラフ。')
+      || !page.includes('aria-pressed={selectedMode === m.id}')
+      || !page.includes('name="calculus-area-strategy"')
+      || !page.includes('selectedAreaStrategy === getCalculusAreaStrategy(problem.type')
+      || !page.includes('selectedMode === \'mix\' && ('))) {
+    throw new Error('calculus-drill must expose named answer fields, selected modes, and a descriptive graph to assistive technology');
   }
 }
 

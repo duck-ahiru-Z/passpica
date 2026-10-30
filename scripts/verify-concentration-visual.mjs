@@ -8,6 +8,7 @@ if (!page.includes('calculateMolarConcentration(moles, volume)')) throw new Erro
 if (!page.includes('const moles = 0.2;')) throw new Error('The visual must keep solute amount fixed.');
 if (!page.includes('min="0.2" max="1.2" step="0.01"')) throw new Error('The volume slider must stay within its positive supported range.');
 if (!page.includes('溶質粒子8個の物質量は一定')) throw new Error('The accessible graphic must communicate the fixed particle count.');
+if (!page.includes('href="/learn/chemistry/mole-calculation-drill"') || !page.includes('モル濃度の計算問題で練習する')) throw new Error('The dilution visual must link directly to its related calculation practice.');
 
 const particleList = page.match(/const particles = (\[\[[^\n]+?\]\]) as const;/)?.[1];
 if (!particleList || JSON.parse(particleList).length !== 8) throw new Error('The visual must preserve its eight solute particles while diluting.');

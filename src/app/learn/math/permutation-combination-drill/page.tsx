@@ -269,6 +269,16 @@ export default function PermutationCombinationDrill() {
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
+  const diagramDescription = problem.pattern === 'pattern1'
+    ? `全体${problem.n}個から${problem.r}個を選び、順番を区別して並べる順列の図`
+    : problem.pattern === 'pattern2'
+      ? `全体${problem.n}個から${problem.r}個を選び、順番を区別せず組み合わせる図`
+      : problem.pattern === 'pattern3'
+        ? `組合せの対称性を使い、全体${problem.n}個から${problem.n - problem.r}個を選んで計算する図`
+        : problem.subType === 'circle'
+          ? `${problem.n}人の円順列の図。回転で同じ並びを除くため、赤い1人を固定する`
+          : `同じものを含む順列の図。${problem.items?.map(item => `${item.name}${item.count}個`).join('、')}を並べる`;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -294,6 +304,7 @@ export default function PermutationCombinationDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="場合の数の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -330,6 +341,7 @@ export default function PermutationCombinationDrill() {
             <div className="space-y-4">
               <div className="flex items-center justify-center gap-4 text-xl">
                 <input 
+                  aria-label="場合の数の答え"
                   type="number" 
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
@@ -377,6 +389,8 @@ export default function PermutationCombinationDrill() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
+                role="img"
+                aria-label={diagramDescription}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>

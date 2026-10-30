@@ -34,13 +34,14 @@ for (const upper of [0.5, 1, 1.5, 2]) {
     for (const index of sections) {
       const radius = rotationDiskRadius(index, slices, 105, upper);
       const x = upper * index / slices;
-      if (!close(radius / 105, (x / 2) ** 2)) throw new Error(`displayed disk radius must match y=x² for b=${upper}, i=${index}, n=${slices}`);
+      if (!close(radius / 105, (x / upper) ** 2)) throw new Error(`displayed disk radius must match the graph's normalized y=x² profile for b=${upper}, i=${index}, n=${slices}`);
     }
-    if (!close(rotationDiskRadius(slices, slices, 105, upper) / 105, (upper / 2) ** 2)) {
-      throw new Error(`end disk must match the selected upper bound b=${upper}, n=${slices}`);
+    if (!close(rotationDiskRadius(slices, slices, 105, upper), 105)) {
+      throw new Error(`end disk must reach the displayed solid radius for b=${upper}, n=${slices}`);
     }
   }
 }
+if (rotationDiskRadius(4, 8, 105, 0) !== 0) throw new Error('a zero-width rotation interval must collapse the displayed solid to zero radius');
 
 for (const upper of [0.5, 1, 1.5, 2]) {
   const exact = rotationVolume(upper);

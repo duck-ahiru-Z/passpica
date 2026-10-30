@@ -22,4 +22,10 @@ for (const [slug, ...snippets] of integrations) {
   for (const snippet of snippets) assert.ok(page.includes(snippet), `${slug} must use strict integer validation (${snippet})`);
 }
 
+const ellipsePage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/ellipse-drill/page.tsx'), 'utf8');
+for (const label of ['出題パターン', '問題文', 'A の値', 'B の値', '座標の x 成分', '座標の y 成分']) {
+  assert.ok(ellipsePage.includes(`aria-label="${label}"`), `ellipse drill must label ${label}`);
+}
+assert.ok(ellipsePage.includes('role="img" aria-label={`楕円の図。中心'), 'ellipse graph must expose its plotted center, shape, and focus distance accessibly');
+
 console.log('Strict integer answer parsing verified: 10 input cases, blank defaults, and four geometry/factorization drill integrations.');

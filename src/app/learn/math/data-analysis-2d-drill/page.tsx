@@ -5,6 +5,8 @@ import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
+import { generateCorrelationScatterPoints, getCorrelationDirectionLabel } from '@/src/lib/dataAnalysis2D';
+import { buildCrossTableExplanation, buildScatterPlotDescription, isDataAnalysis2DAnswerCorrect, isDataAnalysis2DMethodCorrect } from '@/src/lib/dataAnalysis2DAnswers';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
@@ -12,7 +14,36 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
+function ExplanationLine({ value }: { value: string }) {
+  const parts: Array<{ value: string; text: boolean }> = [];
+  const textPattern = /\\text\{([^{}]*)\}/g;
+  let lastIndex = 0;
+
+  for (const match of value.matchAll(textPattern)) {
+    const index = match.index ?? 0;
+    if (index > lastIndex) parts.push({ value: value.slice(lastIndex, index), text: false });
+    parts.push({ value: match[1], text: true });
+    lastIndex = index + match[0].length;
+  }
+  if (lastIndex < value.length) parts.push({ value: value.slice(lastIndex), text: false });
+
+  return <>
+    {parts.map((part, index) => {
+      if (part.text || /[^\x00-\x7F]/.test(part.value)) {
+        return <span key={index}>{part.value}</span>;
+      }
+      return part.value.trim() ? <MathEq key={index} math={part.value} /> : <span key={index}>{part.value}</span>;
+    })}
+  </>;
+}
+
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
+const patternLabels: Record<Pattern, string> = {
+  pattern1: '共分散の計算',
+  pattern2: '相関係数の計算',
+  pattern3: '散布図から相関を推定',
+  pattern4: 'クロス集計表',
+};
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
 
 interface DBEntry {
@@ -141,14 +172,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       const trueR = (Math.random() * 1.8 - 0.9).toFixed(1); // -0.9 to 0.9
       const rNum = parseFloat(trueR);
       
-      // Generate scatter points with approx correlation rNum
-      const pts = [];
-      for (let i = 0; i < 30; i++) {
-        const x = Math.random() * 10;
-        const err = (Math.random() - 0.5) * 5 * Math.sqrt(1 - rNum*rNum);
-        const y = rNum > 0 ? (x * rNum + err) : ((10 - x) * Math.abs(rNum) + err);
-        pts.push({x, y: y + 5});
-      }
+      // Construct the sample so its measured Pearson correlation matches the target.
+      const pts = generateCorrelationScatterPoints(rNum);
       
       const choices = [
         rNum,
@@ -163,7 +188,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       const qStr = `右の散布図から読み取れる相関係数 $r$ として最も適切なものを、次の選択肢から選べ。\n\n$${choices.join('\\quad / \\quad')}$`;
       
-      const dir = rNum > 0.4 ? '右上がり（正の相関）' : (rNum < -0.4 ? '右下がり（負の相関）' : 'バラバラ（無相関）');
+      const dir = getCorrelationDirectionLabel(rNum);
       
       const expLines = [
         `\\text{散布図の点の分布を見ると、全体的に}${dir}\\text{の傾向があります。}`,
@@ -191,10 +216,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       
       const qStr = `次のクロス集計表において、空欄 [ A ] に入る数値を求めよ。`;
       
-      const expLines = [
-        `\\text{表の縦と横の合計が一致することを利用します。}`,
-        `\\text{例えば、}[A]\\text{ を含む行または列の合計値から、他の数値を引くことで求まります。}`
-      ];
+      const tableData = { a, b, c, d, totA, totB, totC, totD, tot, targetCell };
+      const expLines = buildCrossTableExplanation(tableData);
       
       let ansStr = "";
       if (targetCell === 'a') ansStr = a.toString();
@@ -202,7 +225,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (targetCell === 'c') ansStr = c.toString();
       if (targetCell === 'd') ansStr = d.toString();
       
-      return { pattern: p, qStr, ans1: ansStr, tableData: { a,b,c,d, totA,totB,totC,totD, tot, targetCell }, expLines };
+      return { pattern: p, qStr, ans1: ansStr, tableData, expLines };
     }
   }
 }
@@ -212,26 +235,32 @@ export default function DataAnalysis2DDrill() {
   const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
   
   const [ans1, setAns1] = useState<string>('');
+  const [methodChoice, setMethodChoice] = useState<Pattern | ''>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [isMethodCorrect, setIsMethodCorrect] = useState<boolean | null>(null);
+  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
     setAns1('');
+    setMethodChoice('');
     setHasChecked(false);
     setIsCorrect(false);
+    setIsMethodCorrect(null);
+    setIsAnswerCorrect(null);
   };
 
   const handleCheck = () => {
     if (!problem) return;
-    let isOk = false;
-    const actual = Number(ans1.trim().replaceAll(',', ''));
-    const expected = Number(problem.ans1);
-    if (Number.isFinite(actual) && Number.isFinite(expected) && Math.abs(actual - expected) < 1e-9) isOk = true;
+    const methodOk = isDataAnalysis2DMethodCorrect(methodChoice, problem.pattern, selectedPattern === 'mix');
+    const answerOk = isDataAnalysis2DAnswerCorrect(ans1, problem.ans1 ?? '');
     
-    setIsCorrect(isOk);
+    setIsMethodCorrect(selectedPattern === 'mix' ? methodOk : null);
+    setIsAnswerCorrect(answerOk);
+    setIsCorrect(methodOk && answerOk);
     setHasChecked(true);
   };
 
@@ -297,12 +326,10 @@ export default function DataAnalysis2DDrill() {
     explanationEl = (
       <div className="space-y-4">
         {problem.expLines.map((line, idx) => {
-          if (line.includes('\\text{')) {
-            return <div key={idx} className="text-gray-600 mb-1 mt-4"><MathEq math={line} /></div>;
-          }
+          const hasText = line.includes('\\text{');
           return (
-            <div key={idx} className="bg-white p-2 border rounded text-center overflow-x-auto whitespace-nowrap">
-              <MathEq math={line} block />
+            <div key={idx} className={hasText ? 'text-gray-600 mb-1 mt-4' : 'bg-white p-2 border rounded text-center overflow-x-auto whitespace-nowrap'}>
+              {hasText ? <ExplanationLine value={line} /> : <MathEq math={line} block />}
             </div>
           );
         })}
@@ -335,12 +362,13 @@ export default function DataAnalysis2DDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="2変量データ分析の演習パターン"
                 value={selectedPattern}
                 onChange={e => {
                   const nextPattern = e.target.value as Pattern | 'mix';
                   setSelectedPattern(nextPattern);
                   setProblem(generateProblem(nextPattern));
-                  setAns1(''); setHasChecked(false); setIsCorrect(false);
+                  setAns1(''); setMethodChoice(''); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null); setIsAnswerCorrect(null);
                 }}
                 className="border p-1 text-xs"
               >
@@ -396,23 +424,65 @@ export default function DataAnalysis2DDrill() {
             </div>
             
             <div className="space-y-4">
+              {selectedPattern === 'mix' && (
+                <fieldset className="border-t pt-4 space-y-2">
+                  <legend className="font-bold text-center px-2">実戦練習：先に分析方法を選んでください</legend>
+                  <p className="text-center text-gray-600">問題の形から、使う分析方法を判断します。</p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {(Object.keys(patternLabels) as Pattern[]).map(pattern => (
+                      <label key={pattern} className={`flex items-center gap-2 border p-3 cursor-pointer ${methodChoice === pattern ? 'bg-blue-50 border-blue-400' : 'bg-white border-slate-300'}`}>
+                        <input
+                          type="radio"
+                          name="data-analysis-method-choice"
+                          value={pattern}
+                          checked={methodChoice === pattern}
+                          onChange={() => { setMethodChoice(pattern); setHasChecked(false); setIsCorrect(false); setIsMethodCorrect(null); setIsAnswerCorrect(null); }}
+                        />
+                        <span>{patternLabels[pattern]}</span>
+                      </label>
+                    ))}
+                  </div>
+                </fieldset>
+              )}
               <div className="flex flex-col items-center justify-center gap-4 font-bold border-t pt-4">
-                <div className="flex items-center gap-4 text-xl">
-                  <span>解答 =</span>
-                  <input 
-                    type={problem.pattern === 'pattern3' ? "number" : "text"} step="0.1"
-                    className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
-                    value={ans1} 
-                    onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); }}
-                    placeholder={problem.pattern === 'pattern3' ? "0.8" : ""}
-                  />
-                </div>
+                {problem.pattern === 'pattern3' && problem.scatterChoices ? (
+                  <fieldset className="w-full max-w-sm space-y-2">
+                    <legend className="mb-2 text-center">相関係数を選択してください</legend>
+                    {problem.scatterChoices.map(choice => {
+                      const value = choice.toFixed(1);
+                      return (
+                        <label key={value} className={`flex items-center gap-3 border p-3 cursor-pointer ${ans1 === value ? 'bg-blue-50 border-blue-400' : 'bg-white border-slate-300'}`}>
+                          <input
+                            type="radio"
+                            name="scatter-correlation-choice"
+                            value={value}
+                            checked={ans1 === value}
+                            onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); setIsAnswerCorrect(null); }}
+                          />
+                          <MathEq math={`r = ${value}`} />
+                        </label>
+                      );
+                    })}
+                  </fieldset>
+                ) : (
+                  <div className="flex items-center gap-4 text-xl">
+                    <span>解答 =</span>
+                    <input
+                      type="text"
+                      aria-label="解答"
+                      className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500"
+                      value={ans1}
+                      onChange={e => { setAns1(e.target.value); setHasChecked(false); setIsCorrect(false); setIsAnswerCorrect(null); }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={selectedPattern === 'mix' && !methodChoice}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -427,7 +497,19 @@ export default function DataAnalysis2DDrill() {
 
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！2変量の分析も完璧です。' : '不正解... 解説やグラフを見て確認しましょう。'}
+                {selectedPattern === 'mix' && (
+                  <>
+                  <p className="mb-2">
+                    {isMethodCorrect
+                      ? `分析方法の選択も正解です（${patternLabels[problem.pattern]}）。`
+                      : `分析方法は「${patternLabels[problem.pattern]}」です。問題の形を見直しましょう。`}
+                  </p>
+                  <p className="mb-2">
+                    {isAnswerCorrect ? '計算・読み取り結果も正解です。' : '計算・読み取り結果も確認しましょう。'}
+                  </p>
+                  </>
+                )}
+                {isCorrect ? '正解！2変量の分析も完璧です。' : '解説やグラフを見て、分析方法と計算を確認しましょう。'}
               </div>
             )}
           </div>
@@ -444,7 +526,14 @@ export default function DataAnalysis2DDrill() {
 
             {problem.pattern !== 'pattern4' && (
               <div className="flex justify-center mb-4 bg-white border border-gray-300 shadow-sm relative pt-4">
-                <canvas ref={canvasRef} width={260} height={200} className="w-full max-w-full h-auto" />
+                <canvas
+                  ref={canvasRef}
+                  width={260}
+                  height={200}
+                  role="img"
+                  aria-label={buildScatterPlotDescription(problem.scatterPoints)}
+                  className="w-full max-w-full h-auto"
+                />
               </div>
             )}
 

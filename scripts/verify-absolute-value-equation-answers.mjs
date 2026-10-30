@@ -2,6 +2,12 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { parseRationalRoot } from '../src/lib/absoluteValueEquationAnswer.ts';
+import { getAbsoluteValueEquationStrategy } from '../src/lib/absoluteValueEquationStrategy.ts';
+
+assert.deepEqual(
+  ['pattern1', 'pattern2', 'pattern3', 'pattern4'].map(getAbsoluteValueEquationStrategy),
+  ['split-sign', 'split-sign', 'check-sign-case', 'split-number-line'],
+);
 
 const cases = [
   ['3', '', { num: 3, den: 1 }],
@@ -23,8 +29,12 @@ for (const label of ['1つ目の解の分子', '1つ目の解の分母', '2つ�
   assert.ok(page.includes(`aria-label="${label}`), `missing accessible input label: ${label}`);
 }
 assert.ok(page.includes('role="status" aria-live="polite"'), 'answer feedback must be announced');
+assert.ok(page.includes('aria-label="絶対値方程式の演習パターン"'), 'the pattern selector must have an accessible name');
+assert.ok(page.includes("selectedPattern === 'mix' && ("), 'mixed mode must require strategy identification');
+assert.ok(page.includes('selectedStrategy === getAbsoluteValueEquationStrategy(problem.pattern)'), 'mixed answers must validate the selected solution strategy');
+assert.ok(page.includes('name="absolute-value-strategy"'), 'the strategy options must be an accessible radio group');
 assert.ok(page.includes("aria-pressed={detailLevel === 'brief'}") && page.includes("aria-pressed={detailLevel === 'normal'}"), 'explanation-level buttons must expose their selected state');
-assert.equal((page.match(/setHasChecked\(false\); setIsCorrect\(false\);/g) ?? []).length, 4, 'editing any answer field must clear stale feedback');
+assert.equal((page.match(/setAns[12](?:Num|Den)\(e\.target\.value\); setHasChecked\(false\); setIsCorrect\(false\);/g) ?? []).length, 4, 'editing any answer field must clear stale feedback');
 assert.ok(!page.includes('$x$') && page.includes('<MathEq math="x" />'), 'math notation must render instead of showing literal Markdown delimiters');
 
 // Recreate each generator family over a dense deterministic parameter grid and

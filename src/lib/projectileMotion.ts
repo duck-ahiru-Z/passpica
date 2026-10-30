@@ -16,18 +16,25 @@ export type ProjectileState = {
   vy: number;
 };
 
-export function calculateProjectileState(angleInput: number, timeFractionInput: number): ProjectileState {
+export function calculateProjectileState(
+  angleInput: number,
+  timeFractionInput: number,
+  initialSpeedInput = projectileInitialSpeed,
+  initialHeightInput = projectileInitialHeight,
+): ProjectileState {
   const angleDeg = Math.max(0, Math.min(75, angleInput));
   const timeFraction = Math.max(0, Math.min(1, timeFractionInput));
+  const initialSpeed = Math.max(5, Math.min(30, initialSpeedInput));
+  const initialHeight = Math.max(2, Math.min(30, initialHeightInput));
   const angle = (angleDeg * Math.PI) / 180;
-  const vx0 = projectileInitialSpeed * Math.cos(angle);
-  const vy0 = projectileInitialSpeed * Math.sin(angle);
-  const flightTime = (vy0 + Math.sqrt(vy0 * vy0 + 2 * projectileGravity * projectileInitialHeight)) / projectileGravity;
-  const maxHeight = projectileInitialHeight + (vy0 * vy0) / (2 * projectileGravity);
+  const vx0 = initialSpeed * Math.cos(angle);
+  const vy0 = initialSpeed * Math.sin(angle);
+  const flightTime = (vy0 + Math.sqrt(vy0 * vy0 + 2 * projectileGravity * initialHeight)) / projectileGravity;
+  const maxHeight = initialHeight + (vy0 * vy0) / (2 * projectileGravity);
   const range = vx0 * flightTime;
   const time = flightTime * timeFraction;
   const x = vx0 * time;
-  const y = projectileInitialHeight + vy0 * time - 0.5 * projectileGravity * time * time;
+  const y = initialHeight + vy0 * time - 0.5 * projectileGravity * time * time;
 
   return {
     angleDeg,

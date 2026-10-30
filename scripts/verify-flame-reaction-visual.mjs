@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { flameMetals, flameReactionMnemonics } from '../src/lib/flameReactionDrill.ts';
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/chemistry/flame-reaction/page.tsx'), 'utf8');
 const expectedFlames = [
@@ -19,6 +20,13 @@ if (!page.includes('aria-pressed={selectedMetal?.formula === m.formula}')
   || !page.includes('選択されたイオンの発色')
   || !page.includes('aria-label={selectedMetal ? `${selectedMetal.jpName}の炎色反応。炎は${selectedMetal.colorName}。`')) {
   throw new Error('flame selector and colored flame must stay associated with the selected salt');
+}
+for (const metal of flameMetals) {
+  const mnemonic = flameReactionMnemonics[metal];
+  if (!page.includes(`mnemonic: '${mnemonic}'`)) throw new Error(`${metal} visual mnemonic must match the drill: ${mnemonic}`);
+}
+if (!page.includes('リアカーなき（Li:赤 / Na:黄）K村（K:赤紫）動力（Cu:青緑）借りると（Ca:橙赤）する（Sr:紅色・演習対象外）馬力（Ba:黄緑）')) {
+  throw new Error('the complete mnemonic must identify all color labels and disclose that Sr is outside this six-metal practice');
 }
 
 console.log('Flame reaction visual verified: all six salt labels, flame colors, accessible descriptions, and selected-state behavior agree.');

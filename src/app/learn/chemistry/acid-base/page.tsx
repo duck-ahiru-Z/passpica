@@ -167,9 +167,12 @@ export default function AcidBasePage() {
       </div>
 
       <section className="retro-box bg-slate-50 p-4 space-y-2">
-        <h2 className="font-bold">関連する計算演習</h2>
-        <p className="text-slate-600">指示薬の変色を確認したら、反応式の係数比を使う中和滴定の濃度計算にも挑戦できます。</p>
+        <h2 className="font-bold">関連する演習</h2>
+        <p className="text-slate-600">強酸は pH=−log[H⁺]、強塩基は pOH=−log[OH⁻] と pH+pOH=14（25℃）で求めます。弱酸・弱塩基は電離平衡からpHを求める計算も練習できます。</p>
+        <Link href="/learn/chemistry/indicator-drill" className="retro-btn-classic inline-flex mr-2">中和指示薬の色判定を練習する →</Link>
         <Link href="/learn/chemistry/titration-drill" className="retro-btn-classic inline-flex">中和滴定の濃度計算を練習する →</Link>
+        <Link href="/learn/chemistry/mole-calculation-drill" className="retro-btn-classic inline-flex">酸・塩基のpH計算を練習する →</Link>
+        <Link href="/learn/chemistry/weak-electrolyte-visual" className="retro-btn-classic inline-flex">弱酸・弱塩基の電離平衡を見る →</Link>
       </section>
 
     </div>

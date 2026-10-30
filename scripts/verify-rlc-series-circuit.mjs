@@ -48,6 +48,8 @@ for (const frequency of [10, 15, 25, 50, 90, 120]) {
   const state = calculateRlcSeriesState({ ...resonant, frequency });
   close(state.impedance, Math.hypot(100, state.inductiveReactance - state.capacitiveReactance));
   close(state.currentPeak * state.impedance, 50);
+  close(state.averagePower, state.currentPeak ** 2 * 100 / 2);
+  close(state.averagePower, 50 ** 2 * 100 / (2 * state.impedance ** 2));
   assert.ok(state.currentPeak <= resonant.currentPeak + 1e-9, 'resonance must maximize current for the same R, L, C, and voltage');
 }
 
