@@ -1627,7 +1627,7 @@ export default function PseudoLangPage() {
               <span className="text-slate-500 text-xs font-mono">editor.dncl</span>
             </div>
 
-            <div className="flex flex-grow relative font-mono text-sm sm:text-base transition-colors">
+            <div className="flex flex-grow min-h-0 min-w-0 relative font-mono text-sm sm:text-base transition-colors">
               {isDebugging ? (
                 <div className="w-full h-full overflow-auto editor-scrollbar py-2 text-slate-800" style={{ lineHeight: '1.6' }}>
                   {code.split('\n').map((line, i) => (
@@ -1657,7 +1657,7 @@ export default function PseudoLangPage() {
                     onChange={(e) => { updateCode(e.target.value); }}
                     onKeyDown={handleEditorKeyDown}
                     onScroll={handleScroll}
-                    className="flex-grow bg-white text-slate-800 p-4 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 resize-none whitespace-pre overflow-auto editor-scrollbar caret-blue-600"
+                    className="flex-grow min-h-0 min-w-0 bg-white text-slate-800 p-4 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-500 resize-none whitespace-pre overflow-auto editor-scrollbar caret-blue-600"
                     style={{ lineHeight: '1.6' }}
                     placeholder="ここに擬似言語コードを入力してください..."
                     spellCheck="false"
