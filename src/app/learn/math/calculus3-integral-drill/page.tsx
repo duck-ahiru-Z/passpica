@@ -5,11 +5,12 @@ import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { generateIntegralProblem, getIntegralExplanation, integralLabels, integralPatterns, isIntegralAnswerCorrect, isIntegralStrategyValid, type IntegralMode, type IntegralPattern, type IntegralProblem } from '@/src/lib/calculus3Integrals';
+import { createIntegralProblemPicker, getIntegralExplanation, integralLabels, integralPatterns, isIntegralAnswerCorrect, isIntegralStrategyValid, type IntegralMode, type IntegralPattern, type IntegralProblem } from '@/src/lib/calculus3Integrals';
 
 type Pattern = IntegralPattern;
 type Mode = IntegralMode;
 type Problem = IntegralProblem;
+const picker = createIntegralProblemPicker();
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   return <span dangerouslySetInnerHTML={{ __html: katex.renderToString(math, { displayMode: block, throwOnError: false }) }} />;
@@ -17,12 +18,12 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 
 export default function Calculus3IntegralDrillPage() {
   const [mode, setMode] = useState<Mode>('mix');
-  const [problem, setProblem] = useClientGeneratedState<Problem>(() => generateIntegralProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<Problem>(() => picker.next('mix'));
   const [strategy, setStrategy] = useState<Pattern | ''>('');
   const [answer, setAnswer] = useState('');
   const [checked, setChecked] = useState(false);
   const next = (selectedMode: Mode = mode) => {
-    setProblem(generateIntegralProblem(selectedMode));
+    setProblem(picker.next(selectedMode));
     setStrategy(selectedMode === 'mix' ? '' : selectedMode);
     setAnswer('');
     setChecked(false);

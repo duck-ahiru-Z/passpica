@@ -154,6 +154,9 @@ export default function CompletingSquareDrillPage() {
 
   if (!problem) return <main className="max-w-4xl mx-auto px-4 py-8 text-slate-500">問題を準備しています…</main>;
 
+  const vertexX = problem.P.den === 1 ? String(-problem.P.num) : `${-problem.P.num}/${problem.P.den}`;
+  const vertexY = problem.Q.den === 1 ? String(problem.Q.num) : `${problem.Q.num}/${problem.Q.den}`;
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
@@ -206,7 +209,7 @@ export default function CompletingSquareDrillPage() {
                 <input type="text" aria-label="二次項の係数 a" className="w-10 border p-1 text-center bg-yellow-50" value={ansA} onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="a" />
                 <span className="mx-1">(</span>
                 <span>x</span>
-                <select value={ansPSign} onChange={e => { setAnsPSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
+                <select aria-label="平方内の符号" value={ansPSign} onChange={e => { setAnsPSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
                   <option value="+">+</option>
                   <option value="-">-</option>
                 </select>
@@ -216,7 +219,7 @@ export default function CompletingSquareDrillPage() {
                   <input type="number" aria-label="平方内の分数の分母" className="w-10 border p-1 text-center bg-gray-50" value={ansPDen} onChange={e => { setAnsPDen(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="1" />
                 </div>
                 <span className="mx-1">)<sup>2</sup></span>
-                <select value={ansQSign} onChange={e => { setAnsQSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
+                <select aria-label="定数項の符号" value={ansQSign} onChange={e => { setAnsQSign(e.target.value as '+'|'-'); setHasChecked(false); setIsCorrect(false); }} className="mx-1 border p-1 bg-white">
                   <option value="+">+</option>
                   <option value="-">-</option>
                 </select>
@@ -277,6 +280,8 @@ export default function CompletingSquareDrillPage() {
                 ref={canvasRef} 
                 width={300} 
                 height={200} 
+                role="img"
+                aria-label={`二次関数のグラフ。${problem.eq}。頂点は (${vertexX}, ${vertexY})${hasChecked ? '。対称軸と頂点を表示中' : ''}`}
                 className="border border-gray-300 bg-white shadow-sm w-full max-w-full h-auto"
               />
             </div>

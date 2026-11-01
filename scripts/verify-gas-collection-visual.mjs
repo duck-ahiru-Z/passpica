@@ -47,6 +47,8 @@ for (const requirement of [
   '水に難溶・反応しない',
   '空気より軽い',
   '空気より重い',
+  'href="/learn/chemistry/gas-collection-drill"',
+  '気体の捕集法を問題で練習する →',
 ]) {
   if (!page.includes(requirement)) throw new Error(`gas collection visual is missing synchronized or accessible content: ${requirement}`);
 }

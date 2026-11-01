@@ -15,6 +15,9 @@ if (page.includes('左下がり')) {
 if (!page.includes('正の傾き (右上がり／右傾斜)') || !page.includes('M 90 85 Q 83 50 78 15') || !page.includes('M 90 85 Q 96 50 102 15')) {
   throw new Error('the water and CO2 melting-curve SVG paths must match their opposite slope conventions');
 }
+if (!page.includes('<path d="M 25 125 Q 60 115 90 85" fill="none" stroke="#0f172a" strokeWidth="1.5" />\r\n              \r\n              {/* 蒸気圧曲線（三重点と臨界点の間） */}\r\n              <path d="M 90 85 Q 120 70 150 40" fill="none" stroke="#0f172a" strokeWidth="1.5" />')) {
+  throw new Error('the sublimation curve must meet the triple point and the vaporization curve must continue from the triple point to the critical point');
+}
 if (!page.includes("aria-pressed={selectedPhase === 'h2o'}") || !page.includes("aria-pressed={selectedPhase === 'co2'}")) {
   throw new Error('the selected phase-diagram tab must be exposed to assistive technology');
 }

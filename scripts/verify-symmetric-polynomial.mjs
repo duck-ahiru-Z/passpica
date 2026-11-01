@@ -7,6 +7,7 @@ const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/symmet
 for (const text of ['実戦練習：対称式 全パターンランダム', '基礎練習：x²＋y²だけ', '基礎練習：x³＋y³だけ', '基礎練習：x²y＋xy²だけ', 'checkSymmetricPolynomialAnswer(problem, ua)', 'parseSymmetricPolynomialAnswer(ansStr)']) {
   assert.ok(page.includes(text), `symmetric polynomial drill UI is missing ${text}`);
 }
+assert.ok(page.includes('aria-label="対称式の値の答え"'), 'answer field needs an accessible name');
 
 function seeded(seed) {
   let state = seed >>> 0;

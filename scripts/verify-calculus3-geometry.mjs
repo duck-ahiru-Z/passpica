@@ -7,8 +7,11 @@ const visualPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/
 if (!/type="radio" name="geometry-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}') || !/disabled=\{!strategy \|\| answer\.trim\(\) === ''\}/.test(drillPage)) {
   throw new Error('geometry drill must expose a single-choice strategy group and require strategy plus answer before checking');
 }
-if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('!valueIsCorrect')) {
+if (!drillPage.includes('role="status" aria-live="polite"') || !drillPage.includes('!strategyIsCorrect') || !drillPage.includes('valueIsCorrect ?')) {
   throw new Error('geometry feedback must announce the result and distinguish strategy from value errors');
+}
+if (!drillPage.includes('方針は合っています。') || !drillPage.includes('数値は合っています。')) {
+  throw new Error('geometry feedback must acknowledge a correct answer dimension when the other dimension is wrong');
 }
 if (!drillPage.includes('isGeometryStrategyValid(problem, strategy)') || !drillPage.includes('getGeometryExplanation(problem, strategy)')) {
   throw new Error('geometry feedback must accept and explain mathematically equivalent y-axis washer and shell methods');
@@ -117,11 +120,13 @@ for (let value = 1; value <= 5; value += 1) {
   if (!isGeometryStrategyValid(washer, 'shell-method') || !isGeometryStrategyValid(shell, 'y-axis-rotation')) {
     throw new Error(`equivalent y-axis rotation methods must both be accepted`);
   }
-  if (isGeometryStrategyValid(washer, 'x-axis-rotation') || isGeometryStrategyValid(shell, 'curve-length')) {
-    throw new Error('unrelated geometry strategies must remain invalid');
+  const diskVolume = generateGeometryProblem('disk-volume', () => (value - 0.5) / 5);
+  if (!isGeometryStrategyValid(diskVolume, 'x-axis-rotation') || isGeometryStrategyValid(shell, 'curve-length')) {
+    throw new Error('the generic disk method must be accepted for y=x² rotation volume, while unrelated strategies remain invalid');
   }
   if (!getGeometryExplanation(washer, 'shell-method').includes('円筒殻法')
-    || !getGeometryExplanation(shell, 'y-axis-rotation').includes('円環')) {
+    || !getGeometryExplanation(shell, 'y-axis-rotation').includes('円環')
+    || !getGeometryExplanation(diskVolume, 'x-axis-rotation').includes('円板法')) {
     throw new Error('accepted alternate method must show its own derivation');
   }
 }

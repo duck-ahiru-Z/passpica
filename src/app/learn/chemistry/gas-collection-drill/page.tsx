@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import {
-  gasCollectionLabels, gasCollectionPatterns, generateGasCollectionProblem,
+  gasCollectionLabels, gasCollectionPatterns, generateGasCollectionProblem, getGasCollectionAcceptedAnswerLabel, isGasCollectionAnswerCorrect,
   type GasCollectionMode, type GasCollectionPattern, type GasCollectionProblem, type GasCollectionMethod,
 } from '@/src/lib/gasCollectionDrill';
 
@@ -26,7 +26,7 @@ export default function GasCollectionDrillPage() {
   };
 
   if (!problem) return <main className="max-w-3xl mx-auto px-4 py-8">問題を準備しています…</main>;
-  const correct = method === problem.pattern;
+  const correct = isGasCollectionAnswerCorrect(problem, method);
   return (
     <main className="max-w-3xl mx-auto px-4 py-8 space-y-4 text-slate-800 font-sans text-sm">
       <div className="flex flex-wrap gap-x-4 gap-y-1">
@@ -66,7 +66,7 @@ export default function GasCollectionDrillPage() {
           <button type="button" onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button>
         </div>
         {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-          {correct ? '正解！' : `正解は「${problem.method}」です。`}
+          {correct ? '正解！' : `正解は「${getGasCollectionAcceptedAnswerLabel(problem)}」です。`}
           <p className="mt-2 font-normal text-slate-700">{problem.explanation}</p>
           <Link href="/learn/chemistry/gas-collection" className="inline-block mt-2 text-blue-700 underline">装置図で捕集法を確認する</Link>
         </div>}

@@ -230,6 +230,7 @@ export default function SigmaCalculationDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="Σの演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsVal(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
@@ -253,6 +254,7 @@ export default function SigmaCalculationDrill() {
                   分数になる場合は 10/11 のようにスラッシュで入力
                 </div>
                 <input 
+                  aria-label="Σ計算の答え"
                   type="text" 
                   className="w-40 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 

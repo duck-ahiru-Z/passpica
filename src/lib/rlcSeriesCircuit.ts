@@ -13,6 +13,7 @@ export type RlcSeriesState = RlcSeriesInput & {
   netReactance: number;
   impedance: number;
   currentPeak: number;
+  averagePower: number;
   voltageLeadAngleRadians: number;
   voltageLeadAngleDegrees: number;
   resonanceFrequency: number;
@@ -32,6 +33,7 @@ export function calculateRlcSeriesState(input: RlcSeriesInput): RlcSeriesState {
   const netReactance = inductiveReactance - capacitiveReactance;
   const impedance = Math.hypot(input.resistance, netReactance);
   const currentPeak = input.voltagePeak / impedance;
+  const averagePower = currentPeak ** 2 * input.resistance / 2;
   const voltageLeadAngleRadians = Math.atan2(netReactance, input.resistance);
 
   return {
@@ -42,6 +44,7 @@ export function calculateRlcSeriesState(input: RlcSeriesInput): RlcSeriesState {
     netReactance,
     impedance,
     currentPeak,
+    averagePower,
     voltageLeadAngleRadians,
     voltageLeadAngleDegrees: voltageLeadAngleRadians * 180 / Math.PI,
     resonanceFrequency: 1 / (2 * Math.PI * Math.sqrt(input.inductance * capacitanceFarads)),

@@ -14,10 +14,17 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 
 type Pattern = BaseNPattern;
 const generateProblem = generateBaseNProblem;
+const strategyOptions: Array<{ pattern: Pattern; label: string }> = [
+  { pattern: 'pattern1', label: '10進数の整数をn進数へ変換する' },
+  { pattern: 'pattern2', label: 'n進数の各桁を位取りで10進数へ直す' },
+  { pattern: 'pattern3', label: 'n進数から10進数を経由してm進数へ直す' },
+  { pattern: 'pattern4', label: '小数部分にnを掛けてn進数へ変換する' },
+];
 
 export default function BaseNConversionDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
   const [problem, setProblem] = useClientGeneratedState(() => generateProblem('mix'));
+  const [selectedStrategy, setSelectedStrategy] = useState<Pattern | ''>('');
   
   const [ansVal, setAnsVal] = useState<string>('');
   
@@ -26,6 +33,7 @@ export default function BaseNConversionDrill() {
 
   const handleNext = (pattern: Pattern | 'mix' = selectedPattern) => {
     setProblem(generateProblem(pattern));
+    setSelectedStrategy('');
     setAnsVal('');
     setHasChecked(false);
     setIsCorrect(false);
@@ -34,7 +42,7 @@ export default function BaseNConversionDrill() {
   const handleCheck = () => {
     if (!problem) return;
     
-    if (ansVal.trim() === problem.a_val) {
+    if (ansVal.trim() === problem.a_val && (selectedPattern !== 'mix' || selectedStrategy === problem.pattern)) {
       setIsCorrect(true);
     } else {
       setIsCorrect(false);
@@ -212,6 +220,7 @@ export default function BaseNConversionDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="n進法変換の演習パターン"
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
@@ -224,14 +233,36 @@ export default function BaseNConversionDrill() {
               </select>
             </div>
 
-            <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[120px] gap-3 text-lg font-bold text-slate-700 text-center">
+            <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 min-h-[120px] text-lg font-bold text-slate-700 text-center leading-relaxed">
               {questionEl}
             </div>
+
+            {selectedPattern === 'mix' && (
+              <fieldset className="mb-6 border border-gray-300 rounded p-3">
+                <legend className="px-1 font-bold text-slate-700">使う変換方法を選んでください</legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {strategyOptions.map(({ pattern, label }) => (
+                    <label key={pattern} className="flex items-center gap-2 rounded border border-gray-200 bg-white p-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="base-n-conversion-strategy"
+                        aria-label={label}
+                        value={pattern}
+                        checked={selectedStrategy === pattern}
+                        onChange={() => { setSelectedStrategy(pattern); setHasChecked(false); setIsCorrect(false); }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             
             <div className="space-y-4">
               <div className="flex items-center justify-center gap-2 text-xl font-bold">
                 <input 
                   type="text" 
+                  aria-label="変換した数値の答え"
                   className="w-32 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansVal} 
                   onChange={e => { setAnsVal(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -262,7 +293,11 @@ export default function BaseNConversionDrill() {
 
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！素晴らしい計算力です。' : '不正解... 解説を確認して仕組みを復習しましょう。'}
+                {isCorrect
+                  ? '正解！素晴らしい計算力です。'
+                  : selectedPattern === 'mix' && selectedStrategy !== problem.pattern
+                    ? '変換方法の選択を確認しましょう。問題に合う手順を見直してください。'
+                    : '不正解... 解説を確認して仕組みを復習しましょう。'}
               </div>
             )}
           </div>

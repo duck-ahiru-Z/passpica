@@ -1,7 +1,7 @@
 import { BalancedRandom } from './balancedRandom.ts';
 import { generateLimitProblem, limitLabels } from './calculus3Limits.ts';
 import { generateDifferentiationProblem, differentiationLabels } from './calculus3Differentiation.ts';
-import { generateIntegralProblem, getIntegralExplanation, integralLabels } from './calculus3Integrals.ts';
+import { createIntegralProblemPicker, getIntegralExplanation, integralLabels } from './calculus3Integrals.ts';
 import { generateGeometryProblem, geometryLabels } from './calculus3Geometry.ts';
 import { generateDifferentialEquationProblem, differentialEquationLabels } from './calculus3DifferentialEquations.ts';
 import { generateCurveProblem, curveLabels } from './calculus3CurveAnalysis.ts';
@@ -34,6 +34,65 @@ const areaOptions: Record<Calculus3Area, readonly string[]> = {
   geometry: [...new Set(Object.values(geometryLabels))],
   'differential-equation': [...new Set(Object.values(differentialEquationLabels))],
 };
+const integralPicker = createIntegralProblemPicker();
+
+function qualifiedAnswer(area: Calculus3Area, answer: string): string {
+  return `${areaLabels[area]}：${answer}`;
+}
+
+function randomItem<T>(items: readonly T[], random: () => number): T {
+  const sample = random();
+  const index = Number.isFinite(sample)
+    ? Math.min(items.length - 1, Math.max(0, Math.floor(sample * items.length)))
+    : 0;
+  return items[index];
+}
+
+function shuffle<T>(items: T[], random: () => number): T[] {
+  for (let index = items.length - 1; index > 0; index -= 1) {
+    const sample = random();
+    const swapIndex = Number.isFinite(sample)
+      ? Math.min(index, Math.max(0, Math.floor(sample * (index + 1))))
+      : 0;
+    [items[index], items[swapIndex]] = [items[swapIndex], items[index]];
+  }
+  return items;
+}
+
+function addCrossAreaChoices(
+  question: Calculus3Question,
+  random: () => number,
+  answerPositionPicker: BalancedRandom<number>,
+): Calculus3Question {
+  const acceptedAnswers = question.acceptedAnswers ?? [question.answer];
+  const qualifiedAcceptedAnswers = acceptedAnswers.map(answer => qualifiedAnswer(question.area, answer));
+  const localDistractors = areaOptions[question.area].filter(option => !acceptedAnswers.includes(option));
+  const distractors = [qualifiedAnswer(question.area, randomItem(localDistractors, random))];
+
+  for (const area of areas) {
+    if (area === question.area) continue;
+    distractors.push(qualifiedAnswer(area, randomItem(areaOptions[area], random)));
+  }
+
+  const shuffledDistractors = shuffle(distractors, random);
+  const correctStart = answerPositionPicker.next(random);
+  const options = [
+    ...shuffledDistractors.slice(0, correctStart),
+    ...qualifiedAcceptedAnswers,
+    ...shuffledDistractors.slice(correctStart),
+  ];
+  const alternativeExplanations = question.alternativeExplanations
+    ? Object.fromEntries(Object.entries(question.alternativeExplanations).map(([answer, explanation]) => [qualifiedAnswer(question.area, answer), explanation]))
+    : undefined;
+
+  return {
+    ...question,
+    options,
+    answer: qualifiedAnswer(question.area, question.answer),
+    acceptedAnswers: qualifiedAcceptedAnswers,
+    alternativeExplanations,
+  };
+}
 
 function createQuestion(area: Calculus3Area, random: () => number): Calculus3Question {
   switch (area) {
@@ -69,7 +128,7 @@ function createQuestion(area: Calculus3Area, random: () => number): Calculus3Que
       };
     }
     case 'integral': {
-      const problem = generateIntegralProblem('mix', random);
+      const problem = integralPicker.next('mix', random);
       return {
         area, areaLabel: areaLabels[area], pattern: `${area}:${problem.pattern}`,
         prompt: '次の積分を計算するとき、最初に使う方法は？', expression: problem.expression,
@@ -122,11 +181,13 @@ function createQuestion(area: Calculus3Area, random: () => number): Calculus3Que
 export function createCalculus3MixedQuestionPicker() {
   const areaPicker = new BalancedRandom(areas);
   const positionPickers = new Map(areas.map(area => [area, new BalancedRandom(Array.from({ length: areaOptions[area].length }, (_, index) => index))]));
+  const allModeAnswerPositionPicker = new BalancedRandom(Array.from({ length: areas.length + 1 }, (_, index) => index));
 
   return {
     next(mode: Calculus3MixedMode = 'all', random = Math.random): Calculus3Question {
       const area = mode === 'all' ? areaPicker.next(random) : mode;
       const question = createQuestion(area, random);
+      if (mode === 'all') return addCrossAreaChoices(question, random, allModeAnswerPositionPicker);
       const correctPosition = positionPickers.get(area)!.next(random);
       const distractors = question.options.filter(option => option !== question.answer);
       for (let index = distractors.length - 1; index > 0; index -= 1) {

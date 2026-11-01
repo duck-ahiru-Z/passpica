@@ -1,4 +1,17 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { createSequenceProblem, getSequenceGeneralTerm, getSequenceTerms, sequencePatterns } from '../src/lib/sequenceRecurrence.ts';
+
+const sequencePage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/sequence-drill/page.tsx'), 'utf8');
+for (const label of ['数列の演習モード', '一般項の係数 C', '一般項の公比 p', '一般項の定数 α']) {
+  if (!sequencePage.includes(`aria-label="${label}"`)) throw new Error(`sequence drill must expose ${label} to assistive technology`);
+}
+if (!sequencePage.includes('role="img" aria-label={`漸化式の階段図。') || !sequencePage.includes('role="status" aria-live="polite"')) {
+  throw new Error('sequence graph and answer feedback must be announced accessibly');
+}
+if (!sequencePage.includes('aria-expanded={showExplanation} aria-controls="sequence-explanation"') || !sequencePage.includes('aria-expanded={showGraph} aria-controls="sequence-cobweb-graph"')) {
+  throw new Error('sequence explanation and graph toggles must expose their expanded state');
+}
 
 let randomState = 0x5e91c0de;
 const seededRandom = () => {

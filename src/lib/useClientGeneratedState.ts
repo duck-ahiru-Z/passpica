@@ -8,8 +8,7 @@ export function useClientGeneratedState<T>(factory: () => T): [T | null, Dispatc
   const [value, setValue] = useState<T | null>(null);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => setValue(factoryRef.current()));
-    return () => window.cancelAnimationFrame(frame);
+    setValue(factoryRef.current());
   }, []);
 
   return [value, setValue];

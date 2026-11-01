@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import { parseStrictPositiveInteger } from '../src/lib/strictPositiveInteger.ts';
 import { generateTrigSynthesisProblem } from '../src/lib/trigSynthesis.ts';
 
@@ -59,3 +60,24 @@ for (const pattern of patterns) {
   }
 }
 console.log('Trigonometric synthesis generation verified: 2,000 consistent problems across all patterns');
+
+const page = fs.readFileSync('src/app/learn/math/trig-synthesis-drill/page.tsx', 'utf8');
+assertIncludes(page, 'role="img" aria-label={graphDescription}', 'coordinate graph must expose a dynamic text description');
+for (const label of ['振幅の平方根の外側の係数', '振幅の平方根の内側の数', '偏角 alpha', 'cos alpha の値', 'sin alpha の値']) {
+  assertIncludes(page, `aria-label="${label}"`, `answer controls must be named: ${label}`);
+}
+
+function assertIncludes(source, expected, message) {
+  if (!source.includes(expected)) throw new Error(message);
+}
+
+let mixedSeed = 0x243f6a88;
+const mixedRandom = () => {
+  mixedSeed = (Math.imul(mixedSeed, 1664525) + 1013904223) >>> 0;
+  return mixedSeed / 4294967296;
+};
+const mixedQuestions = Array.from({ length: 20_000 }, () => generateTrigSynthesisProblem('mix', mixedRandom));
+const mixedCounts = new Map(['pattern1', 'pattern2', 'pattern3', 'pattern4'].map(pattern => [pattern, mixedQuestions.filter(question => question.pattern === pattern).length]));
+if ([...mixedCounts.values()].some(count => count !== 5_000)) throw new Error(`Mixed pattern frequency is uneven: ${JSON.stringify(Object.fromEntries(mixedCounts))}`);
+if (mixedQuestions.some((question, index) => index > 0 && question.pattern === mixedQuestions[index - 1].pattern)) throw new Error('Mixed trigonometric synthesis questions repeat adjacent patterns');
+console.log('Trigonometric synthesis mixed mode verified: 20,000 generated questions, exactly 5,000 per pattern, no adjacent repeats.');

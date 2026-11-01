@@ -381,6 +381,7 @@ export default function HyperbolaParabolaDrill() {
         <Link href="/drill" className="text-blue-600 hover:underline mb-2 inline-block">
           ← 無限演習ポータルへ戻る
         </Link>
+        <Link href="/learn/math/conic-sections-visual" className="ml-4 text-blue-600 hover:underline">楕円・双曲線・放物線ビジュアルへ →</Link>
         <h1 className="text-xl md:text-2xl font-bold text-slate-900 mb-2 border-b border-gray-300 pb-2">
           2次曲線の焦点と方程式（双曲線・放物線）ドリル
         </h1>

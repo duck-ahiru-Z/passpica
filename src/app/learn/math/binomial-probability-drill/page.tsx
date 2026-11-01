@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import FractionRootInput, { FractionRootValue, defaultFractionRoot, checkFractionRoot } from '@/src/components/math/FractionRootInput';
-import { atLeastOneSuccessProbability, generateBinomialProblem, type BinomialPattern, type BinomialProblem } from '@/src/lib/binomialProbability';
+import { atLeastOneSuccessProbability, generateBinomialProblem, getBinomialStrategy, type BinomialPattern, type BinomialProblem, type BinomialStrategy } from '@/src/lib/binomialProbability';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -16,10 +16,16 @@ function MathEq({ math, block = false }: { math: string; block?: boolean }) {
 type Pattern = BinomialPattern;
 type ProblemData = BinomialProblem;
 const generateProblem = generateBinomialProblem;
+const strategyOptions: Array<{ strategy: BinomialStrategy; label: string }> = [
+  { strategy: 'exact-successes', label: '二項分布の式で「ちょうどr回」を数える' },
+  { strategy: 'complement', label: '余事象で「1−一度も起きない確率」を求める' },
+  { strategy: 'decisive-final-game', label: '最終戦で勝ち、直前までの勝数を数える' },
+];
 
 export default function BinomialProbabilityDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
   const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [selectedStrategy, setSelectedStrategy] = useState<BinomialStrategy | ''>('');
   
   const [ansVal, setAnsVal] = useState<FractionRootValue>(defaultFractionRoot);
   
@@ -93,7 +99,7 @@ export default function BinomialProbabilityDrill() {
       
       ctx.fillStyle = '#64748b';
       ctx.font = '11px sans-serif';
-      ctx.fillText(`この並び方が \\( _{${problem.n}}\\mathrm{C}_{${problem.r}} \\) 通りある`, W/2, startY + boxW + 20);
+      ctx.fillText(`並び方：${problem.n}C${problem.r} 通り`, W/2, startY + boxW + 20);
       
     } else if (problem.pattern === 'pattern3') {
       ctx.fillText(`少なくとも 1 回成功する確率`, W/2, 20);
@@ -133,6 +139,7 @@ export default function BinomialProbabilityDrill() {
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
+    setSelectedStrategy('');
     setAnsVal(defaultFractionRoot);
     setHasChecked(false);
     setIsCorrect(false);
@@ -143,7 +150,8 @@ export default function BinomialProbabilityDrill() {
     
     // Check if the answer matches exactly
     // since root is 1, checkFractionRoot handles it.
-    const isOk = checkFractionRoot(ansVal, 1, problem.ans_num, 1, problem.ans_den);
+    const isOk = checkFractionRoot(ansVal, 1, problem.ans_num, 1, problem.ans_den)
+      && (selectedPattern !== 'mix' || selectedStrategy === getBinomialStrategy(problem.pattern));
     
     setIsCorrect(isOk);
     setHasChecked(true);
@@ -183,11 +191,13 @@ export default function BinomialProbabilityDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="反復試行の演習パターン"
                 value={selectedPattern}
                 onChange={e => {
                   const nextPattern = e.target.value as Pattern | 'mix';
                   setSelectedPattern(nextPattern);
                   setProblem(generateProblem(nextPattern));
+                  setSelectedStrategy('');
                   setAnsVal(defaultFractionRoot);
                   setHasChecked(false);
                   setIsCorrect(false);
@@ -229,6 +239,27 @@ export default function BinomialProbabilityDrill() {
                 </p>
               )}
             </div>
+
+            {selectedPattern === 'mix' && (
+              <fieldset className="mb-6 border border-gray-300 rounded p-3">
+                <legend className="px-1 font-bold text-slate-700">使う考え方を選んでください</legend>
+                <div className="grid grid-cols-1 gap-2">
+                  {strategyOptions.map(({ strategy, label }) => (
+                    <label key={strategy} className="flex items-center gap-2 rounded border border-gray-200 bg-white p-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="binomial-strategy"
+                        aria-label={label}
+                        value={strategy}
+                        checked={selectedStrategy === strategy}
+                        onChange={() => { setSelectedStrategy(strategy); setHasChecked(false); setIsCorrect(false); }}
+                      />
+                      <span>{label}</span>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            )}
             
             <div className="space-y-4">
               <div className="flex flex-col items-center justify-center gap-2">
@@ -254,7 +285,11 @@ export default function BinomialProbabilityDrill() {
 
             {hasChecked && (
               <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！素晴らしい計算スピードです。' : '不正解... 解説を見て約分や立式を確認しよう。'}
+                {isCorrect
+                  ? '正解！素晴らしい計算スピードです。'
+                  : selectedPattern === 'mix' && selectedStrategy !== getBinomialStrategy(problem.pattern)
+                    ? '考え方の選択を確認しましょう。問題に合う方法を見直してください。'
+                    : '不正解... 解説を見て約分や立式を確認しよう。'}
               </div>
             )}
           </div>

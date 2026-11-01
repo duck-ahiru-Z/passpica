@@ -60,7 +60,7 @@ export function generateBaseNProblem(selectedPattern: BaseNMode, random = Math.r
     const base = allowedBases[Math.floor(random() * allowedBases.length)];
     const firstDigit = Math.floor(random() * base);
     const secondDigit = Math.floor(random() * (base - 1)) + 1;
-    const value = firstDigit / base + secondDigit / (base * base);
+    const value = Number((firstDigit / base + secondDigit / (base * base)).toPrecision(12));
     return {
       pattern,
       n: base,

@@ -4,48 +4,17 @@ import { useState } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseRationalParts, rationalEquals } from '@/src/lib/rationalInput';
+import { generateRootsCoefficientsProblem, type RootsCoefficientsMode, type RootsCoefficientsProblem } from '@/src/lib/rootsCoefficients';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
   return <span dangerouslySetInnerHTML={{ __html: html }} />;
 }
 
-function gcd(x: number, y: number): number {
-  x = Math.abs(x);
-  y = Math.abs(y);
-  while (y) {
-    const t = y;
-    y = x % y;
-    x = t;
-  }
-  return x;
-}
-
-type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
-const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
-
-interface ProblemData {
-  pattern: Pattern;
-  a: number;
-  b: number;
-  c: number;
-  ansNum: number;
-  ansDen: number;
-  questionText: string;
-}
-
-function getRand(min: number, max: number, nonZero = true) {
-  let v = 0;
-  while (true) {
-    v = Math.floor(Math.random() * (max - min + 1)) + min;
-    if (nonZero && v === 0) continue;
-    break;
-  }
-  return v;
-}
+type Pattern = RootsCoefficientsMode;
+type ProblemData = RootsCoefficientsProblem;
 
 function formatPoly(a: number, b: number, c: number) {
   let s = "";
@@ -64,73 +33,9 @@ function formatPoly(a: number, b: number, c: number) {
   return s + "=0";
 }
 
-function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
-  const p = selectedPattern === 'mix' 
-    ? mixedPatternPicker.next()
-    : selectedPattern;
-
-  while (true) {
-    let a = getRand(-4, 4);
-    const b = getRand(-5, 5, false);
-    const c = getRand(-5, 5);
-
-    if (p === 'pattern2') {
-      a = 1; // 3乗は大きくなるのでa=1に固定
-    }
-    if (p === 'pattern3') {
-      // 1/a + 1/b requires c != 0
-      if (c === 0) continue;
-    }
-
-    let num = 0;
-    let den = 1;
-    let text = "";
-
-    if (p === 'pattern1') {
-      // a^2 + b^2 = (b^2 - 2ac)/a^2
-      num = b * b - 2 * a * c;
-      den = a * a;
-      text = "\\alpha^2 + \\beta^2";
-    } else if (p === 'pattern2') {
-      // a^3 + b^3 = (-b^3 + 3abc)/a^3
-      num = -b * b * b + 3 * a * b * c;
-      den = a * a * a;
-      text = "\\alpha^3 + \\beta^3";
-    } else if (p === 'pattern3') {
-      // 1/a + 1/b = -b/c
-      // OR b/a + a/b = (a^2+b^2)/ab = (b^2-2ac)/(ac)
-      if (Math.random() > 0.5) {
-        num = -b;
-        den = c;
-        text = "\\frac{1}{\\alpha} + \\frac{1}{\\beta}";
-      } else {
-        num = b * b - 2 * a * c;
-        den = a * c;
-        text = "\\frac{\\beta}{\\alpha} + \\frac{\\alpha}{\\beta}";
-      }
-    } else if (p === 'pattern4') {
-      // (a-b)^2 = (b^2 - 4ac)/a^2
-      num = b * b - 4 * a * c;
-      den = a * a;
-      text = "(\\alpha - \\beta)^2";
-    }
-
-    // reduce fraction
-    const g = gcd(num, den);
-    num /= g;
-    den /= g;
-    if (den < 0) {
-      num = -num;
-      den = -den;
-    }
-
-    return { pattern: p, a, b, c, ansNum: num, ansDen: den, questionText: text };
-  }
-}
-
 export default function RootsCoefficientsDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
-  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateRootsCoefficientsProblem('mix'));
   
   const [ansSign, setAnsSign] = useState<'+' | '-'>('+');
   const [ansNumStr, setAnsNumStr] = useState<string>('');
@@ -140,7 +45,7 @@ export default function RootsCoefficientsDrill() {
   const [isCorrect, setIsCorrect] = useState(false);
 
   const handleNext = () => {
-    setProblem(generateProblem(selectedPattern));
+    setProblem(generateRootsCoefficientsProblem(selectedPattern));
     setAnsSign('+');
     setAnsNumStr('');
     setAnsDenStr('');
@@ -221,7 +126,7 @@ export default function RootsCoefficientsDrill() {
   if (problem.ansNum < 0 && problem.ansDen !== 1) ansDisplay = `-\\frac{${Math.abs(problem.ansNum)}}{${problem.ansDen}}`;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
+    <div className="max-w-6xl mx-auto px-4 py-8 text-slate-800 font-sans text-xs">
       
       <div className="mb-6">
         <Link href="/drill" className="text-blue-600 hover:underline mb-2 inline-block">
@@ -235,7 +140,7 @@ export default function RootsCoefficientsDrill() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* 左カラム：問題と解答入力 */}
         <div className="space-y-6">
@@ -245,8 +150,9 @@ export default function RootsCoefficientsDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="練習する解と係数のパターン"
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsSign('+'); setAnsNumStr(''); setAnsDenStr(''); setHasChecked(false); setIsCorrect(false); }}
+                onChange={e => { const pattern = e.target.value as Pattern; setSelectedPattern(pattern); setProblem(generateRootsCoefficientsProblem(pattern)); setAnsSign('+'); setAnsNumStr(''); setAnsDenStr(''); setHasChecked(false); setIsCorrect(false); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -257,9 +163,10 @@ export default function RootsCoefficientsDrill() {
               </select>
             </div>
 
-            <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center gap-4 text-base font-bold text-slate-700 text-center">
-              2次方程式 <MathEq math={eqStr} /> の2つの解を <MathEq math="\\alpha, \\beta" /> とするとき、次の式の値を求めよ。<br/>
-              <span className="text-2xl text-blue-700 my-2"><MathEq math={problem.questionText} /></span>
+            <div className="bg-white p-5 sm:p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center gap-4 text-base font-bold text-slate-700 text-center">
+              <p>2次方程式 <MathEq math={eqStr} /> の2つの解を <MathEq math="\alpha, \beta" /> とするとき、</p>
+              <p>次の式の値を求めよ。</p>
+              <div className="text-2xl text-blue-700 py-2 overflow-x-auto"><MathEq math={problem.questionText} /></div>
             </div>
             
             <div className="space-y-4">
@@ -267,6 +174,7 @@ export default function RootsCoefficientsDrill() {
                 <div className="text-gray-500 font-bold mb-2">整数になる場合は分母を空欄または1にしてください</div>
                 <div className="flex items-center gap-2">
                   <select 
+                    aria-label="答えの符号"
                     className="border-b-2 bg-transparent outline-none text-2xl font-bold focus:border-blue-500 pb-1"
                     value={ansSign}
                     onChange={(e) => { setAnsSign(e.target.value as '+' | '-'); setHasChecked(false); setIsCorrect(false); }}
@@ -278,6 +186,7 @@ export default function RootsCoefficientsDrill() {
                   <div className="flex flex-col gap-1 items-center">
                     <input 
                       type="number" 
+                      aria-label="答えの分子"
                       className="w-16 bg-transparent outline-none text-center font-bold text-xl text-slate-800" 
                       value={ansNumStr} 
                       onChange={e => { setAnsNumStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -286,6 +195,7 @@ export default function RootsCoefficientsDrill() {
                     <div className="w-full h-0.5 bg-slate-800"></div>
                     <input 
                       type="number" 
+                      aria-label="答えの分母"
                       className="w-16 bg-transparent outline-none text-center font-bold text-xl text-slate-800" 
                       value={ansDenStr} 
                       onChange={e => { setAnsDenStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -312,7 +222,7 @@ export default function RootsCoefficientsDrill() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {isCorrect ? '正解！見事な式変形です。' : '不正解... 解と係数の関係式を確認しましょう。'}
               </div>
             )}

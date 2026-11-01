@@ -39,6 +39,13 @@ if (!page.includes('<ul className="list-disc pl-5 text-gray-600 text-[11px] spac
 if (!page.includes('role="img" aria-label={`分液漏斗の層の図。上層エーテルには${step.etherLayer.join')) {
   throw new Error('The changing separatory-funnel diagram must expose a description of its current layers.');
 }
+if (!page.includes('clipPath id="funnel-liquid-clip"')
+  || !page.includes('clipPath="url(#funnel-liquid-clip)"')
+  || !page.includes('currentStepIdx === 0 ? (')
+  || !page.includes('エーテル溶液</text>')
+  || !page.includes('rect x="35" y="75" width="90" height="49" fill="#93c5fd"')) {
+  throw new Error('The initial ether solution and later aqueous layers must fill the separatory funnel interior with the correct stage-dependent layout.');
+}
 for (const control of ['onClick={handlePrev}', 'onClick={handleNext}', 'onClick={handleReset}']) {
   if (!page.includes(control)) throw new Error(`Organic extraction visualization is missing a navigation control: ${control}`);
 }

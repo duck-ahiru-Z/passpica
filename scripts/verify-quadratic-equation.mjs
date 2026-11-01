@@ -25,6 +25,9 @@ for (const pattern of quadraticEquationPatterns) {
     const problem = generateQuadraticEquationProblem(pattern, random);
     assert.equal(problem.pattern, pattern);
     assert.ok(problem.expression.includes('=') && problem.explanation.trim());
+    if (pattern === 'factorization') {
+      assert.notEqual(problem.coefficients[1], 0, 'factorization items should not duplicate the direct square-root pattern x² = k');
+    }
     if (pattern === 'quadratic-formula') {
       const [, b] = problem.coefficients;
       assert.ok(problem.explanation.includes(`D=(${b})²−`), 'the discriminant explanation must group a negative b before squaring');

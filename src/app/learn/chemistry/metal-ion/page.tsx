@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 interface Step {
   id: number;
+  fractionLabel: string;
   reagent: string;
   reagentFormula: string;
   precipitates: string[];
@@ -18,6 +19,7 @@ interface Step {
 const STEPS: Step[] = [
   {
     id: 0,
+    fractionLabel: '試料溶液',
     reagent: '初期状態',
     reagentFormula: '-',
     precipitates: [],
@@ -29,6 +31,7 @@ const STEPS: Step[] = [
   },
   {
     id: 1,
+    fractionLabel: '試料溶液',
     reagent: '① 希塩酸を静かに加える',
     reagentFormula: 'HCl',
     precipitates: ['AgCl (白色)', 'PbCl2 (白色)'],
@@ -36,33 +39,60 @@ const STEPS: Step[] = [
     precipitateColor: '白色',
     precipitateColors: ['#f8fafc', '#f8fafc'],
     reaction: 'Ag+ + Cl- ➔ AgCl↓ , Pb2+ + 2Cl- ➔ PbCl2↓',
-    explain: '塩化物イオン(Cl-)と結合して難溶性の沈殿を作る銀イオン(Ag+)と鉛イオン(Pb2+)が、塩化物の白色沈殿として同時に沈殿します。★ポイント: 塩化鉛(PbCl2)は熱水に溶けて再電離する性質を持ち、この点で塩化銀(AgCl)と区別できます。'
+    explain: '塩化物イオン(Cl-)と結合して難溶性の沈殿を作る銀イオン(Ag+)と鉛イオン(Pb2+)が、塩化物の白色沈殿として同時に沈殿します。ここではまだ2種類は混合物です。次の熱水抽出と冷却で分けます。'
   },
   {
     id: 2,
-    reagent: '② 濾液を酸性にした状態で、硫化水素を通す',
-    reagentFormula: 'H2S (酸性下)',
-    precipitates: ['CuS (黒色)'],
-    remains: ['Fe3+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
-    precipitateColor: '黒色',
-    precipitateColors: ['#1e293b'],
-    reaction: 'Cu2+ + S2- ➔ CuS↓',
-    explain: '先に希塩酸を加えてAg+とPb2+を塩化物として分離した後の濾液に、酸性条件で硫化水素を通します。酸性下ではS2-濃度が低く保たれるため、この対象イオンの中では溶解度積の小さいCuSだけが沈殿します。Fe3+やZn2+などはこの段階では溶液中に残ります。'
+    fractionLabel: '①で得た塩化物沈殿',
+    reagent: '② 沈殿を熱水で抽出してろ別する',
+    reagentFormula: '熱水',
+    precipitates: ['AgCl (白色)'],
+    remains: ['Pb2+ (熱水抽出液)'],
+    precipitateColor: '白色',
+    precipitateColors: ['#f8fafc'],
+    reaction: 'PbCl2(s) ⇌ Pb2+(aq) + 2Cl-(aq) (熱水)',
+    explain: '①で得たAgClとPbCl2の混合沈殿に熱水を加えます。PbCl2は熱水に溶けますが、AgClは溶けにくく固体として残るため、ろ過するとAgClを残渣、Pb2+を含む熱水抽出液として分けられます。'
   },
   {
     id: 3,
-    reagent: '③ 濾液を煮沸してH2Sを除去後、硝酸を加えて酸化し、過剰のアンモニア水を加える',
+    fractionLabel: '②の熱水抽出液（Pb2+）',
+    reagent: '③ 熱水抽出液を冷却する',
+    reagentFormula: '冷却',
+    precipitates: ['PbCl2 (白色)'],
+    remains: [],
+    precipitateColor: '白色',
+    precipitateColors: ['#f8fafc'],
+    reaction: 'Pb2+(aq) + 2Cl-(aq) ⇌ PbCl2(s) (冷却)',
+    explain: '熱水に溶けたPbCl2は冷却すると溶解度が下がり、白色結晶として再び析出します。ろ過してAgClとは別の画分として回収します。'
+  },
+  {
+    id: 4,
+    fractionLabel: '①で分けた塩化物沈殿のろ液',
+    reagent: '④ ろ液を酸性にして硫化水素を通す',
+    reagentFormula: 'H2S (酸性下)',
+    precipitates: ['CuS (黒色)', 'S (淡黄色)'],
+    remains: ['Fe2+', 'Al3+', 'Zn2+', 'Ca2+', 'Na+'],
+    precipitateColor: '黒色 ＆ 淡黄色',
+    precipitateColors: ['#1e293b', '#fde68a'],
+    reaction: 'Cu2+ + H2S ➔ CuS↓ + 2H+ , 2Fe3+ + H2S ➔ 2Fe2+ + S↓ + 2H+',
+    explain: '①で分けた塩化物沈殿のろ液に戻り、酸性条件で硫化水素を通します。酸性下ではS2-濃度が低く保たれるため、この対象イオンの硫化物では溶解度積の小さいCuSだけが沈殿します。一方、Fe3+はH2Sに還元されてFe2+となり、単体硫黄S（淡黄色）が生じます。Fe2+はこの段階では溶液中に残り、次段階でH2Sを除いて硝酸でFe3+へ酸化してから分離します。'
+  },
+  {
+    id: 5,
+    fractionLabel: '④の酸性H2Sろ液',
+    reagent: '⑤ H2Sを除去し、硝酸で酸化後、過剰のアンモニア水を加える',
     reagentFormula: 'HNO3 ➔ NH3水 (過剰)',
     precipitates: ['Fe(OH)3', 'Al(OH)3'],
     remains: ['[Zn(NH3)4]2+ (溶解)', 'Ca2+', 'Na+'],
     precipitateColor: '赤褐色 ＆ 白色ゲル状',
     precipitateColors: ['#b45309', '#f8fafc'],
     reaction: 'Fe3+ + 3OH- ➔ Fe(OH)3↓ , Al3+ + 3OH- ➔ Al(OH)3↓',
-    explain: '煮沸してH2Sを追い出した後、硝酸で鉄をFe3+に酸化し、アンモニア水を過剰に加えます。塩基性（OH-）になり、鉄とアルミニウムが水酸化物の沈殿として落ちます。★ポイント: 亜鉛イオン(Zn2+)も一度は水酸化物Zn(OH)2を作りますが、アンモニア水を過剰に加えることで無色透明の錯イオン [Zn(NH3)4]2+ となり再溶解します。'
+    explain: '前段階でH2SによりFe2+となった鉄は、煮沸してH2Sを追い出した後、硝酸でFe3+に酸化します。その後アンモニア水を過剰に加えると、塩基性（OH-）になりFe(OH)3とAl(OH)3が沈殿します。★ポイント: 亜鉛イオン(Zn2+)も一度は水酸化物Zn(OH)2を作りますが、アンモニア水を過剰に加えることで無色透明の錯イオン [Zn(NH3)4]2+ となり再溶解します。'
   },
   {
-    id: 4,
-    reagent: '④ 濾液に再び硫化水素を通す',
+    id: 6,
+    fractionLabel: '⑤のアンモニア性ろ液',
+    reagent: '⑥ ろ液に再び硫化水素を通す',
     reagentFormula: 'H2S (塩基性下)',
     precipitates: ['ZnS (白色)'],
     remains: ['Ca2+', 'Na+'],
@@ -72,8 +102,9 @@ const STEPS: Step[] = [
     explain: 'アンモニアによって塩基性になった条件下では、S2-の電離度が大きくなりS2-濃度が十分に高くなります。これにより、酸性下では沈殿しなかった亜鉛イオン(Zn2+)が硫化物(ZnS)として沈殿します。このモデルで対象にしているのはZn2+です。硫化亜鉛(ZnS)は白色を呈するため、色も重要な確認点です。'
   },
   {
-    id: 5,
-    reagent: '⑤ 濾液に炭酸アンモニウム水溶液を加える',
+    id: 7,
+    fractionLabel: '⑥の塩基性H2Sろ液',
+    reagent: '⑦ ろ液に炭酸アンモニウム水溶液を加える',
     reagentFormula: '(NH4)2CO3',
     precipitates: ['CaCO3 (白色)'],
     remains: ['Na+'],
@@ -83,8 +114,9 @@ const STEPS: Step[] = [
     explain: 'この段階では、濾液に残っているカルシウムイオン(Ca2+)に炭酸イオン(CO3 2-)を加え、白色の炭酸カルシウム(CaCO3)として沈殿分離します。'
   },
   {
-    id: 6,
-    reagent: '⑥ 最後に残った濾液の炎色反応を確認する',
+    id: 8,
+    fractionLabel: '⑦のろ液',
+    reagent: '⑧ 最後に残ったろ液の炎色反応を確認する',
     reagentFormula: '炎色反応',
     precipitates: [],
     remains: [],
@@ -129,6 +161,7 @@ export default function MetalIonPage() {
         <p className="text-xs text-gray-500 mt-1">
           各試薬を加えることで、溶液中の多様な金属イオンが溶解度の違い（溶解度積）に基づいて段階的に分離されていく様子をシミュレートします。
         </p>
+        <Link href="/learn/chemistry/metal-ion-drill" className="retro-btn-classic inline-flex mt-3">金属イオンの判別を問題で練習する →</Link>
       </div>
 
       {/* シミュレーション操作バー */}
@@ -172,7 +205,7 @@ export default function MetalIonPage() {
 
           {/* ビーカーと沈殿のフラットSVG */}
           <div className="flex items-center justify-center py-6 w-full relative">
-            <svg width="280" height="240" viewBox="0 0 160 140" className="overflow-visible font-sans" role="img" aria-label={`ステップ${currentStepIdx}。残っているイオン：${step.remains.join('、') || 'なし'}。${step.precipitates.length ? `今回の沈殿：${step.precipitates.join('、')}（${step.precipitateColor}）` : currentStepIdx === STEPS.length - 1 ? '沈殿はなく、ナトリウムの黄色い炎色反応を図示します。' : '今回の沈殿はありません。'}`}>
+            <svg width="280" height="240" viewBox="0 0 160 140" className="overflow-visible font-sans" role="img" aria-label={`ステップ${currentStepIdx}。処理画分：${step.fractionLabel}。残っているイオン：${step.remains.join('、') || 'なし'}。${step.precipitates.length ? `今回の沈殿：${step.precipitates.join('、')}（${step.precipitateColor}）` : currentStepIdx === STEPS.length - 1 ? '沈殿はなく、ナトリウムの黄色い炎色反応を図示します。' : '今回の沈殿はありません。'}`}>
               
               {/* ビーカー */}
               <rect x="35" y="25" width="90" height="80" fill="none" stroke="#334155" strokeWidth="1.5" />
@@ -260,8 +293,9 @@ export default function MetalIonPage() {
           {/* フローチャートミニマップ */}
           <div className="w-full border-t border-gray-200 pt-4 text-center text-[9px] text-gray-500 font-mono flex justify-center gap-1.5 flex-wrap">
             {STEPS.map((s, idx) => (
-              <span 
+                <span
                 key={s.id} 
+                  title={s.reagent}
                 className={`px-1.5 py-0.5 border ${currentStepIdx === idx ? 'border-amber-600 bg-amber-50 font-bold text-slate-800' : 'border-gray-200 text-gray-400'}`}
               >
                 {idx === 0 ? 'Start' : `試薬${idx}`}
@@ -277,11 +311,15 @@ export default function MetalIonPage() {
           {/* 反応式カード */}
           <div className="retro-box space-y-4">
             <h3 className="font-bold border-b border-gray-300 pb-1.5 text-slate-800">
-              ■ {currentStepIdx === STEPS.length - 1 ? '最終確認' : '沈殿生成反応式'}
+              ■ {currentStepIdx === STEPS.length - 1 ? '最終確認' : '反応式・分離の確認'}
             </h3>
 
             <table className="classic-table text-[10px]">
               <tbody>
+                <tr>
+                  <td className="bg-gray-50 font-bold w-24">処理画分</td>
+                  <td className="font-bold text-slate-800">{step.fractionLabel}</td>
+                </tr>
                 <tr>
                   <td className="bg-gray-50 font-bold w-24">{currentStepIdx === STEPS.length - 1 ? '確認方法' : '加えた試薬'}</td>
                   <td className="font-bold text-slate-800 font-mono">{step.reagentFormula}</td>
@@ -297,7 +335,7 @@ export default function MetalIonPage() {
                   <td className="font-bold text-slate-800">{step.precipitateColor}</td>
                 </tr>
                 <tr>
-                  <td className="bg-gray-50 font-bold">{currentStepIdx === STEPS.length - 1 ? '観察内容' : 'イオン反応式'}</td>
+                  <td className="bg-gray-50 font-bold">{currentStepIdx === STEPS.length - 1 ? '観察内容' : '反応式'}</td>
                   <td className="font-mono text-slate-700 break-words">{step.reaction}</td>
                 </tr>
               </tbody>

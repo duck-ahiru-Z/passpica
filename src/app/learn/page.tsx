@@ -39,7 +39,8 @@ const CONTENTS: LearningContent[] = [
     description: '振幅、周期、平行移動のパラメータを自由に動かし、sin/cos/tanのグラフがどのように変形するかを基本形と重ねて比較学習します。',
     difficulty: '標準',
     type: '実験シミュレータ',
-    link: '/learn/math/trigonometry-graph'
+    link: '/learn/math/trigonometry-graph',
+    practiceLink: '/learn/math/trigonometry-graph-drill'
   },
   {
     slug: 'unit-circle-complex',
@@ -67,12 +68,24 @@ const CONTENTS: LearningContent[] = [
   },
 
   {
+    slug: 'conic-sections-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '式と曲線（円錐曲線）',
+    title: '楕円・双曲線・放物線ビジュアル',
+    description: '標準形の係数を動かし、曲線の形と焦点・準線・漸近線がどう変わるかを比べます。楕円、双曲線、放物線の各演習へ直接進めます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/conic-sections-visual',
+    practiceLink: '/learn/math/ellipse-drill'
+  },
+  {
     slug: 'calculus3-limit-visual',
     subject: 'math',
     subjectJp: '数学III',
     field: '極限の直感',
-    title: '極限の直感：sin x / x ビジュアル装置',
-    description: 'xを0へ近づけたとき、sin x / x の値が1へ近づく様子をグラフとスライダーで観察します。',
+    title: '極限の直感：関数・指数型数列ビジュアル',
+    description: 'sin x / x の関数極限と (1+a/n)ⁿ→eᵃ の数列極限を、グラフとスライダーで観察します。',
     difficulty: '標準',
     type: 'ビジュアル図解',
     link: '/learn/math/calculus3-limit-visual',
@@ -96,7 +109,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（面積）',
     title: '定積分と面積ビジュアル装置',
-    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。',
+    description: 'y=x²の下の面積をスライダーで変化させ、積分区間・長方形近似・面積の式を結び付けて理解します。関連する積分ドリルでは基本のべき関数から解法別・ランダムまで練習できます。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/math/calculus3-integral-visual',
@@ -139,6 +152,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/math/calculus3-differentiation-drill'
   },
   {
+    slug: 'calculus3-differential-equation-visual',
+    subject: 'math',
+    subjectJp: '数学III',
+    field: '微分方程式（変数分離・指数成長）',
+    title: '微分方程式の傾き場と指数関数の解',
+    description: 'dy/dx=ky の傾き場と初期値を通る解曲線を重ね、増加・一定・減少の違いを確認します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/math/calculus3-differential-equation-visual',
+    practiceLink: '/learn/math/calculus3-differential-equation-drill'
+  },
+  {
     slug: 'projectile-visual',
     subject: 'physics',
     subjectJp: '物理',
@@ -175,6 +200,114 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/physics/motion-calculation-drill'
   },
   {
+    slug: 'spring-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（ばねの弾性力・弾性エネルギー）',
+    title: 'ばねの伸び・復元力・弾性エネルギービジュアル',
+    description: 'ばねを伸ばす・縮める量を変え、復元力 F=−kx の向きと弾性エネルギー U=½kx² がどう変わるかを図とグラフで確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/spring-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'simple-harmonic-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（単振動）',
+    title: 'ばね振り子の単振動ビジュアル',
+    description: '位相を動かし、変位・速度・加速度と位置／運動エネルギーの交換を一周期で確認します。質量やばね定数による周期の変化も比較できます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/simple-harmonic-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'wave-superposition-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（重ね合わせ・干渉）',
+    title: '波の重ね合わせ・干渉ビジュアル',
+    description: '位相差を動かし、強め合い・打ち消し合いと合成振幅の変化を波形で確かめます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/wave-superposition-visual',
+    practiceLink: '/learn/physics/wave-calculation-drill'
+  },
+  {
+    slug: 'standing-wave-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（定常波・弦と気柱）',
+    title: '定常波・弦と気柱の固有振動',
+    description: '弦・両端開管・片端閉管の端の条件を切り替え、節・腹・波長・固有振動数を図で比べます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/standing-wave-visual',
+    practiceLink: '/learn/physics/standing-wave-drill'
+  },
+  {
+    slug: 'doppler-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（ドップラー効果）',
+    title: 'ドップラー効果・音源と観測者',
+    description: '音源と観測者の動く向きを切り替え、波面間隔と観測振動数の変化を図と式で確かめます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/doppler-visual',
+    practiceLink: '/learn/physics/doppler-drill'
+  },
+  {
+    slug: 'impulse-momentum-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（運動量・力積）',
+    title: '力積と運動量変化のビジュアル',
+    description: '質量・初速度・力の向き・作用時間を変え、力と時間のグラフの面積が運動量の変化になる関係を図と数値で確かめます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/impulse-momentum-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'circular-motion-visual',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '力学（等速円運動）',
+    title: '等速円運動と向心力のビジュアル',
+    description: '円周上の位置を動かし、接線方向の速度と中心向きの向心加速度・向心力、周期や角速度を対応づけます。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/physics/circular-motion-visual',
+    practiceLink: '/learn/physics/motion-calculation-drill'
+  },
+  {
+    slug: 'mole-concept-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '物質量・粒子数・質量・組成・気体',
+    title: 'モルの正体：粒子数・質量・組成・気体体積をつなぐ',
+    description: '物質量を動かし、粒子数・モル質量・元素別の質量割合・標準状態のモル体積を模式図と計算値で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/mole-concept-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
+    slug: 'ideal-gas-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '気体（状態方程式）',
+    title: '理想気体の状態方程式 PV=nRT',
+    description: '物質量・圧力・絶対温度を動かし、状態方程式から求めた体積をピストン図で確かめます。気体の物質量と体積は個別／ランダム演習で練習できます。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/ideal-gas-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
     slug: 'concentration-visual',
     subject: 'chemistry',
     subjectJp: '化学',
@@ -184,6 +317,18 @@ const CONTENTS: LearningContent[] = [
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/chemistry/concentration-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
+    slug: 'stoichiometry-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '化学反応と反応量比',
+    title: '制限試薬・過剰試薬ビジュアルシミュレーター',
+    description: '反応物の物質量を動かし、係数比から制限試薬・生成物の最大量・反応後の残量を図で確かめます。',
+    difficulty: '基礎',
+    type: '実験シミュレータ',
+    link: '/learn/chemistry/stoichiometry-visual',
     practiceLink: '/learn/chemistry/mole-calculation-drill'
   },
 
@@ -220,7 +365,8 @@ const CONTENTS: LearningContent[] = [
     description: 'メタン・ベンゼンなどの基本分子、シクロヘキサンの椅子型・舟型、シス・トランス異性体を3次元で回転・観察できます。',
     difficulty: '標準',
     type: 'ビジュアル図解',
-    link: '/learn/chemistry/organic-3d'
+    link: '/learn/chemistry/organic-3d',
+    practiceLink: '/learn/chemistry/organic-structure-drill'
   },
   // 化学基礎・化学（新設含む）
   {
@@ -272,6 +418,18 @@ const CONTENTS: LearningContent[] = [
     practiceLink: '/learn/chemistry/titration-drill'
   },
   {
+    slug: 'weak-electrolyte-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基（電離平衡）',
+    title: '弱酸・弱塩基の電離平衡ビジュアル',
+    description: '初濃度と電離定数を動かし、平衡時の電離度・粒子の割合・pHがどう変わるかをグラフと模型で確認します。',
+    difficulty: '標準',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/weak-electrolyte-visual',
+    practiceLink: '/learn/chemistry/mole-calculation-drill'
+  },
+  {
     slug: 'titration-drill',
     subject: 'chemistry',
     subjectJp: '化学',
@@ -281,6 +439,18 @@ const CONTENTS: LearningContent[] = [
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/titration-drill'
+  },
+  {
+    slug: 'titration-visual',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基（中和滴定）',
+    title: '中和滴定とpH変化ビジュアル',
+    description: '滴下量スライダーで強酸・強塩基のpH曲線、中和点、フェノールフタレインの変色域を対応づけて観察します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/chemistry/titration-visual',
+    practiceLink: '/learn/chemistry/titration-drill'
   },
   {
     slug: 'metal-ion',
@@ -311,7 +481,7 @@ const CONTENTS: LearningContent[] = [
     subject: 'chemistry',
     subjectJp: '化学',
     field: '無機工業化学（製法）',
-    title: '無機工業化学の製造プロセス流程図',
+    title: '無機工業化学の製造プロセスフロー図',
     description: '接触法・オストワルト法・アンモニアソーダ法の製造ラインの流れと、必要な化学反応式・触媒を整理します。',
     difficulty: '標準',
     type: '製法フロー',
@@ -361,11 +531,23 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '情報I',
     field: '2進数・デジタル表現',
     title: '2進数と2の補数ビジュアル',
-    description: '8ビットを一つずつ切り替え、符号なしと2の補数で値や各ビットの重みがどう変わるかを体験できます。',
+    description: '4〜16ビットを一つずつ切り替え、符号なしと2の補数で表現範囲・値・各ビットの重みがどう変わるかを体験できます。',
     difficulty: '基礎',
     type: 'ビジュアル図解',
     link: '/learn/information/number-representation-visual',
     practiceLink: '/learn/information/number-representation-drill'
+  },
+  {
+    slug: 'pcm-sampling-visual',
+    subject: 'information',
+    subjectJp: '情報I',
+    field: '音声のデジタル化・データ量',
+    title: '標本化とPCMデータ量シミュレーター',
+    description: '標本化周波数・量子化ビット数・チャンネル数・記録時間を切り替え、音声データ量の変化を波形の概念図と計算式で確認します。',
+    difficulty: '基礎',
+    type: 'ビジュアル図解',
+    link: '/learn/information/pcm-sampling-visual',
+    practiceLink: '/learn/information/calculation-drill'
   }
 ];
 

@@ -9,7 +9,7 @@ if (!/type="radio"\s+name="factorization-strategy"/.test(drillPage) || drillPage
 if (!drillPage.includes('setChoice(option); setChecked(false);')) {
   throw new Error('changing a factorization strategy must clear the previous feedback');
 }
-for (const requirement of ["mode === 'mix' ? <fieldset", 'aria-label="因数分解した式"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', '基礎練習：${labels[mode]}の型で因数分解しましょう']) {
+for (const requirement of ["mode === 'mix' && (", 'aria-label="因数分解した式"', '因数の積の形で答えてください。', 'placeholder="例：(x-3)(x+3)"', 'areFactorizationsEquivalent(factorAnswer, question.factorization)', 'const correct = strategyCorrect && factorizationCorrect', "disabled={!factorAnswer.trim() || (mode === 'mix' && !choice)}", '基礎練習：${labels[mode]}の型で因数分解しましょう', '解法選択：{strategyCorrect ?', '因数分解の式：{factorizationCorrect ?']) {
   if (!drillPage.includes(requirement)) throw new Error(`factorization practice is missing fixed-answer behavior: ${requirement}`);
 }
 
@@ -24,6 +24,8 @@ function seededRandom(seed) {
 if (normalizeFactorizationAnswer(' (x−3) (x+3) ') !== normalizeFactorizationAnswer('(x-3)(x+3)')) throw new Error('full-width minus and spacing should be accepted in factorization answers');
 if (normalizeFactorizationAnswer('(x+4)²') !== normalizeFactorizationAnswer('(x+4)^2')) throw new Error('superscript powers should be accepted in factorization answers');
 if (!areFactorizationsEquivalent('(x²−5)(x²−3)', '(x^2-3)(x^2-5)')) throw new Error('commuted quadratic factors must be accepted as equivalent');
+if (!areFactorizationsEquivalent('(x-4)(x-4)', '(x-4)^2')) throw new Error('repeating a factor explicitly must be equivalent to its squared form');
+if (!areFactorizationsEquivalent('(x-4)^2(x+1)', '(x+1)(x-4)(x-4)')) throw new Error('factored expressions with repeated powers must be accepted in either factor order');
 if (!areFactorizationsEquivalent('(4x+3)(x+5)', '(4x+3)(1x+5)')) throw new Error('an omitted coefficient of 1 must be accepted as equivalent');
 if (!areFactorizationsEquivalent('(x^2-3)(x+5)', '(1x^2-3)(1x+5)')) throw new Error('implicit coefficients of 1 must be accepted on linear and quadratic terms');
 if (!areFactorizationsEquivalent('(x-1)(x+4)(x+2)', '(x+2)(x-1)(x+4)')) throw new Error('all reordered groups of factors must be accepted');
@@ -80,10 +82,20 @@ for (const [patternIndex, pattern] of factorizationPatterns.entries()) {
   if (expressions.size < minimumDistinct) throw new Error(`${pattern} exercised only ${expressions.size} distinct expressions; expected at least ${minimumDistinct}`);
 }
 
-const mixed = Array.from({ length: 1000 }, () => generateFactorizationQuestion('mix', fixedRandom).pattern);
+const mixedQuestions = Array.from({ length: 1000 }, () => generateFactorizationQuestion('mix', fixedRandom));
+const mixed = mixedQuestions.map(question => question.pattern);
+for (const question of mixedQuestions) {
+  if (!question.options.includes(question.answer) || !areFactorizationsEquivalent(question.factorization, question.factorization)) {
+    throw new Error(`mixed practice must pair a strategy choice with a factorable answer: ${JSON.stringify(question)}`);
+  }
+  if (areFactorizationsEquivalent(`${question.factorization}x`, question.factorization)) {
+    throw new Error(`mixed practice accepted an incorrect factorization: ${question.factorization}`);
+  }
+}
 for (let start = 0; start < mixed.length; start += factorizationPatterns.length) {
   if (new Set(mixed.slice(start, start + factorizationPatterns.length)).size !== factorizationPatterns.length) throw new Error(`mixed batch ${start} omitted a pattern`);
 }
 if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed mode repeated adjacent patterns');
+
 
 console.log('Factorization strategy verified: 2,500 seeded fixed-mode questions with diverse expressions and 1,000 balanced mixed questions across all five patterns.');

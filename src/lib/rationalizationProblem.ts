@@ -11,6 +11,10 @@ export interface RationalizationProblem {
   answerSign: '+' | '-';
 }
 
+export function isCorrectRationalizationConjugate(problem: RationalizationProblem, selectedSign: '+' | '-'): boolean {
+  return problem.answerSign === selectedSign;
+}
+
 const signPicker = new BalancedRandom<'+' | '-'>(['+', '-']);
 
 export function parseRationalizationInteger(value: string): number | null {

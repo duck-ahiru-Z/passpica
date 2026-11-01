@@ -1,8 +1,9 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import { atLeastOneSuccessProbability, generateBinomialProblem, gcd, nCr } from '../src/lib/binomialProbability.ts';
+import { atLeastOneSuccessProbability, generateBinomialProblem, getBinomialStrategy, gcd, nCr } from '../src/lib/binomialProbability.ts';
 
 const patterns = ['pattern1', 'pattern2', 'pattern3', 'pattern4'];
+assert.deepEqual(patterns.map(getBinomialStrategy), ['exact-successes', 'exact-successes', 'complement', 'decisive-final-game']);
 let seed = 0x3c6ef35f;
 const random = () => {
   seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
@@ -74,8 +75,14 @@ assert.equal(longestRun, 1);
 
 const page = fs.readFileSync('src/app/learn/math/binomial-probability-drill/page.tsx', 'utf8');
 for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `${pattern} must remain independently selectable`);
+assert.ok(page.includes('aria-label="反復試行の演習パターン"'), 'the pattern selector must have an accessible name');
+assert.ok(page.includes("selectedPattern === 'mix' && ("), 'mixed mode must ask for a method choice');
+assert.ok(page.includes('selectedStrategy === getBinomialStrategy(problem.pattern)'), 'mixed answers must validate the selected method');
+assert.ok(page.includes('name="binomial-strategy"'), 'method choices must use an accessible radio group');
 assert.ok(page.includes('const successWidth = barW * successProbability'), 'at-least-one-success diagram must use the generated probability, not a hard-coded segment');
 assert.ok(page.includes('aria-label={graphDescription}'), 'the diagram must have a problem-specific accessible description');
 assert.ok(page.includes('problem.event_label'), 'dice event wording must come from the event probability definition');
+assert.ok(page.includes('並び方：${problem.n}C${problem.r} 通り'), 'canvas combination counts must use readable text rather than raw LaTeX source');
+assert.ok(!page.includes('ctx.fillText(`この並び方が \\( _{${problem.n}}\\mathrm{C}_'), 'canvas must not print unrendered LaTeX commands');
 
 console.log('Repeated-trial probability verified: 4 patterns × 2,000 formula-checked questions; all die-event labels match their probabilities; mixed 20,000 balanced with no adjacent repeats; visual bar matches the answer.');

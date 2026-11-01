@@ -66,6 +66,11 @@ for (const [baseIndex, base] of [2, 4, 5, 8].entries()) {
   }
 }
 assert.equal(exhaustiveFractionalVariants.size, 90, 'fractional conversion must cover all valid two-digit answers across the four supported bases');
+const displayDraws = [0.625, 0.3, 0.1];
+let displayDrawIndex = 0;
+const floatingPointDisplayCase = generateBaseNProblem('pattern4', () => displayDraws[displayDrawIndex++]);
+assert.equal(floatingPointDisplayCase.q_val, 0.24, 'finite decimal values must not expose binary floating-point artifacts');
+assert.equal(String(floatingPointDisplayCase.q_val), '0.24');
 
 const counts = new Map(patterns.map(pattern => [pattern, 0]));
 let previous;
@@ -86,6 +91,12 @@ const page = fs.readFileSync('src/app/learn/math/base-n-conversion-drill/page.ts
 for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `${pattern} must remain independently selectable`);
 assert.ok(page.includes('generateBaseNProblem'), 'the UI must call the tested production generator');
 assert.ok(page.includes('ansVal.trim() === problem.a_val'), 'answers must be checked against the generated conversion result');
+assert.ok(page.includes('aria-label="n進法変換の演習パターン"'), 'the conversion mode selector must have an accessible name');
+assert.ok(page.includes('aria-label="変換した数値の答え"'), 'the answer input must have an accessible name');
+assert.ok(page.includes("selectedPattern === 'mix' && ("), 'mixed mode must require the learner to identify the conversion method');
+assert.ok(page.includes('selectedStrategy === problem.pattern'), 'mixed answers must validate the selected conversion method');
+assert.ok(page.includes('name="base-n-conversion-strategy"'), 'conversion methods must be grouped in one accessible radio set');
+assert.ok(!page.includes('flex flex-col justify-center min-h-[120px] gap-3 text-lg'), 'inline conversion expressions must not be split into vertical flex items');
 assert.ok(page.includes('mulSteps.map(s =>'), 'fractional conversion explanation must show its repeated-multiplication steps');
 assert.ok(!page.includes('\\cline'), 'KaTeX explanations must not contain unsupported cline commands');
 

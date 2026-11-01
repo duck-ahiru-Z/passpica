@@ -23,17 +23,30 @@ function verifyBank(areas, generate, name) {
       if (name === 'Math II' && question.prompt.startsWith('sin 2x を sin x、cos x で表す') && question.options.includes('加法定理だけ')) {
         throw new Error('a mathematically valid route to the answer must not be marked as a distractor');
       }
+      if (name === 'Math B/C' && area === 'sequence' && /n→∞|Σk|1\+2\+…\+n/.test(question.prompt)) {
+        throw new Error('Math B sequence practice must not mix in Math III limits or sigma-only prompts');
+      }
       prompts.add(question.prompt);
     }
     if (prompts.size !== 5) throw new Error(`${name}/${area} generated ${prompts.size}/5 expected variants`);
   }
-  const mixed = Array.from({ length: areas.length * 200 }, () => generate('all', stableRandom).area);
+  const mixedQuestions = Array.from({ length: areas.length * 200 }, () => generate('all', stableRandom));
+  const mixed = mixedQuestions.map(question => question.area);
   for (let start = 0; start < mixed.length; start += areas.length) {
-    if (new Set(mixed.slice(start, start + areas.length)).size !== areas.length) throw new Error(`${name} mixed set omitted an area in batch ${start / areas.length}`);
+    const batch = mixedQuestions.slice(start, start + areas.length);
+    if (new Set(batch.map(question => question.area)).size !== areas.length) throw new Error(`${name} mixed set omitted an area in batch ${start / areas.length}`);
+    for (const question of batch) {
+      if (question.options.length !== 4 || new Set(question.options).size !== 4 || !question.options.includes(question.answer) || !question.explanation.trim()) {
+        throw new Error(`invalid mixed question or answer key in ${name}/${question.area}: ${JSON.stringify(question)}`);
+      }
+    }
   }
   if (mixed.some((area, index) => index > 0 && area === mixed[index - 1])) throw new Error(`${name} mixed practice repeated adjacent areas`);
-  return areas.length * 500 + mixed.length;
+  return areas.length * 500 + mixedQuestions.length;
 }
 
 const verified = verifyBank(math2Areas, generateMath2Question, 'Math II') + verifyBank(mathBcAreas, generateMathBcQuestion, 'Math B/C');
-console.log(`Math II and B/C verified: ${verified.toLocaleString('en-US')} fixed-area and mixed questions; five prompts per area, answer-key coverage, balanced distribution, and adjacency checked.`);
+if (!mathBcAreas.includes('statistics') || mathBcAreas.some(area => Array.from({ length: 500 }, (_, index) => generateMathBcQuestion(area, () => index / 500)).some(question => question.subject !== (area === 'vector' || area === 'complex' || area === 'conic' ? '数学C' : '数学B')))) {
+  throw new Error('Math B/C area labels and subject assignments must match the curriculum');
+}
+console.log(`Math II and B/C verified: ${verified.toLocaleString('en-US')} fixed-area and mixed questions; five prompts per area, all-area coverage, answer keys, balanced distribution, subject labels, and adjacency checked.`);

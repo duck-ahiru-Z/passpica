@@ -24,7 +24,9 @@ const ORANGE: Rgb = [249, 115, 22];
 const YELLOW: Rgb = [234, 179, 8];
 
 export function getIndicatorDisplay(indicator: IndicatorKey, phInput: number): IndicatorDisplay {
-  const pH = Math.max(1, Math.min(14, phInput));
+  // Keep malformed values from producing NaN RGB channels in the visual.
+  // Neutral pH is a safe fallback; finite out-of-range values remain clamped.
+  const pH = Number.isNaN(phInput) ? 7 : Math.max(1, Math.min(14, phInput));
 
   if (indicator === 'pp') {
     if (pH < 8.3) {
@@ -36,9 +38,9 @@ export function getIndicatorDisplay(indicator: IndicatorKey, phInput: number): I
   }
 
   if (indicator === 'litmus') {
-    const color = pH <= 7
+    const color = pH <= 6.5
       ? blend(RED, PURPLE, (pH - 5) / 2)
-      : blend(PURPLE, BLUE, pH - 7);
+      : blend(PURPLE, BLUE, (pH - 6.5) / 1.5);
     const colorName = pH <= 5 ? '赤色' : pH >= 8 ? '青色' : pH < 7 ? '赤紫色' : pH === 7 ? '紫色' : '青紫色';
     return { indicatorName: 'リトマス液', colorName, backgroundColor: rgba(color, 0.7) };
   }

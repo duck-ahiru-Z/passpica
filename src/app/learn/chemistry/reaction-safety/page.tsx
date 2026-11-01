@@ -84,24 +84,24 @@ export default function ReactionSafetyPage() {
     switch (nitrationDegree) {
       case 1:
         return {
-          name: 'モノニトロセルロース (低硝化度)',
+          name: 'モノ硝酸セルロース（置換数1の理想モデル）',
           nitrogen: `約 ${celluloseNitrateNitrogenPercent(1).toFixed(1)} %`,
-          usage: 'セルロイド（プラスチック玩具、ピンポン玉など）の原料。比較的穏やかに燃焼します。',
-          speed: '硝化度に応じて性質が変化',
+          usage: 'セルロイドに使われる硝酸セルロースは一般に窒素含有率約10.5〜11.5%で、この1置換モデル（約6.8%）とは異なります。',
+          speed: '燃焼性は組成・状態などにも依存',
           structure: '[ C₆H₉O₄(ONO₂) ]n'
         };
       case 2:
         return {
-          name: 'ジニトロセルロース (中硝化度)',
+          name: 'ジ硝酸セルロース（置換数2の理想モデル）',
           nitrogen: `約 ${celluloseNitrateNitrogenPercent(2).toFixed(1)} %`,
-          usage: 'コロジオンなどに関連する性質を持ちます。',
-          speed: '硝化度に応じて性質が変化',
+          usage: '窒素含有率の計算例です。実際の硝酸セルロース製品は置換度の分布や状態によって性質が異なります。',
+          speed: '燃焼性は組成・状態などにも依存',
           structure: '[ C₆H₈O₃(ONO₂)₂ ]n'
         };
       case 3:
       default:
         return {
-          name: 'トリ硝酸セルロース（高置換度）',
+          name: 'トリ硝酸セルロース（置換数3の理想モデル）',
           nitrogen: `約 ${celluloseNitrateNitrogenPercent(3).toFixed(1)} %`,
           usage: '高エネルギー物質に分類され、厳格な法規制と専門的管理の対象です。',
           speed: '熱分解・燃焼の危険性が高い',
@@ -314,7 +314,7 @@ export default function ReactionSafetyPage() {
           <span>■</span> 有機化学の視覚化：セルロースの硝酸エステル化度（ニトロセルロース）
         </h2>
         <p className="text-gray-500 text-[10px] leading-relaxed">
-          天然高分子であるセルロースのグルコース単位には、3個のヒドロキシ基（-OH 基）があります。硝酸エステル化では、ヒドロキシ基の水素が硝酸エステル基（-O-NO₂）に置き換わります。置換数によって組成や性質が変化し、高置換度のものは熱分解・燃焼の危険性が高まります。
+          天然高分子であるセルロースのグルコース単位には、3個のヒドロキシ基（-OH 基）があります。下図は置換数1〜3の理想化した単位モデルです。実際の硝酸セルロース製品は置換度の分布や含水状態などによって性質が異なり、高窒素含有率のものは特に熱分解・燃焼の危険性があります。
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -340,7 +340,7 @@ export default function ReactionSafetyPage() {
             </div>
 
             <div className="text-[10px] text-gray-500 leading-normal border-t border-gray-200 pt-2.5">
-              分子内のヒドロキシ基が硝酸エステル基に置換されると、燃焼時に外部の空気から酸素を供給されなくても、分子内の窒素・酸素を利用して自己燃焼（無煙燃焼）できるようになります。
+              硝酸エステル基をもつため、一定以上の硝化度の硝酸セルロースは外部酸素が乏しい条件でも自己燃焼することがあります。燃焼性は硝化度だけでなく組成・含水率・状態にも依存します。実物に触れたり燃焼を試したりせず、安全管理は指導者に任せてください。
             </div>
           </div>
 

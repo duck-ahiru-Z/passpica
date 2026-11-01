@@ -216,16 +216,19 @@ export default function SequenceDrillPage() {
               <div className="flex items-center gap-2 text-lg font-bold flex-wrap justify-center">
                 <MathEq math="a_n =" />
                 <input
+                  aria-label="一般項の係数 C"
                   type="number" value={inC} onChange={e => setInC(e.target.value)}
                   placeholder="係数" required className="retro-input w-20 text-center font-mono text-base mx-1"
                 />
                 <MathEq math="\cdot \Big(" />
                 <input
+                  aria-label="一般項の公比 p"
                   type="number" value={inP} onChange={e => setInP(e.target.value)}
                   placeholder="公比" step="any" required className="retro-input w-20 text-center font-mono text-base mx-1"
                 />
                 <MathEq math="\Big)^{n-1} +" />
                 <input
+                  aria-label="一般項の定数 α"
                   type="number" value={inAlpha} onChange={e => setInAlpha(e.target.value)}
                   placeholder="定数" required className="retro-input w-20 text-center font-mono text-base mx-1"
                 />
@@ -235,7 +238,7 @@ export default function SequenceDrillPage() {
                 <button type="submit" className="retro-btn-classic bg-blue-100 border-blue-400 font-bold px-4 py-2 flex-grow">
                   解答する
                 </button>
-                <button type="button" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
+                <button type="button" aria-expanded={showExplanation} aria-controls="sequence-explanation" onClick={() => setShowExplanation(!showExplanation)} className="retro-btn-classic bg-yellow-100 border-yellow-400 px-4 py-2 flex-grow">
                   {showExplanation ? '解説を隠す' : '正解と解説を見る'}
                 </button>
               <button type="button" onClick={() => generateProblem()} className="retro-btn-classic bg-emerald-100 border-emerald-400 font-bold px-4 py-2 w-full mt-1">
@@ -245,7 +248,7 @@ export default function SequenceDrillPage() {
             </form>
 
             {feedbackMsg && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
                 {feedbackMsg}
               </div>
             )}
@@ -257,13 +260,13 @@ export default function SequenceDrillPage() {
           <div className="retro-box bg-white p-2">
              <div className="flex justify-between items-center mb-2 px-2 border-b border-gray-200 pb-1">
                <span className="font-bold text-slate-700">■ 階段図（コブウェブプロット）</span>
-               <button onClick={() => setShowGraph(!showGraph)} type="button" className="retro-btn-classic text-[10px] px-2 py-0.5">
+               <button onClick={() => setShowGraph(!showGraph)} type="button" aria-expanded={showGraph} aria-controls="sequence-cobweb-graph" className="retro-btn-classic text-[10px] px-2 py-0.5">
                  {showGraph ? 'グラフを隠す' : 'グラフを表示する'}
                </button>
              </div>
              {showGraph ? (
                <>
-                 <canvas ref={canvasRef} width={500} height={300} className="w-full h-auto border border-gray-200 bg-gray-50" />
+                 <canvas id="sequence-cobweb-graph" ref={canvasRef} width={500} height={300} role="img" aria-label={`漸化式の階段図。a(n+1)=${problem.p}a(n)${problem.q >= 0 ? '+' : ''}${problem.q}。固定点α=${problem.alpha}、初項a1=${problem.a1}。反復値 ${getSequenceTerms(problem, 3).map((value, index) => `a${index + 1}=${Number(value.toFixed(3))}`).join('、')}。${Math.abs(problem.p) < 1 ? '固定点へ収束' : '発散'}`} className="w-full h-auto border border-gray-200 bg-gray-50" />
                  <div className="mt-2 space-y-1 text-[11px] text-slate-600">
                    <div className="flex flex-wrap gap-x-4 gap-y-1">
                      <span>点線：y = x</span>
@@ -284,7 +287,7 @@ export default function SequenceDrillPage() {
           </div>
 
           {showExplanation && (
-            <div className="retro-box bg-yellow-50/50 space-y-4 border-yellow-300">
+            <div id="sequence-explanation" className="retro-box bg-yellow-50/50 space-y-4 border-yellow-300">
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-yellow-400 pb-1.5 gap-2">
                 <h2 className="font-bold text-sm text-slate-800">
                   ■ 解説・計算ステップ

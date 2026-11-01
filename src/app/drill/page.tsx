@@ -11,7 +11,7 @@ interface LearningContent {
   title: string;
   description: string;
   difficulty: '基礎' | '標準' | '応用';
-  type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル';
+  type: 'ビジュアル図解' | '実験シミュレータ' | '製法フロー' | '系統分析' | '無限計算ドリル' | '無限演習';
   link: string;
 }
 
@@ -20,7 +20,7 @@ const CONTENTS: LearningContent[] = [
   {
     slug: 'mathbc-mixed-drill', subject: 'math', subjectJp: '数学B・C', field: '数学B・C総合（解法選択）',
     title: '数学B・C 総合・解法選択ランダムドリル',
-    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式を、分野固定または全体ランダムで練習。',
+    description: '数列・数列の和・ベクトル・複素数平面・図形と方程式・統計的な推測を、分野固定または全体ランダムで練習。',
     difficulty: '標準', type: '無限計算ドリル', link: '/learn/math/mathbc-mixed-drill'
   },
 
@@ -44,7 +44,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '積分法（解法選択）',
     title: '数学III 積分法・解法選択ドリル',
-    description: '置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
+    description: 'べき関数の定積分・面積、置換積分・部分積分・部分分数分解・三角関数・平方根を含む積分を、個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-integral-drill'
@@ -55,7 +55,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '微分法（解法選択）',
     title: '数学III 微分法・解法選択ドリル',
-    description: '合成関数・積・対数・媒介変数・陰関数の微分を、個別練習と全パターンランダムで反復します。',
+    description: '合成・積・商・対数・媒介変数・陰関数・逆関数・高次導関数を、個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-differentiation-drill'
@@ -66,7 +66,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学III',
     field: '極限（解法選択）',
     title: '数学III 極限・解法選択ドリル',
-    description: '因数分解・有理化・最高次比較・はさみうち・数列の極限を、個別練習と全パターンランダムで反復します。',
+    description: '因数分解・有理化・最高次比較・はさみうち・数列と指数型数列に加え、sin(kx)/x・tan(kx)/x・sin(ax)/sin(bx)型や連続条件も個別練習と全パターンランダムで反復します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/math/calculus3-limit-drill'
@@ -121,7 +121,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '物質量・反応計算',
     title: '化学 物質量・反応計算ドリル',
-    description: '物質量・モル濃度・希釈・気体・反応量比・制限試薬・pH・収率を個別練習と全パターンランダムで反復します。',
+    description: '物質量・元素の質量百分率・モル濃度・希釈・標準状態と状態方程式の気体計算・反応量比・制限試薬と過剰試薬の残量・強酸／強塩基／弱酸／弱塩基のpH・収率を個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/mole-calculation-drill'
@@ -132,10 +132,21 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '酸と塩基・中和滴定',
     title: '化学 中和滴定・濃度計算ドリル',
-    description: '一価・二価の酸塩基や反応係数比を個別練習し、全パターンの混合問題で中和点から濃度を求めます。',
+    description: '一価・二価の酸塩基や反応係数比に加え、酸濃度から塩基濃度を求める逆向き計算も個別練習し、全パターンの混合問題で中和点と未知濃度を判断します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/chemistry/titration-drill'
+  },
+  {
+    slug: 'indicator-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '酸と塩基・中和指示薬',
+    title: '化学 中和指示薬・色判定ドリル',
+    description: 'フェノールフタレイン・リトマス液・メチルオレンジを個別練習し、全パターンランダムでpHから色を判断します。',
+    difficulty: '基礎',
+    type: '無限演習',
+    link: '/learn/chemistry/indicator-drill'
   },
   {
     slug: 'phase-diagram-drill',
@@ -154,7 +165,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '化学',
     field: '無機化学（イオン反応・沈殿）',
     title: '化学 無機イオン反応・色の判定ドリル',
-    description: '少量・過剰や酸性・塩基性で変わる沈殿・錯イオン・酸化還元を個別練習し、全14パターンを混ぜて判断します。',
+    description: '少量・過剰や酸性・塩基性で変わる沈殿・錯イオン・酸化還元を個別練習し、全15パターンを混ぜて判断します。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/chemistry/inorganic-colors-drill'
@@ -169,6 +180,17 @@ const CONTENTS: LearningContent[] = [
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/chemistry/organic-separation-drill'
+  },
+  {
+    slug: 'organic-structure-drill',
+    subject: 'chemistry',
+    subjectJp: '化学',
+    field: '有機化学（立体構造・混成軌道）',
+    title: '化学 有機分子の立体構造・解法選択ドリル',
+    description: '混成軌道・配座・シクロヘキサン・シス／トランスを分子別に練習し、実戦では全9パターンから構造の特徴を判断します。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/chemistry/organic-structure-drill'
   },
   {
     slug: 'industrial-process-drill',
@@ -231,7 +253,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '力学・計算',
     title: '物理 力学・計算ドリル',
-    description: '平均の速さ・加速度・自由落下・仕事・運動量・エネルギー・ばねに加え、投射速度の分解・最高点・飛行時間・到達距離も個別練習と全パターンランダムで反復します。',
+    description: '平均の速さと符号付き平均速度を区別し、加速度・自由落下・仕事・運動量・力積・エネルギー・ばね・ばね振り子の周期と振動数・円運動の速さと向心加速度・向心力・斜方投射を個別練習と全パターンランダムで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/physics/motion-calculation-drill'
@@ -242,10 +264,43 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '物理',
     field: '電磁気（交流回路）',
     title: '物理 交流回路・計算ドリル',
-    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数を個別練習し、実戦では全5パターンから方法を選びます。',
+    description: 'コイル・コンデンサーのリアクタンス、インピーダンス、回路電流、共振周波数、符号付き位相差（進み・遅れ）、抵抗の平均電力を個別練習し、実戦では全7パターンから方法を選びます。',
     difficulty: '標準',
     type: '無限計算ドリル',
     link: '/learn/physics/ac-circuit-drill'
+  },
+  {
+    slug: 'wave-calculation-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（解法選択）',
+    title: '物理 波動・計算ドリル',
+    description: '波の速さ・周期・振動数・経路差と位相差・合成振幅を個別練習し、実戦では全5パターンをランダムに混ぜて公式選択から答えまで練習します。',
+    difficulty: '基礎',
+    type: '無限計算ドリル',
+    link: '/learn/physics/wave-calculation-drill'
+  },
+  {
+    slug: 'standing-wave-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（定常波・固有振動）',
+    title: '物理 定常波・固有振動ドリル',
+    description: '弦の倍振動・波長・波速と両端開管／片端閉管の固有振動数を個別練習し、実戦では全5パターンをランダムに混ぜて境界条件から式を選びます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/physics/standing-wave-drill'
+  },
+  {
+    slug: 'doppler-drill',
+    subject: 'physics',
+    subjectJp: '物理',
+    field: '波動（ドップラー効果）',
+    title: '物理 ドップラー効果・計算ドリル',
+    description: '観測者だけ・音源だけ・両方が動く場合と静止の場合を個別練習し、実戦では全4パターンをランダムに混ぜて向きと式を選びます。',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    link: '/learn/physics/doppler-drill'
   },
   {
     slug: 'number-representation-drill',
@@ -253,7 +308,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '情報I',
     field: '2進数・デジタル表現',
     title: '情報I 2進数・2の補数ドリル',
-    description: '符号なし・2の補数・ビットの重み・10進数からの変換を個別練習し、実戦では全4パターンから見分けます。',
+    description: '符号なし・2の補数・ビットの重み・10進数からの変換・ビット幅ごとの表現範囲を個別練習し、実戦では全5パターンから見分けます。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/information/number-representation-drill'
@@ -264,7 +319,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '情報I',
     field: '計算・処理',
     title: '情報I 計算・処理ドリル',
-    description: '2進数・データ量・通信時間・論理演算・標本化・圧縮率・補数表現を個別練習と全パターンランダムで反復します。',
+    description: '2進数・画像データ量・bit/byteや接頭語の単位換算・通信時間・論理演算5種の個別練習に加え、全パターンをランダムに混ぜて解法選択まで反復します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/information/calculation-drill'
@@ -287,7 +342,7 @@ const CONTENTS: LearningContent[] = [
     subjectJp: '数学I',
     field: '数と式（因数分解）',
     title: '因数分解・解法選択ドリル',
-    description: '共通因数・展開公式・たすき掛け・置き換え・高次式を個別練習し、実戦では全パターンをバランスよく混ぜます。',
+    description: '共通因数・展開公式・たすき掛け・置き換え・高次式を個別練習し、実戦では解法選択から因数分解の完成まで全パターンで確認します。',
     difficulty: '基礎',
     type: '無限計算ドリル',
     link: '/learn/math/factorization-strategy-drill'
@@ -613,6 +668,17 @@ const CONTENTS: LearningContent[] = [
     slug: 'trig-synthesis-drill',
   },
   {
+    title: '三角関数グラフ・解法選択',
+    description: '振幅・周期・左右/上下移動・値域・tanの漸近線を個別に練習し、実戦では全パターンを混ぜたランダム問題で性質の選択から練習します。',
+    link: '/learn/math/trigonometry-graph-drill',
+    subject: 'math',
+    subjectJp: '数学Ⅱ',
+    field: '三角関数',
+    difficulty: '標準',
+    type: '無限計算ドリル',
+    slug: 'trigonometry-graph-drill',
+  },
+  {
     title: '対数の底の変換公式と性質',
     description: '底の累乗・対数の積・逆数関係・対数を指数に含む型を個別練習し、実戦では4パターンを混ぜます。',
     link: '/learn/math/logarithm-drill',
@@ -733,7 +799,7 @@ export default function DrillPortalPage() {
           無限演習ポータル
         </h1>
         <p className="text-xs text-gray-500 mt-1">
-          綺麗な数値になるよう逆算で自動生成された無限計算ドリルで、圧倒的な計算力と解法パターンを身につけます。
+          数値計算から知識の判定まで、分野ごとの演習をパターン別に反復できます。苦手な型を個別に練習し、慣れたら全パターンランダムで解法選択を練習しましょう。
         </p>
       </div>
 

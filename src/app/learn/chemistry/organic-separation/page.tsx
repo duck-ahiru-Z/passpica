@@ -144,23 +144,24 @@ export default function OrganicSeparationPage() {
               {/* 排出口 */}
               <line x1="80" y1="135" x2="80" y2="155" stroke="#334155" strokeWidth="1.5" />
 
-              {/* 上層：エーテル層（境界線 y=70） */}
-              <path 
-                d="M 54 55 C 50 65 47 70 48 75 L 112 75 C 113 70 110 65 106 55 C 98 45 88 40 80 40 C 72 40 62 45 54 55 Z" 
-                fill="#fef08a" 
-                opacity="0.3" 
-              />
-              <text x="80" y="62" fill="#854d0e" fontSize="7" fontWeight="bold" textAnchor="middle">エーテル層</text>
-
-              {/* 下層：水層（境界線 y=75 〜 y=110） */}
-              {step.waterLayer.length > 0 && (
-                <g>
-                  <path 
-                    d="M 48 76 C 50 85 58 100 76 115 L 84 115 C 102 100 110 85 112 76 Z" 
-                    fill="#93c5fd" 
-                    opacity="0.3" 
-                  />
-                  <text x="80" y="90" fill="#1d4ed8" fontSize="8" fontWeight="bold" textAnchor="middle">水層</text>
+              <defs>
+                <clipPath id="funnel-liquid-clip">
+                  <path d="M 80 20 C 50 20 40 70 80 120 C 120 70 110 20 80 20 Z" />
+                </clipPath>
+              </defs>
+              {/* 液体は漏斗の内側に沿って満たす。初期状態はエーテル溶液のみ。 */}
+              {currentStepIdx === 0 ? (
+                <g clipPath="url(#funnel-liquid-clip)">
+                  <rect x="35" y="24" width="90" height="100" fill="#fef08a" opacity="0.38" />
+                  <text x="80" y="72" fill="#854d0e" fontSize="7" fontWeight="bold" textAnchor="middle">エーテル溶液</text>
+                </g>
+              ) : (
+                <g clipPath="url(#funnel-liquid-clip)">
+                  <rect x="35" y="24" width="90" height="51" fill="#fef08a" opacity="0.38" />
+                  <rect x="35" y="75" width="90" height="49" fill="#93c5fd" opacity="0.38" />
+                  <line x1="48" y1="75" x2="112" y2="75" stroke="#64748b" strokeWidth="1" />
+                  <text x="80" y="56" fill="#854d0e" fontSize="7" fontWeight="bold" textAnchor="middle">エーテル層</text>
+                  <text x="80" y="91" fill="#1d4ed8" fontSize="8" fontWeight="bold" textAnchor="middle">水層</text>
                 </g>
               )}
 
@@ -238,6 +239,12 @@ export default function OrganicSeparationPage() {
         </div>
 
       </div>
+
+      <section className="retro-box space-y-2">
+        <h2 className="font-bold">分離の仕組みを問題で確認</h2>
+        <p className="text-slate-600">酸・塩基の強さから水層へ移る物質を判断する練習を、物質ごとの基礎と全パターン混合で行えます。</p>
+        <Link href="/learn/chemistry/organic-separation-drill" className="retro-btn-classic inline-flex">有機化合物の分離ドリルへ →</Link>
+      </section>
 
     </div>
   );

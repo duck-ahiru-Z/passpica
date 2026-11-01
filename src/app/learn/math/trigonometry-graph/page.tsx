@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { getTrigonometryProbeStatus } from '@/src/lib/trigonometryGraphProbe';
+import { clampTrigonometryParameter } from '@/src/lib/trigonometryGraphParameters';
 
 type TrigonometricFunc = 'sin' | 'cos' | 'tan';
 
@@ -219,6 +220,11 @@ export default function TrigonometryGraphPage() {
         <p className="text-xs text-gray-500 mt-1">
           式 y = a {func}(b(θ - c)) + d の係数 a, b, c, d を操作し、縦横の拡大縮小・周期・位置の変化を学びます。sin・cosの振幅と、tanの縦方向の倍率・漸近線の移動を比べられます。
         </p>
+      </div>
+
+      <div className="retro-box flex flex-wrap items-center justify-between gap-3">
+        <p className="font-bold">式を見て、どの性質を調べるか選ぶ練習もできます。</p>
+        <Link href="/learn/math/trigonometry-graph-drill" className="retro-btn-classic bg-blue-100 border-blue-400 font-bold">個別・全パターンランダム演習へ →</Link>
       </div>
 
       {/* プリセット選択エリア */}
@@ -445,11 +451,12 @@ export default function TrigonometryGraphPage() {
             {/* 関数選択 */}
             <div className="space-y-1.5">
               <span className="font-bold text-slate-700 block">1. 対象の関数を選択</span>
-              <div className="grid grid-cols-3 gap-1">
+              <div role="group" aria-label="対象の三角関数" className="grid grid-cols-3 gap-1">
                 {(['sin', 'cos', 'tan'] as TrigonometricFunc[]).map(f => (
                   <button
                     key={f}
                     onClick={() => setFunc(f)}
+                    aria-pressed={func === f}
                     className={`retro-btn-classic text-center font-bold ${func === f ? 'bg-[#cbd5e1] font-bold' : ''}`}
                   >
                     {f}
@@ -465,11 +472,12 @@ export default function TrigonometryGraphPage() {
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
+                    aria-label={`aの値（${func === 'tan' ? '縦方向の倍率' : '縦の倍率・振幅'}）`}
                     step="0.1"
                     min="-3.0"
                     max="3.0"
                     value={a}
-                    onChange={(e) => setA(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setA(clampTrigonometryParameter(parseFloat(e.target.value), -3, 3, 0))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setA(1.0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">1.0</button>
@@ -477,6 +485,7 @@ export default function TrigonometryGraphPage() {
               </div>
               <input
                 type="range"
+                aria-label={`aの値スライダー（${func === 'tan' ? '縦方向の倍率' : '縦の倍率・振幅'}）`}
                 min="-3.0"
                 max="3.0"
                 step="0.1"
@@ -493,11 +502,12 @@ export default function TrigonometryGraphPage() {
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
+                    aria-label="bの値（周期係数）"
                     step="0.1"
                     min="0.2"
                     max="4.0"
                     value={b}
-                    onChange={(e) => setB(Math.max(0.1, parseFloat(e.target.value) || 1))}
+                    onChange={(e) => setB(clampTrigonometryParameter(parseFloat(e.target.value), 0.2, 4, 1))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setB(1.0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">1.0</button>
@@ -505,6 +515,7 @@ export default function TrigonometryGraphPage() {
               </div>
               <input
                 type="range"
+                aria-label="bの値スライダー（周期係数）"
                 min="0.2"
                 max="4.0"
                 step="0.1"
@@ -521,11 +532,12 @@ export default function TrigonometryGraphPage() {
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
+                    aria-label="cの値（左右移動角）"
                     step="5"
                     min="-360"
                     max="360"
                     value={c}
-                    onChange={(e) => setC(parseInt(e.target.value) || 0)}
+                    onChange={(e) => setC(clampTrigonometryParameter(parseInt(e.target.value, 10), -360, 360, 0))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setC(0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">0°</button>
@@ -534,6 +546,7 @@ export default function TrigonometryGraphPage() {
               <div className="flex items-center gap-2">
                 <input
                   type="range"
+                  aria-label="cの値スライダー（左右移動角）"
                   min="-360"
                   max="360"
                   step="15"
@@ -556,11 +569,12 @@ export default function TrigonometryGraphPage() {
                 <div className="flex items-center gap-1">
                   <input
                     type="number"
+                    aria-label="dの値（上下移動量）"
                     step="0.1"
                     min="-3.0"
                     max="3.0"
                     value={d}
-                    onChange={(e) => setD(parseFloat(e.target.value) || 0)}
+                    onChange={(e) => setD(clampTrigonometryParameter(parseFloat(e.target.value), -3, 3, 0))}
                     className="retro-input w-12 text-center text-[10px]"
                   />
                   <button onClick={() => setD(0.0)} className="text-[9px] border border-gray-300 px-1 py-0.5 bg-white">0.0</button>
@@ -568,6 +582,7 @@ export default function TrigonometryGraphPage() {
               </div>
               <input
                 type="range"
+                aria-label="dの値スライダー（上下移動量）"
                 min="-3.0"
                 max="3.0"
                 step="0.1"
@@ -588,6 +603,7 @@ export default function TrigonometryGraphPage() {
                 </div>
                 <input
                   type="range"
+                  aria-label="座標プローブの角度"
                   min="-360"
                   max="360"
                   step="5"

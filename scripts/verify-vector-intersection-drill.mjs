@@ -12,6 +12,9 @@ assert.ok(page.includes('if (answerIsCorrect)'));
 assert.ok(!page.includes('selectedStrategy === strategy'), 'a mathematically valid alternate strategy must not be marked wrong');
 assert.ok(!page.includes('strategyPicker'), 'the selected strategy must not be arbitrarily preassigned to a valid alternate-method problem');
 assert.ok(portal.includes('どちらも使える交点問題で自分の解法を選びます。'));
+for (const label of ['ベクトルOAの係数の分子', 'ベクトルOAの係数の分母', 'ベクトルOBの係数の分子', 'ベクトルOBの係数の分母']) {
+  assert.ok(page.includes(`aria-label="${label}"`), `answer input must expose the accessible name ${label}`);
+}
 
 let seed = 0x6d2b79f5;
 const randomInt = max => {

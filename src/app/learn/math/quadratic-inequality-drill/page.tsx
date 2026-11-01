@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
-import { getQuadraticInequalityRegion, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
+import { getQuadraticInequalityRegion, getQuadraticInequalityRootLabelBaselines, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign, type QuadraticInequalityAnswerType } from '@/src/lib/quadraticInequality';
 import { generateQuadraticInequalityProblem, type QuadraticInequalityPattern, type QuadraticInequalityProblem } from '@/src/lib/quadraticInequalityProblems';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 
@@ -129,8 +129,18 @@ export default function QuadraticInequalityDrillPage() {
 
       // Draw Roots Dots
       ctx.fillStyle = '#000';
-      problem.roots.forEach(r => {
+      ctx.font = '12px sans-serif';
+      ctx.textAlign = 'center';
+      const rootLabels = problem.roots.map(r => {
         const x = r.num / r.den;
+        const text = r.den === 1 ? `${r.num}` : `${r.num}/${r.den}`;
+        return { root: r, x, text, labelX: mapX(x), width: ctx.measureText(text).width };
+      });
+      const labelBaselines = getQuadraticInequalityRootLabelBaselines(
+        rootLabels.map(({ labelX, width }) => ({ x: labelX, width })),
+        mapY(0) + 16,
+      );
+      rootLabels.forEach(({ x, text }, index) => {
         ctx.beginPath();
         if (problem.ineqSign === '<' || problem.ineqSign === '>') {
           ctx.arc(mapX(x), mapY(0), 4, 0, 2 * Math.PI);
@@ -145,10 +155,7 @@ export default function QuadraticInequalityDrillPage() {
           ctx.fill();
         }
         
-        ctx.font = '12px sans-serif';
-        ctx.textAlign = 'center';
-        const txt = r.den === 1 ? `${r.num}` : `${r.num}/${r.den}`;
-        ctx.fillText(txt, mapX(x), mapY(0) + 16);
+        ctx.fillText(text, mapX(x), labelBaselines[index]);
       });
     }
 

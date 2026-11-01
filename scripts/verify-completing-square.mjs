@@ -13,8 +13,11 @@ for (const phrase of ['実戦練習：平方完成 全パターンランダム',
 if (!page.includes('isCompletingSquareAnswerCorrect(problem, answer)')) {
   throw new Error('Completing-square UI must use the strict answer validator.');
 }
-for (const label of ['平方完成の演習パターン', '二次項の係数 a', '平方内の分数の分子', '平方内の分数の分母', '定数項の分子', '定数項の分母']) {
+for (const label of ['平方完成の演習パターン', '平方内の符号', '定数項の符号', '二次項の係数 a', '平方内の分数の分子', '平方内の分数の分母', '定数項の分子', '定数項の分母']) {
   if (!page.includes(`aria-label="${label}"`)) throw new Error(`Completing-square UI is missing an accessible label: ${label}`);
+}
+if (!page.includes('role="img"') || !page.includes('二次関数のグラフ。${problem.eq}。頂点は')) {
+  throw new Error('Completing-square graph must expose an accessible equation and vertex description.');
 }
 if (!page.includes('role="status" aria-live="polite"')) throw new Error('Completing-square answer feedback must be announced to assistive technology.');
 

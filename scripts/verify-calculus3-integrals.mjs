@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { generateIntegralProblem, getIntegralExplanation, integralPatterns, isIntegralAnswerCorrect, isIntegralStrategyValid } from '../src/lib/calculus3Integrals.ts';
+import { createIntegralProblemPicker, generateIntegralProblem, getIntegralExplanation, integralPatterns, isIntegralAnswerCorrect, isIntegralStrategyValid } from '../src/lib/calculus3Integrals.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/calculus3-integral-drill/page.tsx'), 'utf8');
 if (!/type="radio"\s+name="integral-strategy"/.test(drillPage) || drillPage.includes('aria-pressed={strategy === p}')) {
@@ -54,15 +54,30 @@ const checks = {
   },
   rational: problem => {
     const [, xCoefficient, constant] = problem.expression.match(/\\frac\{(\d+)x\+(\d+)\}/);
-    const a = Number(constant) - Number(xCoefficient);
-    const b = 2 * Number(xCoefficient) - Number(constant);
+    const x = Number(xCoefficient);
+    const c = Number(constant);
     const logTerm = (coefficient, argument) => `${coefficient === 1 ? '' : `${coefficient} `}ln ${argument}`;
-    return close(problem.answer, a * Math.log(2) + b * Math.log(1.5))
-      && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`)
-      && problem.explanation.includes(`${logTerm(a, '2')} + ${logTerm(b, '(3/2)')}`)
-      && !problem.explanation.includes('1 ln')
-      && (a + b) === Number(xCoefficient)
-      && (2 * a + b) === Number(constant);
+    if (problem.expression.includes('(x+1)(x+2)')) {
+      const a = c - x;
+      const b = 2 * x - c;
+      return close(problem.answer, a * Math.log(2) + b * Math.log(1.5))
+        && problem.explanation.includes(`${a}/(x+1)+${b}/(x+2)`)
+        && problem.explanation.includes(`${logTerm(a, '2')} + ${logTerm(b, '(3/2)')}`)
+        && x === a + b && c === 2 * a + b;
+    }
+    if (problem.expression.includes('(x+1)^2')) {
+      const a = x;
+      const b = c - x;
+      return close(problem.answer, a * Math.log(2) + b / 2)
+        && problem.explanation.includes(`${a}/(x+1)+${b}/(x+1)²`)
+        && problem.explanation.includes(`${logTerm(a, '2')} + ${b}/2`)
+        && x === a && c === a + b;
+    }
+    const a = x;
+    const b = c;
+    return close(problem.answer, a * Math.log(2) / 2 + b * Math.PI / 4)
+      && problem.explanation.includes(`${a}x+${b}`)
+      && problem.explanation.includes(`${a}/2 ln 2 + ${b}π/4`);
   },
   trig: problem => {
     const [, exponent] = problem.expression.match(/\\sin\^\{(\d+)\}/);
@@ -81,13 +96,16 @@ const checks = {
     const expectedUpper = r % 2 === 0 ? String(r / 2) : `\\frac{${r}}{2}`;
     const expected = r ** 2 * (Math.PI / 12 + Math.sqrt(3) / 8);
     return upper === expectedUpper && close(problem.answer, expected)
-      && problem.hint.includes('上端が R/2') && problem.explanation.includes('sin θ=1/2 より θ=π/6')
+      && problem.hint.includes('R²−x²') && !problem.hint.includes('上端')
+      && problem.explanation.includes('=1/2 より θ=π/6')
+      && problem.explanation.startsWith('三角置換 x=')
+      && problem.explanation.includes(`上端 x=${r % 2 === 0 ? r / 2 : `${r}/2`} では x/${r}=1/2`)
       && !problem.explanation.includes('\\frac')
       && problem.explanation.includes(expected.toFixed(3));
   },
 };
 
-const expectedVariants = { 'power-area': 5, substitution: 4, parts: 3, rational: 9, trig: 4, radical: 5 };
+const expectedVariants = { 'power-area': 5, substitution: 4, parts: 3, rational: 21, trig: 4, radical: 5 };
 if (!isIntegralAnswerCorrect('1.718', Math.E - 1)) throw new Error('three-decimal displayed answers should be accepted');
 if (!isIntegralAnswerCorrect(String(Math.E - 1), Math.E - 1)) throw new Error('full-precision integral answers should be accepted');
 if (!isIntegralAnswerCorrect('1.718281', Math.E - 1)) throw new Error('more precise integral answers should be accepted');
@@ -110,12 +128,29 @@ for (const pattern of integralPatterns) {
   if (seen.size !== expectedVariants[pattern]) throw new Error(`${pattern} generated ${seen.size}/${expectedVariants[pattern]} expected variants`);
 }
 
-const mixed = Array.from({ length: 600 }, () => generateIntegralProblem('mix', stableRandom).pattern);
-for (let start = 0; start < mixed.length; start += integralPatterns.length) {
-  const batch = mixed.slice(start, start + integralPatterns.length);
-  if (new Set(batch).size !== integralPatterns.length) throw new Error(`mixed set omitted an integral pattern in batch ${start / integralPatterns.length}`);
+const verifyMixed = (sequence, label) => {
+  const frequencies = new Map(integralPatterns.map(pattern => [pattern, 0]));
+  for (const [index, pattern] of sequence.entries()) {
+    frequencies.set(pattern, frequencies.get(pattern) + 1);
+    if (index > 0 && pattern === sequence[index - 1]) throw new Error(`${label} repeated ${pattern} consecutively at ${index}`);
+  }
+  const counts = [...frequencies.values()];
+  if (counts.some(count => count === 0) || Math.max(...counts) - Math.min(...counts) > 1) {
+    throw new Error(`${label} did not balance all patterns: ${JSON.stringify(Object.fromEntries(frequencies))}`);
+  }
+};
+
+const deterministicPicker = createIntegralProblemPicker();
+verifyMixed(Array.from({ length: 600 }, () => deterministicPicker.next('mix', stableRandom).pattern), 'deterministic mixed practice');
+
+const rationalKinds = new Set();
+const rationalFixedPicker = createIntegralProblemPicker();
+for (let index = 0; index < 2_100; index += 1) {
+  const problem = rationalFixedPicker.next('rational', stableRandom);
+  if (!checks.rational(problem)) throw new Error(`rational fixed-pattern formula mismatch: ${JSON.stringify(problem)}`);
+  rationalKinds.add(problem.expression.includes('(x+1)(x+2)') ? 'distinct linear factors' : problem.expression.includes('(x+1)^2') ? 'repeated linear factor' : 'irreducible quadratic');
 }
-if (mixed.some((pattern, index) => index > 0 && pattern === mixed[index - 1])) throw new Error('mixed integral practice repeated adjacent patterns');
+if (rationalKinds.size !== 3) throw new Error(`rational fixed practice omitted a partial-fraction form: ${[...rationalKinds]}`);
 
 for (let seed = 1; seed <= 20; seed += 1) {
   let state = seed;
@@ -123,10 +158,16 @@ for (let seed = 1; seed <= 20; seed += 1) {
     state = (state * 48271) % 2147483647;
     return (state - 1) / 2147483646;
   };
-  const sequence = Array.from({ length: 5_000 }, () => generateIntegralProblem('mix', seededRandom).pattern);
-  const counts = new Map(integralPatterns.map(pattern => [pattern, sequence.filter(item => item === pattern).length]));
-  if (Math.max(...counts.values()) - Math.min(...counts.values()) > 2) throw new Error(`seed ${seed} produced imbalanced mixed counts: ${JSON.stringify(Object.fromEntries(counts))}`);
-  if (sequence.some((pattern, index) => index > 0 && pattern === sequence[index - 1])) throw new Error(`seed ${seed} repeated adjacent mixed patterns`);
+  const picker = createIntegralProblemPicker();
+  const mixedKinds = new Set();
+  const sequence = Array.from({ length: 5_000 }, () => {
+    const problem = picker.next('mix', seededRandom);
+    if (!checks[problem.pattern](problem)) throw new Error(`mixed generator formula mismatch: ${JSON.stringify(problem)}`);
+    if (problem.pattern === 'rational') mixedKinds.add(problem.expression.includes('(x+1)(x+2)') ? 'distinct linear factors' : problem.expression.includes('(x+1)^2') ? 'repeated linear factor' : 'irreducible quadratic');
+    return problem.pattern;
+  });
+  verifyMixed(sequence, `seed ${seed}`);
+  if (mixedKinds.size !== 3) throw new Error(`seed ${seed} mixed practice omitted a partial-fraction form: ${[...mixedKinds]}`);
 }
 
-console.log('Calculus III integration verified: fixed-pattern options, formulas, answers, and variants; 100,000 seeded mixed questions plus 600 deterministic balance cases checked.');
+console.log('Calculus III integration verified: fixed-pattern options, formulas, answers, 21 rational variants across three forms, 100,000 seeded mixed questions plus 600 deterministic balance cases checked.');

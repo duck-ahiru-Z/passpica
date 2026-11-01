@@ -109,6 +109,7 @@ export default function SymmetricPolynomialDrillPage() {
                 <MathEq math="=" />
                 <input 
                   type="number" 
+                  aria-label="対称式の値の答え"
                   className="w-24 border p-2 text-center font-bold" 
                   value={ansStr} 
                   onChange={e => { setAnsStr(e.target.value); setHasChecked(false); setIsCorrect(false); }}

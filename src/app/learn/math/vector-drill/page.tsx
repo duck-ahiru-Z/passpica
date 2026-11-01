@@ -243,24 +243,24 @@ export default function VectorDrillPage() {
                 <MathEq math="\vec{\text{OP}} =" />
                 <div className="flex flex-col items-center gap-1 mx-2">
                   <input
-                    type="number" value={inXNum} onChange={e => setInXNum(e.target.value)}
+                    type="number" aria-label="ベクトルOAの係数の分子" value={inXNum} onChange={e => setInXNum(e.target.value)}
                     placeholder="分子" required className="retro-input w-24 text-center font-mono text-base"
                   />
                   <div className="w-full h-px bg-slate-800"></div>
                   <input
-                    type="number" value={inXDen} onChange={e => setInXDen(e.target.value)}
+                    type="number" aria-label="ベクトルOAの係数の分母" value={inXDen} onChange={e => setInXDen(e.target.value)}
                     placeholder="分母(1)" className="retro-input w-24 text-center font-mono text-base placeholder:text-[10px]"
                   />
                 </div>
                 <MathEq math="\vec{\text{OA}} +" />
                 <div className="flex flex-col items-center gap-1 mx-2">
                   <input
-                    type="number" value={inYNum} onChange={e => setInYNum(e.target.value)}
+                    type="number" aria-label="ベクトルOBの係数の分子" value={inYNum} onChange={e => setInYNum(e.target.value)}
                     placeholder="分子" required className="retro-input w-24 text-center font-mono text-base"
                   />
                   <div className="w-full h-px bg-slate-800"></div>
                   <input
-                    type="number" value={inYDen} onChange={e => setInYDen(e.target.value)}
+                    type="number" aria-label="ベクトルOBの係数の分母" value={inYDen} onChange={e => setInYDen(e.target.value)}
                     placeholder="分母(1)" className="retro-input w-24 text-center font-mono text-base placeholder:text-[10px]"
                   />
                 </div>

@@ -8,6 +8,7 @@ import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { parseStrictInteger } from '@/src/lib/strictInteger';
 import { arePositiveIntegerRatiosEquivalent } from '@/src/lib/integerRatio';
+import { getCevaMasses } from '@/src/lib/menelausCeva';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -27,6 +28,12 @@ function gcd(x: number, y: number): number {
 
 type Pattern = 'pattern1' | 'pattern2' | 'pattern3' | 'pattern4';
 const mixedPatternPicker = new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+const strategyLabels: Record<Pattern, string> = {
+  pattern1: 'チェバの定理',
+  pattern2: 'メネラウスの定理（内側の比）',
+  pattern3: 'メネラウスの定理（外側の比）',
+  pattern4: '面積比を質量点で求める',
+};
 
 interface ProblemData {
   pattern: Pattern;
@@ -75,13 +82,8 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
     }
     else if (p === 'pattern4') {
       // Area ratio: Ceva. Find Area(PAB) : Area(ABC)
-      // mC = a*c, mB = b*c, mA = a*d
-      const mC = a * c;
-      const mB = b * c;
-      const mA = a * d;
-      const M = mC + mB + mA;
+      const { mC, total: areaABC } = getCevaMasses(a, b, c, d);
       const areaPAB = mC;
-      const areaABC = M;
       const g2 = gcd(areaPAB, areaABC);
       return { pattern: p, a, b, c, d, e, f, ansX: areaPAB / g2, ansY: areaABC / g2 };
     }
@@ -91,19 +93,25 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
 export default function MenelausCevaDrill() {
   const [selectedPattern, setSelectedPattern] = useState<Pattern | 'mix'>('mix');
   const [problem, setProblem] = useClientGeneratedState<ProblemData>(() => generateProblem('mix'));
+  const [selectedStrategy, setSelectedStrategy] = useState<Pattern | ''>('');
   
   const [ansX, setAnsX] = useState<string>('');
   const [ansY, setAnsY] = useState<string>('');
   
   const [hasChecked, setHasChecked] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
+  const [isRatioCorrect, setIsRatioCorrect] = useState(false);
+  const [isStrategyCorrect, setIsStrategyCorrect] = useState(true);
 
   const handleNext = () => {
     setProblem(generateProblem(selectedPattern));
+    setSelectedStrategy(selectedPattern === 'mix' ? '' : selectedPattern);
     setAnsX('');
     setAnsY('');
     setHasChecked(false);
     setIsCorrect(false);
+    setIsRatioCorrect(false);
+    setIsStrategyCorrect(true);
   };
 
   const handleCheck = () => {
@@ -114,11 +122,11 @@ export default function MenelausCevaDrill() {
     
     // allow multiples (e.g. 2:4 for 1:2 is correct geometrically, though we usually want simplest form)
     // we'll enforce simplest form or proportional. Let's do proportional.
-    if (ux !== null && uy !== null && arePositiveIntegerRatiosEquivalent(ux, uy, problem.ansX, problem.ansY)) {
-      setIsCorrect(true);
-    } else {
-      setIsCorrect(false);
-    }
+    const ratioCorrect = ux !== null && uy !== null && arePositiveIntegerRatiosEquivalent(ux, uy, problem.ansX, problem.ansY);
+    const strategyCorrect = selectedPattern !== 'mix' || selectedStrategy === problem.pattern;
+    setIsRatioCorrect(ratioCorrect);
+    setIsStrategyCorrect(strategyCorrect);
+    setIsCorrect(ratioCorrect && strategyCorrect);
     setHasChecked(true);
   };
 
@@ -130,7 +138,7 @@ export default function MenelausCevaDrill() {
     questionEl = (
       <>
         三角形ABCの内部の点Pを通る直線AD, BE, CFがある。<br/>
-        <MathEq math={`BD:DC = ${problem.a}:${problem.b}`} /> 、<MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
+        <MathEq math={`BD:DC = ${problem.a}:${problem.b},\\; CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
         <MathEq math="AF:FB" /> を求めよ。
       </>
     );
@@ -157,8 +165,8 @@ export default function MenelausCevaDrill() {
     questionEl = (
       <>
         三角形ABCの内部の点Pを通る直線AD, BE, CFがある。<br/>
-        <MathEq math={`BD:DC = ${problem.a}:${problem.b}`} /> 、<MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
-        面積比 <MathEq math="\\triangle PAB : \\triangle ABC" /> を求めよ。
+        <MathEq math={`BD:DC = ${problem.a}:${problem.b},\\; CE:EA = ${problem.c}:${problem.d}`} /> のとき、<br/>
+        面積比 <MathEq math="\triangle PAB : \triangle ABC" /> を求めよ。
       </>
     );
   }
@@ -205,12 +213,9 @@ export default function MenelausCevaDrill() {
     const F = getPt(A, B, problem.e, problem.f);
     const P = { x: 0, y: 0 }; // intersection of AD and BE
     // Just use mass points for P
-    const mA = problem.a * problem.d;
-    const mB = problem.b * problem.c;
-    const mC = problem.a * problem.c;
-    const M = mA + mB + mC;
-    P.x = (mA * A.x + mB * B.x + mC * C.x) / M;
-    P.y = (mA * A.y + mB * B.y + mC * C.y) / M;
+    const { mA, mB, mC, total } = getCevaMasses(problem.a, problem.b, problem.c, problem.d);
+    P.x = (mA * A.x + mB * B.x + mC * C.x) / total;
+    P.y = (mA * A.y + mB * B.y + mC * C.y) / total;
 
     // Draw triangle
     drawLine(A, B, "#334155", false, 2);
@@ -326,8 +331,9 @@ export default function MenelausCevaDrill() {
                 ■ 問題
               </h2>
               <select 
+                aria-label="練習する定理パターン"
                 value={selectedPattern}
-                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); }}
+                onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); setSelectedStrategy(pattern === 'mix' ? '' : pattern); setProblem(generateProblem(pattern)); setAnsX(''); setAnsY(''); setHasChecked(false); setIsCorrect(false); setIsRatioCorrect(false); setIsStrategyCorrect(true); }}
                 className="border p-1 text-xs"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
@@ -341,11 +347,28 @@ export default function MenelausCevaDrill() {
             <div className="bg-white p-6 border border-gray-300 rounded shadow-sm mb-6 flex flex-col justify-center min-h-[100px] gap-2 text-base font-bold text-slate-700 leading-relaxed">
               {questionEl}
             </div>
+
+            {selectedPattern === 'mix' ? (
+              <fieldset className="mb-6 rounded border border-gray-300 bg-white p-3 space-y-2">
+                <legend className="px-1 font-bold text-slate-700">問題の形から使う定理・方針を選んでください</legend>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {(Object.keys(strategyLabels) as Pattern[]).map(pattern => (
+                    <label key={pattern} className={`retro-btn-classic flex items-center gap-2 cursor-pointer ${selectedStrategy === pattern ? 'bg-blue-100 border-blue-400 font-bold' : ''}`}>
+                      <input type="radio" name="menelaus-ceva-strategy" value={pattern} checked={selectedStrategy === pattern} onChange={() => { setSelectedStrategy(pattern); setHasChecked(false); }} className="accent-blue-600" />
+                      {strategyLabels[pattern]}
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
+            ) : (
+              <p role="status" aria-live="polite" className="mb-6 text-center font-bold text-blue-800">基礎練習：{strategyLabels[selectedPattern]}に固定して繰り返します。</p>
+            )}
             
             <div className="space-y-4">
               <div className="flex items-center justify-center gap-2 text-xl font-bold">
                 <input 
                   type="number" 
+                  aria-label="求める比の左側"
                   className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansX} 
                   onChange={e => { setAnsX(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -353,6 +376,7 @@ export default function MenelausCevaDrill() {
                 <span>：</span>
                 <input 
                   type="number" 
+                  aria-label="求める比の右側"
                   className="w-16 bg-transparent border-b-2 outline-none text-center font-bold text-2xl text-slate-800 focus:border-blue-500" 
                   value={ansY} 
                   onChange={e => { setAnsY(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -363,6 +387,7 @@ export default function MenelausCevaDrill() {
             <div className="mt-8 flex flex-wrap gap-4 justify-center">
               <button 
                 onClick={handleCheck}
+                disabled={selectedPattern === 'mix' && selectedStrategy === ''}
                 className="retro-btn-classic bg-blue-100 border-blue-400 text-blue-800 font-bold px-6"
               >
                 解答する
@@ -376,8 +401,12 @@ export default function MenelausCevaDrill() {
             </div>
 
             {hasChecked && (
-              <div className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
-                {isCorrect ? '正解！見事な図形的直感です。' : '不正解... 定理の経路「頂点→分点→頂点」を確認しましょう。'}
+              <div role="status" aria-live="polite" className={`mt-4 p-3 border font-bold text-center ${isCorrect ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>
+                {isCorrect ? '正解！定理の選択も比の計算も合っています。' : <>
+                  {selectedPattern === 'mix' && !isStrategyCorrect && <>方針が不正解です。使うのは「{strategyLabels[problem.pattern]}」です。 </>}
+                  {!isRatioCorrect && <>比の答えは {problem.ansX}:{problem.ansY} です。</>}
+                  {isStrategyCorrect && isRatioCorrect && '正解です。'}
+                </>}
               </div>
             )}
           </div>
@@ -431,15 +460,15 @@ export default function MenelausCevaDrill() {
                       <MathEq math={`CE:EA = ${problem.c}:${problem.d}`} /> を満たすように全体を調整すると、各頂点の相対質量は以下のようになります。
                     </p>
                     <div className="bg-white p-2 text-center border">
-                      <MathEq math={`m_A = ${problem.a * problem.d}, \\quad m_B = ${problem.b * problem.c}, \\quad m_C = ${problem.a * problem.c}`} block />
+                      <MathEq math={`m_A = ${problem.a * problem.c}, \\quad m_B = ${problem.b * problem.d}, \\quad m_C = ${problem.a * problem.d}`} block />
                     </div>
                     <p>
-                      交点Pは三角形全体の重心になります。<br/>
+                      交点Pは、3頂点に置いた質量の重心（質量中心）になります。<br/>
                       実は、内部の三角形の面積比は<strong>対向する頂点の質量</strong>に比例します！
                     </p>
                     <div className="text-center">
                       <MathEq math={`\\triangle PAB : \\triangle ABC = m_C : (m_A + m_B + m_C)`} block />
-                      <MathEq math={`= ${problem.a * problem.c} : ${problem.a*problem.d + problem.b*problem.c + problem.a*problem.c}`} block />
+                      <MathEq math={`= ${problem.a * problem.d} : ${problem.a * problem.c + problem.b * problem.d + problem.a * problem.d}`} block />
                       <MathEq math={`= ${problem.ansX} : ${problem.ansY}`} block />
                     </div>
                   </div>

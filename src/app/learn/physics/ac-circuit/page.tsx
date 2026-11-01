@@ -115,6 +115,9 @@ export default function ACCircuitPage() {
         <p className="text-xs text-gray-500 mt-1">
           抵抗 R、自己インダクタンス L、電気容量 C を直列につないだ交流回路で、周波数や素子の大きさを変化させて電圧と電流の位相のズレを観察します。
         </p>
+        <Link href="/learn/physics/ac-circuit-drill" className="retro-btn-classic inline-flex mt-3">
+          交流回路の計算問題で練習する →
+        </Link>
       </div>
 
       {/* RLC直列回路の概略図 */}

@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { checkRationalizationAnswer, generateRationalizationProblem, parseRationalizationInteger } from '../src/lib/rationalizationProblem.ts';
+import { checkRationalizationAnswer, generateRationalizationProblem, isCorrectRationalizationConjugate, parseRationalizationInteger } from '../src/lib/rationalizationProblem.ts';
 
 const page = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/rationalization-drill/page.tsx'), 'utf8');
 for (const text of [
@@ -9,9 +9,18 @@ for (const text of [
   '基礎練習：足し算型だけ',
   '基礎練習：引き算型だけ',
   'checkRationalizationAnswer(problem',
+  'name="rationalization-conjugate-sign"',
+  'selectedConjugateSign !== \'\' && isCorrectRationalizationConjugate(problem, selectedConjugateSign)',
+  'mode === \'mix\' && (',
   'parseRationalizationInteger(ansA)',
   'aria-label="有理化の演習モード"',
+  'aria-label="√aの係数"',
+  'aria-label="最初の根号の中身"',
+  'aria-label="√bの係数"',
+  'aria-label="2つ目の根号の中身"',
+  '<span aria-hidden="true" className="font-serif">√</span>',
 ]) assert.ok(page.includes(text), `rationalization drill UI is missing ${text}`);
+assert.ok(!page.includes('<MathEq math="\\sqrt{"'), 'answer input must show an actual radical, not malformed KaTeX');
 
 function seeded(seed) {
   let state = seed >>> 0;
@@ -28,6 +37,8 @@ for (const [mode, expectedSign] of [['+', '+'], ['-', '-']]) {
     const problem = generateRationalizationProblem(mode, random);
     assert.equal(problem.denominatorSign, expectedSign);
     assert.equal(problem.answerSign, expectedSign === '+' ? '-' : '+');
+    assert.equal(isCorrectRationalizationConjugate(problem, problem.answerSign), true);
+    assert.equal(isCorrectRationalizationConjugate(problem, problem.denominatorSign), false, 'the original denominator sign is not its conjugate sign');
     assert.ok(problem.a > problem.b && problem.b >= 1 && problem.a <= 16);
     for (const radicand of [problem.a, problem.b]) {
       for (let factor = 2; factor * factor <= radicand; factor += 1) {

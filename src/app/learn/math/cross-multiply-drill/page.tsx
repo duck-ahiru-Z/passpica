@@ -199,6 +199,7 @@ export default function CrossMultiplyDrillPage() {
                 value={selectedPattern}
                 onChange={e => { const pattern = e.target.value as Pattern | 'mix'; setSelectedPattern(pattern); handleNext(pattern); }}
                 className="border p-1 text-xs"
+                aria-label="たすき掛け因数分解の出題パターン"
               >
                 <option value="mix">ミックスモード (ランダム)</option>
                 <option value="pattern1">パターン1 (全てプラス)</option>
@@ -217,16 +218,16 @@ export default function CrossMultiplyDrillPage() {
                 以下の形に因数分解しなさい。
               </div>
               <div className="flex items-center justify-center gap-1 text-lg">
-                <input type="number" className="w-10 border p-1 text-center font-bold bg-yellow-50" value={ansK} onChange={e => { setAnsK(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="k" />
+                <input type="number" className="w-10 border p-1 text-center font-bold bg-yellow-50" value={ansK} onChange={e => { setAnsK(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="k" aria-label="先頭にくくり出す数 k。ない場合は空欄または1" />
                 (
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansP} onChange={e => { setAnsP(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="p" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansP} onChange={e => { setAnsP(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="p" aria-label="左の因数の x の係数 p" />
                 <MathEq math="x +" />
-                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansQ} onChange={e => { setAnsQ(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="q" />
+                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansQ} onChange={e => { setAnsQ(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="q" aria-label={problem.hasY ? "左の因数の y の係数 q" : "左の因数の定数項 q"} />
                 {problem.hasY && <MathEq math="y" />}
                 ) (
-                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansR} onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="r" />
+                <input type="number" className="w-10 border p-1 text-center font-bold" value={ansR} onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="r" aria-label="右の因数の x の係数 r" />
                 <MathEq math="x +" />
-                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansS} onChange={e => { setAnsS(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="s" />
+                <input type="number" className="w-12 border p-1 text-center font-bold" value={ansS} onChange={e => { setAnsS(e.target.value); setHasChecked(false); setIsCorrect(false); }} placeholder="s" aria-label={problem.hasY ? "右の因数の y の係数 s" : "右の因数の定数項 s"} />
                 {problem.hasY && <MathEq math="y" />}
                 )
               </div>

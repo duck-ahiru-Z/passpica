@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { getQuadraticInequalityAnswerType, getQuadraticInequalityRegion, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign } from '../src/lib/quadraticInequality.ts';
+import { getQuadraticInequalityAnswerType, getQuadraticInequalityRegion, getQuadraticInequalityRootLabelBaselines, parseQuadraticInequalityFraction, reverseQuadraticInequalitySign } from '../src/lib/quadraticInequality.ts';
 import { generateQuadraticInequalityProblem } from '../src/lib/quadraticInequalityProblems.ts';
 
 const drillPage = fs.readFileSync(path.join(process.cwd(), 'src/app/learn/math/quadratic-inequality-drill/page.tsx'), 'utf8');
@@ -21,6 +21,17 @@ if (!drillPage.includes('const normalizedSign = problem.a < 0 ? reverseQuadratic
 }
 if (!drillPage.includes('transformedB === 0 ?')) {
   throw new Error('normalized quadratic explanations must omit the x-term when its coefficient is zero');
+}
+if (!drillPage.includes('ctx.measureText(text).width') || !drillPage.includes('labelBaselines[index]')) {
+  throw new Error('quadratic-inequality root labels must adapt to measured horizontal overlap');
+}
+const closeRootBaselines = getQuadraticInequalityRootLabelBaselines([{ x: 100, width: 22 }, { x: 122, width: 22 }], 200);
+if (closeRootBaselines[0] !== 200 || closeRootBaselines[1] <= closeRootBaselines[0]) {
+  throw new Error('overlapping root labels must be staggered vertically');
+}
+const separatedRootBaselines = getQuadraticInequalityRootLabelBaselines([{ x: 100, width: 22 }, { x: 180, width: 22 }], 200);
+if (separatedRootBaselines.some(baseline => baseline !== 200)) {
+  throw new Error('well-separated root labels must retain their shared baseline');
 }
 for (const [sign, boundary, side] of [['<', '0未満', '下'], ['\\le', '0以下', '下'], ['>', '0より大きい（0超）', '上'], ['\\ge', '0以上', '上']]) {
   const region = getQuadraticInequalityRegion(sign);

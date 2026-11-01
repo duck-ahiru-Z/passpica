@@ -6,7 +6,7 @@ import katex from 'katex';
 import 'katex/dist/katex.min.css';
 import { BalancedRandom } from '@/src/lib/balancedRandom';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
-import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs } from '@/src/lib/complexPolarExact';
+import { formatExactTrigComponent, formatPolarAngle, getSupportedPolarAnglePairs, getUniformNonFirstQuadrantSigns, isExactComponentAnswerCorrect, isPolarAngleAnswerCorrect } from '@/src/lib/complexPolarExact';
 
 function MathEq({ math, block = false }: { math: string; block?: boolean }) {
   const html = katex.renderToString(math, { displayMode: block, throwOnError: false });
@@ -77,9 +77,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       let signY = 1;
       
       if (p === 'pattern2') {
-        signX = Math.random() > 0.5 ? 1 : -1;
-        signY = Math.random() > 0.5 ? 1 : -1;
-        if (signX === 1 && signY === 1) signX = -1; // force quad II-IV
+        [signX, signY] = getUniformNonFirstQuadrantSigns();
       }
       
       const finalX = x * signX;
@@ -112,11 +110,11 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (thDisplay.startsWith("1\\pi")) thDisplay = thDisplay.replace("1\\pi", "\\pi");
       if (thDisplay.includes("/")) {
         const pts = thDisplay.split("/");
-        thDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
+        thDisplay = `\\frac{${pts[1]}}{${pts[0]}}`;
       }
       
       const expLines = [
-        `r = \\sqrt{(${finalXS})^2 + (${finalYS})^2} = ${rStr}`,
+        `r = \\sqrt{${finalXS.startsWith('-') ? `(${finalXS})` : finalXS}^2 + ${finalYS.startsWith('-') ? `(${finalYS})` : finalYS}^2} = ${rStr}`,
         `\\cos\\theta = \\frac{${finalXS}}{${rStr}}, \\quad \\sin\\theta = \\frac{${finalYS}}{${rStr}}`,
         `0 \\le \\theta < 2\\pi \\text{ の範囲でこれを満たす } \\theta \\text{ は } ${thDisplay}`,
         `\\text{よって極形式は } z = ${rStr}\\left(\\cos ${thDisplay} + i\\sin ${thDisplay}\\right)`
@@ -141,7 +139,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (thDisplay === "0") thDisplay = "0";
       else if (thDisplay.includes("/")) {
         const pts = thDisplay.split("/");
-        thDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
+        thDisplay = `\\frac{${pts[1]}}{${pts[0]}}`;
       }
       
       const expLines = [
@@ -234,7 +232,7 @@ function generateProblem(selectedPattern: Pattern | 'mix'): ProblemData {
       if (finalThDisplay.startsWith("1\\pi")) finalThDisplay = finalThDisplay.replace("1\\pi", "\\pi");
       if (finalThDisplay.includes("/")) {
         const pts = finalThDisplay.split("/");
-        finalThDisplay = `\\frac{${pts[0]}}{${pts[1]}}`;
+        finalThDisplay = `\\frac{${pts[1]}}{${pts[0]}}`;
       }
       if (finalThDisplay === "0") finalThDisplay = "0";
 
@@ -278,25 +276,16 @@ export default function ComplexPolarDrill() {
     setIsCorrect(false);
   };
 
-  const cleanAns = (s: string) => s.trim().replace(/\s+/g, '').replace(/\\/g, '');
-
   const handleCheck = () => {
     if (!problem) return;
     
     let isOk = false;
     if (problem.pattern.startsWith('pattern4-')) {
-      const uA = cleanAns(ansA);
-      const pA = cleanAns(problem.ansA!);
-      const uB = cleanAns(ansB);
-      const pB = cleanAns(problem.ansB!);
-      // handle simple numeric matches as well if no sqrt
-      if (uA === pA && uB === pB) isOk = true;
+      if (isExactComponentAnswerCorrect(ansA, problem.ansA!)
+        && isExactComponentAnswerCorrect(ansB, problem.ansB!)) isOk = true;
     } else {
-      const uR = cleanAns(ansR);
-      const pR = cleanAns(problem.ansR!);
-      const uTh = cleanAns(ansTheta).toLowerCase();
-      const pTh = cleanAns(problem.ansTheta!);
-      if (uR === pR && (uTh === pTh || (uTh === "0" && pTh === "2pi") || (uTh === "2pi" && pTh === "0"))) {
+      if (isExactComponentAnswerCorrect(ansR, problem.ansR!)
+        && isPolarAngleAnswerCorrect(ansTheta, problem.ansTheta!)) {
         isOk = true;
       }
     }
@@ -441,6 +430,7 @@ export default function ComplexPolarDrill() {
               </h2>
               <select 
                 value={selectedPattern}
+                aria-label="複素数平面の演習パターン"
                 onChange={e => {
                   const nextPattern = e.target.value as Pattern | 'mix';
                   setSelectedPattern(nextPattern);
@@ -474,6 +464,7 @@ export default function ComplexPolarDrill() {
                   <div className="flex items-center gap-2 text-xl">
                     <input 
                       type="text" 
+                      aria-label="答えの実部 a"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansA} 
                       onChange={e => { setAnsA(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -482,6 +473,7 @@ export default function ComplexPolarDrill() {
                     <span>+</span>
                     <input 
                       type="text" 
+                      aria-label="答えの虚部 b"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansB} 
                       onChange={e => { setAnsB(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -489,7 +481,7 @@ export default function ComplexPolarDrill() {
                     />
                     <span>i</span>
                   </div>
-                  <span className="text-[10px] text-gray-400 mt-1">※ルートは \sqrt&#123;3&#125; と入力</span>
+                  <span className="text-[10px] text-gray-400 mt-1">※平方根は sqrt(2) のように入力</span>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center gap-4 font-bold border-t pt-4">
@@ -497,6 +489,7 @@ export default function ComplexPolarDrill() {
                     <span><MathEq math="r =" /></span>
                     <input 
                       type="text" 
+                      aria-label="極形式の絶対値 r"
                       className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
                       value={ansR} 
                       onChange={e => { setAnsR(e.target.value); setHasChecked(false); setIsCorrect(false); }}
@@ -507,13 +500,14 @@ export default function ComplexPolarDrill() {
                     <span><MathEq math="\theta =" /></span>
                     <input 
                       type="text" 
-                      className="w-24 bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500" 
+                      aria-label="極形式の偏角 θ"
+                      className="w-36 max-w-[40vw] bg-transparent border-b-2 outline-none text-center font-bold text-slate-800 focus:border-blue-500"
                       value={ansTheta} 
                       onChange={e => { setAnsTheta(e.target.value); setHasChecked(false); setIsCorrect(false); }}
                       placeholder="偏角"
                     />
                   </div>
-                  <span className="text-[10px] text-gray-400">※ \sqrt&#123;2&#125; や 5pi/6 などを入力</span>
+                  <span className="text-[10px] text-gray-400">※ r は sqrt(2)・3sqrt(2)、θ は 5pi/6 や 2.618（ラジアン）などを入力</span>
                 </div>
               )}
             </div>

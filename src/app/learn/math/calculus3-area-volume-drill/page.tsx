@@ -46,7 +46,11 @@ export default function Calculus3AreaVolumeDrillPage() {
           <button onClick={() => setChecked(true)} disabled={!strategy || answer.trim() === ''} className="retro-btn-classic bg-blue-100 border-blue-400 font-bold disabled:opacity-50 disabled:cursor-not-allowed">解答する</button>
           <button onClick={() => next()} className="retro-btn-classic">次の問題へ ➔</button>
         </div>
-        {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : <>不正解。{!strategyIsCorrect && <>方針は「{geometryLabels[problem.pattern]}」です。 </>}{!valueIsCorrect && <>答えは約 {problem.answer.toFixed(3)} です。</>}</>}<div className="mt-2 font-normal text-slate-700">{getGeometryExplanation(problem, strategy)}</div></div>}
+        {checked && <div role="status" aria-live="polite" className={`p-3 border text-center font-bold ${correct ? 'bg-emerald-100 border-emerald-400 text-emerald-800' : 'bg-red-100 border-red-400 text-red-800'}`}>{correct ? '正解！' : <>
+          不正解。
+          {!strategyIsCorrect ? <>方針は「{geometryLabels[problem.pattern]}」が適切です。 </> : <>方針は合っています。 </>}
+          {valueIsCorrect ? '数値は合っています。' : <>答えは約 {problem.answer.toFixed(3)} です。</>}
+        </>}<div className="mt-2 font-normal text-slate-700">{getGeometryExplanation(problem, strategy)}</div></div>}
       </section>
     </main>
   );

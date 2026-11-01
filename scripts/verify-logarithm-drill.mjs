@@ -66,5 +66,11 @@ assert.equal(longestRun, 1, 'mixed practice should not repeat the same strategy 
 
 const page = fs.readFileSync('src/app/learn/math/logarithm-drill/page.tsx', 'utf8');
 assert.ok(page.includes('generateLogarithmProblem'), 'page must use the tested production generator');
+assert.ok(page.includes('aria-label="対数計算の演習パターン"'), 'the logarithm mode selector must have an accessible name');
+assert.ok(page.includes('aria-label="対数計算の答え"'), 'the logarithm answer input must have an accessible name');
+assert.ok(page.includes('<ExplanationLine value={line} />'), 'Japanese explanation prose must stay outside KaTeX math mode');
+assert.ok(page.includes("selectedPattern === 'mix' && ("), 'mixed mode must require explicit strategy selection');
+assert.ok(page.includes('selectedStrategy === problem.pattern'), 'mixed answers must validate the selected strategy as well as the numeric result');
+assert.ok(page.includes('name="logarithm-strategy"'), 'strategy choices must be grouped as one accessible radio set');
 for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `${pattern} must be individually selectable`);
 console.log('Logarithm mixed mode verified: 20,000 questions, exactly 5,000 per pattern, with no adjacent strategy repeats.');

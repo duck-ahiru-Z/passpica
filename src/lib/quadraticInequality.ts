@@ -1,6 +1,25 @@
 export type QuadraticInequalitySign = '<' | '>' | '\\le' | '\\ge';
 export type QuadraticInequalityAnswerType = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 
+export function getQuadraticInequalityRootLabelBaselines(
+  labels: Array<{ x: number; width: number }>,
+  baseY: number,
+  verticalGap = 14,
+  horizontalPadding = 6,
+): number[] {
+  const baselines = labels.map(() => baseY);
+  if (labels.length < 2) return baselines;
+
+  const ordered = labels.map((label, index) => ({ ...label, index })).sort((left, right) => left.x - right.x);
+  for (let index = 1; index < ordered.length; index += 1) {
+    const previous = ordered[index - 1];
+    const current = ordered[index];
+    const minimumDistance = (previous.width + current.width) / 2 + horizontalPadding;
+    if (current.x - previous.x < minimumDistance) baselines[current.index] = baselines[previous.index] + verticalGap;
+  }
+  return baselines;
+}
+
 export function reverseQuadraticInequalitySign(sign: QuadraticInequalitySign): QuadraticInequalitySign {
   switch (sign) {
     case '<': return '>';

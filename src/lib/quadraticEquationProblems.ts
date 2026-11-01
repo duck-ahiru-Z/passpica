@@ -52,7 +52,9 @@ export function generateQuadraticEquationProblem(
   if (pattern === 'factorization') {
     let first = integer(random, -5, 5);
     let second = integer(random, -5, 5);
-    while (first === 0 || second === 0 || first === second) {
+    // Keep the factorization pattern distinct from direct square-root problems:
+    // symmetric roots produce x² = k and make both strategies equally natural.
+    while (first === 0 || second === 0 || first === second || first === -second) {
       first = integer(random, -5, 5);
       second = integer(random, -5, 5);
     }

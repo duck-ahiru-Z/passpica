@@ -28,6 +28,16 @@ for (const slug of ['euclidean-algorithm-drill', 'permutation-combination-drill'
   if (!page.includes('parseStrictPositiveInteger(ansVal)') || page.includes('parseInt(ansVal)')) {
     throw new Error(`${slug} must reject malformed integer answers instead of truncating them`);
   }
+  if (slug === 'permutation-combination-drill') {
+    for (const text of [
+      'aria-label="場合の数の演習パターン"',
+      'aria-label="場合の数の答え"',
+      'role="img"',
+      'aria-label={diagramDescription}',
+    ]) {
+      if (!page.includes(text)) throw new Error(`permutation-combination-drill is missing ${text}`);
+    }
+  }
 }
 
 console.log(`Strict positive integer input verified: ${cases.length} parser cases and both affected drills reject truncating parseInt answers.`);

@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useClientGeneratedState } from '@/src/lib/useClientGeneratedState';
 import { generateMetalIonProblem, metalIonLabels, metalIonPatterns, type MetalIonMode, type MetalIonProblem } from '@/src/lib/metalIonDrill';
 
-const answerOptions = ['Ag⁺・Pb²⁺', 'Cu²⁺', 'Fe³⁺・Al³⁺', 'Zn²⁺', 'Ca²⁺', '炎色反応・黄色'];
+const answerOptions = ['Ag⁺・Pb²⁺', 'AgCl残渣・PbCl₂再沈殿', 'Cu²⁺', 'Fe³⁺・Al³⁺', 'Zn²⁺', 'Ca²⁺', '炎色反応・黄色'];
 
 export default function MetalIonDrillPage() {
   const [mode, setMode] = useState<MetalIonMode>('mix');

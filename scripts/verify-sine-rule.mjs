@@ -71,5 +71,6 @@ for (const pattern of patterns) assert.ok(page.includes(`value="${pattern}"`), `
 assert.ok(page.includes('generateSineRuleProblem'), 'the UI must use the tested production generator');
 assert.ok(page.includes('は鋭角なので'), 'pattern 3 explanation must identify the acute-angle condition it relies on');
 assert.ok(page.includes('aria-label={`外接円上の三角形ABC'), 'the triangle canvas must have an angle-aware accessible description');
+assert.ok(page.includes("aria-label={problem.pattern === 'pattern3' ? '求める角Bの大きさ（度）' : '最大角の大きさ（度）'}"), 'the angle input must have a pattern-specific accessible name');
 
 console.log('Sine-rule drill verified: 4 patterns × 2,000 formula-checked questions; every side matches 2R sin(angle), pattern 3 has acute B, ratio diagram labels match; mixed 20,000 balanced with no repeats.');

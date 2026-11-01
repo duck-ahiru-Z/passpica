@@ -22,7 +22,12 @@ export default function MotionCalculationDrillPage() {
   return <main className="max-w-3xl mx-auto px-4 py-8 text-slate-800 font-sans text-sm">
     <div className="flex flex-wrap gap-x-4 gap-y-1">
       <Link href="/drill" className="text-blue-600 hover:underline">← 無限演習ポータルへ戻る</Link>
+      <Link href="/learn/physics/motion-visual" className="text-blue-600 hover:underline">等加速度運動ビジュアルへ →</Link>
+      <Link href="/learn/physics/spring-visual" className="text-blue-600 hover:underline">ばねの弾性力ビジュアルへ →</Link>
+      <Link href="/learn/physics/simple-harmonic-visual" className="text-blue-600 hover:underline">単振動ビジュアルへ →</Link>
       <Link href="/learn/physics/projectile-visual" className="text-blue-600 hover:underline">投射運動ビジュアルへ →</Link>
+      <Link href="/learn/physics/impulse-momentum-visual" className="text-blue-600 hover:underline">力積と運動量変化のビジュアルへ →</Link>
+      <Link href="/learn/physics/circular-motion-visual" className="text-blue-600 hover:underline">等速円運動ビジュアルへ →</Link>
     </div>
     <h1 className="text-xl md:text-2xl font-bold border-b border-gray-300 pb-2 my-3">物理 力学・計算ドリル</h1>
     <p className="text-gray-500 mb-6">問題の条件から使う公式を選び、数値まで計算します。公式別の基礎練習と、全パターンを混ぜた実戦練習を切り替えられます。</p>

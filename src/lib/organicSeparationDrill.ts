@@ -5,7 +5,7 @@ export type OrganicSeparationMode = OrganicSeparationPattern | 'mix';
 export type OrganicSeparationProblem = { pattern: OrganicSeparationPattern; prompt: string; answer: string; explanation: string };
 export const organicSeparationPatterns: readonly OrganicSeparationPattern[] = ['aniline', 'benzoicAcid', 'phenol'];
 export const organicSeparationLabels: Record<OrganicSeparationPattern, string> = {
-  aniline: '塩酸でアニリンを抽出', benzoicAcid: '炭酸水素ナトリウムで安息香酸を抽出', phenol: '水酸化ナトリウムでフェノールを抽出',
+  aniline: 'HClによるアニリンの抽出', benzoicAcid: 'NaHCO₃による安息香酸の抽出', phenol: 'NaOHによるフェノールの抽出',
 };
 const problemData: Record<OrganicSeparationPattern, OrganicSeparationProblem> = {
   aniline: {

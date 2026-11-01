@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { generateCosineRuleAmbiguousTriangle, getCosineRuleAmbiguousTriangleCount } from '../src/lib/cosineRuleAmbiguous.ts';
+import { BalancedRandom } from '../src/lib/balancedRandom.ts';
 
 // Reproduce each supported angle/side coefficient case from the production generator.
 // For pattern 4, verify the quadratic coefficient is 2b cos(A), including radicals.
@@ -37,6 +38,11 @@ assert.ok(production.includes('a2 = triangle.opposite * triangle.opposite'), 'pa
 assert.ok(production.includes('generateCosineRuleAmbiguousTriangle'), 'pattern 4 must use its directly tested production generator');
 assert.ok(production.includes('ansTerms!.length > 1'), 'pattern 4 must support both valid positive roots');
 assert.ok(production.includes('余弦定理の適用'), 'checked answers must show a solution explanation');
+assert.ok(production.includes("new BalancedRandom<Pattern>(['pattern1', 'pattern2', 'pattern3', 'pattern4'])"), 'mixed practice must schedule all four patterns evenly');
+assert.ok(production.includes('mixedPatternPicker.next()'), 'mixed practice must use the balanced scheduler');
+assert.ok(production.includes('label={problem.pattern === \'pattern4\' ? \'辺cの解（1つ目）\' : \'辺aの長さ\'}'), 'side answer input must identify the requested side');
+assert.ok(production.includes('label="辺cの解（2つ目）"'), 'second ambiguous root input must be distinguishable');
+assert.ok(production.includes('aria-label="角Aの大きさ（度）"'), 'angle answer input must have an accessible name');
 
 const simplify = n => {
   let value = n;
@@ -50,6 +56,12 @@ const random = () => {
   seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
   return seed / 4294967296;
 };
+const picker = new BalancedRandom(['pattern1', 'pattern2', 'pattern3', 'pattern4']);
+const mixed = Array.from({ length: 20_000 }, () => picker.next(random));
+const patternCounts = new Map([...new Set(mixed)].map(pattern => [pattern, mixed.filter(item => item === pattern).length]));
+assert.equal(patternCounts.size, 4, 'all patterns must appear in mixed practice');
+assert.ok([...patternCounts.values()].every(count => count === 5_000), 'mixed practice must give each pattern equal frequency');
+assert.ok(mixed.every((pattern, index) => index === 0 || pattern !== mixed[index - 1]), 'mixed practice must avoid adjacent repeats');
 const seenPattern4 = new Set();
 for (let index = 0; index < 10_000; index += 1) {
   const triangle = generateCosineRuleAmbiguousTriangle(random);
